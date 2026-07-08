@@ -13,8 +13,7 @@ from typing import Any, Callable
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-WORKSPACE_ROOT = PROJECT_ROOT.parent
-DEFAULT_CORPUS_DIR = WORKSPACE_ROOT / "synth-pipeline" / "output" / "corpus"
+DEFAULT_CORPUS_DIR = PROJECT_ROOT / "data" / "corpus"
 
 
 def log_path() -> Path | None:

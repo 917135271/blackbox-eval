@@ -11,8 +11,7 @@ from typing import Any, Callable
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-WORKSPACE_ROOT = PROJECT_ROOT.parent
-DEFAULT_DB_PATH = WORKSPACE_ROOT / "synth-pipeline" / "output" / "data" / "expense.db"
+DEFAULT_DB_PATH = PROJECT_ROOT / "data" / "expense.db"
 PAGE_SIZE = 50
 
 
