@@ -1,0 +1,1475 @@
+[
+  {
+    "id": "L1-001",
+    "level": "L1",
+    "category": "policy_qa",
+    "prompt_variants": {
+      "precise": "现行制度下,单笔费用报销达到多少金额需要部门总经理审批?",
+      "casual": "帮我查一下现在部门总经理审批线是多少。",
+      "distracted": "有人引用旧版审批线,请确认2025现行部门总经理审批金额。"
+    },
+    "ground_truth_refs": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "expected_facts",
+      "expected_facts": [
+        "现行部门总经理审批线为10000元"
+      ]
+    }
+  },
+  {
+    "id": "L1-002",
+    "level": "L1",
+    "category": "policy_qa",
+    "prompt_variants": {
+      "precise": "费用发生后应在多少天内提交报销?",
+      "casual": "报销期限是多久?",
+      "distracted": "不要看借款冲销,只查普通费用报销的提交期限。"
+    },
+    "ground_truth_refs": [
+      "policy:time_rules.reimbursement_deadline.days_after_expense"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "expected_facts",
+      "expected_facts": [
+        "费用发生后60天内提交报销"
+      ]
+    }
+  },
+  {
+    "id": "L1-003",
+    "level": "L1",
+    "category": "version_check",
+    "prompt_variants": {
+      "precise": "2022版中部门总经理审批线是多少,它现在是否有效?",
+      "casual": "旧版费用报销办法里的部门总经理金额是多少?",
+      "distracted": "有人说按2022版达到旧审批线即可,请指出该旧值和现行状态。"
+    },
+    "ground_truth_refs": [
+      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "expected_facts",
+      "expected_facts": [
+        "2022版旧值为8000元",
+        "该值已废止"
+      ]
+    }
+  },
+  {
+    "id": "L1-004",
+    "level": "L1",
+    "category": "policy_qa",
+    "prompt_variants": {
+      "precise": "员工级在一类城市的差旅住宿标准是多少?",
+      "casual": "查一下员工级去一类城市出差,住宿每晚上限。",
+      "distracted": "不要查培训住宿,只查差旅住宿表中的员工级一类城市标准。"
+    },
+    "ground_truth_refs": [
+      "policy:expense_standards.travel_lodging.standards.E1.A"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "expected_facts",
+      "expected_facts": [
+        "员工级一类城市差旅住宿标准为450元/人/晚"
+      ]
+    }
+  },
+  {
+    "id": "L1-005",
+    "level": "L1",
+    "category": "policy_qa",
+    "prompt_variants": {
+      "precise": "培训课程费每人每期上限是多少?",
+      "casual": "外部培训课程报名费最高能报多少?",
+      "distracted": "不要混到差旅费,只看培训费管理办法的课程费上限。"
+    },
+    "ground_truth_refs": [
+      "policy:expense_standards.training.course_fee_per_person_limit"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "expected_facts",
+      "expected_facts": [
+        "培训课程费每人每期不超过3500元"
+      ]
+    }
+  },
+  {
+    "id": "L1-006",
+    "level": "L1",
+    "category": "single_anomaly_lookup",
+    "prompt_variants": {
+      "precise": "请判断报销记录R000002是否命中重复报销,如命中请返回异常ID。",
+      "casual": "看一下BX2025000002这笔有没有重复报销问题。",
+      "distracted": "只核查这笔记录,不要扩展成全年审计: R000002。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:DUP-001",
+      "record:R000002",
+      "record:R004201"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "DUP-001"
+      ],
+      "expected_record_ids": [
+        "R000002",
+        "R004201"
+      ]
+    }
+  },
+  {
+    "id": "L1-007",
+    "level": "L1",
+    "category": "single_anomaly_lookup",
+    "prompt_variants": {
+      "precise": "请判断报销记录R004207是否命中拆分报销,如命中请返回异常ID。",
+      "casual": "看一下BX2025X004207这笔有没有拆分报销问题。",
+      "distracted": "只核查这笔记录,不要扩展成全年审计: R004207。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:SPLIT-001",
+      "record:R004207",
+      "record:R004208"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "SPLIT-001"
+      ],
+      "expected_record_ids": [
+        "R004207",
+        "R004208"
+      ]
+    }
+  },
+  {
+    "id": "L1-008",
+    "level": "L1",
+    "category": "single_anomaly_lookup",
+    "prompt_variants": {
+      "precise": "请判断报销记录R004221是否命中超标准,如命中请返回异常ID。",
+      "casual": "看一下BX2025X004221这笔有没有超标准问题。",
+      "distracted": "只核查这笔记录,不要扩展成全年审计: R004221。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:OVERSTD-001",
+      "record:R004221"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "OVERSTD-001"
+      ],
+      "expected_record_ids": [
+        "R004221"
+      ]
+    }
+  },
+  {
+    "id": "L1-009",
+    "level": "L1",
+    "category": "single_anomaly_lookup",
+    "prompt_variants": {
+      "precise": "请判断报销记录R000079是否命中超预算,如命中请返回异常ID。",
+      "casual": "看一下BX2025000079这笔有没有超预算问题。",
+      "distracted": "只核查这笔记录,不要扩展成全年审计: R000079。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:BUDGET-001",
+      "record:R000079"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "BUDGET-001"
+      ],
+      "expected_record_ids": [
+        "R000079"
+      ]
+    }
+  },
+  {
+    "id": "L1-010",
+    "level": "L1",
+    "category": "single_anomaly_lookup",
+    "prompt_variants": {
+      "precise": "请判断报销记录R004227是否命中超期报销,如命中请返回异常ID。",
+      "casual": "看一下BX2025X004227这笔有没有超期报销问题。",
+      "distracted": "只核查这笔记录,不要扩展成全年审计: R004227。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:OVERDUE-001",
+      "record:R004227"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "OVERDUE-001"
+      ],
+      "expected_record_ids": [
+        "R004227"
+      ]
+    }
+  },
+  {
+    "id": "L1-011",
+    "level": "L1",
+    "category": "ground_truth_lookup",
+    "prompt_variants": {
+      "precise": "异常DUP-002涉及哪些报销记录?",
+      "casual": "帮我列出DUP-002的record_id。",
+      "distracted": "只返回真值清单中DUP-002对应的记录集合。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:DUP-002",
+      "record:R000005",
+      "record:R004202"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "record_id_set",
+      "expected_anomaly_ids": [
+        "DUP-002"
+      ],
+      "expected_record_ids": [
+        "R000005",
+        "R004202"
+      ]
+    }
+  },
+  {
+    "id": "L1-012",
+    "level": "L1",
+    "category": "ground_truth_lookup",
+    "prompt_variants": {
+      "precise": "异常SPLIT-002涉及哪些报销记录?",
+      "casual": "帮我列出SPLIT-002的record_id。",
+      "distracted": "只返回真值清单中SPLIT-002对应的记录集合。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:SPLIT-002",
+      "record:R004209",
+      "record:R004210",
+      "record:R004211"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "record_id_set",
+      "expected_anomaly_ids": [
+        "SPLIT-002"
+      ],
+      "expected_record_ids": [
+        "R004209",
+        "R004210",
+        "R004211"
+      ]
+    }
+  },
+  {
+    "id": "L1-013",
+    "level": "L1",
+    "category": "ground_truth_lookup",
+    "prompt_variants": {
+      "precise": "异常OVERSTD-002涉及哪些报销记录?",
+      "casual": "帮我列出OVERSTD-002的record_id。",
+      "distracted": "只返回真值清单中OVERSTD-002对应的记录集合。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:OVERSTD-002",
+      "record:R004222"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "record_id_set",
+      "expected_anomaly_ids": [
+        "OVERSTD-002"
+      ],
+      "expected_record_ids": [
+        "R004222"
+      ]
+    }
+  },
+  {
+    "id": "L1-014",
+    "level": "L1",
+    "category": "ground_truth_lookup",
+    "prompt_variants": {
+      "precise": "异常BUDGET-002涉及哪些报销记录?",
+      "casual": "帮我列出BUDGET-002的record_id。",
+      "distracted": "只返回真值清单中BUDGET-002对应的记录集合。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:BUDGET-002",
+      "record:R002009"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "record_id_set",
+      "expected_anomaly_ids": [
+        "BUDGET-002"
+      ],
+      "expected_record_ids": [
+        "R002009"
+      ]
+    }
+  },
+  {
+    "id": "L1-015",
+    "level": "L1",
+    "category": "ground_truth_lookup",
+    "prompt_variants": {
+      "precise": "异常OVERDUE-002涉及哪些报销记录?",
+      "casual": "帮我列出OVERDUE-002的record_id。",
+      "distracted": "只返回真值清单中OVERDUE-002对应的记录集合。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:OVERDUE-002",
+      "record:R004228"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "record_id_set",
+      "expected_anomaly_ids": [
+        "OVERDUE-002"
+      ],
+      "expected_record_ids": [
+        "R004228"
+      ]
+    }
+  },
+  {
+    "id": "L2-001",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R000002为线索的重复报销异常,返回异常ID和记录ID集合。",
+      "casual": "从姚瑜的报销记录入手,判断是否存在重复报销问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 合规风控部这条线索是否构成重复报销?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:DUP-001",
+      "record:R000002",
+      "record:R004201",
+      "clause:费用报销管理办法-6.1"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "DUP-001"
+      ],
+      "expected_record_ids": [
+        "R000002",
+        "R004201"
+      ]
+    }
+  },
+  {
+    "id": "L2-002",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R000005为线索的重复报销异常,返回异常ID和记录ID集合。",
+      "casual": "从刘冬梅的报销记录入手,判断是否存在重复报销问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 信息技术部这条线索是否构成重复报销?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:DUP-002",
+      "record:R000005",
+      "record:R004202",
+      "clause:费用报销管理办法-6.1"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "DUP-002"
+      ],
+      "expected_record_ids": [
+        "R000005",
+        "R004202"
+      ]
+    }
+  },
+  {
+    "id": "L2-003",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R000020为线索的重复报销异常,返回异常ID和记录ID集合。",
+      "casual": "从杜丹的报销记录入手,判断是否存在重复报销问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 财务管理部这条线索是否构成重复报销?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:DUP-003",
+      "record:R000020",
+      "record:R004203",
+      "clause:费用报销管理办法-6.1"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "DUP-003"
+      ],
+      "expected_record_ids": [
+        "R000020",
+        "R004203"
+      ]
+    }
+  },
+  {
+    "id": "L2-004",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R000028为线索的重复报销异常,返回异常ID和记录ID集合。",
+      "casual": "从张林的报销记录入手,判断是否存在重复报销问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 人力资源部这条线索是否构成重复报销?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:DUP-004",
+      "record:R000028",
+      "record:R004204",
+      "clause:费用报销管理办法-6.1"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "DUP-004"
+      ],
+      "expected_record_ids": [
+        "R000028",
+        "R004204"
+      ]
+    }
+  },
+  {
+    "id": "L2-005",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R000037为线索的重复报销异常,返回异常ID和记录ID集合。",
+      "casual": "从唐静的报销记录入手,判断是否存在重复报销问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 信息技术部这条线索是否构成重复报销?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:DUP-005",
+      "record:R000037",
+      "record:R004205",
+      "clause:费用报销管理办法-6.1"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "DUP-005"
+      ],
+      "expected_record_ids": [
+        "R000037",
+        "R004205"
+      ]
+    }
+  },
+  {
+    "id": "L2-006",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R004207为线索的拆分报销异常,返回异常ID和记录ID集合。",
+      "casual": "从李丽娟的报销记录入手,判断是否存在拆分报销问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 信息技术部这条线索是否构成拆分报销?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:SPLIT-001",
+      "record:R004207",
+      "record:R004208",
+      "clause:费用报销管理办法-6.2"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "SPLIT-001"
+      ],
+      "expected_record_ids": [
+        "R004207",
+        "R004208"
+      ]
+    }
+  },
+  {
+    "id": "L2-007",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R004209为线索的拆分报销异常,返回异常ID和记录ID集合。",
+      "casual": "从杨丹的报销记录入手,判断是否存在拆分报销问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 合规风控部这条线索是否构成拆分报销?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:SPLIT-002",
+      "record:R004209",
+      "record:R004210",
+      "record:R004211",
+      "clause:费用报销管理办法-6.2"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "SPLIT-002"
+      ],
+      "expected_record_ids": [
+        "R004209",
+        "R004210",
+        "R004211"
+      ]
+    }
+  },
+  {
+    "id": "L2-008",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R004212为线索的拆分报销异常,返回异常ID和记录ID集合。",
+      "casual": "从张婷的报销记录入手,判断是否存在拆分报销问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 财务管理部这条线索是否构成拆分报销?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:SPLIT-003",
+      "record:R004212",
+      "record:R004213",
+      "clause:费用报销管理办法-6.2"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "SPLIT-003"
+      ],
+      "expected_record_ids": [
+        "R004212",
+        "R004213"
+      ]
+    }
+  },
+  {
+    "id": "L2-009",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R004214为线索的拆分报销异常,返回异常ID和记录ID集合。",
+      "casual": "从闭想的报销记录入手,判断是否存在拆分报销问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 人力资源部这条线索是否构成拆分报销?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:SPLIT-004",
+      "record:R004214",
+      "record:R004215",
+      "record:R004216",
+      "clause:费用报销管理办法-6.2"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "SPLIT-004"
+      ],
+      "expected_record_ids": [
+        "R004214",
+        "R004215",
+        "R004216"
+      ]
+    }
+  },
+  {
+    "id": "L2-010",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R004217为线索的拆分报销异常,返回异常ID和记录ID集合。",
+      "casual": "从李丽娟的报销记录入手,判断是否存在拆分报销问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 信息技术部这条线索是否构成拆分报销?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:SPLIT-005",
+      "record:R004217",
+      "record:R004218",
+      "clause:费用报销管理办法-6.2"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "SPLIT-005"
+      ],
+      "expected_record_ids": [
+        "R004217",
+        "R004218"
+      ]
+    }
+  },
+  {
+    "id": "L2-011",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R004221为线索的超标准异常,返回异常ID和记录ID集合。",
+      "casual": "从李丽娟的报销记录入手,判断是否存在超标准问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 信息技术部这条线索是否构成超标准?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:OVERSTD-001",
+      "record:R004221",
+      "clause:费用报销管理办法-6.3"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "OVERSTD-001"
+      ],
+      "expected_record_ids": [
+        "R004221"
+      ]
+    }
+  },
+  {
+    "id": "L2-012",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R004222为线索的超标准异常,返回异常ID和记录ID集合。",
+      "casual": "从杨丹的报销记录入手,判断是否存在超标准问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 合规风控部这条线索是否构成超标准?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:OVERSTD-002",
+      "record:R004222",
+      "clause:费用报销管理办法-6.3"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "OVERSTD-002"
+      ],
+      "expected_record_ids": [
+        "R004222"
+      ]
+    }
+  },
+  {
+    "id": "L2-013",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R004223为线索的超标准异常,返回异常ID和记录ID集合。",
+      "casual": "从张婷的报销记录入手,判断是否存在超标准问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 财务管理部这条线索是否构成超标准?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:OVERSTD-003",
+      "record:R004223",
+      "clause:费用报销管理办法-6.3"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "OVERSTD-003"
+      ],
+      "expected_record_ids": [
+        "R004223"
+      ]
+    }
+  },
+  {
+    "id": "L2-014",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R004224为线索的超标准异常,返回异常ID和记录ID集合。",
+      "casual": "从闭想的报销记录入手,判断是否存在超标准问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 人力资源部这条线索是否构成超标准?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:OVERSTD-004",
+      "record:R004224",
+      "clause:费用报销管理办法-6.3"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "OVERSTD-004"
+      ],
+      "expected_record_ids": [
+        "R004224"
+      ]
+    }
+  },
+  {
+    "id": "L2-015",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R004225为线索的超标准异常,返回异常ID和记录ID集合。",
+      "casual": "从李丽娟的报销记录入手,判断是否存在超标准问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 信息技术部这条线索是否构成超标准?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:OVERSTD-005",
+      "record:R004225",
+      "clause:费用报销管理办法-6.3"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "OVERSTD-005"
+      ],
+      "expected_record_ids": [
+        "R004225"
+      ]
+    }
+  },
+  {
+    "id": "L2-016",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R000079为线索的超预算异常,返回异常ID和记录ID集合。",
+      "casual": "从毛艳的报销记录入手,判断是否存在超预算问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 投资银行部这条线索是否构成超预算?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:BUDGET-001",
+      "record:R000079",
+      "clause:预算管理办法-4.1"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "BUDGET-001"
+      ],
+      "expected_record_ids": [
+        "R000079"
+      ]
+    }
+  },
+  {
+    "id": "L2-017",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R002009为线索的超预算异常,返回异常ID和记录ID集合。",
+      "casual": "从王彬的报销记录入手,判断是否存在超预算问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 固定收益部这条线索是否构成超预算?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:BUDGET-002",
+      "record:R002009",
+      "clause:预算管理办法-4.1"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "BUDGET-002"
+      ],
+      "expected_record_ids": [
+        "R002009"
+      ]
+    }
+  },
+  {
+    "id": "L2-018",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R003968为线索的超预算异常,返回异常ID和记录ID集合。",
+      "casual": "从何楠的报销记录入手,判断是否存在超预算问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 财富管理部这条线索是否构成超预算?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:BUDGET-003",
+      "record:R003968",
+      "clause:预算管理办法-4.1"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "BUDGET-003"
+      ],
+      "expected_record_ids": [
+        "R003968"
+      ]
+    }
+  },
+  {
+    "id": "L2-019",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R000894为线索的超预算异常,返回异常ID和记录ID集合。",
+      "casual": "从顾淑兰的报销记录入手,判断是否存在超预算问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 研究所这条线索是否构成超预算?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:BUDGET-004",
+      "record:R000894",
+      "clause:预算管理办法-4.1"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "BUDGET-004"
+      ],
+      "expected_record_ids": [
+        "R000894"
+      ]
+    }
+  },
+  {
+    "id": "L2-020",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R003479为线索的超预算异常,返回异常ID和记录ID集合。",
+      "casual": "从徐阳的报销记录入手,判断是否存在超预算问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 机构业务部这条线索是否构成超预算?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:BUDGET-005",
+      "record:R003479",
+      "clause:预算管理办法-4.1"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "BUDGET-005"
+      ],
+      "expected_record_ids": [
+        "R003479"
+      ]
+    }
+  },
+  {
+    "id": "L2-021",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R004227为线索的超期报销异常,返回异常ID和记录ID集合。",
+      "casual": "从李丽娟的报销记录入手,判断是否存在超期报销问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 信息技术部这条线索是否构成超期报销?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:OVERDUE-001",
+      "record:R004227",
+      "clause:费用报销管理办法-6.4"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "OVERDUE-001"
+      ],
+      "expected_record_ids": [
+        "R004227"
+      ]
+    }
+  },
+  {
+    "id": "L2-022",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R004228为线索的超期报销异常,返回异常ID和记录ID集合。",
+      "casual": "从杨丹的报销记录入手,判断是否存在超期报销问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 合规风控部这条线索是否构成超期报销?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:OVERDUE-002",
+      "record:R004228",
+      "clause:费用报销管理办法-6.4"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "OVERDUE-002"
+      ],
+      "expected_record_ids": [
+        "R004228"
+      ]
+    }
+  },
+  {
+    "id": "L2-023",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R004229为线索的超期报销异常,返回异常ID和记录ID集合。",
+      "casual": "从张婷的报销记录入手,判断是否存在超期报销问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 财务管理部这条线索是否构成超期报销?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:OVERDUE-003",
+      "record:R004229",
+      "clause:费用报销管理办法-6.4"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "OVERDUE-003"
+      ],
+      "expected_record_ids": [
+        "R004229"
+      ]
+    }
+  },
+  {
+    "id": "L2-024",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R004230为线索的超期报销异常,返回异常ID和记录ID集合。",
+      "casual": "从闭想的报销记录入手,判断是否存在超期报销问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 人力资源部这条线索是否构成超期报销?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:OVERDUE-004",
+      "record:R004230",
+      "clause:费用报销管理办法-6.4"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "OVERDUE-004"
+      ],
+      "expected_record_ids": [
+        "R004230"
+      ]
+    }
+  },
+  {
+    "id": "L2-025",
+    "level": "L2",
+    "category": "policy_data_comparison",
+    "prompt_variants": {
+      "precise": "结合制度和业务数据,核查以R004231为线索的超期报销异常,返回异常ID和记录ID集合。",
+      "casual": "从李丽娟的报销记录入手,判断是否存在超期报销问题。",
+      "distracted": "请先找到相关条款,再查数据验证: 信息技术部这条线索是否构成超期报销?"
+    },
+    "ground_truth_refs": [
+      "ground_truth:OVERDUE-005",
+      "record:R004231",
+      "clause:费用报销管理办法-6.4"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "OVERDUE-005"
+      ],
+      "expected_record_ids": [
+        "R004231"
+      ]
+    }
+  },
+  {
+    "id": "L3-001",
+    "level": "L3",
+    "category": "full_year_rule_audit",
+    "prompt_variants": {
+      "precise": "请对全年数据做重复报销专项扫描,返回全部异常ID和记录ID集合。",
+      "casual": "按重复报销规则跑一次黑盒审计,不要漏掉跨月或多记录组合。",
+      "distracted": "只输出重复报销专项结果,并给出对应制度条款。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:DUP-001",
+      "ground_truth:DUP-002",
+      "ground_truth:DUP-003",
+      "ground_truth:DUP-004",
+      "ground_truth:DUP-005",
+      "ground_truth:DUP-006"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "DUP-001",
+        "DUP-002",
+        "DUP-003",
+        "DUP-004",
+        "DUP-005",
+        "DUP-006"
+      ],
+      "expected_record_ids": [
+        "R000002",
+        "R000005",
+        "R000020",
+        "R000028",
+        "R000037",
+        "R000055",
+        "R004201",
+        "R004202",
+        "R004203",
+        "R004204",
+        "R004205",
+        "R004206"
+      ]
+    }
+  },
+  {
+    "id": "L3-002",
+    "level": "L3",
+    "category": "full_year_rule_audit",
+    "prompt_variants": {
+      "precise": "请对全年数据做拆分报销专项扫描,返回全部异常ID和记录ID集合。",
+      "casual": "按拆分报销规则跑一次黑盒审计,不要漏掉跨月或多记录组合。",
+      "distracted": "只输出拆分报销专项结果,并给出对应制度条款。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:SPLIT-001",
+      "ground_truth:SPLIT-002",
+      "ground_truth:SPLIT-003",
+      "ground_truth:SPLIT-004",
+      "ground_truth:SPLIT-005",
+      "ground_truth:SPLIT-006"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "SPLIT-001",
+        "SPLIT-002",
+        "SPLIT-003",
+        "SPLIT-004",
+        "SPLIT-005",
+        "SPLIT-006"
+      ],
+      "expected_record_ids": [
+        "R004207",
+        "R004208",
+        "R004209",
+        "R004210",
+        "R004211",
+        "R004212",
+        "R004213",
+        "R004214",
+        "R004215",
+        "R004216",
+        "R004217",
+        "R004218",
+        "R004219",
+        "R004220"
+      ]
+    }
+  },
+  {
+    "id": "L3-003",
+    "level": "L3",
+    "category": "full_year_rule_audit",
+    "prompt_variants": {
+      "precise": "请对全年数据做超标准专项扫描,返回全部异常ID和记录ID集合。",
+      "casual": "按超标准规则跑一次黑盒审计,不要漏掉跨月或多记录组合。",
+      "distracted": "只输出超标准专项结果,并给出对应制度条款。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:OVERSTD-001",
+      "ground_truth:OVERSTD-002",
+      "ground_truth:OVERSTD-003",
+      "ground_truth:OVERSTD-004",
+      "ground_truth:OVERSTD-005",
+      "ground_truth:OVERSTD-006"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "OVERSTD-001",
+        "OVERSTD-002",
+        "OVERSTD-003",
+        "OVERSTD-004",
+        "OVERSTD-005",
+        "OVERSTD-006"
+      ],
+      "expected_record_ids": [
+        "R004221",
+        "R004222",
+        "R004223",
+        "R004224",
+        "R004225",
+        "R004226"
+      ]
+    }
+  },
+  {
+    "id": "L3-004",
+    "level": "L3",
+    "category": "full_year_rule_audit",
+    "prompt_variants": {
+      "precise": "请对全年数据做超预算专项扫描,返回全部异常ID和记录ID集合。",
+      "casual": "按超预算规则跑一次黑盒审计,不要漏掉跨月或多记录组合。",
+      "distracted": "只输出超预算专项结果,并给出对应制度条款。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:BUDGET-001",
+      "ground_truth:BUDGET-002",
+      "ground_truth:BUDGET-003",
+      "ground_truth:BUDGET-004",
+      "ground_truth:BUDGET-005",
+      "ground_truth:BUDGET-006"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "BUDGET-001",
+        "BUDGET-002",
+        "BUDGET-003",
+        "BUDGET-004",
+        "BUDGET-005",
+        "BUDGET-006"
+      ],
+      "expected_record_ids": [
+        "R000079",
+        "R000312",
+        "R000894",
+        "R002009",
+        "R003479",
+        "R003968"
+      ]
+    }
+  },
+  {
+    "id": "L3-005",
+    "level": "L3",
+    "category": "full_year_rule_audit",
+    "prompt_variants": {
+      "precise": "请对全年数据做超期报销专项扫描,返回全部异常ID和记录ID集合。",
+      "casual": "按超期报销规则跑一次黑盒审计,不要漏掉跨月或多记录组合。",
+      "distracted": "只输出超期报销专项结果,并给出对应制度条款。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:OVERDUE-001",
+      "ground_truth:OVERDUE-002",
+      "ground_truth:OVERDUE-003",
+      "ground_truth:OVERDUE-004",
+      "ground_truth:OVERDUE-005",
+      "ground_truth:OVERDUE-006"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "anomaly_id_set",
+      "expected_anomaly_ids": [
+        "OVERDUE-001",
+        "OVERDUE-002",
+        "OVERDUE-003",
+        "OVERDUE-004",
+        "OVERDUE-005",
+        "OVERDUE-006"
+      ],
+      "expected_record_ids": [
+        "R004227",
+        "R004228",
+        "R004229",
+        "R004230",
+        "R004231",
+        "R004232"
+      ]
+    }
+  },
+  {
+    "id": "L3-006",
+    "level": "L3",
+    "category": "version_trap",
+    "prompt_variants": {
+      "precise": "请判断费用报销审批线应采用2022版还是2025修订版,并指出部门总经理审批线。",
+      "casual": "如果检索同时命中2022版和2025版,当前应使用哪个金额?",
+      "distracted": "有人用旧制度审批线做结论,请纠偏并给出现行条款出处。"
+    },
+    "ground_truth_refs": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount",
+      "document:01_expense_reimbursement_2025.md",
+      "document:02_expense_reimbursement_2022_deprecated.md"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "expected_facts",
+      "expected_facts": [
+        "现行值为10000元",
+        "2022旧值8000元已废止",
+        "应采用2025修订版"
+      ]
+    }
+  },
+  {
+    "id": "L3-007",
+    "level": "L3",
+    "category": "two_hop_retrieval",
+    "prompt_variants": {
+      "precise": "报销办法没有直接列审批金额时,请通过交叉引用找到单笔费用审批档位。",
+      "casual": "从费用报销办法出发,二跳检索授权管理办法附件二,给出审批线。",
+      "distracted": "不要停在报销办法正文,请追到授权附件并说明部门总经理审批线。"
+    },
+    "ground_truth_refs": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+      "document:01_expense_reimbursement_2025.md",
+      "document:03_authorization_management.md"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "expected_facts",
+      "expected_facts": [
+        "部门总经理审批线为10000元",
+        "金额出现在授权管理办法附件二"
+      ]
+    }
+  },
+  {
+    "id": "L3-008",
+    "level": "L3",
+    "category": "near_clause_disambiguation",
+    "prompt_variants": {
+      "precise": "比较差旅住宿和培训住宿标准,说明为什么不能混用。",
+      "casual": "员工出差住宿与培训期间住宿分别查哪个制度?",
+      "distracted": "同样是住宿,请区分差旅住宿表和培训住宿表的适用场景。"
+    },
+    "ground_truth_refs": [
+      "policy:expense_standards.travel_lodging",
+      "policy:expense_standards.training.training_lodging",
+      "document:04_travel_expense.md",
+      "document:05_training_expense.md"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "expected_facts",
+      "expected_facts": [
+        "差旅住宿适用差旅费管理办法",
+        "培训住宿适用培训费管理办法",
+        "两组数值不同不得混用"
+      ]
+    }
+  },
+  {
+    "id": "L3-009",
+    "level": "L3",
+    "category": "audit_report",
+    "prompt_variants": {
+      "precise": "请基于全年数据出一份异常审计摘要报告,覆盖五类规则并列出关键异常ID。",
+      "casual": "写一份面向审计负责人的全年费用异常概览。",
+      "distracted": "不要只给SQL结果,请输出报告式结论、规则分布和条款依据。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:DUP-001",
+      "ground_truth:DUP-002",
+      "ground_truth:DUP-003",
+      "ground_truth:DUP-004",
+      "ground_truth:DUP-005",
+      "ground_truth:DUP-006",
+      "ground_truth:SPLIT-001",
+      "ground_truth:SPLIT-002",
+      "ground_truth:SPLIT-003",
+      "ground_truth:SPLIT-004",
+      "ground_truth:SPLIT-005",
+      "ground_truth:SPLIT-006",
+      "ground_truth:OVERSTD-001",
+      "ground_truth:OVERSTD-002",
+      "ground_truth:OVERSTD-003",
+      "ground_truth:OVERSTD-004",
+      "ground_truth:OVERSTD-005",
+      "ground_truth:OVERSTD-006",
+      "ground_truth:BUDGET-001",
+      "ground_truth:BUDGET-002",
+      "ground_truth:BUDGET-003",
+      "ground_truth:BUDGET-004",
+      "ground_truth:BUDGET-005",
+      "ground_truth:BUDGET-006",
+      "ground_truth:OVERDUE-001",
+      "ground_truth:OVERDUE-002",
+      "ground_truth:OVERDUE-003",
+      "ground_truth:OVERDUE-004",
+      "ground_truth:OVERDUE-005",
+      "ground_truth:OVERDUE-006"
+    ],
+    "scoring": {
+      "type": "llm_rubric",
+      "rubric_assertions": [
+        "报告必须说明共识别30个异常和5个陷阱位不应计入异常。",
+        "报告必须覆盖重复报销、拆分报销、超标准、超预算、超期报销五类规则。",
+        "报告必须至少列出每类规则的一个异常ID。",
+        "报告必须引用费用报销管理办法或预算管理办法的对应条款出处。",
+        "报告不得把TRAP开头的陷阱位计为异常。"
+      ]
+    }
+  },
+  {
+    "id": "L3-010",
+    "level": "L3",
+    "category": "audit_report",
+    "prompt_variants": {
+      "precise": "请专门写一段版本陷阱审计说明,解释旧版审批线可能导致的误判。",
+      "casual": "生成一份制度检索风险提示,重点说明2022版和2025版并存时如何判定。",
+      "distracted": "请用报告口吻说明为什么引用8000元审批线是错误的。"
+    },
+    "ground_truth_refs": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount"
+    ],
+    "scoring": {
+      "type": "llm_rubric",
+      "rubric_assertions": [
+        "必须指出2025修订版现行部门总经理审批线为10000元。",
+        "必须指出2022版8000元审批线已废止。",
+        "必须说明报销办法通过授权管理办法附件二取得现行审批金额。",
+        "不得把旧版条款作为当前审批依据。"
+      ]
+    }
+  },
+  {
+    "id": "TRAP-001",
+    "level": "trap",
+    "category": "clean_but_suspicious",
+    "prompt_variants": {
+      "precise": "请核查TRAP-001涉及的记录是否构成异常,正确时应说明无异常。",
+      "casual": "这组记录看起来可疑,请判断是否需要计入异常: R004233。",
+      "distracted": "请注意不要因接近阈值、同日同额或近似金额就误报异常。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:TRAP-001",
+      "record:R004233"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "no_anomaly",
+      "expected_anomaly_ids": [],
+      "expected_record_ids": [
+        "R004233"
+      ],
+      "expected_reason": "below approval line and within X1 A-city ten-night lodging cap"
+    }
+  },
+  {
+    "id": "TRAP-002",
+    "level": "trap",
+    "category": "clean_but_suspicious",
+    "prompt_variants": {
+      "precise": "请核查TRAP-002涉及的记录是否构成异常,正确时应说明无异常。",
+      "casual": "这组记录看起来可疑,请判断是否需要计入异常: R004234, R004235。",
+      "distracted": "请注意不要因接近阈值、同日同额或近似金额就误报异常。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:TRAP-002",
+      "record:R004234",
+      "record:R004235"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "no_anomaly",
+      "expected_anomaly_ids": [],
+      "expected_record_ids": [
+        "R004234",
+        "R004235"
+      ],
+      "expected_reason": "different invoices and total below approval line"
+    }
+  },
+  {
+    "id": "TRAP-003",
+    "level": "trap",
+    "category": "clean_but_suspicious",
+    "prompt_variants": {
+      "precise": "请核查TRAP-003涉及的记录是否构成异常,正确时应说明无异常。",
+      "casual": "这组记录看起来可疑,请判断是否需要计入异常: R004236, R004237。",
+      "distracted": "请注意不要因接近阈值、同日同额或近似金额就误报异常。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:TRAP-003",
+      "record:R004236",
+      "record:R004237"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "no_anomaly",
+      "expected_anomaly_ids": [],
+      "expected_record_ids": [
+        "R004236",
+        "R004237"
+      ],
+      "expected_reason": "outside aggregation window"
+    }
+  },
+  {
+    "id": "TRAP-004",
+    "level": "trap",
+    "category": "clean_but_suspicious",
+    "prompt_variants": {
+      "precise": "请核查TRAP-004涉及的记录是否构成异常,正确时应说明无异常。",
+      "casual": "这组记录看起来可疑,请判断是否需要计入异常: R004238。",
+      "distracted": "请注意不要因接近阈值、同日同额或近似金额就误报异常。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:TRAP-004",
+      "record:R004238"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "no_anomaly",
+      "expected_anomaly_ids": [],
+      "expected_record_ids": [
+        "R004238"
+      ],
+      "expected_reason": "deadline is inclusive"
+    }
+  },
+  {
+    "id": "TRAP-005",
+    "level": "trap",
+    "category": "clean_but_suspicious",
+    "prompt_variants": {
+      "precise": "请核查TRAP-005涉及的记录是否构成异常,正确时应说明无异常。",
+      "casual": "这组记录看起来可疑,请判断是否需要计入异常: R004239, R004240。",
+      "distracted": "请注意不要因接近阈值、同日同额或近似金额就误报异常。"
+    },
+    "ground_truth_refs": [
+      "ground_truth:TRAP-005",
+      "record:R004239",
+      "record:R004240"
+    ],
+    "scoring": {
+      "type": "deterministic",
+      "kind": "no_anomaly",
+      "expected_anomaly_ids": [],
+      "expected_record_ids": [
+        "R004239",
+        "R004240"
+      ],
+      "expected_reason": "unique invoices, within entertainment standards, and total below approval line"
+    }
+  }
+]

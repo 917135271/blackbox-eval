@@ -1,6 +1,6 @@
 # GATE 4 Baseline Report
 
-- generated_at: `2026-07-08T12:31:35`
+- generated_at: `2026-07-08T12:55:54`
 - runs: `qwen-code=gate4_baseline_qwen_v1, goose=gate4_baseline_goose_v1, trae-agent=gate4_baseline_trae_v1, opencode=gate4_baseline_opencode_v1`
 - task_scope: `55 tasks x 3 variants x 1 repeat = 165 results per candidate`
 - failure_detail: `output/gate4_failure_attribution.jsonl`
@@ -34,8 +34,8 @@
 - `fixtures/expense_query_mcp.py`: `c2b2cee2b9ac3973`
 - `fixtures/audit_role_prompt.md`: `f91af06484f69773`
 - `fixtures/output_contract.md`: `f4d021e4bda746fb`
-- `D:/算法LLM/项目篇/东方证券/agent/synth-pipeline/output/evals.json`: `ee51bd3dbabc0a32`
-- `D:/算法LLM/项目篇/东方证券/agent/synth-pipeline/output/ground_truth.yaml`: `38bfd3b2eb4f415e`
+- `data/evals.json`: `ee51bd3dbabc0a32`
+- `data/ground_truth.yaml`: `38bfd3b2eb4f415e`
 - `D:/算法LLM/项目篇/东方证券/agent/synth-pipeline/output/data/expense.db`: `8d6a115d60775736`
 
 ## Main Results

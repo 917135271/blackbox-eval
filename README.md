@@ -72,12 +72,16 @@ Important: the original prompt required a local model endpoint and prohibited cl
 
 ## Data Fixture Paths
 
-The config points to the generated synthetic assets:
+The repository now includes the benchmark task list and answer key:
+
+- Eval tasks: `data/evals.json`
+- Ground truth: `data/ground_truth.yaml`
+
+The config still points to the generated synthetic database and policy corpus in
+the sibling `synth-pipeline` workspace:
 
 - Expense SQLite: `../synth-pipeline/output/data/expense.db`
 - Policy corpus: `../synth-pipeline/output/corpus`
-- Ground truth: `../synth-pipeline/output/ground_truth.yaml`
-- Eval tasks: `../synth-pipeline/output/evals.json`
 
 ## MCP Fixtures
 
