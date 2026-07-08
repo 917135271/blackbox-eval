@@ -1,0 +1,51 @@
+{
+  "completed": true,
+  "candidate": "qwen-code",
+  "task_id": "L2-015",
+  "level": "L2",
+  "category": "policy_data_comparison",
+  "variant": "precise",
+  "repeat_index": 1,
+  "elapsed_seconds": 55.26,
+  "exit_code": 0,
+  "timeout": false,
+  "format_failure": false,
+  "parse_error": null,
+  "answer_json": {
+    "anomaly_ids": [
+      "OVR-STD-TRAVEL-LODGING-D007-001",
+      "OVR-STD-OFFICE-SUPPLIES-D007-002"
+    ],
+    "answer": "以R004225为线索追溯员工E0007（李丽娟，信息技术部部门经理），发现两笔超标准异常：(1) 记录R004225差旅住宿费900元，部门负责人级一类城市标准为850元/晚，超出50元且无专项审批；(2) 记录R004221办公用品费650元，办公用品月度限额为600元，超出50元且无专项审批。两笔均违反《XX证券费用报销管理办法(2025修订版)》第十二条及其他专项费用管理办法的超标准条款。",
+    "citations": [
+      {
+        "doc_id": "04_travel_expense.md",
+        "clause_no": "第四条"
+      },
+      {
+        "doc_id": "04_travel_expense.md",
+        "clause_no": "第五条"
+      },
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十二条"
+      },
+      {
+        "doc_id": "07_office_communication.md",
+        "clause_no": "第二条"
+      }
+    ]
+  },
+  "final_text": "根据已获取的信息，我来汇总审计结论。\n\n## 审计分析\n\n以 **R004225** 为线索追溯到员工 **E0007（李丽娟）**，该员工职级 D1、岗位**部门经理**（对应制度中的\"部门负责人级\"），共发现以下超标准异常：\n\n---\n\n### 异常 1：差旅住宿超标准\n\n| 字段 | 值 |\n|---|---|\n| 记录 ID | **R004225** |\n| 费用类型 | travel_lodging（差旅住宿） |\n| 城市档位 | A类（一类城市） |\n| 职级 | 部门负责人级 |\n| 标准上限 | **850元/晚** |\n| 报销金额 | **900元**（超50元） |\n| 专项审批 | 无（special_approval=0） |\n\n**违反制度：**\n- 《XX证券差旅费管理办法》第四条：部门负责人级一类城市住宿标准 850 元/晚\n- 《XX证券差旅费管理办法》第五条：超过住宿标准且无专项审批的，不得报销超出部分\n- 《XX证券费用报销管理办法(2025修订版)》第十二条：无专项审批时，报销金额不得超过对应制度标准的 1.0 倍\n\n---\n\n### 异常 2：办公用品超标准\n\n| 字段 | 值 |\n|---|---|\n| 记录 ID | **R004221** |\n| 费用类型 | office_supplies（办公用品） |\n| 月度限额 | **600元/月** |\n| 报销金额 | **650元**（超50元） |\n| 专项审批 | 无（special_approval=0） |\n\n**违反制度：**\n- 《XX证券办公与通讯费用管理办法》第二条：员工个人办公用品报销按月控制，每人每月不超过 600 元\n- 《XX证券费用报销管理办法(2025修订版)》第十二条：无专项审批时，报销金额不得超过对应制度标准的 1.0 倍\n\n---\n\n两笔异常均为同一员工（信息技术部部门经理李丽娟）在同一系统中的超标准报销行为。\n\n```json\n{\n  \"anomaly_ids\": [\"OVR-STD-TRAVEL-LODGING-D007-001\", \"OVR-STD-OFFICE-SUPPLIES-D007-002\"],\n  \"answer\": \"以R004225为线索追溯员工E0007（李丽娟，信息技术部部门经理），发现两笔超标准异常：(1) 记录R004225差旅住宿费900元，部门负责人级一类城市标准为850元/晚，超出50元且无专项审批；(2) 记录R004221办公用品费650元，办公用品月度限额为600元，超出50元且无专项审批。两笔均违反《XX证券费用报销管理办法(2025修订版)》第十二条及其他专项费用管理办法的超标准条款。\",\n  \"citations\": [\n    {\"doc_id\": \"04_travel_expense.md\", \"clause_no\": \"第四条\"},\n    {\"doc_id\": \"04_travel_expense.md\", \"clause_no\": \"第五条\"},\n    {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十二条\"},\n    {\"doc_id\": \"07_office_communication.md\", \"clause_no\": \"第二条\"}\n  ]\n}\n```",
+  "tool_calls_count": 13,
+  "tool_log_present": true,
+  "workdir_diff_empty": true,
+  "files": {
+    "stdout": "stdout.log",
+    "stderr": "stderr.log",
+    "tool_calls": "tool_calls.jsonl",
+    "trajectory": "trajectory.json",
+    "result": "result.json",
+    "workdir_diff": "workdir_diff.txt"
+  }
+}

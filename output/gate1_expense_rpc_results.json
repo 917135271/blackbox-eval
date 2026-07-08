@@ -1,0 +1,258 @@
+[
+  {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+      "protocolVersion": "2024-11-05",
+      "capabilities": {
+        "tools": {}
+      },
+      "serverInfo": {
+        "name": "expense_query_mcp",
+        "version": "0.1.0"
+      }
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 2,
+    "result": {
+      "tools": [
+        {
+          "name": "list_expenses",
+          "description": "List reimbursement records with optional filters and fixed 50-row pages.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "employee_id": {
+                "type": "string",
+                "description": "employee_id parameter for list_expenses."
+              },
+              "department_id": {
+                "type": "string",
+                "description": "department_id parameter for list_expenses."
+              },
+              "expense_type": {
+                "type": "string",
+                "description": "expense_type parameter for list_expenses."
+              },
+              "date_from": {
+                "type": "string",
+                "description": "date_from parameter for list_expenses."
+              },
+              "date_to": {
+                "type": "string",
+                "description": "date_to parameter for list_expenses."
+              },
+              "min_amount": {
+                "type": "number",
+                "description": "min_amount parameter for list_expenses."
+              },
+              "max_amount": {
+                "type": "number",
+                "description": "max_amount parameter for list_expenses."
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 1,
+                "description": "page parameter for list_expenses."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "get_expense_detail",
+          "description": "Return one reimbursement record with linked invoice, employee, department, and approvals.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "record_id": {
+                "type": "string",
+                "description": "record_id parameter for get_expense_detail."
+              }
+            },
+            "required": [
+              "record_id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "find_invoice_usage",
+          "description": "Find reimbursement records that use a given invoice number.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "invoice_no": {
+                "type": "string",
+                "description": "invoice_no parameter for find_invoice_usage."
+              }
+            },
+            "required": [
+              "invoice_no"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "list_employees",
+          "description": "List employees, optionally filtered by department.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "department_id": {
+                "type": "string",
+                "description": "department_id parameter for list_employees."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "get_employee",
+          "description": "Return one employee with level, department, role, and hire date.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "employee_id": {
+                "type": "string",
+                "description": "employee_id parameter for get_employee."
+              }
+            },
+            "required": [
+              "employee_id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "get_department_budget",
+          "description": "Return one department budget and approved reimbursement cumulative amount.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "department_id": {
+                "type": "string",
+                "description": "department_id parameter for get_department_budget."
+              }
+            },
+            "required": [
+              "department_id"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "list_approvals",
+          "description": "List approval chain rows for one reimbursement record.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "record_id": {
+                "type": "string",
+                "description": "record_id parameter for list_approvals."
+              }
+            },
+            "required": [
+              "record_id"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ]
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 3,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"page\": 1, \"page_size\": 50, \"total\": 2642, \"has_next\": true, \"records\": [{\"record_id\": \"R000367\", \"record_no\": \"BX2025000367\", \"employee_id\": \"E0063\", \"employee_name\": \"苗兰英\", \"department_id\": \"D004\", \"department_name\": \"研究所\", \"expense_date\": \"2025-01-01\", \"reimburse_date\": \"2025-01-21\", \"expense_type\": \"local_transport\", \"amount\": 166.16, \"reason\": \"杭州材料补充交通费\", \"invoice_no\": \"FP202500000367\", \"status\": \"approved\"}, {\"record_id\": \"R000640\", \"record_no\": \"BX2025000640\", \"employee_id\": \"E0080\", \"employee_name\": \"王桂英\", \"department_id\": \"D009\", \"department_name\": \"财务管理部\", \"expense_date\": \"2025-01-01\", \"reimburse_date\": \"2025-01-07\", \"expense_type\": \"communication\", \"amount\": 244.73, \"reason\": \"客户回访电话费用\", \"invoice_no\": \"FP202500000640\", \"status\": \"approved\"}, {\"record_id\": \"R000884\", \"record_no\": \"BX2025000884\", \"employee_id\": \"E0039\", \"employee_name\": \"覃秀英\", \"department_id\": \"D002\", \"department_name\": \"固定收益部\", \"expense_date\": \"2025-01-01\", \"reimburse_date\": \"2025-01-14\", \"expense_type\": \"communication\", \"amount\": 253.23, \"reason\": \"云帆进度跟踪通讯费\", \"invoice_no\": \"FP202500000884\", \"status\": \"approved\"}, {\"record_id\": \"R001201\", \"record_no\": \"BX2025001201\", \"employee_id\": \"E0019\", \"employee_name\": \"韦柳\", \"department_id\": \"D006\", \"department_name\": \"运营管理部\", \"expense_date\": \"2025-01-01\", \"reimburse_date\": \"2025-02-14\", \"expense_type\": \"local_transport\", \"amount\": 297.49, \"reason\": \"启明系统测试交通费\", \"invoice_no\": \"FP202500001201\", \"status\": \"approved\"}, {\"record_id\": \"R002250\", \"record_no\": \"BX2025002250\", \"employee_id\": \"E0031\", \"employee_name\": \"徐峰\", \"department_id\": \"D006\", \"department_name\": \"运营管理部\", \"expense_date\": \"2025-01-01\", \"reimburse_date\": \"2025-01-09\", \"expense_type\": \"local_transport\", \"amount\": 191.3, \"reason\": \"分支机构沟通事项市内交通费\", \"invoice_no\": \"FP202500002250\", \"status\": \"approved\"}, {\"record_id\": \"R002555\", \"record_no\": \"BX2025002555\", \"employee_id\": \"E0058\", \"employee_name\": \"莫佳\", \"department_id\": \"D007\", \"department_name\": \"信息技术部\", \"expense_date\": \"2025-01-01\", \"reimburse_date\": \"2025-02-13\", \"expense_type\": \"communication\", \"amount\": 249.75, \"reason\": \"青竹资料确认通讯费\", \"invoice_no\": \"FP202500002555\", \"status\": \"approved\"}, {\"record_id\": \"R002599\", \"record_no\": \"BX2025002599\", \"employee_id\": \"E0079\", \"employee_name\": \"李帅\", \"department_id\": \"D002\", \"department_name\": \"固定收益部\", \"expense_date\": \"2025-01-01\", \"reimburse_date\": \"2025-02-20\", \"expense_type\": \"travel_lodging\", \"amount\": 294.48, \"reason\": \"赴合肥参加业务协调会住宿费\", \"invoice_no\": \"FP202500002599\", \"status\": \"approved\"}, {\"record_id\": \"R003769\", \"record_no\": \"BX2025003769\", \"employee_id\": \"E0035\", \"employee_name\": \"桂玉梅\", \"department_id\": \"D005\", \"department_name\": \"机构业务部\", \"expense_date\": \"2025-01-01\", \"reimburse_date\": \"2025-01-27\", \"expense_type\": \"communication\", \"amount\": 271.06, \"reason\": \"星河项目沟通通讯费\", \"invoice_no\": \"FP202500003769\", \"status\": \"approved\"}, {\"record_id\": \"R004030\", \"record_no\": \"BX2025004030\", \"employee_id\": \"E0040\", \"employee_name\": \"郑丹丹\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"expense_date\": \"2025-01-01\", \"reimburse_date\": \"2025-02-10\", \"expense_type\": \"local_transport\", \"amount\": 87.8, \"reason\": \"投资银行部外勤走访市内交通费\", \"invoice_no\": \"FP202500004030\", \"status\": \"approved\"}, {\"record_id\": \"R001942\", \"record_no\": \"BX2025001942\", \"employee_id\": \"E0072\", \"employee_name\": \"谢辉\", \"department_id\": \"D005\", \"department_name\": \"机构业务部\", \"expense_date\": \"2025-01-02\", \"reimburse_date\": \"2025-01-29\", \"expense_type\": \"local_transport\", \"amount\": 153.11, \"reason\": \"启明资料递送交通费\", \"invoice_no\": \"FP202500001942\", \"status\": \"approved\"}, {\"record_id\": \"R002707\", \"record_no\": \"BX2025002707\", \"employee_id\": \"E0077\", \"employee_name\": \"孔凤兰\", \"department_id\": \"D004\", \"department_name\": \"研究所\", \"expense_date\": \"2025-01-02\", \"reimburse_date\": \"2025-01-14\", \"expense_type\": \"local_transport\", \"amount\": 104.73, \"reason\": \"上海材料补充交通费\", \"invoice_no\": \"FP202500002707\", \"status\": \"approved\"}, {\"record_id\": \"R002924\", \"record_no\": \"BX2025002924\", \"employee_id\": \"E0074\", \"employee_name\": \"陈桂花\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"expense_date\": \"2025-01-02\", \"reimburse_date\": \"2025-02-16\", \"expense_type\": \"communication\", \"amount\": 122.89, \"reason\": \"启明进度跟踪通讯费\", \"invoice_no\": \"FP202500002924\", \"status\": \"approved\"}, {\"record_id\": \"R002983\", \"record_no\": \"BX2025002983\", \"employee_id\": \"E0035\", \"employee_name\": \"桂玉梅\", \"department_id\": \"D005\", \"department_name\": \"机构业务部\", \"expense_date\": \"2025-01-02\", \"reimburse_date\": \"2025-02-13\", \"expense_type\": \"local_transport\", \"amount\": 452.56, \"reason\": \"机构业务部外勤走访市内交通费\", \"invoice_no\": \"FP202500002983\", \"status\": \"approved\"}, {\"record_id\": \"R003742\", \"record_no\": \"BX2025003742\", \"employee_id\": \"E0028\", \"employee_name\": \"杜丹\", \"department_id\": \"D009\", \"department_name\": \"财务管理部\", \"expense_date\": \"2025-01-02\", \"reimburse_date\": \"2025-01-05\", \"expense_type\": \"travel_lodging\", \"amount\": 337.52, \"reason\": \"分支机构走访赴上海住宿费\", \"invoice_no\": \"FP202500003742\", \"status\": \"approved\"}, {\"record_id\": \"R000589\", \"record_no\": \"BX2025000589\", \"employee_id\": \"E0055\", \"employee_name\": \"黄洁\", \"department_id\": \"D004\", \"department_name\": \"研究所\", \"expense_date\": \"2025-01-03\", \"reimburse_date\": \"2025-01-05\", \"expense_type\": \"local_transport\", \"amount\": 102.84, \"reason\": \"北辰现场巡检交通费\", \"invoice_no\": \"FP202500000589\", \"status\": \"approved\"}, {\"record_id\": \"R001125\", \"record_no\": \"BX2025001125\", \"employee_id\": \"E0073\", \"employee_name\": \"梁玉英\", \"department_id\": \"D004\", \"department_name\": \"研究所\", \"expense_date\": \"2025-01-03\", \"reimburse_date\": \"2025-02-21\", \"expense_type\": \"travel_lodging\", \"amount\": 175.39, \"reason\": \"远航材料访谈期间住宿费\", \"invoice_no\": \"FP202500001125\", \"status\": \"approved\"}, {\"record_id\": \"R001579\", \"record_no\": \"BX2025001579\", \"employee_id\": \"E0047\", \"employee_name\": \"巩丹\", \"department_id\": \"D009\", \"department_name\": \"财务管理部\", \"expense_date\": \"2025-01-03\", \"reimburse_date\": \"2025-01-31\", \"expense_type\": \"travel_lodging\", \"amount\": 431.24, \"reason\": \"合肥启明路演支持住宿费\", \"invoice_no\": \"FP202500001579\", \"status\": \"approved\"}, {\"record_id\": \"R001676\", \"record_no\": \"BX2025001676\", \"employee_id\": \"E0022\", \"employee_name\": \"刘冬梅\", \"department_id\": \"D007\", \"department_name\": \"信息技术部\", \"expense_date\": \"2025-01-03\", \"reimburse_date\": \"2025-02-20\", \"expense_type\": \"business_entertainment\", \"amount\": 401.77, \"reason\": \"上海业务拜访工作餐费\", \"invoice_no\": \"FP202500001676\", \"status\": \"approved\"}, {\"record_id\": \"R001690\", \"record_no\": \"BX2025001690\", \"employee_id\": \"E0078\", \"employee_name\": \"毛凤英\", \"department_id\": \"D006\", \"department_name\": \"运营管理部\", \"expense_date\": \"2025-01-03\", \"reimburse_date\": \"2025-03-04\", \"expense_type\": \"communication\", \"amount\": 199.13, \"reason\": \"运营管理部业务联系通讯费\", \"invoice_no\": \"FP202500001690\", \"status\": \"approved\"}, {\"record_id\": \"R001920\", \"record_no\": \"BX2025001920\", \"employee_id\": \"E0035\", \"employee_name\": \"桂玉梅\", \"department_id\": \"D005\", \"department_name\": \"机构业务部\", \"expense_date\": \"2025-01-03\", \"reimburse_date\": \"2025-01-13\", \"expense_type\": \"communication\", \"amount\": 154.08, \"reason\": \"北辰需求沟通通讯费\", \"invoice_no\": \"FP202500001920\", \"status\": \"approved\"}, {\"record_id\": \"R002463\", \"record_no\": \"BX2025002463\", \"employee_id\": \"E0052\", \"employee_name\": \"张亮\", \"department_id\": \"D003\", \"department_name\": \"财富管理部\", \"expense_date\": \"2025-01-03\", \"reimburse_date\": \"2025-02-08\", \"expense_type\": \"office_supplies\", \"amount\": 209.08, \"reason\": \"业务会议用品费\", \"invoice_no\": \"FP202500002463\", \"status\": \"approved\"}, {\"record_id\": \"R002483\", \"record_no\": \"BX2025002483\", \"employee_id\": \"E0077\", \"employee_name\": \"孔凤兰\", \"department_id\": \"D004\", \"department_name\": \"研究所\", \"expense_date\": \"2025-01-03\", \"reimburse_date\": \"2025-02-11\", \"expense_type\": \"travel_lodging\", \"amount\": 355.49, \"reason\": \"启明项目在上海开展尽调期间住宿费\", \"invoice_no\": \"FP202500002483\", \"status\": \"approved\"}, {\"record_id\": \"R003729\", \"record_no\": \"BX2025003729\", \"employee_id\": \"E0042\", \"employee_name\": \"谢玉\", \"department_id\": \"D008\", \"department_name\": \"合规风控部\", \"expense_date\": \"2025-01-03\", \"reimburse_date\": \"2025-02-06\", \"expense_type\": \"communication\", \"amount\": 105.11, \"reason\": \"合肥现场支持通讯费\", \"invoice_no\": \"FP202500003729\", \"status\": \"approved\"}, {\"record_id\": \"R000347\", \"record_no\": \"BX2025000347\", \"employee_id\": \"E0073\", \"employee_name\": \"梁玉英\", \"department_id\": \"D004\", \"department_name\": \"研究所\", \"expense_date\": \"2025-01-04\", \"reimburse_date\": \"2025-01-09\", \"expense_type\": \"travel_lodging\", \"amount\": 212.51, \"reason\": \"合肥分支机构培训支持住宿费\", \"invoice_no\": \"FP202500000347\", \"status\": \"approved\"}, {\"record_id\": \"R000381\", \"record_no\": \"BX2025000381\", \"employee_id\": \"E0033\", \"employee_name\": \"郑刚\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"expense_date\": \"2025-01-04\", \"reimburse_date\": \"2025-02-02\", \"expense_type\": \"office_supplies\", \"amount\": 445.41, \"reason\": \"投资银行部文件夹和标签耗材费\", \"invoice_no\": \"FP202500000381\", \"status\": \"approved\"}, {\"record_id\": \"R001574\", \"record_no\": \"BX2025001574\", \"employee_id\": \"E0066\", \"employee_name\": \"何楠\", \"department_id\": \"D003\", \"department_name\": \"财富管理部\", \"expense_date\": \"2025-01-04\", \"reimburse_date\": \"2025-02-04\", \"expense_type\": \"office_supplies\", \"amount\": 295.04, \"reason\": \"青竹会议材料打印用品费\", \"invoice_no\": \"FP202500001574\", \"status\": \"approved\"}, {\"record_id\": \"R001826\", \"record_no\": \"BX2025001826\", \"employee_id\": \"E0037\", \"employee_name\": \"梁梅\", \"department_id\": \"D008\", \"department_name\": \"合规风控部\", \"expense_date\": \"2025-01-04\", \"reimburse_date\": \"2025-02-14\", \"expense_type\": \"office_supplies\", \"amount\": 487.64, \"reason\": \"业务会议用品费\", \"invoice_no\": \"FP202500001826\", \"status\": \"approved\"}, {\"record_id\": \"R002138\", \"record_no\": \"BX2025002138\", \"employee_id\": \"E0033\", \"employee_name\": \"郑刚\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"expense_date\": \"2025-01-04\", \"reimburse_date\": \"2025-02-12\", \"expense_type\": \"office_supplies\", \"amount\": 232.26, \"reason\": \"投资银行部培训材料用品费\", \"invoice_no\": \"FP202500002138\", \"status\": \"approved\"}, {\"record_id\": \"R002311\", \"record_no\": \"BX2025002311\", \"employee_id\": \"E0025\", \"employee_name\": \"王丹丹\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"expense_date\": \"2025-01-04\", \"reimburse_date\": \"2025-02-20\", \"expense_type\": \"local_transport\", \"amount\": 47.51, \"reason\": \"投资银行部跨部门沟通交通费\", \"invoice_no\": \"FP202500002311\", \"status\": \"approved\"}, {\"record_id\": \"R002745\", \"record_no\": \"BX2025002745\", \"employee_id\": \"E0058\", \"employee_name\": \"莫佳\", \"department_id\": \"D007\", \"department_name\": \"信息技术部\", \"expense_date\": \"2025-01-04\", \"reimburse_date\": \"2025-02-13\", \"expense_type\": \"office_supplies\", \"amount\": 301.04, \"reason\": \"信息技术部硒鼓和纸张费用\", \"invoice_no\": \"FP202500002745\", \"status\": \"approved\"}, {\"record_id\": \"R003139\", \"record_no\": \"BX2025003139\", \"employee_id\": \"E0042\", \"employee_name\": \"谢玉\", \"department_id\": \"D008\", \"department_name\": \"合规风控部\", \"expense_date\": \"2025-01-04\", \"reimburse_date\": \"2025-01-31\", \"expense_type\": \"office_supplies\", \"amount\": 474.31, \"reason\": \"合规风控部硒鼓和纸张费用\", \"invoice_no\": \"FP202500003139\", \"status\": \"approved\"}, {\"record_id\": \"R000777\", \"record_no\": \"BX2025000777\", \"employee_id\": \"E0034\", \"employee_name\": \"黄萍\", \"department_id\": \"D005\", \"department_name\": \"机构业务部\", \"expense_date\": \"2025-01-05\", \"reimburse_date\": \"2025-01-10\", \"expense_type\": \"local_transport\", \"amount\": 213.62, \"reason\": \"青竹系统测试交通费\", \"invoice_no\": \"FP202500000777\", \"status\": \"approved\"}, {\"record_id\": \"R001401\", \"record_no\": \"BX2025001401\", \"employee_id\": \"E0059\", \"employee_name\": \"郑桂英\", \"department_id\": \"D006\", \"department_name\": \"运营管理部\", \"expense_date\": \"2025-01-05\", \"reimburse_date\": \"2025-02-10\", \"expense_type\": \"communication\", \"amount\": 284.22, \"reason\": \"杭州现场支持通讯费\", \"invoice_no\": \"FP202500001401\", \"status\": \"approved\"}, {\"record_id\": \"R002579\", \"record_no\": \"BX2025002579\", \"employee_id\": \"E0065\", \"employee_name\": \"吴小红\", \"department_id\": \"D006\", \"department_name\": \"运营管理部\", \"expense_date\": \"2025-01-05\", \"reimburse_date\": \"2025-02-25\", \"expense_type\": \"travel_lodging\", \"amount\": 276.51, \"reason\": \"远航材料访谈期间住宿费\", \"invoice_no\": \"FP202500002579\", \"status\": \"approved\"}, {\"record_id\": \"R002678\", \"record_no\": \"BX2025002678\", \"employee_id\": \"E0050\", \"employee_name\": \"姚瑜\", \"department_id\": \"D008\", \"department_name\": \"合规风控部\", \"expense_date\": \"2025-01-05\", \"reimburse_date\": \"2025-01-16\", \"expense_type\": \"communication\", \"amount\": 215.07, \"reason\": \"客户回访电话费用\", \"invoice_no\": \"FP202500002678\", \"status\": \"approved\"}, {\"record_id\": \"R002711\", \"record_no\": \"BX2025002711\", \"employee_id\": \"E0039\", \"employee_name\": \"覃秀英\", \"department_id\": \"D002\", \"department_name\": \"固定收益部\", \"expense_date\": \"2025-01-05\", \"reimburse_date\": \"2025-01-29\", \"expense_type\": \"office_supplies\", \"amount\": 314.81, \"reason\": \"部门月度办公耗材费\", \"invoice_no\": \"FP202500002711\", \"status\": \"approved\"}, {\"record_id\": \"R003083\", \"record_no\": \"BX2025003083\", \"employee_id\": \"E0017\", \"employee_name\": \"黄宁\", \"department_id\": \"D003\", \"department_name\": \"财富管理部\", \"expense_date\": \"2025-01-05\", \"reimburse_date\": \"2025-01-12\", \"expense_type\": \"communication\", \"amount\": 132.03, \"reason\": \"财富管理部值班联络通讯费\", \"invoice_no\": \"FP202500003083\", \"status\": \"approved\"}, {\"record_id\": \"R003300\", \"record_no\": \"BX2025003300\", \"employee_id\": \"E0063\", \"employee_name\": \"苗兰英\", \"department_id\": \"D004\", \"department_name\": \"研究所\", \"expense_date\": \"2025-01-05\", \"reimburse_date\": \"2025-02-07\", \"expense_type\": \"office_supplies\", \"amount\": 460.09, \"reason\": \"项目交付资料用品费\", \"invoice_no\": \"FP202500003300\", \"status\": \"approved\"}, {\"record_id\": \"R003461\", \"record_no\": \"BX2025003461\", \"employee_id\": \"E0042\", \"employee_name\": \"谢玉\", \"department_id\": \"D008\", \"department_name\": \"合规风控部\", \"expense_date\": \"2025-01-05\", \"reimburse_date\": \"2025-01-17\", \"expense_type\": \"local_transport\", \"amount\": 73.96, \"reason\": \"参加杭州业务会议市内交通费\", \"invoice_no\": \"FP202500003461\", \"status\": \"approved\"}, {\"record_id\": \"R003826\", \"record_no\": \"BX2025003826\", \"employee_id\": \"E0031\", \"employee_name\": \"徐峰\", \"department_id\": \"D006\", \"department_name\": \"运营管理部\", \"expense_date\": \"2025-01-05\", \"reimburse_date\": \"2025-01-19\", \"expense_type\": \"office_supplies\", \"amount\": 250.69, \"reason\": \"业务会议用品费\", \"invoice_no\": \"FP202500003826\", \"status\": \"approved\"}, {\"record_id\": \"R003992\", \"record_no\": \"BX2025003992\", \"employee_id\": \"E0055\", \"employee_name\": \"黄洁\", \"department_id\": \"D004\", \"department_name\": \"研究所\", \"expense_date\": \"2025-01-05\", \"reimburse_date\": \"2025-01-31\", \"expense_type\": \"travel_lodging\", \"amount\": 450.66, \"reason\": \"合肥分支机构培训支持住宿费\", \"invoice_no\": \"FP202500003992\", \"status\": \"approved\"}, {\"record_id\": \"R004227\", \"record_no\": \"BX2025X004227\", \"employee_id\": \"E0007\", \"employee_name\": \"李丽娟\", \"department_id\": \"D007\", \"department_name\": \"信息技术部\", \"expense_date\": \"2025-01-05\", \"reimburse_date\": \"2025-03-11\", \"expense_type\": \"communication\", \"amount\": 181.0, \"reason\": \"超期报销注入样本1\", \"invoice_no\": \"FP2025X0004221\", \"status\": \"approved\"}, {\"record_id\": \"R000220\", \"record_no\": \"BX2025000220\", \"employee_id\": \"E0070\", \"employee_name\": \"李琳\", \"department_id\": \"D006\", \"department_name\": \"运营管理部\", \"expense_date\": \"2025-01-06\", \"reimburse_date\": \"2025-02-14\", \"expense_type\": \"communication\", \"amount\": 206.46, \"reason\": \"监管沟通事项通讯费\", \"invoice_no\": \"FP202500000220\", \"status\": \"approved\"}, {\"record_id\": \"R000627\", \"record_no\": \"BX2025000627\", \"employee_id\": \"E0019\", \"employee_name\": \"韦柳\", \"department_id\": \"D006\", \"department_name\": \"运营管理部\", \"expense_date\": \"2025-01-06\", \"reimburse_date\": \"2025-03-06\", \"expense_type\": \"office_supplies\", \"amount\": 199.8, \"reason\": \"客户材料制作用品费\", \"invoice_no\": \"FP202500000627\", \"status\": \"approved\"}, {\"record_id\": \"R000773\", \"record_no\": \"BX2025000773\", \"employee_id\": \"E0075\", \"employee_name\": \"鞠英\", \"department_id\": \"D007\", \"department_name\": \"信息技术部\", \"expense_date\": \"2025-01-06\", \"reimburse_date\": \"2025-02-27\", \"expense_type\": \"office_supplies\", \"amount\": 343.19, \"reason\": \"项目底稿归档用品费\", \"invoice_no\": \"FP202500000773\", \"status\": \"approved\"}, {\"record_id\": \"R001022\", \"record_no\": \"BX2025001022\", \"employee_id\": \"E0037\", \"employee_name\": \"梁梅\", \"department_id\": \"D008\", \"department_name\": \"合规风控部\", \"expense_date\": \"2025-01-06\", \"reimburse_date\": \"2025-01-12\", \"expense_type\": \"local_transport\", \"amount\": 103.73, \"reason\": \"分支机构培训支持交通费\", \"invoice_no\": \"FP202500001022\", \"status\": \"approved\"}, {\"record_id\": \"R001358\", \"record_no\": \"BX2025001358\", \"employee_id\": \"E0064\", \"employee_name\": \"李秀云\", \"department_id\": \"D004\", \"department_name\": \"研究所\", \"expense_date\": \"2025-01-06\", \"reimburse_date\": \"2025-01-13\", \"expense_type\": \"travel_lodging\", \"amount\": 241.87, \"reason\": \"合肥客户沟通行程住宿费\", \"invoice_no\": \"FP202500001358\", \"status\": \"approved\"}, {\"record_id\": \"R001832\", \"record_no\": \"BX2025001832\", \"employee_id\": \"E0070\", \"employee_name\": \"李琳\", \"department_id\": \"D006\", \"department_name\": \"运营管理部\", \"expense_date\": \"2025-01-06\", \"reimburse_date\": \"2025-01-12\", \"expense_type\": \"communication\", \"amount\": 207.56, \"reason\": \"运营管理部值班联络通讯费\", \"invoice_no\": \"FP202500001832\", \"status\": \"approved\"}, {\"record_id\": \"R001925\", \"record_no\": \"BX2025001925\", \"employee_id\": \"E0080\", \"employee_name\": \"王桂英\", \"department_id\": \"D009\", \"department_name\": \"财务管理部\", \"expense_date\": \"2025-01-06\", \"reimburse_date\": \"2025-02-08\", \"expense_type\": \"business_entertainment\", \"amount\": 407.57, \"reason\": \"澄江资料确认工作餐费\", \"invoice_no\": \"FP202500001925\", \"status\": \"approved\"}, {\"record_id\": \"R001935\", \"record_no\": \"BX2025001935\", \"employee_id\": \"E0028\", \"employee_name\": \"杜丹\", \"department_id\": \"D009\", \"department_name\": \"财务管理部\", \"expense_date\": \"2025-01-06\", \"reimburse_date\": \"2025-01-31\", \"expense_type\": \"communication\", \"amount\": 245.66, \"reason\": \"星河跨部门协作通讯费\", \"invoice_no\": \"FP202500001935\", \"status\": \"approved\"}]}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 4,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"record\": {\"record_id\": \"R000002\", \"record_no\": \"BX2025000002\", \"employee_id\": \"E0050\", \"department_id\": \"D008\", \"expense_date\": \"2025-08-19\", \"reimburse_date\": \"2025-09-09\", \"expense_type\": \"office_supplies\", \"amount\": 423.79, \"reason\": \"清源项目资料装订用品费\", \"invoice_id\": \"INV000002\", \"status\": \"approved\", \"city_tier\": null, \"nights\": null, \"days\": null, \"participants\": null, \"budget_year\": 2025, \"special_approval\": 0, \"employee_name\": \"姚瑜\", \"employee_level\": \"X1\", \"position_role\": \"员工\", \"department_name\": \"合规风控部\", \"annual_budget\": 381600.0, \"invoice_no\": \"FP202500000002\", \"vendor_name\": \"XX供应商7753\", \"invoice_date\": \"2025-08-19\", \"invoice_amount\": 423.79}, \"approvals\": [{\"approval_id\": \"A000002\", \"tier_id\": \"AR-01\", \"approver_employee_id\": \"E0008\", \"approver_role\": \"部门经理\", \"approved_at\": \"2025-09-09\", \"approval_status\": \"approved\"}]}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 5,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"invoice_no\": \"FP202500000002\", \"usage_count\": 2, \"records\": [{\"record_id\": \"R004201\", \"record_no\": \"BX2025X004201\", \"employee_id\": \"E0050\", \"employee_name\": \"姚瑜\", \"department_id\": \"D008\", \"expense_date\": \"2025-02-10\", \"reimburse_date\": \"2025-02-18\", \"expense_type\": \"office_supplies\", \"amount\": 423.79, \"invoice_no\": \"FP202500000002\"}, {\"record_id\": \"R000002\", \"record_no\": \"BX2025000002\", \"employee_id\": \"E0050\", \"employee_name\": \"姚瑜\", \"department_id\": \"D008\", \"expense_date\": \"2025-08-19\", \"reimburse_date\": \"2025-09-09\", \"expense_type\": \"office_supplies\", \"amount\": 423.79, \"invoice_no\": \"FP202500000002\"}]}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 6,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"department_id\": \"D001\", \"employees\": [{\"employee_id\": \"E0001\", \"employee_name\": \"何英\", \"employee_level\": \"D1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"部门经理\", \"hire_date\": \"2022-01-06\"}, {\"employee_id\": \"E0011\", \"employee_name\": \"杨凤兰\", \"employee_level\": \"D1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"部门总经理\", \"hire_date\": \"2022-07-05\"}, {\"employee_id\": \"E0025\", \"employee_name\": \"王丹丹\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2020-12-11\"}, {\"employee_id\": \"E0033\", \"employee_name\": \"郑刚\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2023-04-19\"}, {\"employee_id\": \"E0040\", \"employee_name\": \"郑丹丹\", \"employee_level\": \"D1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2020-06-19\"}, {\"employee_id\": \"E0045\", \"employee_name\": \"吴磊\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2020-03-05\"}, {\"employee_id\": \"E0046\", \"employee_name\": \"杨英\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2024-08-12\"}, {\"employee_id\": \"E0054\", \"employee_name\": \"曾凤英\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2019-06-19\"}, {\"employee_id\": \"E0067\", \"employee_name\": \"毛艳\", \"employee_level\": \"M1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2024-08-18\"}, {\"employee_id\": \"E0074\", \"employee_name\": \"陈桂花\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2022-02-04\"}]}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 7,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"employee\": {\"employee_id\": \"E0001\", \"employee_name\": \"何英\", \"employee_level\": \"D1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"部门经理\", \"hire_date\": \"2022-01-06\"}}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 8,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"department\": {\"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"annual_budget\": 230395.17, \"manager_employee_id\": \"E0001\"}, \"cumulative_amount\": 363614.58, \"record_count\": 525}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 9,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"record_id\": \"R000002\", \"approvals\": [{\"approval_id\": \"A000002\", \"record_id\": \"R000002\", \"tier_id\": \"AR-01\", \"approver_employee_id\": \"E0008\", \"approver_role\": \"部门经理\", \"approved_at\": \"2025-09-09\", \"approval_status\": \"approved\"}]}"
+        }
+      ],
+      "isError": false
+    }
+  }
+]

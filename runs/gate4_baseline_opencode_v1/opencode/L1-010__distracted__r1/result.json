@@ -1,0 +1,43 @@
+{
+  "completed": true,
+  "candidate": "opencode",
+  "task_id": "L1-010",
+  "level": "L1",
+  "category": "single_anomaly_lookup",
+  "variant": "distracted",
+  "repeat_index": 1,
+  "elapsed_seconds": 39.5,
+  "exit_code": 0,
+  "timeout": false,
+  "format_failure": false,
+  "parse_error": null,
+  "answer_json": {
+    "anomaly_ids": [
+      "EXC-OVERDUE-001",
+      "EXC-SELF-APPROVAL-001"
+    ],
+    "answer": "核查记录R004227（李丽娟/信息技术部/通讯费181元）发现两项异常：一、费用日期2025-01-05至报销日期2025-03-11超出60天报销期限（超期6天），违反《费用报销管理办法》第七条，且事由明确标注为超期报销；二、报销人李丽娟作为部门经理自行审批本人报销，违反审批回避原则，应按《授权管理办法》附件二由上级角色审批。通讯费金额未超月度标准，发票无重复使用，预算未超支。",
+    "citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第七条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "final_text": "**核查结果**\n\n经过对记录 R004227（BX2025X004227）的核查，发现以下异常：\n\n1. **超期报销**  \n   - 费用日期 2025-01-05，报销日期 2025-03-11，间隔 65 天，超过《XX证券费用报销管理办法(2025修订版)》第七条规定的 60 天期限。  \n   - 报销事由明确标注\"超期报销注入样本1\"，属于明知超期仍报销。\n\n2. **自我审批（审批回避缺失）**  \n   - 报销人李丽娟（E0007，部门经理）同时担任该笔报销的审批人（审批记录 A004227 的批准人为 E0007，角色为\"部门经理\"），违反了费用报销管理中\"经办人、审批人分离\"的基本内控原则。  \n   - 根据《XX证券授权管理办法》附件二，AR-01 档位虽要求\"部门经理\"审批，但当部门经理本人为报销经办人时，应由其上级（如部门总经理或分管副总）履行审批，而非自我批准。\n\n**合规项**  \n- 通讯费 181 元未超过每人每月 300 元标准（《办公与通讯费用管理办法》第三条）。  \n- 发票 FP2025X0004221 仅用于本笔报销，无重复使用。  \n- 金额 181 元在预算额度内，无预算超支。\n\n```json\n{\n  \"anomaly_ids\": [\"EXC-OVERDUE-001\", \"EXC-SELF-APPROVAL-001\"],\n  \"answer\": \"核查记录R004227（李丽娟/信息技术部/通讯费181元）发现两项异常：一、费用日期2025-01-05至报销日期2025-03-11超出60天报销期限（超期6天），违反《费用报销管理办法》第七条，且事由明确标注为超期报销；二、报销人李丽娟作为部门经理自行审批本人报销，违反审批回避原则，应按《授权管理办法》附件二由上级角色审批。通讯费金额未超月度标准，发票无重复使用，预算未超支。\",\n  \"citations\": [\n    {\n      \"doc_id\": \"01_expense_reimbursement_2025.md\",\n      \"clause_no\": \"第七条\"\n    },\n    {\n      \"doc_id\": \"03_authorization_management.md\",\n      \"clause_no\": \"附件二\"\n    }\n  ]\n}\n```",
+  "tool_calls_count": 10,
+  "tool_log_present": true,
+  "workdir_diff_empty": true,
+  "files": {
+    "stdout": "stdout.log",
+    "stderr": "stderr.log",
+    "tool_calls": "tool_calls.jsonl",
+    "trajectory": "trajectory.json",
+    "result": "result.json",
+    "workdir_diff": "workdir_diff.txt"
+  }
+}

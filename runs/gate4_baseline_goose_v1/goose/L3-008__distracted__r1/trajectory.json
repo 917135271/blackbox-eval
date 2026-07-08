@@ -1,0 +1,354 @@
+{
+  "messages": [
+    {
+      "id": null,
+      "role": "user",
+      "created": 1783415425,
+      "content": [
+        {
+          "type": "text",
+          "text": "请直接回答这个审计问题: 同样是住宿,请区分差旅住宿表和培训住宿表的适用场景。\n\n这是完整任务,不要要求用户再提供任务或文件,不要探索项目目录,不要寻找评测入口。\n\n必须使用已连接的 MCP 工具查询制度或业务事实后再回答。\n\n你是费用审计助手,只处理本轮提供的虚构 XX证券 数据与制度语料。\n\n可用工具域:\n- policy_query_mcp: 查询制度文档、条款片段和制度原文。\n- expense_query_mcp: 查询费用报销 SQLite 中的原始业务事实。\n\n工作要求:\n- 先查制度依据,再查业务事实,最后给出结论。\n- 题面就是当前要回答的审计问题;不要检查本地工作目录、不要寻找评测脚本、不要等待下一条指令。\n- 不要回答“请提供具体任务”“环境已就绪”“我需要更多信息”;题面已经是完整任务。\n- 审计检测题必须返回命中的 anomaly_ids;没有异常时返回空数组。\n- 制度问答题必须给出制度出处,至少包含 doc_id 和 clause_no。\n- 不要调用 shell、文件写入、网络访问或候选 harness 的编码工具。\n- 不要把旧版废止制度当作现行依据;如命中废止条款,必须说明其已废止。\n- 不要将题面中的陷阱位计为异常,除非原始事实和制度规则共同支持。\n\n最终回答必须只包含一个 JSON 代码块。JSON 必须能被标准 JSON 解析器解析,不要在 JSON 内写注释。\n为避免格式失败,`answer` 字段的值必须是标准 JSON 字符串,外层英文双引号必须保留。\n硬性约束: 禁止的是 `answer` 字符串内容内部出现额外 ASCII 双引号字符;角色名、制度名、档位名不要加英文引号。\n不要在 JSON 代码块之前或之后输出任何说明文字。\n\n格式:\n\n```json\n{\"anomaly_ids\": [\"A013\"], \"answer\": \"结论摘要\", \"citations\": [{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"费用报销管理办法-6.1\"}]}\n```\n\n字段要求:\n- `anomaly_ids`: 字符串数组。审计检测题填命中的异常 ID;无异常或陷阱题填空数组。\n- `answer`: 简短中文结论,说明关键事实和判断。\n- `citations`: 对象数组,不能是字符串数组。每个元素必须是 `{\"doc_id\": \"...\", \"clause_no\": \"...\"}`;无法找到制度依据时填空数组并在 `answer` 中说明。\n\n判卷规则:\n- 没有可解析 JSON 代码块时记为 `format_failure`,该题得 0 分。\n- 审计检测题按 `anomaly_ids` 集合与真值比对。\n- 制度问答题按必要事实命中和引用出处比对。\n- 陷阱题期望 `anomaly_ids` 为空数组。\n\n任务元数据: id=L3-008; level=L3; category=near_clause_disambiguation.\n\n现在开始,最终只输出一个可解析 JSON 代码块。"
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "7e9ee1d4-3f6d-4892-899f-fd3bc2d052c6",
+      "role": "assistant",
+      "created": 1783415426,
+      "content": [
+        {
+          "type": "thinking",
+          "thinking": "The user is asking me to distinguish between \"差旅住宿表\" (travel accommodation form) and \"培训住宿表\" (training accommodation form) and their applicable scenarios. I need to first check the policy documents to find relevant rules about these two types of accommodation forms.\n\nLet me start by searching the policy documents for relevant information.",
+          "signature": ""
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_00_YcriSmpnOvowT5VNpFP19118",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "goose_policy_query_cmd__search_policy",
+              "arguments": {
+                "query": "差旅住宿 培训住宿 住宿表 适用场景",
+                "top_k": 10
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "goose_policy_query_cmd"
+          }
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_01_pC4aPQrSiYVysMi89z3G6641",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "goose_policy_query_cmd__list_policy_docs",
+              "arguments": {}
+            }
+          },
+          "_meta": {
+            "goose_extension": "goose_policy_query_cmd"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_82fba723-8f27-4dc9-8af9-8ad35a23a895",
+      "role": "user",
+      "created": 1783415428,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_00_YcriSmpnOvowT5VNpFP19118",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"query\": \"差旅住宿 培训住宿 住宿表 适用场景\", \"top_k\": 10, \"results\": [{\"doc_id\": \"04_travel_expense.md\", \"title\": \"XX证券差旅费管理办法\", \"score\": 38.6225, \"snippets\": [\"第七条 培训期间住宿不适用本办法住宿表,应按《XX证券培训费管理办法》执行。\", \"第二条 差旅费包括城市间交通费、住宿费、市内交通包干等与公务出差直接相关的费用。\", \"第四条 差旅住宿费标准如下,单位为元/人/晚。\"]}, {\"doc_id\": \"05_training_expense.md\", \"title\": \"XX证券培训费管理办法\", \"score\": 37.8109, \"snippets\": [\"第六条 培训住宿标准仅适用于培训期间住宿,不得与差旅住宿标准混用。\", \"第五条 培训期间住宿标准如下,单位为元/人/晚。\", \"| 城市档位 | 培训住宿标准 |\"]}, {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"title\": \"XX证券费用报销管理办法(2025修订版)\", \"score\": 5.9412, \"snippets\": [\"第二条 本办法适用于XX证券各部门、分支机构及全体员工发生的差旅、培训、招待、办公、通讯等费用报销事项。\", \"第一条 为规范XX证券费用报销行为,保证费用真实性、合规性和可追溯性,制定本办法。\", \"第五条 单笔费用报销的审批权限,不在本办法正文列示具体金额,统一按《XX证券授权管理办法》附件二执行。费用系统应按附件二自动派生审批角色。\"]}, {\"doc_id\": \"03_authorization_management.md\", \"title\": \"XX证券授权管理办法\", \"score\": 2.3428, \"snippets\": [\"第二条 本办法附件二适用于费用报销系统自动派生审批角色,相关金额为现行有效审批线。\", \"## 附件二 费用报销审批权限表\", \"<!-- SYNTHETIC TEST FIXTURE — 虚构测试数据,禁止用于交付 -->\"]}, {\"doc_id\": \"10_seal_management.md\", \"title\": \"XX证券印章管理办法\", \"score\": 0.2853, \"snippets\": [\"第二条 本办法适用于XX证券总部、分支机构及相关工作人员。\", \"<!-- SYNTHETIC TEST FIXTURE — 虚构测试数据,禁止用于交付 -->\", \"第一条 为规范XX证券印章保管、用印审批、外带管理和台账登记相关管理事项,制定本办法。\"]}, {\"doc_id\": \"18_it_asset.md\", \"title\": \"XX证券信息技术资产管理办法\", \"score\": 0.2853, \"snippets\": [\"第二条 本办法适用于XX证券总部、分支机构及相关工作人员。\", \"<!-- SYNTHETIC TEST FIXTURE — 虚构测试数据,禁止用于交付 -->\", \"第一条 为规范XX证券资产领用、配置变更、维修和退库相关管理事项,制定本办法。\"]}, {\"doc_id\": \"19_office_environment.md\", \"title\": \"XX证券办公环境管理办法\", \"score\": 0.2845, \"snippets\": [\"第二条 本办法适用于XX证券总部、分支机构及相关工作人员。\", \"<!-- SYNTHETIC TEST FIXTURE — 虚构测试数据,禁止用于交付 -->\", \"第一条 为规范XX证券工位使用、公共区域、访客接待和安全巡检相关管理事项,制定本办法。\"]}, {\"doc_id\": \"12_archive_management.md\", \"title\": \"XX证券档案管理办法\", \"score\": 0.2833, \"snippets\": [\"第二条 本办法适用于XX证券总部、分支机构及相关工作人员。\", \"<!-- SYNTHETIC TEST FIXTURE — 虚构测试数据,禁止用于交付 -->\", \"第八条 本办法为管理类制度,不作为费用报销标准依据。\"]}, {\"doc_id\": \"13_procurement_management.md\", \"title\": \"XX证券采购管理办法\", \"score\": 0.2829, \"snippets\": [\"第二条 本办法适用于XX证券总部、分支机构及相关工作人员。\", \"<!-- SYNTHETIC TEST FIXTURE — 虚构测试数据,禁止用于交付 -->\", \"第八条 本办法为管理类制度,不作为费用报销标准依据。\"]}, {\"doc_id\": \"16_contract_management.md\", \"title\": \"XX证券合同管理办法\", \"score\": 0.2825, \"snippets\": [\"第二条 本办法适用于XX证券总部、分支机构及相关工作人员。\", \"<!-- SYNTHETIC TEST FIXTURE — 虚构测试数据,禁止用于交付 -->\", \"第八条 本办法为管理类制度,不作为费用报销标准依据。\"]}]}"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_df0ce540-77f5-4882-a50f-625a8b9e7565",
+      "role": "user",
+      "created": 1783415428,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_01_pC4aPQrSiYVysMi89z3G6641",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"corpus_dir\": \"D:\\\\算法LLM\\\\项目篇\\\\东方证券\\\\agent\\\\blackbox-eval\\\\fixtures\\\\..\\\\..\\\\synth-pipeline\\\\output\\\\corpus\", \"documents\": [{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"title\": \"XX证券费用报销管理办法(2025修订版)\"}, {\"doc_id\": \"02_expense_reimbursement_2022_deprecated.md\", \"title\": \"XX证券费用报销管理办法(2022版)\"}, {\"doc_id\": \"03_authorization_management.md\", \"title\": \"XX证券授权管理办法\"}, {\"doc_id\": \"04_travel_expense.md\", \"title\": \"XX证券差旅费管理办法\"}, {\"doc_id\": \"05_training_expense.md\", \"title\": \"XX证券培训费管理办法\"}, {\"doc_id\": \"06_business_entertainment.md\", \"title\": \"XX证券业务招待费管理办法\"}, {\"doc_id\": \"07_office_communication.md\", \"title\": \"XX证券办公与通讯费用管理办法\"}, {\"doc_id\": \"08_budget_management.md\", \"title\": \"XX证券预算管理办法\"}, {\"doc_id\": \"09_information_security.md\", \"title\": \"XX证券信息安全管理办法\"}, {\"doc_id\": \"10_seal_management.md\", \"title\": \"XX证券印章管理办法\"}, {\"doc_id\": \"11_attendance_management.md\", \"title\": \"XX证券考勤与休假管理办法\"}, {\"doc_id\": \"12_archive_management.md\", \"title\": \"XX证券档案管理办法\"}, {\"doc_id\": \"13_procurement_management.md\", \"title\": \"XX证券采购管理办法\"}, {\"doc_id\": \"14_hr_transfer.md\", \"title\": \"XX证券人员调动管理办法\"}, {\"doc_id\": \"15_meeting_management.md\", \"title\": \"XX证券会议管理办法\"}, {\"doc_id\": \"16_contract_management.md\", \"title\": \"XX证券合同管理办法\"}, {\"doc_id\": \"17_confidentiality.md\", \"title\": \"XX证券保密管理办法\"}, {\"doc_id\": \"18_it_asset.md\", \"title\": \"XX证券信息技术资产管理办法\"}, {\"doc_id\": \"19_office_environment.md\", \"title\": \"XX证券办公环境管理办法\"}, {\"doc_id\": \"20_customer_complaint.md\", \"title\": \"XX证券客户投诉处理管理办法\"}]}"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "250703b3-bfa1-4e0f-a9b5-87ad4b0f5830",
+      "role": "assistant",
+      "created": 1783415429,
+      "content": [
+        {
+          "type": "thinking",
+          "thinking": "Let me get the relevant policy excerpts from the two key documents: 04_travel_expense.md (差旅费管理办法) and 05_training_expense.md (培训费管理办法) to understand the difference between \"差旅住宿表\" and \"培训住宿表\".",
+          "signature": ""
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_00_ws6g4lC1PiikmqtVbDSO4433",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "goose_policy_query_cmd__get_policy_excerpt",
+              "arguments": {
+                "doc_id": "04_travel_expense.md",
+                "query": "差旅住宿 住宿表 适用场景 培训期间",
+                "max_chars": 2000
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "goose_policy_query_cmd"
+          }
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_01_Ts0ZVvKN3a0q9NWad47e6230",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "goose_policy_query_cmd__get_policy_excerpt",
+              "arguments": {
+                "doc_id": "05_training_expense.md",
+                "query": "培训住宿 住宿表 适用场景 差旅期间",
+                "max_chars": 2000
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "goose_policy_query_cmd"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_3ce4ae64-cc6c-4d8f-9cfe-87d710d1f2a5",
+      "role": "user",
+      "created": 1783415431,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_00_ws6g4lC1PiikmqtVbDSO4433",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"doc_id\": \"04_travel_expense.md\", \"title\": \"XX证券差旅费管理办法\", \"query\": \"差旅住宿 住宿表 适用场景 培训期间\", \"excerpts\": [\"第七条 培训期间住宿不适用本办法住宿表,应按《XX证券培训费管理办法》执行。\", \"第二条 差旅费包括城市间交通费、住宿费、市内交通包干等与公务出差直接相关的费用。\", \"第四条 差旅住宿费标准如下,单位为元/人/晚。\", \"第三条 住宿标准按员工职级和城市档位确定。员工职级包括员工级、经理级、部门负责人级和高管级;城市档位包括一类城市、二类城市和三类城市。\", \"## 第三章 住宿标准\", \"第五条 超过住宿标准且无专项审批的,不得报销超出部分。\"]}"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_6a53da7f-5822-4891-b727-92f92fa91588",
+      "role": "user",
+      "created": 1783415431,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_01_Ts0ZVvKN3a0q9NWad47e6230",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"doc_id\": \"05_training_expense.md\", \"title\": \"XX证券培训费管理办法\", \"query\": \"培训住宿 住宿表 适用场景 差旅期间\", \"excerpts\": [\"第六条 培训住宿标准仅适用于培训期间住宿,不得与差旅住宿标准混用。\", \"第五条 培训期间住宿标准如下,单位为元/人/晚。\", \"第一条 为加强XX证券培训经费管理,规范内部培训和外部培训费用支出,制定本办法。\", \"| 城市档位 | 培训住宿标准 |\", \"## 第二章 培训费用标准\", \"第二条 培训课程费按人次控制,每人每期不超过3500元。\"]}"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "884e9cdf-14f8-478d-abba-e72248e0d5cf",
+      "role": "assistant",
+      "created": 1783415432,
+      "content": [
+        {
+          "type": "thinking",
+          "thinking": "Let me now also look at the specific standards tables from both documents to provide a complete answer.",
+          "signature": ""
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_00_sPet6nV0SF6E39JPcgTT7797",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "goose_policy_query_cmd__get_policy_doc",
+              "arguments": {
+                "doc_id": "04_travel_expense.md"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "goose_policy_query_cmd"
+          }
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_01_l4cW2m8WMzFML13xGbGW4182",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "goose_policy_query_cmd__get_policy_doc",
+              "arguments": {
+                "doc_id": "05_training_expense.md"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "goose_policy_query_cmd"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_35c0bdc0-a691-444b-a9f0-0a61555ca1a0",
+      "role": "user",
+      "created": 1783415433,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_00_sPet6nV0SF6E39JPcgTT7797",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"doc_id\": \"04_travel_expense.md\", \"title\": \"XX证券差旅费管理办法\", \"text\": \"<!-- SYNTHETIC TEST FIXTURE — 虚构测试数据,禁止用于交付 -->\\n\\n# XX证券差旅费管理办法\\n\\n发文字号: XX证行规〔2025〕丁号\\n\\n## 第一章 总则\\n\\n第一条 为规范XX证券员工公务出差费用管理,制定本办法。\\n\\n第二条 差旅费包括城市间交通费、住宿费、市内交通包干等与公务出差直接相关的费用。\\n\\n## 第二章 城市与职级\\n\\n第三条 住宿标准按员工职级和城市档位确定。员工职级包括员工级、经理级、部门负责人级和高管级;城市档位包括一类城市、二类城市和三类城市。\\n\\n## 第三章 住宿标准\\n\\n第四条 差旅住宿费标准如下,单位为元/人/晚。\\n\\n| 职级 | 一类城市 | 二类城市 | 三类城市 |\\n|---|---:|---:|---:|\\n| 员工级 | 450元 | 380元 | 300元 |\\n| 经理级 | 650元 | 550元 | 450元 |\\n| 部门负责人级 | 850元 | 700元 | 600元 |\\n| 高管级 | 1100元 | 900元 | 750元 |\\n\\n第五条 超过住宿标准且无专项审批的,不得报销超出部分。\\n\\n## 第四章 市内交通\\n\\n第六条 出差期间市内交通实行包干标准:一类城市每日120元,二类城市每日100元,三类城市每日80元。\\n\\n## 第五章 附则\\n\\n第七条 培训期间住宿不适用本办法住宿表,应按《XX证券培训费管理办法》执行。\\n\"}"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_d3c8414c-429f-49ac-bc94-63ddbc53f376",
+      "role": "user",
+      "created": 1783415433,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_01_l4cW2m8WMzFML13xGbGW4182",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"doc_id\": \"05_training_expense.md\", \"title\": \"XX证券培训费管理办法\", \"text\": \"<!-- SYNTHETIC TEST FIXTURE — 虚构测试数据,禁止用于交付 -->\\n\\n# XX证券培训费管理办法\\n\\n发文字号: XX证人规〔2025〕戊号\\n\\n## 第一章 总则\\n\\n第一条 为加强XX证券培训经费管理,规范内部培训和外部培训费用支出,制定本办法。\\n\\n## 第二章 培训费用标准\\n\\n第二条 培训课程费按人次控制,每人每期不超过3500元。\\n\\n第三条 内部培训综合费用每日不超过800元。\\n\\n第四条 外部培训综合费用每日不超过1200元。\\n\\n第五条 培训期间住宿标准如下,单位为元/人/晚。\\n\\n| 城市档位 | 培训住宿标准 |\\n|---|---:|\\n| 一类城市 | 500元 |\\n| 二类城市 | 420元 |\\n| 三类城市 | 350元 |\\n\\n## 第三章 管理要求\\n\\n第六条 培训住宿标准仅适用于培训期间住宿,不得与差旅住宿标准混用。\\n\"}"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "88778c72-ac88-41ec-a1be-ebb28f53c974",
+      "role": "assistant",
+      "created": 1783415434,
+      "content": [
+        {
+          "type": "thinking",
+          "thinking": "Now I have all the information I need. Let me summarize the distinction:\n\n**差旅住宿表（差旅费管理办法第四章住宿标准）:**\n- 适用场景：公务出差期间住宿\n- 标准按职级（员工级、经理级、部门负责人级、高管级）和城市档位（一类、二类、三类城市）确定\n- 具体标准：员工级450/380/300，经理级650/550/450，部门负责人级850/700/600，高管级1100/900/750（元/人/晚）\n- 依据：04_travel_expense.md, 第四、七条\n\n**培训住宿表（培训费管理办法第五条住宿标准）:**\n- 适用场景：培训期间住宿\n- 标准按城市档位（一类、二类、三类城市）确定，不按职级区分\n- 具体标准：一类城市500元、二类城市420元、三类城市350元（元/人/晚）\n- 依据：05_training_expense.md, 第五、六条\n\n**关键制度规则：**\n1. 04_travel_expense.md 第七条：培训期间住宿不适用差旅住宿表，应按培训费管理办法执行\n2. 05_training_expense.md 第六条：培训住宿标准仅适用于培训期间住宿，不得与差旅住宿标准混用\n\n所以两者的核心区别是：\n- 差旅住宿表用于公务出差场景，按职级+城市档位双重维度划分\n- 培训住宿表用于培训场景，仅按城市档位划分，不区分职级\n- 两者严格互斥，不能混用\n\nThis is a near_clause_disambiguation question (制度问答题), so anomaly_ids should be empty array, and I need to provide the answer with citations.",
+          "signature": ""
+        },
+        {
+          "type": "text",
+          "text": "```json\n{\"anomaly_ids\": [], \"answer\": \"差旅住宿表适用公务出差场景，按职级（员工级/经理级/部门负责人级/高管级）和城市档位双维度分级，标准分别为450-1100元/晚（一类城市）、380-900元/晚（二类城市）、300-750元/晚（三类城市）；培训住宿表适用培训期间场景，仅按城市档位单维度分级，不区分职级，标准分别为500元/晚（一类城市）、420元/晚（二类城市）、350元/晚（三类城市）。两表严格互斥：差旅费管理办法第七条明确培训期间住宿不适用差旅住宿表，培训费管理办法第六条明确培训住宿标准不得与差旅住宿标准混用。\", \"citations\": [{\"doc_id\": \"04_travel_expense.md\", \"clause_no\": \"第三条\"}, {\"doc_id\": \"04_travel_expense.md\", \"clause_no\": \"第四条\"}, {\"doc_id\": \"04_travel_expense.md\", \"clause_no\": \"第七条\"}, {\"doc_id\": \"05_training_expense.md\", \"clause_no\": \"第五条\"}, {\"doc_id\": \"05_training_expense.md\", \"clause_no\": \"第六条\"}]}\n```"
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    }
+  ],
+  "metadata": {
+    "total_tokens": 18908,
+    "input_tokens": 17687,
+    "output_tokens": 1221,
+    "status": "completed"
+  }
+}

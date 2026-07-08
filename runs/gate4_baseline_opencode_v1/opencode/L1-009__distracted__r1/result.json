@@ -1,0 +1,47 @@
+{
+  "completed": true,
+  "candidate": "opencode",
+  "task_id": "L1-009",
+  "level": "L1",
+  "category": "single_anomaly_lookup",
+  "variant": "distracted",
+  "repeat_index": 1,
+  "elapsed_seconds": 46.99,
+  "exit_code": 0,
+  "timeout": false,
+  "format_failure": false,
+  "parse_error": null,
+  "answer_json": {
+    "anomaly_ids": [
+      "BUDGET_OVER_100_PCT",
+      "NO_SPECIAL_APPROVAL"
+    ],
+    "answer": "记录R000079（毛艳，投资银行部，办公用品费226.98元）存在预算违规问题。投资银行部2025年度预算230,395.17元，已批准累计金额已达363,614.58元（超额约58%）。根据《XX证券费用报销管理办法(2025修订版)》第十三条，部门预算使用达到预算额度的1.0倍后，确需发生的费用应履行专项审批，但本记录special_approval字段为0，未取得任何专项审批即予批准报销，违反了该条款。其他方面（办公用品月度限额、报销时限、发票唯一性、审批权限档位）均未见异常。",
+    "citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十三条"
+      },
+      {
+        "doc_id": "07_office_communication.md",
+        "clause_no": "第二条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "final_text": "感谢您提供的信息。我已完成对记录 R000079 的核查。\n\n---\n\n**已完成的审计分析：**\n\n**记录 R000079 基本信息：**\n- 员工：毛艳 (E0067, M1级别，员工岗位)\n- 部门：投资银行部 (D001)\n- 费用类型：办公用品（office_supplies）\n- 金额：226.98 元\n- 费用日期：2025-08-30\n- 报销日期：2025-10-21（间隔52天，在60天期限内）\n- 发票：FP202500000079（仅用于本记录，无重复报销）\n- 审批：AR-01 档位（部门经理审批），正确匹配金额<3000元\n- 专项审批标记：0（未履行专项审批）\n- 状态：已批准\n\n**已核查的合规要点：**\n\n| 检查项 | 政策依据 | 结果 |\n|---|---|---|\n| 办公用品月度限额（≤600元/月/人） | 《办公与通讯费用管理办法》第二条 | ✅ 226.98 < 600，合规 |\n| 报销时限（费用发生后60天内） | 《费用报销管理办法》第七条 | ✅ 52天，合规 |\n| 重复发票 | 《费用报销管理办法》第十条 | ✅ 仅使用一次 |\n| 拆分报销（7天同类型） | 《费用报销管理办法》第十一条 | ✅ 上一个办公用品报销为8月17日，间隔>7天 |\n| 审批权限档位 | 《授权管理办法》附件二 | ✅ AR-01正确（金额＜3000元） |\n\n**⚠️ 发现异常：部门预算超额且未获专项审批**\n\n- 投资银行部年度预算：**230,395.17 元**\n- 已批准累计金额：**363,614.58 元**（已达预算的 **158%**）\n- 根据《费用报销管理办法(2025修订版)》第十三条：*\"部门年度预算不足时不得继续报销。预算使用达到预算额度的1.0倍后，确需发生的费用应履行专项审批。\"*\n- 该记录 `special_approval = 0`，说明未取得专项审批即予以报销。\n\n---\n\n```json\n{\n  \"anomaly_ids\": [\"BUDGET_OVER_100_PCT\", \"NO_SPECIAL_APPROVAL\"],\n  \"answer\": \"记录R000079（毛艳，投资银行部，办公用品费226.98元）存在预算违规问题。投资银行部2025年度预算230,395.17元，已批准累计金额已达363,614.58元（超额约58%）。根据《XX证券费用报销管理办法(2025修订版)》第十三条，部门预算使用达到预算额度的1.0倍后，确需发生的费用应履行专项审批，但本记录special_approval字段为0，未取得任何专项审批即予批准报销，违反了该条款。其他方面（办公用品月度限额、报销时限、发票唯一性、审批权限档位）均未见异常。\",\n  \"citations\": [\n    {\n      \"doc_id\": \"01_expense_reimbursement_2025.md\",\n      \"clause_no\": \"第十三条\"\n    },\n    {\n      \"doc_id\": \"07_office_communication.md\",\n      \"clause_no\": \"第二条\"\n    },\n    {\n      \"doc_id\": \"03_authorization_management.md\",\n      \"clause_no\": \"附件二\"\n    }\n  ]\n}\n```",
+  "tool_calls_count": 11,
+  "tool_log_present": true,
+  "workdir_diff_empty": true,
+  "files": {
+    "stdout": "stdout.log",
+    "stderr": "stderr.log",
+    "tool_calls": "tool_calls.jsonl",
+    "trajectory": "trajectory.json",
+    "result": "result.json",
+    "workdir_diff": "workdir_diff.txt"
+  }
+}

@@ -1,0 +1,103 @@
+diff --git a/trae_agent/agent/agent.py b/trae_agent/agent/agent.py
+index bbca94f..f84328b 100644
+--- a/trae_agent/agent/agent.py
++++ b/trae_agent/agent/agent.py
+@@ -95,6 +95,10 @@ class Agent:
+                 await self.agent.cleanup_mcp_clients()
+ 
+         if cli_console_task:
+-            await cli_console_task
++            # Console rendering is auxiliary. If async teardown cancels the
++            # background console task, preserve the agent run result instead of
++            # turning the CLI process into a failure.
++            with contextlib.suppress(Exception, asyncio.CancelledError):
++                await cli_console_task
+ 
+         return execution
+diff --git a/trae_agent/agent/trae_agent.py b/trae_agent/agent/trae_agent.py
+index c414117..70baa6b 100644
+--- a/trae_agent/agent/trae_agent.py
++++ b/trae_agent/agent/trae_agent.py
+@@ -49,6 +49,7 @@ class TraeAgent(BaseAgent):
+         self.base_commit: str | None = None
+         self.must_patch: str = "false"
+         self.patch_path: str | None = None
++        self.system_prompt: str | None = trae_agent_config.system_prompt
+         self.mcp_servers_config: dict[str, MCPServerConfig] | None = (
+             trae_agent_config.mcp_servers_config if trae_agent_config.mcp_servers_config else None
+         )
+@@ -171,7 +172,7 @@ class TraeAgent(BaseAgent):
+ 
+     def get_system_prompt(self) -> str:
+         """Get the system prompt for TraeAgent."""
+-        return TRAE_AGENT_SYSTEM_PROMPT
++        return self.system_prompt or TRAE_AGENT_SYSTEM_PROMPT
+ 
+     @override
+     def reflect_on_result(self, tool_results: list[ToolResult]) -> str | None:
+@@ -235,6 +236,13 @@ class TraeAgent(BaseAgent):
+     @override
+     def _is_task_completed(self, llm_response: LLMResponse) -> bool:
+         """Enhanced task completion detection."""
++        for tool_call in llm_response.tool_calls or []:
++            if tool_call.name != "task_done":
++                continue
++            result = tool_call.arguments.get("result")
++            if isinstance(result, str) and result.strip() and not llm_response.content.strip():
++                llm_response.content = result.strip()
++
+         if self.must_patch == "true":
+             model_patch = self.get_git_diff()
+             patch = self.remove_patches_to_tests(model_patch)
+@@ -252,7 +260,10 @@ class TraeAgent(BaseAgent):
+     async def cleanup_mcp_clients(self) -> None:
+         """Clean up all MCP clients to prevent async context leaks."""
+         for client in self.mcp_clients:
+-            with contextlib.suppress(Exception):
++            # anyio's stdio teardown can raise asyncio.CancelledError after the
++            # subprocess has already been closed; do not let cleanup flip a
++            # completed run into a CLI failure.
++            with contextlib.suppress(Exception, asyncio.CancelledError):
+                 # Use a generic server name for cleanup since we don't track which server each client is for
+                 await client.cleanup("cleanup")
+         self.mcp_clients.clear()
+diff --git a/trae_agent/tools/task_done_tool.py b/trae_agent/tools/task_done_tool.py
+index 837d068..a0927c1 100644
+--- a/trae_agent/tools/task_done_tool.py
++++ b/trae_agent/tools/task_done_tool.py
+@@ -22,12 +22,20 @@ class TaskDoneTool(Tool):
+ 
+     @override
+     def get_description(self) -> str:
+-        return "Report the completion of the task. Note that you cannot call this tool before any verification is done. You can write reproduce / test script to verify your solution."
++        return "Report the completion of the task. Pass the final user-facing answer in result."
+ 
+     @override
+     def get_parameters(self) -> list[ToolParameter]:
+-        return []
++        return [
++            ToolParameter(
++                name="result",
++                type="string",
++                description="The final answer to return to the user.",
++                required=False,
++            )
++        ]
+ 
+     @override
+     async def execute(self, arguments: ToolCallArguments) -> ToolExecResult:
+-        return ToolExecResult(output="Task done.")
++        result = arguments.get("result")
++        return ToolExecResult(output=str(result) if result else "Task done.")
+diff --git a/trae_agent/utils/config.py b/trae_agent/utils/config.py
+index d950269..54721b3 100644
+--- a/trae_agent/utils/config.py
++++ b/trae_agent/utils/config.py
+@@ -161,6 +161,7 @@ class TraeAgentConfig(AgentConfig):
+     Trae agent configuration.
+     """
+ 
++    system_prompt: str | None = None
+     enable_lakeview: bool = True
+     tools: list[str] = field(
+         default_factory=lambda: [

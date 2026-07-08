@@ -1,0 +1,134 @@
+{
+  "modelProviders": {
+    "openai": [
+      {
+        "id": "deepseek-v4-flash",
+        "name": "DeepSeek V4 Flash",
+        "envKey": "LLM_API_KEY",
+        "baseUrl": "https://api.deepseek.com",
+        "generationConfig": {
+          "temperature": 0,
+          "maxOutputTokens": 4096
+        }
+      }
+    ]
+  },
+  "model": {
+    "name": "deepseek-v4-flash"
+  },
+  "security": {
+    "auth": {
+      "selectedType": "openai"
+    }
+  },
+  "tools": {
+      "exclude": [
+        "shell",
+        "write",
+        "edit",
+        "run_shell_command",
+        "write_file",
+        "replace",
+        "edit_file",
+        "read_file",
+        "list_directory",
+        "grep_search",
+        "glob",
+        "web_fetch",
+        "ask_user_question",
+        "send_message",
+        "cron_create",
+        "cron_list",
+        "cron_delete",
+        "task_stop",
+        "skill",
+        "todo_write",
+        "loop_wakeup",
+        "agent",
+        "enter_plan_mode",
+        "exit_plan_mode",
+        "enter_worktree",
+        "exit_worktree",
+        "read_mcp_resource",
+        "computer_use",
+        "computer_use__bring_to_front",
+        "computer_use__check_for_update",
+        "computer_use__check_permissions",
+        "computer_use__click",
+        "computer_use__double_click",
+        "computer_use__drag",
+        "computer_use__end_session",
+        "computer_use__get_accessibility_tree",
+        "computer_use__get_agent_cursor_state",
+        "computer_use__get_config",
+        "computer_use__get_cursor_position",
+        "computer_use__get_recording_state",
+        "computer_use__get_screen_size",
+        "computer_use__get_window_state",
+        "computer_use__hotkey",
+        "computer_use__kill_app",
+        "computer_use__launch_app",
+        "computer_use__list_apps",
+        "computer_use__list_windows",
+        "computer_use__move_cursor",
+        "computer_use__page",
+        "computer_use__press_key",
+        "computer_use__replay_trajectory",
+        "computer_use__right_click",
+        "computer_use__scroll",
+        "computer_use__set_agent_cursor_enabled",
+        "computer_use__set_agent_cursor_motion",
+        "computer_use__set_agent_cursor_style",
+        "computer_use__set_config",
+        "computer_use__set_value",
+        "computer_use__start_recording",
+        "computer_use__stop_recording",
+        "computer_use__type_text",
+        "computer_use__zoom"
+      ]
+  },
+  "mcpServers": {
+    "policy_query": {
+      "command": "python",
+      "args": [
+        "D:/算法LLM/项目篇/东方证券/agent/blackbox-eval/fixtures/policy_query_mcp.py"
+      ],
+      "cwd": "D:/算法LLM/项目篇/东方证券/agent/blackbox-eval",
+      "env": {
+        "EVAL_POLICY_CORPUS_DIR": "D:/算法LLM/项目篇/东方证券/agent/synth-pipeline/output/corpus",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "timeout": 30000,
+      "trust": true,
+      "includeTools": [
+        "list_policy_docs",
+        "search_policy",
+        "get_policy_doc",
+        "get_policy_excerpt"
+      ]
+    },
+    "expense_query": {
+      "command": "python",
+      "args": [
+        "D:/算法LLM/项目篇/东方证券/agent/blackbox-eval/fixtures/expense_query_mcp.py"
+      ],
+      "cwd": "D:/算法LLM/项目篇/东方证券/agent/blackbox-eval",
+      "env": {
+        "EVAL_EXPENSE_DB": "D:/算法LLM/项目篇/东方证券/agent/synth-pipeline/output/data/expense.db",
+        "PYTHONIOENCODING": "utf-8"
+      },
+      "timeout": 30000,
+      "trust": true,
+      "includeTools": [
+        "list_expenses",
+        "get_expense_detail",
+        "find_invoice_usage",
+        "list_employees",
+        "get_employee",
+        "get_department_budget",
+        "list_approvals"
+      ]
+    }
+  },
+  "$version": 4
+}

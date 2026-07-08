@@ -1,0 +1,373 @@
+
+    __( O)>  ● new session · openai deepseek-v4-flash
+   \____)    20260707_26 · D:\算法LLM\项目篇\东方证券\agent\blackbox-eval\candidates\goose\workdir
+     L L     goose is ready
+{
+  "messages": [
+    {
+      "id": null,
+      "role": "user",
+      "created": 1783408828,
+      "content": [
+        {
+          "type": "text",
+          "text": "# 审计单题执行指令\n\n你现在必须立即回答下面的审计问题。不要自我介绍,不要说明环境已就绪,不要等待下一条指令。\n\n必须使用已连接的 MCP 工具查询制度或业务事实;不要检查本地工作目录,不要寻找项目入口,不要要求用户提供文件。\n\n最后必须输出契约要求的 JSON 代码块。\n\n# 当前审计问题\n\n2022版中部门总经理审批线是多少,它现在是否有效?\n\n# 元数据\n\nid: L1-003\n\nlevel: L1\n\ncategory: version_check\n\n# 统一角色与约束\n\n你是费用审计助手,只处理本轮提供的虚构 XX证券 数据与制度语料。\n\n可用工具域:\n- policy_query_mcp: 查询制度文档、条款片段和制度原文。\n- expense_query_mcp: 查询费用报销 SQLite 中的原始业务事实。\n\n工作要求:\n- 先查制度依据,再查业务事实,最后给出结论。\n- 题面就是当前要回答的审计问题;不要检查本地工作目录、不要寻找评测脚本、不要等待下一条指令。\n- 审计检测题必须返回命中的 anomaly_ids;没有异常时返回空数组。\n- 制度问答题必须给出制度出处,至少包含 doc_id 和 clause_no。\n- 不要调用 shell、文件写入、网络访问或候选 harness 的编码工具。\n- 不要把旧版废止制度当作现行依据;如命中废止条款,必须说明其已废止。\n- 不要将题面中的陷阱位计为异常,除非原始事实和制度规则共同支持。\n\n# 统一输出契约\n\n最终回答必须以一个 JSON 代码块结束。JSON 必须能被标准 JSON 解析器解析,不要在 JSON 内写注释。\n\n格式:\n\n```json\n{\"anomaly_ids\": [\"A013\"], \"answer\": \"结论摘要\", \"citations\": [{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"费用报销管理办法-6.1\"}]}\n```\n\n字段要求:\n- `anomaly_ids`: 字符串数组。审计检测题填命中的异常 ID;无异常或陷阱题填空数组。\n- `answer`: 简短中文结论,说明关键事实和判断。\n- `citations`: 数组。每个元素包含 `doc_id` 和 `clause_no`;无法找到制度依据时填空数组并在 `answer` 中说明。\n\n判卷规则:\n- 没有可解析 JSON 代码块时记为 `format_failure`,该题得 0 分。\n- 审计检测题按 `anomaly_ids` 集合与真值比对。\n- 制度问答题按必要事实命中和引用出处比对。\n- 陷阱题期望 `anomaly_ids` 为空数组。\n\n# 立即作答\n\n请现在直接回答: 2022版中部门总经理审批线是多少,它现在是否有效?"
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "a866f61e-5120-4bad-afd0-f15bdc194351",
+      "role": "assistant",
+      "created": 1783408830,
+      "content": [
+        {
+          "type": "thinking",
+          "thinking": "The question asks about the 2022 version of the expense reimbursement policy, specifically the approval line for a department general manager (部门总经理审批线), and whether it is still valid.\n\nLet me start by searching for policy documents related to expense reimbursement to find the 2022 version.",
+          "signature": ""
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_00_SJYO401mLwT5FndczYr01979",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "goose_policy_query_cmd__list_policy_docs",
+              "arguments": {}
+            }
+          },
+          "_meta": {
+            "goose_extension": "goose_policy_query_cmd"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_314ca6ef-b0f7-493c-ae54-2bd62e7349cc",
+      "role": "user",
+      "created": 1783408831,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_00_SJYO401mLwT5FndczYr01979",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"corpus_dir\": \"D:\\\\算法LLM\\\\项目篇\\\\东方证券\\\\agent\\\\blackbox-eval\\\\fixtures\\\\..\\\\..\\\\synth-pipeline\\\\output\\\\corpus\", \"documents\": [{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"title\": \"XX证券费用报销管理办法(2025修订版)\"}, {\"doc_id\": \"02_expense_reimbursement_2022_deprecated.md\", \"title\": \"XX证券费用报销管理办法(2022版)\"}, {\"doc_id\": \"03_authorization_management.md\", \"title\": \"XX证券授权管理办法\"}, {\"doc_id\": \"04_travel_expense.md\", \"title\": \"XX证券差旅费管理办法\"}, {\"doc_id\": \"05_training_expense.md\", \"title\": \"XX证券培训费管理办法\"}, {\"doc_id\": \"06_business_entertainment.md\", \"title\": \"XX证券业务招待费管理办法\"}, {\"doc_id\": \"07_office_communication.md\", \"title\": \"XX证券办公与通讯费用管理办法\"}, {\"doc_id\": \"08_budget_management.md\", \"title\": \"XX证券预算管理办法\"}, {\"doc_id\": \"09_information_security.md\", \"title\": \"XX证券信息安全管理办法\"}, {\"doc_id\": \"10_seal_management.md\", \"title\": \"XX证券印章管理办法\"}, {\"doc_id\": \"11_attendance_management.md\", \"title\": \"XX证券考勤与休假管理办法\"}, {\"doc_id\": \"12_archive_management.md\", \"title\": \"XX证券档案管理办法\"}, {\"doc_id\": \"13_procurement_management.md\", \"title\": \"XX证券采购管理办法\"}, {\"doc_id\": \"14_hr_transfer.md\", \"title\": \"XX证券人员调动管理办法\"}, {\"doc_id\": \"15_meeting_management.md\", \"title\": \"XX证券会议管理办法\"}, {\"doc_id\": \"16_contract_management.md\", \"title\": \"XX证券合同管理办法\"}, {\"doc_id\": \"17_confidentiality.md\", \"title\": \"XX证券保密管理办法\"}, {\"doc_id\": \"18_it_asset.md\", \"title\": \"XX证券信息技术资产管理办法\"}, {\"doc_id\": \"19_office_environment.md\", \"title\": \"XX证券办公环境管理办法\"}, {\"doc_id\": \"20_customer_complaint.md\", \"title\": \"XX证券客户投诉处理管理办法\"}]}"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "64091875-55ba-47f8-a758-4948d2275394",
+      "role": "assistant",
+      "created": 1783408831,
+      "content": [
+        {
+          "type": "thinking",
+          "thinking": "I can see there are two relevant documents:\n1. `01_expense_reimbursement_2025.md` - XX证券费用报销管理办法(2025修订版) - the current version\n2. `02_expense_reimbursement_2022_deprecated.md` - XX证券费用报销管理办法(2022版) - marked as deprecated\n\nLet me search for the approval line amounts related to department general manager in the 2022 version, and also check the 2025 version to see if it's still valid.",
+          "signature": ""
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_00_HNQNk8Mk4OXZx40fdKZh2344",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "goose_policy_query_cmd__get_policy_excerpt",
+              "arguments": {
+                "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+                "query": "部门总经理 审批线 金额 权限",
+                "max_chars": 2000
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "goose_policy_query_cmd"
+          }
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_01_jIiTC9wWCVX2BiMq9vqv8819",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "goose_policy_query_cmd__get_policy_excerpt",
+              "arguments": {
+                "doc_id": "01_expense_reimbursement_2025.md",
+                "query": "部门总经理 审批线 金额 权限",
+                "max_chars": 2000
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "goose_policy_query_cmd"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_0ea718eb-70d5-43c1-bcc4-41f81ad47b5e",
+      "role": "user",
+      "created": 1783408833,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_00_HNQNk8Mk4OXZx40fdKZh2344",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"doc_id\": \"02_expense_reimbursement_2022_deprecated.md\", \"title\": \"XX证券费用报销管理办法(2022版)\", \"query\": \"部门总经理 审批线 金额 权限\", \"excerpts\": [\"第二条 旧版制度曾规定,单笔报销金额达到8000元的,应提交部门总经理审批。\", \"第四条 本办法的审批金额已被后续制度替代,不得作为现行审批依据。\", \"第三条 旧版制度曾规定,单笔报销金额达到30000元的,应提交分管副总审批。\", \"## 第二章 审批权限\", \"# XX证券费用报销管理办法(2022版)\", \"## 第一章 总则\"]}"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_6524b31e-f384-40be-b0ee-47d80f25bb88",
+      "role": "user",
+      "created": 1783408833,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_01_jIiTC9wWCVX2BiMq9vqv8819",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"title\": \"XX证券费用报销管理办法(2025修订版)\", \"query\": \"部门总经理 审批线 金额 权限\", \"excerpts\": [\"第十一条 不得将同一事项或同类事项拆分为多笔报销以规避审批权限。同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到《授权管理办法》附件二较高审批线的,应重点核查拆分规避审批。\", \"第五条 单笔费用报销的审批权限,不在本办法正文列示具体金额,统一按《XX证券授权管理办法》附件二执行。费用系统应按附件二自动派生审批角色。\", \"第三条 费用报销实行经办人真实性承诺、部门负责人业务审核、财务复核和授权审批相结合的管理原则。\", \"第十三条 部门年度预算不足时不得继续报销。预算使用达到预算额度的1.0倍后,确需发生的费用应履行专项审批。\", \"第六条 财务部门对票据合法性、费用归属、预算占用和制度标准进行复核。复核不替代业务部门对事项真实性的确认。\", \"第十二条 无专项审批时,报销金额不得超过对应制度标准的1.0倍。\"]}"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "7245bca9-1305-4754-9926-6f73de549724",
+      "role": "assistant",
+      "created": 1783408835,
+      "content": [
+        {
+          "type": "thinking",
+          "thinking": "The 2025 version refers to \"XX证券授权管理办法\" (Authorization Management) for the specific amounts. Let me check that document for the approval line for department general manager.\n\nAlso, let me get the full content of the 2022 deprecated document to see the specific approval line.",
+          "signature": ""
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_00_nsODXq181U97jz4LdYcQ3840",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "goose_policy_query_cmd__get_policy_doc",
+              "arguments": {
+                "doc_id": "02_expense_reimbursement_2022_deprecated.md"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "goose_policy_query_cmd"
+          }
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_01_yJhTpG7Evxx54GSwW5di0516",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "goose_policy_query_cmd__get_policy_doc",
+              "arguments": {
+                "doc_id": "03_authorization_management.md"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "goose_policy_query_cmd"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_d5a04025-d9f9-4a88-9fd7-52fb3e371045",
+      "role": "user",
+      "created": 1783408836,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_00_nsODXq181U97jz4LdYcQ3840",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"doc_id\": \"02_expense_reimbursement_2022_deprecated.md\", \"title\": \"XX证券费用报销管理办法(2022版)\", \"text\": \"<!-- SYNTHETIC TEST FIXTURE — 虚构测试数据,禁止用于交付 -->\\n\\n# XX证券费用报销管理办法(2022版)\\n\\n发文字号: XX证财规〔2022〕乙号\\n\\n## 第一章 总则\\n\\n第一条 本办法为XX证券旧版费用报销制度文本,仅作为制度沿革留档。现行制度应以《XX证券费用报销管理办法(2025修订版)》为准。\\n\\n## 第二章 审批权限\\n\\n第二条 旧版制度曾规定,单笔报销金额达到8000元的,应提交部门总经理审批。\\n\\n第三条 旧版制度曾规定,单笔报销金额达到30000元的,应提交分管副总审批。\\n\\n## 第三章 附则\\n\\n第四条 本办法的审批金额已被后续制度替代,不得作为现行审批依据。\\n\"}"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_3b8500a1-a7c0-43e2-8f22-d937fdd189e4",
+      "role": "user",
+      "created": 1783408836,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_01_yJhTpG7Evxx54GSwW5di0516",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"doc_id\": \"03_authorization_management.md\", \"title\": \"XX证券授权管理办法\", \"text\": \"<!-- SYNTHETIC TEST FIXTURE — 虚构测试数据,禁止用于交付 -->\\n\\n# XX证券授权管理办法\\n\\n发文字号: XX证综规〔2025〕丙号\\n\\n## 第一章 总则\\n\\n第一条 为明确XX证券经营管理授权边界,提升审批效率,制定本办法。\\n\\n第二条 本办法附件二适用于费用报销系统自动派生审批角色,相关金额为现行有效审批线。\\n\\n## 第二章 授权执行\\n\\n第三条 各部门应按系统派生结果提交审批,不得以口头授权替代系统流程。\\n\\n第四条 授权事项发生调整的,以最新修订版附件为准。\\n\\n## 附件二 费用报销审批权限表\\n\\n| 档位 | 单笔金额区间 | 必要审批角色 |\\n|---|---:|---|\\n| AR-01 | 大于等于0元且小于3000元 | 部门经理 |\\n| AR-02 | 大于等于3000元且小于10000元 | 部门经理,并经财务复核 |\\n| AR-03 | 大于等于10000元且小于50000元 | 部门总经理 |\\n| AR-04 | 大于等于50000元且小于200000元 | 分管副总 |\\n| AR-05 | 大于等于200000元 | 总经理办公会 |\\n\\n## 第三章 附则\\n\\n第五条 本办法自二〇二五年一月一日起施行。\\n\"}"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "0822f640-e5dc-4646-b5c1-9ae543ed3661",
+      "role": "assistant",
+      "created": 1783408837,
+      "content": [
+        {
+          "type": "thinking",
+          "thinking": "Now I have all the information needed to answer the question.\n\nThe 2022 version (now deprecated) stated in Article 2 that \"单笔报销金额达到8000元的,应提交部门总经理审批\" - meaning single reimbursement amounts reaching 8,000 yuan should be submitted to the department general manager for approval.\n\nSo in the 2022 version, the department general manager's approval line was **8,000 yuan**.\n\nHowever, the document is clearly marked as deprecated (\"旧版制度\" / \"已被后续制度替代\"), and the current valid version (2025 revision and the Authorization Management document) shows different approval lines. In the current authorization management (附件二), the department general manager (部门总经理) approval is needed for amounts >= 10,000 yuan and < 50,000 yuan (AR-03).\n\nSo to answer:\n1. The 2022 version stated the department general manager's approval line was 8,000 yuan.\n2. It is no longer valid - the 2022 version has been deprecated and replaced by the 2025 revision, which delegates approval lines to the Authorization Management document's Appendix 2.\n\nLet me check the 2025 document more carefully to see if it explicitly mentions the 2022 version being replaced.\n\nLet me get the full text of the 2025 document.",
+          "signature": ""
+        },
+        {
+          "type": "toolRequest",
+          "id": "call_00_Iwor1SWtaMNTOecGLSa20545",
+          "toolCall": {
+            "status": "success",
+            "value": {
+              "name": "goose_policy_query_cmd__get_policy_doc",
+              "arguments": {
+                "doc_id": "01_expense_reimbursement_2025.md"
+              }
+            }
+          },
+          "_meta": {
+            "goose_extension": "goose_policy_query_cmd"
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "msg_b3743174-3912-462e-84be-ebcfd18fe8a2",
+      "role": "user",
+      "created": 1783408840,
+      "content": [
+        {
+          "type": "toolResponse",
+          "id": "call_00_Iwor1SWtaMNTOecGLSa20545",
+          "toolResult": {
+            "status": "success",
+            "value": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"title\": \"XX证券费用报销管理办法(2025修订版)\", \"text\": \"<!-- SYNTHETIC TEST FIXTURE — 虚构测试数据,禁止用于交付 -->\\n\\n# XX证券费用报销管理办法(2025修订版)\\n\\n发文字号: XX证财规〔2025〕甲号\\n\\n## 第一章 总则\\n\\n第一条 为规范XX证券费用报销行为,保证费用真实性、合规性和可追溯性,制定本办法。\\n\\n第二条 本办法适用于XX证券各部门、分支机构及全体员工发生的差旅、培训、招待、办公、通讯等费用报销事项。\\n\\n第三条 费用报销实行经办人真实性承诺、部门负责人业务审核、财务复核和授权审批相结合的管理原则。\\n\\n## 第二章 报销申请与审批\\n\\n第四条 报销申请应通过费用系统提交,经办人应上传合法有效票据、业务说明和必要的审批依据。\\n\\n第五条 单笔费用报销的审批权限,不在本办法正文列示具体金额,统一按《XX证券授权管理办法》附件二执行。费用系统应按附件二自动派生审批角色。\\n\\n第六条 财务部门对票据合法性、费用归属、预算占用和制度标准进行复核。复核不替代业务部门对事项真实性的确认。\\n\\n## 第三章 时限管理\\n\\n第七条 员工应在费用发生后60天内提交报销申请;超过期限的,原则上不得报销。\\n\\n第八条 差旅借款应在行程结束后30天内完成冲销。\\n\\n第九条 会计年度末发生的费用,最迟可在财政年度结束后15天内补充提交,逾期按超期报销处理。\\n\\n## 第四章 禁止性规定\\n\\n第十条 同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。\\n\\n第十一条 不得将同一事项或同类事项拆分为多笔报销以规避审批权限。同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到《授权管理办法》附件二较高审批线的,应重点核查拆分规避审批。\\n\\n第十二条 无专项审批时,报销金额不得超过对应制度标准的1.0倍。\\n\\n第十三条 部门年度预算不足时不得继续报销。预算使用达到预算额度的1.0倍后,确需发生的费用应履行专项审批。\\n\\n## 第五章 附则\\n\\n第十四条 本办法自二〇二五年一月一日起施行。原《XX证券费用报销管理办法(2022版)》同时废止。\\n\"}"
+                }
+              ],
+              "isError": false
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    },
+    {
+      "id": "b60434e9-74ba-4fbe-bb36-8d1c3a0c4e12",
+      "role": "assistant",
+      "created": 1783408841,
+      "content": [
+        {
+          "type": "thinking",
+          "thinking": "Now I have all the information I need. Let me summarize:\n\n1. **2022版中部门总经理审批线是多少？**\n   - 根据《XX证券费用报销管理办法(2022版)》第二条规定：单笔报销金额达到8000元的，应提交部门总经理审批。\n   - 所以部门总经理审批线是 **8,000元**。\n\n2. **它现在是否有效？**\n   - 根据《XX证券费用报销管理办法(2025修订版)》第十四条规定：原《XX证券费用报销管理办法(2022版)》同时废止。\n   - 2022版本身也在其第四条明确说明：\"本办法的审批金额已被后续制度替代，不得作为现行审批依据。\"\n   - 现行有效的制度是2025修订版，其第五条规定审批权限统一按《XX证券授权管理办法》附件二执行。\n   - 在附件二中，部门总经理（部门总经理）的审批线是 **10,000元** 起（AR-03: 大于等于10000元且小于50000元）。\n   \n所以结论：2022版中部门总经理审批线为8,000元，但该规定现已废止，不再有效。",
+          "signature": ""
+        },
+        {
+          "type": "text",
+          "text": "根据查询结果，我来回答您的问题：\n\n---\n\n## 2022版中部门总经理审批线\n\n根据《XX证券费用报销管理办法(2022版)》**第二条**规定：\n> **单笔报销金额达到8,000元的，应提交部门总经理审批。**\n\n因此，2022版中部门总经理审批线为 **8,000元**。\n\n## 当前是否有效？\n\n**该规定现已废止，不再有效。**\n\n理由如下：\n\n1. 2022版文档本身已在**第四条**明确声明：\"本办法的审批金额已被后续制度替代，不得作为现行审批依据。\"\n\n2. 《XX证券费用报销管理办法(2025修订版)》**第十四条**明确规定：\"原《XX证券费用报销管理办法(2022版)》**同时废止**。\"\n\n3. 现行有效规定是：2025修订版**第五条**统一按《XX证券授权管理办法》附件二执行。附件二中，部门总经理（AR-03档）的审批线为 **≥10,000元且<50,000元**（原8,000元对应档位已被当前AR-02档——部门经理+财务复核——覆盖）。\n\n---\n\n```json\n{\"anomaly_ids\": [], \"answer\": \"2022版中部门总经理审批线为8,000元（单笔报销金额达到8,000元需提交部门总经理审批），但该规定已随《XX证券费用报销管理办法(2022版)》一同废止，不再有效。现行审批线按《XX证券授权管理办法》附件二执行，部门总经理审批线为≥10,000元。\", \"citations\": [{\"doc_id\": \"02_expense_reimbursement_2022_deprecated.md\", \"clause_no\": \"第二条\"}, {\"doc_id\": \"02_expense_reimbursement_2022_deprecated.md\", \"clause_no\": \"第四条\"}, {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"费用报销管理办法-第五条\"}, {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"费用报销管理办法-第十四条\"}, {\"doc_id\": \"03_authorization_management.md\", \"clause_no\": \"授权管理办法-附件二\"}]}\n```"
+        }
+      ],
+      "metadata": {
+        "userVisible": true,
+        "agentVisible": true
+      }
+    }
+  ],
+  "metadata": {
+    "total_tokens": 22110,
+    "input_tokens": 20470,
+    "output_tokens": 1640,
+    "status": "completed"
+  }
+}

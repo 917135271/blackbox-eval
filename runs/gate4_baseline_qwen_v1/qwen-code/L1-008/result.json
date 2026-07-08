@@ -1,0 +1,42 @@
+{
+  "completed": true,
+  "candidate": "qwen-code",
+  "task_id": "L1-008",
+  "level": "L1",
+  "category": "single_anomaly_lookup",
+  "variant": "precise",
+  "repeat_index": 1,
+  "elapsed_seconds": 42.06,
+  "exit_code": 0,
+  "timeout": false,
+  "format_failure": false,
+  "parse_error": null,
+  "answer_json": {
+    "anomaly_ids": [
+      "R004221"
+    ],
+    "answer": "是，报销记录R004221命中超标准。该记录为办公用品报销，金额650元，超过《XX证券办公与通讯费用管理办法》第二条规定的每人每月不超过600元的标准，且无专项审批，违反《XX证券费用报销管理办法(2025修订版)》第十二条关于无专项审批时金额不得超过制度标准1.0倍的规定。",
+    "citations": [
+      {
+        "doc_id": "07_office_communication.md",
+        "clause_no": "第二条"
+      },
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十二条"
+      }
+    ]
+  },
+  "final_text": "我已经完成所有调查。以下是审计结论：\n\n---\n\n**判断结果：报销记录 R004221 已命中超标准。**\n\n**原因分析：**\n1. 该记录 expense_type 为 `office_supplies`（办公用品），金额 **650元**。\n2. 根据《XX证券办公与通讯费用管理办法》（07_office_communication.md）**第二条**，员工个人办公用品报销按月控制，每人每月不超过 **600元**。650元 > 600元，超出标准。\n3. 根据《XX证券费用报销管理办法(2025修订版)》（01_expense_reimbursement_2025.md）**第十二条**，无专项审批时，报销金额不得超过对应制度标准的 **1.0倍**。该记录 `special_approval = 0`（无专项审批），金额已超标。\n4. 该记录报销事由明确标注为\"超标准注入样本1\"，确认其为超标准异常。\n\n```json\n{\n  \"anomaly_ids\": [\"R004221\"],\n  \"answer\": \"是，报销记录R004221命中超标准。该记录为办公用品报销，金额650元，超过《XX证券办公与通讯费用管理办法》第二条规定的每人每月不超过600元的标准，且无专项审批，违反《XX证券费用报销管理办法(2025修订版)》第十二条关于无专项审批时金额不得超过制度标准1.0倍的规定。\",\n  \"citations\": [\n    {\n      \"doc_id\": \"07_office_communication.md\",\n      \"clause_no\": \"第二条\"\n    },\n    {\n      \"doc_id\": \"01_expense_reimbursement_2025.md\",\n      \"clause_no\": \"第十二条\"\n    }\n  ]\n}\n```",
+  "tool_calls_count": 10,
+  "tool_log_present": true,
+  "workdir_diff_empty": true,
+  "files": {
+    "stdout": "stdout.log",
+    "stderr": "stderr.log",
+    "tool_calls": "tool_calls.jsonl",
+    "trajectory": "trajectory.json",
+    "result": "result.json",
+    "workdir_diff": "workdir_diff.txt"
+  }
+}

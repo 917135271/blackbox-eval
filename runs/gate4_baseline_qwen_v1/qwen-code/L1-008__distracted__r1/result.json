@@ -1,0 +1,51 @@
+{
+  "completed": true,
+  "candidate": "qwen-code",
+  "task_id": "L1-008",
+  "level": "L1",
+  "category": "single_anomaly_lookup",
+  "variant": "distracted",
+  "repeat_index": 1,
+  "elapsed_seconds": 42.78,
+  "exit_code": 0,
+  "timeout": false,
+  "format_failure": false,
+  "parse_error": null,
+  "answer_json": {
+    "anomaly_ids": [
+      "ANOM-001",
+      "ANOM-002"
+    ],
+    "answer": "记录R004221存在两项异常。异常一：报销人李丽娟报销办公用品650元，超过《办公与通讯费用管理办法》规定的个人月度限额600元，且无专项审批。异常二：李丽娟作为部门经理审批了自己的报销，审批链中审批人E0007与报销人E0007为同一人，违反费用报销管理办法第三条规定的职责分离管理原则。",
+    "citations": [
+      {
+        "doc_id": "07_office_communication.md",
+        "clause_no": "第二条"
+      },
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十二条"
+      },
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第三条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "final_text": "根据核查，费用报销记录 **R004221** 共发现 **2项异常**：\n\n---\n\n**异常1：个人办公用品报销金额超过月度限额**  \n- 报销金额650元，而《XX证券办公与通讯费用管理办法》第二条规定，员工个人办公用品报销按月控制，每人每月不超过600元。  \n- 且《XX证券费用报销管理办法(2025修订版)》第十二条规定，无专项审批时，报销金额不得超过对应制度标准的1.0倍（即600元）。该笔报销无专项审批（special_approval=0），超标准50元。\n\n**异常2：部门经理自我审批，违反职责分离原则**  \n- 报销人李丽娟（E0007）为信息技术部部门经理。  \n- 审批记录显示，该笔报销的唯一审批人也是E0007（李丽娟本人），即部门经理审批了自己的报销。  \n- 《XX证券费用报销管理办法(2025修订版)》第三条规定，费用报销实行\"经办人真实性承诺、部门负责人业务审核、财务复核和授权审批相结合的管理原则\"，经办人与业务审核人应为不同角色。《XX证券授权管理办法》附件二AR-01档的\"部门经理\"审批角色不应由报销人本人担任，否则违背内部控制的基本职责分离原则。\n\n---\n\n```json\n{\n  \"anomaly_ids\": [\"ANOM-001\", \"ANOM-002\"],\n  \"answer\": \"记录R004221存在两项异常。异常一：报销人李丽娟报销办公用品650元，超过《办公与通讯费用管理办法》规定的个人月度限额600元，且无专项审批。异常二：李丽娟作为部门经理审批了自己的报销，审批链中审批人E0007与报销人E0007为同一人，违反费用报销管理办法第三条规定的职责分离管理原则。\",\n  \"citations\": [\n    {\"doc_id\": \"07_office_communication.md\", \"clause_no\": \"第二条\"},\n    {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十二条\"},\n    {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第三条\"},\n    {\"doc_id\": \"03_authorization_management.md\", \"clause_no\": \"附件二\"}\n  ]\n}\n```",
+  "tool_calls_count": 11,
+  "tool_log_present": true,
+  "workdir_diff_empty": true,
+  "files": {
+    "stdout": "stdout.log",
+    "stderr": "stderr.log",
+    "tool_calls": "tool_calls.jsonl",
+    "trajectory": "trajectory.json",
+    "result": "result.json",
+    "workdir_diff": "workdir_diff.txt"
+  }
+}

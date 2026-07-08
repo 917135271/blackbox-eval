@@ -1,0 +1,38 @@
+{
+  "completed": true,
+  "candidate": "opencode",
+  "task_id": "L2-005",
+  "level": "L2",
+  "category": "policy_data_comparison",
+  "variant": "precise",
+  "repeat_index": 1,
+  "elapsed_seconds": 36.34,
+  "exit_code": 0,
+  "timeout": false,
+  "format_failure": false,
+  "parse_error": null,
+  "answer_json": {
+    "anomaly_ids": [
+      "ANOMALY-DUPLICATE-INVOICE"
+    ],
+    "answer": "通过核查发现报销记录R000037所关联的发票FP202500000037同时在另一报销记录R004205中被使用，构成重复报销。两条记录均由同一员工唐静(E0027)在信息技术部(D007)提交，金额均为84.72元，费用类型均为市内交通。该行为违反《XX证券费用报销管理办法(2025修订版)》第十条：同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。",
+    "citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条"
+      }
+    ]
+  },
+  "final_text": "工具已达到最大调用次数，以下是完整的审计结论。\n\n---\n\n**审计结论**\n\n经过核查，以 **R000037** 为线索发现了一起典型的重复报销异常：\n\n1. **R000037**（员工唐静，信息技术部E0027，2025-03-30，金额84.72元，发票FP202500000037，已于2025-04-20审批通过）  \n2. **R004205**（员工唐静，信息技术部E0027，2025-06-10，金额84.72元，**同一发票FP202500000037**，已于2025-07-25审批通过）\n\n两张报销单使用了**完全相同的发票号码（FP202500000037）**，且金额（84.72元）、事由（北辰尽调访谈交通费）、供应商均一致，违反了《XX证券费用报销管理办法(2025修订版)》**第十条**「同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险」。\n\nR004205 的备注中写有\"重复发票注入样本\"，进一步佐证了该异常系刻意构造的重复报销场景。\n\n**异常ID**：根据制度第十条，将此类违规定义为 `ANOMALY-DUPLICATE-INVOICE`（同一发票重复报销异常）。\n\n```json\n{\n  \"anomaly_ids\": [\"ANOMALY-DUPLICATE-INVOICE\"],\n  \"answer\": \"通过核查发现报销记录R000037所关联的发票FP202500000037同时在另一报销记录R004205中被使用，构成重复报销。两条记录均由同一员工唐静(E0027)在信息技术部(D007)提交，金额均为84.72元，费用类型均为市内交通。该行为违反《XX证券费用报销管理办法(2025修订版)》第十条：同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。\",\n  \"citations\": [\n    {\n      \"doc_id\": \"01_expense_reimbursement_2025.md\",\n      \"clause_no\": \"第十条\"\n    }\n  ]\n}\n```",
+  "tool_calls_count": 10,
+  "tool_log_present": true,
+  "workdir_diff_empty": true,
+  "files": {
+    "stdout": "stdout.log",
+    "stderr": "stderr.log",
+    "tool_calls": "tool_calls.jsonl",
+    "trajectory": "trajectory.json",
+    "result": "result.json",
+    "workdir_diff": "workdir_diff.txt"
+  }
+}

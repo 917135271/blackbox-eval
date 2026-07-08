@@ -1,0 +1,47 @@
+{
+  "completed": true,
+  "candidate": "opencode",
+  "task_id": "L1-006",
+  "level": "L1",
+  "category": "single_anomaly_lookup",
+  "variant": "distracted",
+  "repeat_index": 1,
+  "elapsed_seconds": 48.78,
+  "exit_code": 0,
+  "timeout": false,
+  "format_failure": false,
+  "parse_error": null,
+  "answer_json": {
+    "anomaly_ids": [
+      "ANOMALY-DUP-INVOICE-R000002",
+      "ANOMALY-MONTHLY-CAP-R000002"
+    ],
+    "answer": "记录R000002（BX2025000002）存在两项违规：一、发票FP202500000002已于2025年2月在记录R004201中报销使用，违反《费用报销管理办法》第十条同一发票最多报销一次的规定，构成重复报销风险；二、员工姚瑜2025年8月办公用品报销合计604.90元（含本笔423.79元和R001775的181.11元），超过《办公与通讯费用管理办法》第二条每人每月600元的上限，且无专项审批，违反《费用报销管理办法》第十二条。建议退回整改或补充专项审批。",
+    "citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条"
+      },
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十二条"
+      },
+      {
+        "doc_id": "07_office_communication.md",
+        "clause_no": "第二条"
+      }
+    ]
+  },
+  "final_text": "我已完成了对记录 R000002 的核查。以下是我的发现和结论。\n\n---\n\n## 核查结果总结\n\n### 记录基本信息\n| 字段 | 值 |\n|---|---|\n| 记录编号 | R000002 (BX2025000002) |\n| 员工 | E0050 姚瑜 (X1级, 合规风控部, 员工) |\n| 费用类型 | 办公用品 (office_supplies) |\n| 金额 | ¥423.79 |\n| 费用日期 | 2025-08-19 |\n| 发票号 | FP202500000002 |\n| 事由 | 清源项目资料装订用品费 |\n| 审批链 | 部门经理 E0008 杨丹 (AR-01档) |\n| 专项审批 | 无 (special_approval=0) |\n\n---\n\n### 发现的异常\n\n**异常 A — 同一发票重复报销**  \n- 发票 **FP202500000002** 已在另一报销单 **R004201**（2025-02-10，相同员工E0050，相同金额¥423.79，相同费用类型\"办公用品\"）中使用过。  \n- 违反《XX证券费用报销管理办法(2025修订版)》**第十条**：\"同一发票最多报销1次。发现同一发票在不同报销单中重复出现的，应认定为重复报销风险。\"  \n\n**异常 B — 月度办公用品限额超标**  \n- 员工姚瑜2025年8月已有办公用品报销 **R001775**（¥181.11，2025-08-03），加上本笔 **R000002**（¥423.79），**8月合计 ¥604.90**。  \n- 违反《XX证券办公与通讯费用管理办法》**第二条**：\"员工个人办公用品报销按月控制，每人每月不超过600元。\"  \n- 且无专项审批，违反《XX证券费用报销管理办法(2025修订版)》**第十二条**：\"无专项审批时，报销金额不得超过对应制度标准的1.0倍。\"\n\n---\n\n### 结论\n本记录 **R000002** 存在两处异常，需退回整改或进行专项审批补充。\n\n```json\n{\n  \"anomaly_ids\": [\n    \"ANOMALY-DUP-INVOICE-R000002\",\n    \"ANOMALY-MONTHLY-CAP-R000002\"\n  ],\n  \"answer\": \"记录R000002（BX2025000002）存在两项违规：一、发票FP202500000002已于2025年2月在记录R004201中报销使用，违反《费用报销管理办法》第十条同一发票最多报销一次的规定，构成重复报销风险；二、员工姚瑜2025年8月办公用品报销合计604.90元（含本笔423.79元和R001775的181.11元），超过《办公与通讯费用管理办法》第二条每人每月600元的上限，且无专项审批，违反《费用报销管理办法》第十二条。建议退回整改或补充专项审批。\",\n  \"citations\": [\n    {\n      \"doc_id\": \"01_expense_reimbursement_2025.md\",\n      \"clause_no\": \"第十条\"\n    },\n    {\n      \"doc_id\": \"01_expense_reimbursement_2025.md\",\n      \"clause_no\": \"第十二条\"\n    },\n    {\n      \"doc_id\": \"07_office_communication.md\",\n      \"clause_no\": \"第二条\"\n    }\n  ]\n}\n```",
+  "tool_calls_count": 13,
+  "tool_log_present": true,
+  "workdir_diff_empty": true,
+  "files": {
+    "stdout": "stdout.log",
+    "stderr": "stderr.log",
+    "tool_calls": "tool_calls.jsonl",
+    "trajectory": "trajectory.json",
+    "result": "result.json",
+    "workdir_diff": "workdir_diff.txt"
+  }
+}

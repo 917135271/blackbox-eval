@@ -1,0 +1,39 @@
+{
+  "completed": true,
+  "candidate": "qwen-code",
+  "task_id": "L1-006",
+  "level": "L1",
+  "category": "single_anomaly_lookup",
+  "variant": "casual",
+  "repeat_index": 1,
+  "elapsed_seconds": 49.15,
+  "exit_code": 0,
+  "timeout": false,
+  "format_failure": false,
+  "parse_error": null,
+  "answer_json": {
+    "anomaly_ids": [
+      "R000002",
+      "R004201"
+    ],
+    "answer": "存在重复报销问题。发票FP202500000002被同时用于BX2025000002（姚瑜,2025-08-19,办公用品423.79元）和BX2025X004201（姚瑜,2025-02-10,办公用品423.79元）两笔报销单。同一发票在不同报销单中重复出现，违反《XX证券费用报销管理办法》第十条同一发票最多报销1次的规定，应认定为重复报销风险。",
+    "citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条"
+      }
+    ]
+  },
+  "final_text": "以下是审计结论：\n\n发票 **FP202500000002** 被发现在两笔报销单中重复使用：\n\n| 记录 | 报销单号 | 员工 | 费用日期 | 金额 | 发票号 |\n|------|---------|------|---------|------|-------|\n| R004201 | BX2025X004201 | 姚瑜（合规风控部） | 2025-02-10 | 423.79元 | FP202500000002 |\n| R000002 | BX2025000002 | 姚瑜（合规风控部） | 2025-08-19 | 423.79元 | FP202500000002 |\n\n两笔均为同一员工、同一部门、同一费用类型（办公用品）、同一金额，使用了同一张发票，已构成**重复报销**，违反了《XX证券费用报销管理办法(2025修订版)》第十条之规定。\n\n```json\n{\n  \"anomaly_ids\": [\"R000002\", \"R004201\"],\n  \"answer\": \"存在重复报销问题。发票FP202500000002被同时用于BX2025000002（姚瑜,2025-08-19,办公用品423.79元）和BX2025X004201（姚瑜,2025-02-10,办公用品423.79元）两笔报销单。同一发票在不同报销单中重复出现，违反《XX证券费用报销管理办法》第十条同一发票最多报销1次的规定，应认定为重复报销风险。\",\n  \"citations\": [\n    {\n      \"doc_id\": \"01_expense_reimbursement_2025.md\",\n      \"clause_no\": \"第十条\"\n    }\n  ]\n}\n```",
+  "tool_calls_count": 11,
+  "tool_log_present": true,
+  "workdir_diff_empty": true,
+  "files": {
+    "stdout": "stdout.log",
+    "stderr": "stderr.log",
+    "tool_calls": "tool_calls.jsonl",
+    "trajectory": "trajectory.json",
+    "result": "result.json",
+    "workdir_diff": "workdir_diff.txt"
+  }
+}

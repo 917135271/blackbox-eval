@@ -1,0 +1,42 @@
+{
+  "completed": true,
+  "candidate": "qwen-code",
+  "task_id": "L1-012",
+  "level": "L1",
+  "category": "ground_truth_lookup",
+  "variant": "casual",
+  "repeat_index": 1,
+  "elapsed_seconds": 123.92,
+  "exit_code": 0,
+  "timeout": false,
+  "format_failure": false,
+  "parse_error": null,
+  "answer_json": {
+    "anomaly_ids": [
+      "SPLIT-002"
+    ],
+    "answer": "SPLIT-002对应的record_id为：R004209、R004210、R004211",
+    "citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "final_text": "根据查询结果，**SPLIT-002**（拆分报销注入样本2）对应的 record_id 如下：\n\n| 记录ID | 报销单号 | 员工 | 费用日期 | 金额 | 说明 |\n|--------|----------|------|----------|------|------|\n| **R004209** | BX2025X004209 | 杨丹（合规风控部） | 2025-02-26 | 3400.00 | 拆分报销注入样本2 |\n| **R004210** | BX2025X004210 | 杨丹（合规风控部） | 2025-02-28 | 3400.00 | 拆分报销注入样本2 |\n| **R004211** | BX2025X004211 | 杨丹（合规风控部） | 2025-03-02 | 3400.00 | 拆分报销注入样本2 |\n\n这三笔报销均由同一员工（杨丹，部门经理E0008）在同一费用类型（travel_lodging）下，7天内分3次提交，每笔均为3400元（合计10200元），仅经过AR-02（部门经理）审批。按《授权管理办法》附件二，合计金额超过10000元应触发AR-03档位（部门总经理审批），存在拆分规避审批的风险。\n\n```json\n{\n  \"anomaly_ids\": [\"SPLIT-002\"],\n  \"answer\": \"SPLIT-002对应的record_id为：R004209、R004210、R004211\",\n  \"citations\": [\n    {\n      \"doc_id\": \"01_expense_reimbursement_2025.md\",\n      \"clause_no\": \"第十一条\"\n    },\n    {\n      \"doc_id\": \"03_authorization_management.md\",\n      \"clause_no\": \"附件二\"\n    }\n  ]\n}\n```",
+  "tool_calls_count": 48,
+  "tool_log_present": true,
+  "workdir_diff_empty": true,
+  "files": {
+    "stdout": "stdout.log",
+    "stderr": "stderr.log",
+    "tool_calls": "tool_calls.jsonl",
+    "trajectory": "trajectory.json",
+    "result": "result.json",
+    "workdir_diff": "workdir_diff.txt"
+  }
+}

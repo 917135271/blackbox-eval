@@ -1,0 +1,46 @@
+model:
+  # User-supplied OpenAI-compatible endpoint.
+  # Note: https://api.deepseek.com is not a local endpoint; this is a recorded deviation
+  # from the original "local model only / no cloud API" baseline requirement.
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-v4-flash"
+  api_key_env: "LLM_API_KEY"
+  temperature: 0
+  max_tokens: 4096
+
+paths:
+  expense_db: "D:/算法LLM/项目篇/东方证券/agent/synth-pipeline/output/data/expense.db"
+  policy_corpus_dir: "D:/算法LLM/项目篇/东方证券/agent/synth-pipeline/output/corpus"
+  ground_truth: "D:/算法LLM/项目篇/东方证券/agent/synth-pipeline/output/ground_truth.yaml"
+  evals: "D:/算法LLM/项目篇/东方证券/agent/synth-pipeline/output/evals.json"
+  runs_dir: "D:/算法LLM/项目篇/东方证券/agent/blackbox-eval/runs"
+  output_dir: "D:/算法LLM/项目篇/东方证券/agent/blackbox-eval/output"
+
+fixtures:
+  policy_query_mcp: "D:/算法LLM/项目篇/东方证券/agent/blackbox-eval/fixtures/policy_query_mcp.py"
+  expense_query_mcp: "D:/算法LLM/项目篇/东方证券/agent/blackbox-eval/fixtures/expense_query_mcp.py"
+  audit_role_prompt: "D:/算法LLM/项目篇/东方证券/agent/blackbox-eval/fixtures/audit_role_prompt.md"
+  output_contract: "D:/算法LLM/项目篇/东方证券/agent/blackbox-eval/fixtures/output_contract.md"
+
+execution:
+  task_timeout_seconds: 900
+  prompt_variants:
+    - precise
+    - casual
+    - distracted
+  repeats_per_variant: 1
+  variance_probe:
+    enabled: false
+    sample_tasks: 5
+    repeats: 3
+
+candidates:
+  - name: qwen-code
+    enabled: true
+  - name: goose
+    enabled: true
+  - name: trae-agent
+    enabled: true
+  - name: opencode
+    enabled: true
+

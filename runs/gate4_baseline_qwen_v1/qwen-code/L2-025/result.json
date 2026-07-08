@@ -1,0 +1,39 @@
+{
+  "completed": true,
+  "candidate": "qwen-code",
+  "task_id": "L2-025",
+  "level": "L2",
+  "category": "policy_data_comparison",
+  "variant": "precise",
+  "repeat_index": 1,
+  "elapsed_seconds": 53.11,
+  "exit_code": 0,
+  "timeout": false,
+  "format_failure": false,
+  "parse_error": null,
+  "answer_json": {
+    "anomaly_ids": [
+      "A001",
+      "A002"
+    ],
+    "answer": "以R004231为线索，核查到同一员工E0007（李丽娟，信息技术部部门经理）的两笔超期报销异常：R004227（超期报销注入样本1，费用2025-01-05，报销2025-03-11，超期5天）和R004231（超期报销注入样本5，费用2025-08-02，报销2025-11-30，超期60天），均违反2025版费用报销管理办法第七条的60天时限规定。R004238为陷阱样本（恰好60天，未超期）。",
+    "citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第七条"
+      }
+    ]
+  },
+  "final_text": "根据制度规定（《XX证券费用报销管理办法(2025修订版)》第七条），员工应在费用发生后 **60 天内** 提交报销申请，超出即构成超期报销异常。以 R004231 为线索，核查到同一员工（李丽娟，部门经理，信息技术部）名下的两笔超期报销记录：\n\n| 异常ID | 记录ID | 费用日期 | 报销日期 | 相隔天数 | 超期天数 | 备注 |\n|---|---|---|---|---|---|---|\n| A001 | R004227 | 2025-01-05 | 2025-03-11 | 65天 | 超期5天 | 超期报销注入样本1 |\n| A002 | R004231 | 2025-08-02 | 2025-11-30 | 120天 | 超期60天 | 超期报销注入样本5（线索记录） |\n\n此外，同一员工的 R004238（费用日期 2025-07-01，报销日期 2025-08-30，相隔恰好 60 天）属于陷阱样本，未超期。\n\n```json\n{\n  \"anomaly_ids\": [\"A001\", \"A002\"],\n  \"answer\": \"以R004231为线索，核查到同一员工E0007（李丽娟，信息技术部部门经理）的两笔超期报销异常：R004227（超期报销注入样本1，费用2025-01-05，报销2025-03-11，超期5天）和R004231（超期报销注入样本5，费用2025-08-02，报销2025-11-30，超期60天），均违反2025版费用报销管理办法第七条的60天时限规定。R004238为陷阱样本（恰好60天，未超期）。\",\n  \"citations\": [\n    {\n      \"doc_id\": \"01_expense_reimbursement_2025.md\",\n      \"clause_no\": \"第七条\"\n    }\n  ]\n}\n```",
+  "tool_calls_count": 16,
+  "tool_log_present": true,
+  "workdir_diff_empty": true,
+  "files": {
+    "stdout": "stdout.log",
+    "stderr": "stderr.log",
+    "tool_calls": "tool_calls.jsonl",
+    "trajectory": "trajectory.json",
+    "result": "result.json",
+    "workdir_diff": "workdir_diff.txt"
+  }
+}

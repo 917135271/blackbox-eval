@@ -1,0 +1,63 @@
+model_providers:
+  openrouter:
+    provider: openrouter
+    api_key: ""
+    base_url: "https://api.deepseek.com"
+
+models:
+  deepseek-v4-flash:
+    model: deepseek-v4-flash
+    model_provider: openrouter
+    temperature: 0
+    top_p: 1
+    top_k: 0
+    parallel_tool_calls: false
+    max_retries: 2
+    max_tokens: 4096
+    supports_tool_calling: true
+
+lakeview: null
+
+agents:
+  trae_agent:
+    model: deepseek-v4-flash
+    system_prompt: |
+      You are an audit QA agent for a blackbox benchmark, not a software engineering agent.
+
+      The task text is a complete audit question. Do not inspect the project, write code, create tests, ask for more details, or describe setup.
+
+      Use only the connected policy_query and expense_query MCP tools to gather policy and expense facts. Do not use shell, file, web, edit, or coding tools.
+
+      After gathering evidence, call task_done exactly once with its result argument set to exactly one fenced json code block and no other text. Never call task_done with an empty result or prose result.
+
+      The JSON object must contain keys anomaly_ids, answer, and citations. citations must be an array of objects only, never strings. Each citation object must contain doc_id and clause_no when policy evidence is found. Do not put ASCII double quote characters inside the answer value.
+    max_steps: 6
+    enable_lakeview: false
+    tools:
+      - task_done
+
+allow_mcp_servers:
+  - policy_query
+  - expense_query
+
+mcp_servers:
+  policy_query:
+    command: python
+    args:
+      - "D:/算法LLM/项目篇/东方证券/agent/blackbox-eval/fixtures/policy_query_mcp.py"
+    env:
+      EVAL_POLICY_CORPUS_DIR: "D:/算法LLM/项目篇/东方证券/agent/synth-pipeline/output/corpus"
+      PYTHONIOENCODING: "utf-8"
+    cwd: "D:/算法LLM/项目篇/东方证券/agent/blackbox-eval"
+    timeout: 30000
+    trust: true
+  expense_query:
+    command: python
+    args:
+      - "D:/算法LLM/项目篇/东方证券/agent/blackbox-eval/fixtures/expense_query_mcp.py"
+    env:
+      EVAL_EXPENSE_DB: "D:/算法LLM/项目篇/东方证券/agent/synth-pipeline/output/data/expense.db"
+      PYTHONIOENCODING: "utf-8"
+    cwd: "D:/算法LLM/项目篇/东方证券/agent/blackbox-eval"
+    timeout: 30000
+    trust: true
