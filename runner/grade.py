@@ -1,12 +1,31 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
+import os
 import re
+import time
+import urllib.error
+import urllib.request
 from pathlib import Path
 from typing import Any
 
+import yaml
+
 from gate2_candidate_check import ROOT, load_eval_config
+
+
+ALLOWED_JUDGE_FAILURE_LAYERS = {
+    "fact_miss",
+    "citation_miss",
+    "record_id_miss",
+    "reasoning_or_retrieval_error",
+    "rubric_miss",
+    "no_anomaly_false_positive",
+    "timeout",
+    "judge_error",
+}
 
 
 def normalize(text: Any) -> str:
@@ -17,6 +36,23 @@ def normalize(text: Any) -> str:
 def load_tasks(config: dict[str, Any]) -> dict[str, dict[str, Any]]:
     with Path(config["paths"]["evals"]).open("r", encoding="utf-8") as handle:
         return {task["id"]: task for task in json.load(handle)}
+
+
+def load_ground_truth(config: dict[str, Any]) -> dict[str, Any]:
+    ground_truth_path = config.get("paths", {}).get("ground_truth")
+    if not ground_truth_path:
+        return {}
+    path = Path(ground_truth_path)
+    if not path.exists():
+        return {}
+    return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+
+
+def scoring_kind(scoring: dict[str, Any]) -> str | None:
+    kind = scoring.get("kind")
+    if kind is None and scoring.get("type") == "llm_rubric":
+        kind = "llm_rubric"
+    return kind
 
 
 def doc_refs(task: dict[str, Any]) -> list[str]:
@@ -69,13 +105,9 @@ def citation_ok(task: dict[str, Any], answer_json: dict[str, Any]) -> bool:
     return bool(expected_docs & cited_docs)
 
 
-def grade_result(result: dict[str, Any], task: dict[str, Any], run_path: Path) -> dict[str, Any]:
+def base_grade_fields(result: dict[str, Any], task: dict[str, Any], run_path: Path) -> dict[str, Any]:
     scoring = task.get("scoring") or {}
-    kind = scoring.get("kind")
-    if kind is None and scoring.get("type") == "llm_rubric":
-        kind = "llm_rubric"
-    answer_json = result.get("answer_json") if isinstance(result.get("answer_json"), dict) else None
-    base = {
+    return {
         "candidate": result.get("candidate"),
         "task_id": result.get("task_id"),
         "level": result.get("level"),
@@ -88,8 +120,15 @@ def grade_result(result: dict[str, Any], task: dict[str, Any], run_path: Path) -
         "elapsed_seconds": result.get("elapsed_seconds"),
         "tool_calls_count": result.get("tool_calls_count"),
         "workdir_diff_empty": result.get("workdir_diff_empty"),
-        "kind": kind,
+        "kind": scoring_kind(scoring),
     }
+
+
+def rule_grade_result(result: dict[str, Any], task: dict[str, Any], run_path: Path) -> dict[str, Any]:
+    scoring = task.get("scoring") or {}
+    kind = scoring_kind(scoring)
+    answer_json = result.get("answer_json") if isinstance(result.get("answer_json"), dict) else None
+    base = base_grade_fields(result, task, run_path)
     if answer_json is None:
         return {**base, "score": 0.0, "failure_layer": "format_failure"}
 
@@ -187,27 +226,389 @@ def grade_result(result: dict[str, Any], task: dict[str, Any], run_path: Path) -
     return {**base, "score": 0.0, "failure_layer": "unsupported_scoring_kind"}
 
 
+def selected_truth_items(ground_truth: dict[str, Any], ids: set[str]) -> dict[str, list[dict[str, Any]]]:
+    selected: dict[str, list[dict[str, Any]]] = {"anomalies": [], "traps": []}
+    for group in ("anomalies", "traps"):
+        for item in ground_truth.get(group) or []:
+            if str(item.get("anomaly_id")) in ids:
+                selected[group].append(item)
+    return selected
+
+
+def build_truth_context(task: dict[str, Any], ground_truth: dict[str, Any]) -> dict[str, Any]:
+    scoring = task.get("scoring") or {}
+    ids = {str(item) for item in scoring.get("expected_anomaly_ids", [])}
+    for ref in task.get("ground_truth_refs") or []:
+        if isinstance(ref, str) and ref.startswith("ground_truth:"):
+            ids.add(ref.split(":", 1)[1])
+    selected = selected_truth_items(ground_truth, ids)
+    return {
+        "meta": ground_truth.get("meta", {}),
+        "scoring": scoring,
+        "ground_truth_refs": task.get("ground_truth_refs") or [],
+        "referenced_ground_truth": selected,
+    }
+
+
+def truncate_text(text: Any, max_chars: int) -> str:
+    raw = "" if text is None else str(text)
+    if len(raw) <= max_chars:
+        return raw
+    head = raw[: max_chars // 2]
+    tail = raw[-max_chars // 2 :]
+    return f"{head}\n\n...[truncated {len(raw) - max_chars} chars]...\n\n{tail}"
+
+
+def parse_json_object(text: str) -> dict[str, Any]:
+    try:
+        parsed = json.loads(text)
+        if isinstance(parsed, dict):
+            return parsed
+    except json.JSONDecodeError:
+        pass
+    blocks = re.findall(r"```(?:json)?\s*([\s\S]*?)```", text, flags=re.IGNORECASE)
+    for block in reversed(blocks):
+        try:
+            parsed = json.loads(block.strip())
+            if isinstance(parsed, dict):
+                return parsed
+        except json.JSONDecodeError:
+            continue
+    start = text.find("{")
+    end = text.rfind("}")
+    if start >= 0 and end > start:
+        parsed = json.loads(text[start : end + 1])
+        if isinstance(parsed, dict):
+            return parsed
+    raise ValueError("judge response did not contain a JSON object")
+
+
+class LLMJudge:
+    def __init__(self, config: dict[str, Any]) -> None:
+        model_config = config.get("model") or {}
+        judge_config = config.get("judge") or {}
+        self.mode = str(judge_config.get("mode", "rule"))
+        self.base_url = str(judge_config.get("base_url") or model_config.get("base_url", "")).rstrip("/")
+        self.model = str(judge_config.get("model") or model_config.get("model", ""))
+        self.api_key_env = str(judge_config.get("api_key_env") or model_config.get("api_key_env", "LLM_API_KEY"))
+        self.api_key = os.environ.get(self.api_key_env, "")
+        self.temperature = float(judge_config.get("temperature", 0))
+        self.max_tokens = int(judge_config.get("max_tokens", 1200))
+        self.timeout_seconds = int(judge_config.get("timeout_seconds", 90))
+        self.retries = int(judge_config.get("retries", 2))
+        self.final_text_max_chars = int(judge_config.get("final_text_max_chars", 12000))
+        self.require_parseable_json = bool(judge_config.get("require_parseable_json", False))
+        if not self.base_url or not self.model:
+            raise RuntimeError("judge.base_url and judge.model must be configured for LLM judge mode")
+        if not self.api_key:
+            raise RuntimeError(f"missing environment variable {self.api_key_env} for LLM judge")
+
+    def grade(
+        self,
+        *,
+        result: dict[str, Any],
+        task: dict[str, Any],
+        rule_grade: dict[str, Any],
+        ground_truth: dict[str, Any],
+    ) -> dict[str, Any]:
+        if result.get("timeout"):
+            return {
+                "score": 0.0,
+                "failure_layer": "timeout",
+                "judge_reason": "candidate run timed out; no complete answer to judge",
+                "judge_confidence": 1.0,
+                "judge_missing": [],
+                "judge_extra": [],
+                "judge_raw": None,
+            }
+
+        messages = self.build_messages(result=result, task=task, rule_grade=rule_grade, ground_truth=ground_truth)
+        last_error: Exception | None = None
+        for attempt in range(self.retries + 1):
+            try:
+                raw = self.chat_completion(messages)
+                parsed = parse_json_object(raw)
+                return self.normalize_judge_output(parsed, raw)
+            except Exception as exc:  # noqa: BLE001 - keep grading batch moving after retries.
+                last_error = exc
+                if attempt < self.retries:
+                    time.sleep(1.5 * (attempt + 1))
+        return {
+            "score": 0.0,
+            "failure_layer": "judge_error",
+            "judge_reason": f"judge call failed: {last_error}",
+            "judge_confidence": 0.0,
+            "judge_missing": [],
+            "judge_extra": [],
+            "judge_raw": None,
+        }
+
+    def build_messages(
+        self,
+        *,
+        result: dict[str, Any],
+        task: dict[str, Any],
+        rule_grade: dict[str, Any],
+        ground_truth: dict[str, Any],
+    ) -> list[dict[str, str]]:
+        variant = str(result.get("variant") or "precise")
+        prompt_variants = task.get("prompt_variants") or {}
+        task_prompt = prompt_variants.get(variant) or prompt_variants.get("precise") or ""
+        answer_json = result.get("answer_json") if isinstance(result.get("answer_json"), dict) else None
+        context = {
+            "task": {
+                "id": task.get("id"),
+                "level": task.get("level"),
+                "category": task.get("category"),
+                "variant": variant,
+                "prompt": task_prompt,
+            },
+            "expected": build_truth_context(task, ground_truth),
+            "candidate_response": {
+                "format_failure": bool(result.get("format_failure")),
+                "parse_error": result.get("parse_error"),
+                "answer_json": answer_json,
+                "final_text": truncate_text(result.get("final_text", ""), self.final_text_max_chars),
+            },
+            "machine_diagnostics": {
+                "tool_calls_count": result.get("tool_calls_count"),
+                "exit_code": result.get("exit_code"),
+                "workdir_diff_empty": result.get("workdir_diff_empty"),
+                "rule_score_for_reference_only": rule_grade.get("score"),
+                "rule_failure_layer_for_reference_only": rule_grade.get("failure_layer"),
+            },
+        }
+        system = (
+            "You are a strict but fair evaluator for a synthetic audit-agent benchmark. "
+            "Judge only from the supplied task, expected ground truth, and candidate response. "
+            "Do not reward tool effort by itself. Do not reveal chain-of-thought; give a concise reason."
+        )
+        user = (
+            "请对候选 agent 的回答做语义判卷。\n"
+            "判卷原则:\n"
+            "1. anomaly_id_set/no_anomaly: 判断候选是否识别了同一个标准异常集合。若候选没有写标准异常ID, "
+            "但明确给出了正确规则、正确记录集合,可视为语义命中; 若混入无关异常或把干净陷阱计为异常,判错。\n"
+            "2. record_id_set: 必须覆盖期望 record_id, 且不能用无关记录替代。\n"
+            "3. expected_facts: 关键事实必须语义完整; citation 应支持答案,但不要求逐字相同。\n"
+            "4. llm_rubric: 逐条判断 rubric_assertions 是否满足。\n"
+            "5. format_failure 只作为诊断信号; 本次 score 主要衡量内容语义是否正确。\n\n"
+            "只返回一个 JSON 对象,不要 Markdown,字段必须为:\n"
+            "{\n"
+            '  "pass": true/false,\n'
+            '  "score": 0 或 1,\n'
+            '  "failure_layer": null 或 "fact_miss" 或 "citation_miss" 或 "record_id_miss" 或 '
+            '"reasoning_or_retrieval_error" 或 "rubric_miss" 或 "no_anomaly_false_positive",\n'
+            '  "reason": "一句话说明判定依据",\n'
+            '  "missing": ["缺失点"],\n'
+            '  "extra": ["多报或错误点"],\n'
+            '  "confidence": 0到1之间的数字\n'
+            "}\n\n"
+            "判卷上下文如下:\n"
+            f"{json.dumps(context, ensure_ascii=False, indent=2)}"
+        )
+        return [{"role": "system", "content": system}, {"role": "user", "content": user}]
+
+    def chat_completion(self, messages: list[dict[str, str]]) -> str:
+        url = f"{self.base_url}/chat/completions"
+        payload = {
+            "model": self.model,
+            "messages": messages,
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens,
+            "response_format": {"type": "json_object"},
+        }
+        data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        request = urllib.request.Request(
+            url,
+            data=data,
+            headers={
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
+                response_data = json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")
+            raise RuntimeError(f"HTTP {exc.code}: {body[:500]}") from exc
+        choices = response_data.get("choices")
+        if not choices:
+            raise RuntimeError(f"judge response missing choices: {response_data}")
+        message = choices[0].get("message") or {}
+        content = message.get("content")
+        if not isinstance(content, str) or not content.strip():
+            raise RuntimeError(f"judge response missing content: {response_data}")
+        return content.strip()
+
+    def normalize_judge_output(self, parsed: dict[str, Any], raw: str) -> dict[str, Any]:
+        raw_pass = parsed.get("pass")
+        raw_score = parsed.get("score")
+        try:
+            numeric_score = float(raw_score)
+        except (TypeError, ValueError):
+            numeric_score = 1.0 if raw_pass is True else 0.0
+        score = 1.0 if numeric_score >= 0.5 or raw_pass is True else 0.0
+        failure_layer = parsed.get("failure_layer")
+        if score == 1.0:
+            failure_layer = None
+        elif failure_layer not in ALLOWED_JUDGE_FAILURE_LAYERS:
+            failure_layer = "reasoning_or_retrieval_error"
+        confidence = parsed.get("confidence")
+        try:
+            confidence_value = round(float(confidence), 4)
+        except (TypeError, ValueError):
+            confidence_value = None
+        missing = parsed.get("missing") if isinstance(parsed.get("missing"), list) else []
+        extra = parsed.get("extra") if isinstance(parsed.get("extra"), list) else []
+        return {
+            "score": score,
+            "failure_layer": failure_layer,
+            "judge_reason": str(parsed.get("reason", "")).strip(),
+            "judge_confidence": confidence_value,
+            "judge_missing": [str(item) for item in missing],
+            "judge_extra": [str(item) for item in extra],
+            "judge_raw": raw,
+        }
+
+
+def grade_result(
+    result: dict[str, Any],
+    task: dict[str, Any],
+    run_path: Path,
+    *,
+    judge: LLMJudge | None = None,
+    ground_truth: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    rule_grade = rule_grade_result(result, task, run_path)
+    if judge is None:
+        return {**rule_grade, "judge_mode": "rule"}
+
+    judge_grade = judge.grade(
+        result=result,
+        task=task,
+        rule_grade=rule_grade,
+        ground_truth=ground_truth or {},
+    )
+    output = {
+        **rule_grade,
+        "rule_score": rule_grade.get("score"),
+        "rule_failure_layer": rule_grade.get("failure_layer"),
+        "score": judge_grade["score"],
+        "failure_layer": judge_grade["failure_layer"],
+        "judge_mode": "llm",
+        "judge_model": judge.model,
+        "judge_require_parseable_json": judge.require_parseable_json,
+        "judge_reason": judge_grade.get("judge_reason"),
+        "judge_confidence": judge_grade.get("judge_confidence"),
+        "judge_missing": judge_grade.get("judge_missing"),
+        "judge_extra": judge_grade.get("judge_extra"),
+        "judge_raw": judge_grade.get("judge_raw"),
+    }
+    if judge.require_parseable_json and output.get("format_failure"):
+        output["score"] = 0.0
+        output["failure_layer"] = "format_failure"
+    return output
+
+
 def iter_results(run_root: Path, candidate: str | None) -> list[Path]:
     pattern = f"{candidate}/*/result.json" if candidate else "*/*/result.json"
     return sorted(run_root.glob(pattern))
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Grade deterministic blackbox eval results.")
+    parser = argparse.ArgumentParser(description="Grade blackbox eval results.")
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--candidate", default=None)
+    parser.add_argument("--task-id", action="append", default=[])
+    parser.add_argument("--limit", type=int, default=None)
+    parser.add_argument("--judge-mode", choices=["rule", "llm"], default=None)
+    parser.add_argument("--workers", type=int, default=None)
+    parser.add_argument("--only-judge-errors", action="store_true")
+    parser.add_argument("--output-name", default="grades.jsonl")
     args = parser.parse_args()
 
     config = load_eval_config()
+    judge_mode = args.judge_mode or str((config.get("judge") or {}).get("mode", "rule"))
+    judge = LLMJudge(config) if judge_mode == "llm" else None
+    ground_truth = load_ground_truth(config) if judge is not None else {}
+    workers = args.workers
+    if workers is None:
+        workers = int((config.get("judge") or {}).get("workers", 1)) if judge is not None else 1
+
     run_root = Path(config["paths"]["runs_dir"]) / args.run_id
     tasks = load_tasks(config)
-    grades_path = run_root / "grades.jsonl"
-    rows = []
+    grades_path = run_root / args.output_name
+    task_filter = set(args.task_id)
+    existing_rows: list[dict[str, Any]] = []
+    existing_judge_error_paths: set[str] = set()
+    if args.only_judge_errors:
+        if not grades_path.exists():
+            raise SystemExit(f"--only-judge-errors requires existing {grades_path}")
+        existing_rows = [
+            json.loads(line)
+            for line in grades_path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        existing_judge_error_paths = {
+            str(row.get("run_path"))
+            for row in existing_rows
+            if row.get("failure_layer") == "judge_error"
+        }
+    result_paths = []
     for result_path in iter_results(run_root, args.candidate):
         result = json.loads(result_path.read_text(encoding="utf-8"))
         task_id = result["task_id"]
-        grade = grade_result(result, tasks[task_id], result_path.parent)
-        rows.append(grade)
+        if task_filter and task_id not in task_filter:
+            continue
+        relative_run_path = str(result_path.parent.relative_to(ROOT))
+        if args.only_judge_errors and relative_run_path not in existing_judge_error_paths:
+            continue
+        result_paths.append(result_path)
+        if args.limit is not None and len(result_paths) >= args.limit:
+            break
+
+    def grade_path(index_and_path: tuple[int, Path]) -> tuple[int, dict[str, Any]]:
+        index, result_path = index_and_path
+        result = json.loads(result_path.read_text(encoding="utf-8"))
+        task_id = result["task_id"]
+        grade = grade_result(
+            result,
+            tasks[task_id],
+            result_path.parent,
+            judge=judge,
+            ground_truth=ground_truth,
+        )
+        return index, grade
+
+    rows_by_index: list[dict[str, Any] | None] = [None] * len(result_paths)
+    if workers > 1 and len(result_paths) > 1:
+        completed = 0
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            futures = [
+                executor.submit(grade_path, item)
+                for item in enumerate(result_paths)
+            ]
+            for future in as_completed(futures):
+                index, row = future.result()
+                rows_by_index[index] = row
+                completed += 1
+                if completed % 10 == 0 or completed == len(result_paths):
+                    print(f"graded {completed}/{len(result_paths)}", flush=True)
+    else:
+        for item in enumerate(result_paths):
+            index, row = grade_path(item)
+            rows_by_index[index] = row
+            print(f"graded {index + 1}/{len(result_paths)}", flush=True)
+
+    rows = [row for row in rows_by_index if row is not None]
+    if args.only_judge_errors:
+        by_run_path = {str(row.get("run_path")): row for row in rows}
+        rows = [
+            by_run_path.get(str(existing_row.get("run_path")), existing_row)
+            for existing_row in existing_rows
+        ]
     grades_path.write_text(
         "".join(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n" for row in rows),
         encoding="utf-8",

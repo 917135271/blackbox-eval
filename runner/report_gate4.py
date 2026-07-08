@@ -353,6 +353,7 @@ def main() -> int:
         f"- runs: `{', '.join(f'{candidate}={run_id}' for candidate, run_id in run_pairs)}`",
         f"- task_scope: `55 tasks x 3 variants x 1 repeat = 165 results per candidate`",
         f"- failure_detail: `{short_path(failure_detail)}`",
+        "- scoring: `LLM judge semantic score; format_ok is tracked separately`",
         "",
         "## Experiment Setup",
         "",
@@ -360,6 +361,9 @@ def main() -> int:
         f"- model: `{config['model']['model']}`",
         f"- temperature: `{config['model'].get('temperature')}`",
         f"- max_tokens: `{config['model'].get('max_tokens')}`",
+        f"- judge_mode: `{(config.get('judge') or {}).get('mode', 'rule')}`",
+        f"- judge_model: `{(config.get('judge') or {}).get('model', config['model']['model'])}`",
+        f"- judge_require_parseable_json: `{(config.get('judge') or {}).get('require_parseable_json', False)}`",
         "- baseline_note: current endpoint is the user-approved DeepSeek cloud API; this is a recorded deviation from the original local-only target.",
         f"- timeout_seconds: `{config['execution']['task_timeout_seconds']}`",
         f"- prompt_variants: `{', '.join(config['execution']['prompt_variants'])}`",
@@ -399,7 +403,7 @@ def main() -> int:
             "",
             "## Main Results",
             "",
-            "| candidate | completed | score | L1 | L2 | L3 | TRAP | format_ok | clean_workdir | artifacts | timeouts | avg_tool_calls | trap_fp_ids |",
+            "| candidate | completed | llm_score | L1 | L2 | L3 | TRAP | format_ok | clean_workdir | artifacts | timeouts | avg_tool_calls | trap_fp_ids |",
             "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
         ]
     )
@@ -470,7 +474,16 @@ def main() -> int:
             )
         )
 
-    lines.extend(["", "## Failure Distribution", ""])
+    lines.extend(
+        [
+            "",
+            "## Operational Failure Distribution",
+            "",
+            "This distribution prioritizes timeout/format/workdir issues before semantic judge failures; "
+            "therefore `ok` here can be lower than `llm_score` when an answer is semantically correct but violates the JSON output contract.",
+            "",
+        ]
+    )
     lines.append("| candidate | failure_layers |")
     lines.append("| --- | --- |")
     for item in summaries:
@@ -526,7 +539,8 @@ def main() -> int:
             "- Per-task five-piece artifacts: reported in `artifacts`; required files are stdout.log, tool_calls.jsonl, trajectory.json, result.json, workdir_diff.txt.",
             "- Workdir diff empty: reported in `clean_workdir` and failure attribution.",
             "- Resumability: `run_eval.py` skips completed task directories with existing completed result.json; this was used by the GATE4 runner structure and remains available for interruption recovery.",
-            "- Traceability: every score comes from `grades.jsonl`; every failure row points back to its per-task run directory and trajectory line.",
+            "- Traceability: every LLM judge score comes from `grades.jsonl`; every failure row points back to its per-task run directory and trajectory line.",
+            "- `rule_score` remains in `grades.jsonl` for comparison with the previous deterministic scorer.",
             "- Fixture hashes and candidate versions are included above.",
             "",
             "## Limitations",

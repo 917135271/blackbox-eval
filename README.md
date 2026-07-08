@@ -55,6 +55,13 @@ The configured OpenAI-compatible endpoint is:
 - `model`: `deepseek-v4-flash`
 - `api_key_env`: `LLM_API_KEY`
 
+The grader now uses an LLM judge by default, configured under `judge:` in
+`config/eval_config.yaml`. It uses the same `LLM_API_KEY` environment variable
+and does not store secrets in the repository. Each grade row keeps both:
+
+- `score`: LLM judge semantic score.
+- `rule_score`: previous deterministic rule score for comparison.
+
 Before running any candidate, set the API key in the shell environment instead of writing it to config:
 
 ```powershell
@@ -131,12 +138,22 @@ python runner/run_eval.py --candidate qwen-code --all-tasks --all-variants --run
 python runner/run_eval.py --candidate goose --all-tasks --all-variants --run-id gate4_baseline_goose_v1 --timeout-seconds 900
 python runner/run_eval.py --candidate trae-agent --all-tasks --all-variants --run-id gate4_baseline_trae_v1 --timeout-seconds 900
 python runner/run_eval.py --candidate opencode --all-tasks --all-variants --run-id gate4_baseline_opencode_v1 --timeout-seconds 900
-python runner/grade.py --run-id gate4_baseline_qwen_v1 --candidate qwen-code
-python runner/grade.py --run-id gate4_baseline_goose_v1 --candidate goose
-python runner/grade.py --run-id gate4_baseline_trae_v1 --candidate trae-agent
-python runner/grade.py --run-id gate4_baseline_opencode_v1 --candidate opencode
+python runner/grade.py --run-id gate4_baseline_qwen_v1 --candidate qwen-code --judge-mode llm
+python runner/grade.py --run-id gate4_baseline_goose_v1 --candidate goose --judge-mode llm
+python runner/grade.py --run-id gate4_baseline_trae_v1 --candidate trae-agent --judge-mode llm
+python runner/grade.py --run-id gate4_baseline_opencode_v1 --candidate opencode --judge-mode llm
 python runner/report_gate4.py --run qwen-code=gate4_baseline_qwen_v1 --run goose=gate4_baseline_goose_v1 --run trae-agent=gate4_baseline_trae_v1 --run opencode=gate4_baseline_opencode_v1
+python runner/report_gate4_tasktypes.py
 ```
+
+If the judge API has transient network failures, retry only failed judge rows and
+merge them back into the existing grade file:
+
+```powershell
+python runner/grade.py --run-id gate4_baseline_goose_v1 --candidate goose --judge-mode llm --workers 1 --only-judge-errors
+```
+
+Use `--judge-mode rule` when you need to reproduce the old deterministic scorer.
 
 ## Design Decisions
 
@@ -145,4 +162,5 @@ python runner/report_gate4.py --run qwen-code=gate4_baseline_qwen_v1 --run goose
 - Fixture logs accept `EVAL_TASK_LOG` as either a directory or a file path; if it is a directory, `tool_calls.jsonl` is created inside it.
 - The current endpoint is DeepSeek's cloud API because the local model is not deployed yet; reports must record this as a temporary baseline deviation from the original no-cloud requirement.
 - Candidate configs never store the API key. The runner maps `LLM_API_KEY` to each candidate's expected provider variables at process launch.
+- The grader uses LLM judge semantic scoring by default and records the previous deterministic result as `rule_score`.
 - For qwen-code task runs, `run_eval.py` temporarily injects the task-specific `EVAL_TASK_LOG` directory into `.qwen/settings.json` MCP server env entries, approves that config with official `qwen mcp approve --all`, and restores the original config after each task. This keeps task-level MCP logs isolated while using the candidate's official configuration surface.

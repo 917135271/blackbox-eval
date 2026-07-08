@@ -98,7 +98,7 @@ def main() -> int:
             "",
             "## Summary",
             "",
-            f"- deterministic_score: `{passed}/{total}`",
+            f"- score: `{passed}/{total}`",
             f"- format_follow_rate: `{pct(format_ok, total)}`",
             f"- clean_workdir_rate: `{pct(clean_workdir, total)}`",
             f"- failure_layers: `{dict(failure_layers)}`",
