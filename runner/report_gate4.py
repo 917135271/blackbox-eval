@@ -197,6 +197,7 @@ def behavior_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
     get_detail_tasks = 0
     deprecated_citations = 0
     trap_false_positive = 0
+    contract_warning_tasks = 0
 
     for row in rows:
         calls = iter_tool_calls(row)
@@ -217,6 +218,8 @@ def behavior_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
             get_detail_tasks += 1
 
         result = load_result(row)
+        if result.get("contract_warnings"):
+            contract_warning_tasks += 1
         answer = result.get("answer_json") if isinstance(result.get("answer_json"), dict) else {}
         citations = answer.get("citations") if isinstance(answer, dict) else []
         if isinstance(citations, list):
@@ -239,6 +242,7 @@ def behavior_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "invalid_tool_calls": invalid_calls,
         "deprecated_citations": deprecated_citations,
         "trap_false_positive_ids": trap_false_positive,
+        "contract_warning_tasks": contract_warning_tasks,
     }
 
 
@@ -315,7 +319,7 @@ def main() -> int:
         "--run",
         action="append",
         required=True,
-        help="Candidate/run pair, for example goose=gate4_baseline_goose_v1",
+        help="Candidate/run pair, for example qwen-code=gate4_standard_qwen_v4pro_v1",
     )
     parser.add_argument("--output-name", default="gate4_baseline_report.md")
     parser.add_argument("--failure-output-name", default="gate4_failure_attribution.jsonl")
@@ -345,13 +349,21 @@ def main() -> int:
         summaries.append(summarize_candidate(candidate, run_id, manifest, grades))
 
     failure_detail = write_failure_attribution(output_dir, args.failure_output_name, all_grades)
+    scope_text = ", ".join(
+        f"{candidate}={expected_count(manifests[candidate])} results"
+        for candidate, _ in run_pairs
+    )
+    configured_variants = list(config["execution"].get("prompt_variants") or [])
+    seen_variants = {str(row.get("variant")) for row in all_grades if row.get("variant")}
+    variant_names = [variant for variant in configured_variants if variant in seen_variants]
+    variant_names.extend(sorted(seen_variants - set(variant_names)))
 
     lines = [
         "# GATE 4 Baseline Report",
         "",
         f"- generated_at: `{datetime.now().isoformat(timespec='seconds')}`",
         f"- runs: `{', '.join(f'{candidate}={run_id}' for candidate, run_id in run_pairs)}`",
-        f"- task_scope: `55 tasks x 3 variants x 1 repeat = 165 results per candidate`",
+        f"- task_scope: `{scope_text}`",
         f"- failure_detail: `{short_path(failure_detail)}`",
         "- scoring: `LLM judge semantic score; format_ok is tracked separately`",
         "",
@@ -435,40 +447,35 @@ def main() -> int:
             "",
             "## Variant Results",
             "",
-            "| candidate | precise | casual | distracted |",
-            "| --- | ---: | ---: | ---: |",
+            "| candidate | " + " | ".join(variant_names) + " |",
+            "| --- | " + " | ".join("---:" for _ in variant_names) + " |",
         ]
     )
     for item in summaries:
         variant = item["variant"]
-        lines.append(
-            "| {candidate} | {precise} | {casual} | {distracted} |".format(
-                candidate=item["candidate"],
-                precise=variant.get("precise", {}).get("rate", "n/a"),
-                casual=variant.get("casual", {}).get("rate", "n/a"),
-                distracted=variant.get("distracted", {}).get("rate", "n/a"),
-            )
-        )
+        cells = [variant.get(name, {}).get("rate", "n/a") for name in variant_names]
+        lines.append(f"| {item['candidate']} | " + " | ".join(cells) + " |")
 
     lines.extend(
         [
             "",
             "## Behavior Summary",
             "",
-            "| candidate | avg_policy_calls | avg_expense_calls | get_detail_task_rate | invalid_tool_calls | deprecated_citations | avg_elapsed_s | wall_min |",
-            "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+            "| candidate | avg_policy_calls | avg_expense_calls | get_detail_task_rate | invalid_tool_calls | deprecated_citations | contract_warning_tasks | avg_elapsed_s | wall_min |",
+            "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
         ]
     )
     for item in summaries:
         behavior = item["behavior"]
         lines.append(
-            "| {candidate} | {policy} | {expense} | {detail_rate} | {invalid} | {deprecated} | {avg_elapsed} | {wall} |".format(
+            "| {candidate} | {policy} | {expense} | {detail_rate} | {invalid} | {deprecated} | {contract_warnings} | {avg_elapsed} | {wall} |".format(
                 candidate=item["candidate"],
                 policy=behavior["avg_policy_calls"],
                 expense=behavior["avg_expense_calls"],
                 detail_rate=behavior["get_detail_task_rate"],
                 invalid=behavior["invalid_tool_calls"],
                 deprecated=behavior["deprecated_citations"],
+                contract_warnings=behavior["contract_warning_tasks"],
                 avg_elapsed=item["avg_elapsed"],
                 wall=item["duration_min"],
             )
@@ -530,7 +537,7 @@ def main() -> int:
             "## Canary And Tool Disable Validation",
             "",
             "- GATE2 setup and canary checks are recorded in `output/gate2_candidate_check.md`.",
-            "- All four candidates passed canary-bash, canary-write, and canary-mcp before GATE4.",
+            "- GATE2 canary status is candidate-specific and recorded in `output/gate2_candidate_check.md` before GATE4.",
             "- GATE4 tool logs contain only `policy_query_mcp` and `expense_query_mcp` server calls when parsed from `tool_calls.jsonl`; see `invalid_tool_calls` in the behavior table.",
             "- Workdir mutation checks are reported as `clean_workdir`; any non-empty `workdir_diff.txt` would be surfaced in failure attribution.",
             "",

@@ -1,0 +1,54 @@
+{
+  "completed": true,
+  "candidate": "claude-code",
+  "task_id": "L1-009",
+  "level": "L1",
+  "category": "single_anomaly_lookup",
+  "variant": "precise",
+  "repeat_index": 1,
+  "elapsed_seconds": 60.02,
+  "exit_code": 0,
+  "timeout": false,
+  "format_failure": false,
+  "format_repaired": false,
+  "parse_error": null,
+  "contract_warnings": [
+    "extra_text_outside_json_code_block"
+  ],
+  "answer_json": {
+    "anomaly_ids": [
+      "ANO_OVER_BUDGET"
+    ],
+    "record_ids": [
+      "R000079"
+    ],
+    "answer": "报销记录R000079命中超预算异常。该记录所属部门D001(投资银行部)年度预算为230,395.17元，但累计已审批报销金额已达363,614.58元，预算使用率为157.8%，远超1.0倍阈值。且该记录special_approval为0，未履行超预算专项审批即被批准，违反预算管理办法第三条、第四条及费用报销管理办法第十三条。",
+    "citations": [
+      {
+        "doc_id": "08_budget_management.md",
+        "clause_no": "第三条"
+      },
+      {
+        "doc_id": "08_budget_management.md",
+        "clause_no": "第四条"
+      },
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十三条"
+      }
+    ]
+  },
+  "final_text": "Based on my analysis, here are the findings:\n\n- **R000079** is in department **D001 (投资银行部)**, which has an annual budget of **230,395.17** but cumulative approved spending of **363,614.58** (157.8% usage).\n- The record has **special_approval: 0** (no special approval) despite the department having already exceeded its budget.\n- Policy **08_budget_management.md Clause 3** states that once cumulative spending reaches 1.0x of annual budget, further reimbursement is not permitted in principle.\n- Policy **08_budget_management.md Clause 4** and **01_expense_reimbursement_2025.md Clause 13** both require special approval for over-budget expenses.\n\nThis record clearly hits the \"超预算\" anomaly.\n\n```json\n{\n  \"anomaly_ids\": [\"ANO_OVER_BUDGET\"],\n  \"record_ids\": [\"R000079\"],\n  \"answer\": \"报销记录R000079命中超预算异常。该记录所属部门D001(投资银行部)年度预算为230,395.17元，但累计已审批报销金额已达363,614.58元，预算使用率为157.8%，远超1.0倍阈值。且该记录special_approval为0，未履行超预算专项审批即被批准，违反预算管理办法第三条、第四条及费用报销管理办法第十三条。\",\n  \"citations\": [\n    {\"doc_id\": \"08_budget_management.md\", \"clause_no\": \"第三条\"},\n    {\"doc_id\": \"08_budget_management.md\", \"clause_no\": \"第四条\"},\n    {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十三条\"}\n  ]\n}\n```",
+  "tool_calls_count": 5,
+  "tool_log_present": true,
+  "workdir_diff_empty": true,
+  "files": {
+    "stdout": "stdout.log",
+    "stderr": "stderr.log",
+    "tool_calls": "tool_calls.jsonl",
+    "trajectory": "trajectory.json",
+    "result": "result.json",
+    "workdir_diff": "workdir_diff.txt",
+    "last_message": "last_message.txt"
+  }
+}

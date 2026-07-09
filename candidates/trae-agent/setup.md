@@ -22,7 +22,7 @@ Patch status: locally patched for engineering usability. This candidate is no lo
 - Headless command: `trae-cli.exe run <task> --config-file candidates/trae-agent/config/trae_config.yaml --working-dir candidates/trae-agent/workdir`
 - Provider: `openrouter` client pointed at the same OpenAI-compatible DeepSeek endpoint
 - Base URL: `https://api.deepseek.com`
-- Model: `deepseek-v4-flash`
+- Model: `deepseek-v4-pro`
 - API key mapping: `OPENROUTER_API_KEY` is populated from `LLM_API_KEY` by the runner.
 
 ## MCP

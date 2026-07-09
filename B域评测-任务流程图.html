@@ -1,0 +1,303 @@
+<title>B 域评测 · 智能体期望行为流程</title>
+<style>
+  :root{
+    --ground:#f5f7f9; --panel:#ffffff; --ink:#1b2230; --muted:#5c6675; --faint:#8a94a3;
+    --line:#dde3ea; --line2:#eef2f6;
+    --accent:#0e7490;            /* pipeline teal */
+    --pol:#5b54d6;               /* policy_query_mcp */
+    --pol-bg:#ecebfb; --pol-ln:#c7c3f2;
+    --exp:#a56412;               /* expense_query_mcp */
+    --exp-bg:#f8efdd; --exp-ln:#ecd7ac;
+    --trap:#be2f4d; --trap-bg:#fbe8ec; --trap-ln:#f2c3ce;
+    --ok:#0f7a52; --ok-bg:#e4f3ec;
+    --shadow:0 1px 2px rgba(20,30,48,.06),0 6px 18px rgba(20,30,48,.05);
+    --mono:ui-monospace,"SF Mono",Menlo,"Cascadia Code",Consolas,monospace;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#0f141c; --panel:#161d28; --ink:#e7ecf3; --muted:#9aa6b6; --faint:#6b7788;
+      --line:#28323f; --line2:#1e2732;
+      --accent:#35b8c9;
+      --pol:#a9a2ff; --pol-bg:#231f3c; --pol-ln:#3b3468;
+      --exp:#e0a94e; --exp-bg:#2c2312; --exp-ln:#4d3d1c;
+      --trap:#f2879e; --trap-bg:#2f1720; --trap-ln:#54283440;
+      --ok:#54c495; --ok-bg:#132a20;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.28);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#f5f7f9; --panel:#ffffff; --ink:#1b2230; --muted:#5c6675; --faint:#8a94a3;
+    --line:#dde3ea; --line2:#eef2f6; --accent:#0e7490;
+    --pol:#5b54d6; --pol-bg:#ecebfb; --pol-ln:#c7c3f2;
+    --exp:#a56412; --exp-bg:#f8efdd; --exp-ln:#ecd7ac;
+    --trap:#be2f4d; --trap-bg:#fbe8ec; --trap-ln:#f2c3ce; --ok:#0f7a52; --ok-bg:#e4f3ec;
+  }
+  :root[data-theme="dark"]{
+    --ground:#0f141c; --panel:#161d28; --ink:#e7ecf3; --muted:#9aa6b6; --faint:#6b7788;
+    --line:#28323f; --line2:#1e2732; --accent:#35b8c9;
+    --pol:#a9a2ff; --pol-bg:#231f3c; --pol-ln:#3b3468;
+    --exp:#e0a94e; --exp-bg:#2c2312; --exp-ln:#4d3d1c;
+    --trap:#f2879e; --trap-bg:#2f1720; --trap-ln:#542834; --ok:#54c495; --ok-bg:#132a20;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+    line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:clamp(20px,4vw,52px) clamp(16px,3vw,32px)}
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+    font-weight:700;margin:0 0 10px}
+  h1{font-size:clamp(24px,3.4vw,36px);line-height:1.12;margin:0 0 12px;letter-spacing:-.02em;
+    text-wrap:balance;font-weight:750}
+  .lede{color:var(--muted);max-width:64ch;margin:0;font-size:clamp(14px,1.4vw,16px)}
+  h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);
+    font-weight:700;margin:0;padding:0 0 2px}
+  section{margin-top:clamp(30px,4vw,46px)}
+  .rule{height:1px;background:var(--line);border:0;margin:14px 0 22px}
+
+  /* legend */
+  .legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:18px}
+  .key{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
+  .dot{width:11px;height:11px;border-radius:3px;flex:none}
+  .dot.pol{background:var(--pol)} .dot.exp{background:var(--exp)}
+  .dot.trap{background:var(--trap)} .dot.acc{background:var(--accent)}
+
+  /* pipeline */
+  .pipe{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px}
+  .stage{flex:1 1 150px;min-width:150px;background:var(--panel);border:1px solid var(--line);
+    border-radius:11px;padding:13px 14px;box-shadow:var(--shadow);position:relative}
+  .stage .n{font:600 11px/1 var(--mono);color:var(--faint)}
+  .stage h3{margin:6px 0 4px;font-size:14px;font-weight:700;letter-spacing:-.01em}
+  .stage p{margin:0;font-size:12px;color:var(--muted)}
+  .stage.hero{flex-basis:100%;border-color:var(--accent);
+    background:linear-gradient(180deg,color-mix(in oklab,var(--accent) 8%,var(--panel)),var(--panel))}
+  .arrow{align-self:center;color:var(--faint);font-size:16px;flex:none}
+  @media(max-width:720px){.arrow{transform:rotate(90deg)}.stage{flex-basis:100%}}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+
+  /* tool chip */
+  code.t{font:600 11.5px/1.5 var(--mono);padding:2px 7px;border-radius:6px;white-space:nowrap;
+    border:1px solid transparent}
+  code.t.pol{color:var(--pol);background:var(--pol-bg);border-color:var(--pol-ln)}
+  code.t.exp{color:var(--exp);background:var(--exp-bg);border-color:var(--exp-ln)}
+  code.plain{font:600 11.5px/1.5 var(--mono);color:var(--muted);background:var(--line2);
+    padding:2px 7px;border-radius:6px}
+
+  /* level band */
+  .band{display:flex;align-items:baseline;gap:12px;margin:0 0 14px}
+  .tag{font:700 12px/1 var(--mono);padding:5px 9px;border-radius:7px;letter-spacing:.02em}
+  .tag.l1{color:var(--accent);background:color-mix(in oklab,var(--accent) 12%,transparent)}
+  .tag.l2{color:var(--exp);background:var(--exp-bg);border:1px solid var(--exp-ln)}
+  .tag.l3{color:var(--pol);background:var(--pol-bg);border:1px solid var(--pol-ln)}
+  .tag.tr{color:var(--trap);background:var(--trap-bg);border:1px solid var(--trap-ln)}
+  .band .desc{font-size:13px;color:var(--muted)}
+  .band .desc b{color:var(--ink);font-weight:650}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+
+  .flow{background:var(--panel);border:1px solid var(--line);border-radius:13px;
+    padding:16px 16px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+  .flow.trap{border-color:var(--trap-ln)}
+  .flow > header{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px}
+  .flow h3{margin:0;font:650 13.5px/1.2 var(--mono);letter-spacing:-.01em}
+  .flow .count{margin-left:auto;font-size:11px;color:var(--faint);font-weight:600;white-space:nowrap}
+  .gist{margin:2px 0 13px;font-size:12.5px;color:var(--muted)}
+  .gist b{color:var(--ink);font-weight:650}
+
+  ol.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0}
+  ol.steps li{position:relative;padding:0 0 13px 26px}
+  ol.steps li:last-child{padding-bottom:2px}
+  ol.steps li::before{content:"";position:absolute;left:8px;top:16px;bottom:-2px;width:2px;
+    background:var(--line)}
+  ol.steps li:last-child::before{display:none}
+  .s-n{position:absolute;left:0;top:1px;width:18px;height:18px;border-radius:50%;
+    display:grid;place-items:center;font:700 10px/1 var(--mono);color:var(--panel);
+    background:var(--accent)}
+  .flow.trap .s-n{background:var(--trap)}
+  .s-lab{font-size:12.5px;font-weight:600;display:block;margin-bottom:5px}
+  .note{font-size:11.5px;color:var(--faint)}
+
+  .flow > footer{margin-top:13px;padding-top:11px;border-top:1px dashed var(--line);
+    font-size:11.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
+  .flow > footer .k{color:var(--faint)}
+  .flow > footer b{color:var(--ink);font-weight:650}
+  .pill{font:600 10.5px/1.4 var(--mono);padding:1px 6px;border-radius:5px}
+  .pill.ok{color:var(--ok);background:var(--ok-bg)}
+  .pill.trap{color:var(--trap);background:var(--trap-bg)}
+
+  .foot{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--faint)}
+  .foot code{font-family:var(--mono);font-size:11px}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">blackbox-eval · B 域费用审计</p>
+  <h1>智能体期望行为流程：从题面到判分</h1>
+  <p class="lede">每道题都按同一条管线跑；真正分叉的是<strong>中间的工具编排</strong>——不同任务类型期望智能体调用哪些工具、按什么顺序、产出什么形状的答案。角色提示的铁律是<strong>先查制度依据 → 再查业务事实 → 给结论</strong>。</p>
+
+  <div class="legend">
+    <span class="key"><span class="dot pol"></span><code class="t pol">policy_query_mcp</code> 制度检索（4 工具）</span>
+    <span class="key"><span class="dot exp"></span><code class="t exp">expense_query_mcp</code> 费用数据（7 工具）</span>
+    <span class="key"><span class="dot acc"></span>通用管线</span>
+    <span class="key"><span class="dot trap"></span>反幻觉 / 版本红线</span>
+  </div>
+
+  <section>
+    <h2>通用管线（所有题共用）</h2>
+    <hr class="rule">
+    <div class="pipe">
+      <div class="stage"><span class="n">01</span><h3>题面输入</h3><p>三选一变体：precise · casual · distracted</p></div>
+      <span class="arrow">→</span>
+      <div class="stage"><span class="n">02</span><h3>组装 prompt</h3><p>角色提示 ＋ 题面变体 ＋ 输出契约</p></div>
+      <span class="arrow">→</span>
+      <div class="stage hero"><span class="n">03</span><h3>候选 harness 编排循环</h3>
+        <p>原生 bash / 文件写入 / 联网 <b style="color:var(--trap)">已禁用</b>；仅挂两个 MCP。推理 ↔ 工具调用反复迭代，直至给出结论。</p>
+        <div class="chips">
+          <code class="t pol">policy_query_mcp</code><code class="t exp">expense_query_mcp</code>
+        </div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="stage"><span class="n">04</span><h3>最终答案</h3><p>单个 JSON 块<br><code class="plain">anomaly_ids · answer · citations</code></p></div>
+      <span class="arrow">→</span>
+      <div class="stage"><span class="n">05</span><h3>判卷</h3><p>格式闸门 → 确定性 / LLM judge → 多维指标</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="band"><span class="tag l1">L1</span><span class="desc"><b>单点检索</b> · 一次查询答一个事实（15 题）</span></div>
+    <div class="grid">
+
+      <article class="flow">
+        <header><h3>policy_qa</h3><span class="count">×4</span></header>
+        <p class="gist">问一条现行制度规定（如审批线、报销时限）。</p>
+        <ol class="steps">
+          <li><span class="s-n">1</span><span class="s-lab">检索制度</span><span class="chips"><code class="t pol">search_policy</code></span></li>
+          <li><span class="s-n">2</span><span class="s-lab">读原文条款</span><span class="chips"><code class="t pol">get_policy_doc</code><code class="t pol">get_policy_excerpt</code></span></li>
+          <li><span class="s-n">3</span><span class="s-lab">提取事实并作答</span><span class="note">带 doc_id + clause_no 引用，anomaly_ids 空</span></li>
+        </ol>
+        <footer><span class="k">判</span><b>expected_facts</b> <span class="pill ok">事实命中＋引用正确</span></footer>
+      </article>
+
+      <article class="flow">
+        <header><h3>single_anomaly_lookup / ground_truth_lookup</h3><span class="count">×10</span></header>
+        <p class="gist">题面给线索（记录号 / 发票号），查一条业务事实。</p>
+        <ol class="steps">
+          <li><span class="s-n">1</span><span class="s-lab">按线索取记录</span><span class="chips"><code class="t exp">get_expense_detail</code><code class="t exp">list_expenses</code></span></li>
+          <li><span class="s-n">2</span><span class="s-lab">必要时溯发票 / 审批</span><span class="chips"><code class="t exp">find_invoice_usage</code><code class="t exp">list_approvals</code></span></li>
+          <li><span class="s-n">3</span><span class="s-lab">读原始事实并作答</span></li>
+        </ol>
+        <footer><span class="k">判</span><b>expected_facts</b></footer>
+      </article>
+
+      <article class="flow">
+        <header><h3>version_check</h3><span class="count">×1</span></header>
+        <p class="gist">确认哪一版是现行版（库里有 2025 现行与 2022 废止两版）。</p>
+        <ol class="steps">
+          <li><span class="s-n">1</span><span class="s-lab">列制度看版本</span><span class="chips"><code class="t pol">list_policy_docs</code></span></li>
+          <li><span class="s-n">2</span><span class="s-lab">取现行版原文</span><span class="chips"><code class="t pol">get_policy_doc</code></span></li>
+          <li><span class="s-n">3</span><span class="s-lab">作答并标明现行</span><span class="note">勿把 _deprecated 版当依据</span></li>
+        </ol>
+        <footer><span class="k">判</span><b>expected_facts</b></footer>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="band"><span class="tag l2">L2</span><span class="desc"><b>制度 × 数据 比对</b> · 横评核心能力（25 题 · 全是 policy_data_comparison）</span></div>
+    <div class="grid">
+      <article class="flow" style="grid-column:1/-1">
+        <header><h3>policy_data_comparison</h3><span class="count">×25 · 核心</span></header>
+        <p class="gist">拿<b>制度规则</b>去核<b>业务数据</b>，以给定线索定位<b>一个</b>异常，返回异常与记录集合。这是横评真正想测的<b>多工具编排</b>。</p>
+        <ol class="steps">
+          <li><span class="s-n">1</span><span class="s-lab">先取制度规则</span><span class="chips"><code class="t pol">search_policy</code><code class="t pol">get_policy_excerpt</code></span><span class="note">审批线 / 报销限额 / 时限 / 唯一发票等口径</span></li>
+          <li><span class="s-n">2</span><span class="s-lab">再取业务事实</span><span class="chips"><code class="t exp">get_expense_detail</code><code class="t exp">find_invoice_usage</code><code class="t exp">list_approvals</code><code class="t exp">get_department_budget</code></span></li>
+          <li><span class="s-n">3</span><span class="s-lab">规则 × 数据 交叉比对</span><span class="note">发票是否被多单重复报销、金额是否越过审批档、是否缺审批…</span></li>
+          <li><span class="s-n">4</span><span class="s-lab">判定异常并作答</span><span class="note">命中则给 anomaly_ids + record_ids + 制度引用</span></li>
+        </ol>
+        <footer><span class="k">判</span><b>anomaly_id_set</b> <span class="pill ok">异常集合与真值完全相等 = 1 分</span> <span class="k">另算</span>precision / recall</footer>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <div class="band"><span class="tag l3">L3</span><span class="desc"><b>全量 / 多跳 / 版本 / 报告</b> · 深度编排＋抗 context 压力（10 题）</span></div>
+    <div class="grid">
+
+      <article class="flow">
+        <header><h3>full_year_rule_audit</h3><span class="count">×5</span></header>
+        <p class="gist">不给线索，自己<b>全年扫</b>，一个不漏地找出<b>全部</b>某类异常。</p>
+        <ol class="steps">
+          <li><span class="s-n">1</span><span class="s-lab">取规则</span><span class="chips"><code class="t pol">search_policy</code></span></li>
+          <li><span class="s-n">2</span><span class="s-lab">分页翻完整年数据</span><span class="chips"><code class="t exp">list_expenses</code></span><span class="note">page 1…N，每页 ≤ 50 → context 压力在此</span></li>
+          <li><span class="s-n">3</span><span class="s-lab">逐条套规则、汇总全部异常</span></li>
+          <li><span class="s-n">4</span><span class="s-lab">输出完整异常集合</span><span class="note">重点＝召回完整性</span></li>
+        </ol>
+        <footer><span class="k">判</span><b>anomaly_id_set</b>（大集合）</footer>
+      </article>
+
+      <article class="flow">
+        <header><h3>two_hop_retrieval</h3><span class="count">×1</span></header>
+        <p class="gist">答案要两次链式检索，第一跳的结果是第二跳的输入。</p>
+        <ol class="steps">
+          <li><span class="s-n">1</span><span class="s-lab">第一跳检索</span><span class="chips"><code class="t pol">search_policy</code><code class="t exp">get_expense_detail</code></span></li>
+          <li><span class="s-n">2</span><span class="s-lab">用其结果构造第二跳</span><span class="chips"><code class="t pol">get_policy_doc</code></span></li>
+          <li><span class="s-n">3</span><span class="s-lab">合成两跳结果作答</span></li>
+        </ol>
+        <footer><span class="k">判</span><b>expected_facts</b></footer>
+      </article>
+
+      <article class="flow trap">
+        <header><h3>version_trap</h3><span class="count">×1</span></header>
+        <p class="gist">现行版与废止版并存，<b>引用废止版即判错</b>（红线）。</p>
+        <ol class="steps">
+          <li><span class="s-n">1</span><span class="s-lab">列制度、辨现行 vs 废止</span><span class="chips"><code class="t pol">list_policy_docs</code></span></li>
+          <li><span class="s-n">2</span><span class="s-lab">只用现行版</span><span class="chips"><code class="t pol">get_policy_doc</code></span></li>
+          <li><span class="s-n">3</span><span class="s-lab">作答</span><span class="note">命中废止条款须说明其已废止</span></li>
+        </ol>
+        <footer><span class="k">判</span><b>expected_facts</b> <span class="pill trap">deprecated_citations 计数</span></footer>
+      </article>
+
+      <article class="flow">
+        <header><h3>near_clause_disambiguation</h3><span class="count">×1</span></header>
+        <p class="gist">检索命中多条相似条款，要选对适用的那条。</p>
+        <ol class="steps">
+          <li><span class="s-n">1</span><span class="s-lab">检索得多条近义条款</span><span class="chips"><code class="t pol">search_policy</code></span></li>
+          <li><span class="s-n">2</span><span class="s-lab">读全文消歧</span><span class="chips"><code class="t pol">get_policy_doc</code></span></li>
+          <li><span class="s-n">3</span><span class="s-lab">锁定正确条款作答</span></li>
+        </ol>
+        <footer><span class="k">判</span><b>expected_facts</b></footer>
+      </article>
+
+      <article class="flow">
+        <header><h3>audit_report</h3><span class="count">×2</span></header>
+        <p class="gist">综合制度＋全量数据，产出结构化审计结论。</p>
+        <ol class="steps">
+          <li><span class="s-n">1</span><span class="s-lab">取规则</span><span class="chips"><code class="t pol">search_policy</code></span></li>
+          <li><span class="s-n">2</span><span class="s-lab">翻数据、逐项核查</span><span class="chips"><code class="t exp">list_expenses</code><code class="t exp">get_expense_detail</code></span></li>
+          <li><span class="s-n">3</span><span class="s-lab">汇总为审计报告作答</span></li>
+        </ol>
+        <footer><span class="k">判</span><b>anomaly_id_set</b> / <b>expected_facts</b></footer>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="band"><span class="tag tr">TRAP</span><span class="desc"><b>干净但可疑</b> · 反幻觉：该说"无异常"时别乱报（5 题）</span></div>
+    <div class="grid">
+      <article class="flow trap" style="grid-column:1/-1">
+        <header><h3>clean_but_suspicious</h3><span class="count">×5</span></header>
+        <p class="gist">题面给一条<b>看着可疑、实则合规</b>的记录。正确答案是<b>空异常集</b> —— 测的是会不会脑补出不存在的异常（假阳性）。</p>
+        <ol class="steps">
+          <li><span class="s-n">1</span><span class="s-lab">取被点名记录的原始事实</span><span class="chips"><code class="t exp">get_expense_detail</code><code class="t exp">find_invoice_usage</code></span></li>
+          <li><span class="s-n">2</span><span class="s-lab">取相关制度规则</span><span class="chips"><code class="t pol">search_policy</code></span></li>
+          <li><span class="s-n">3</span><span class="s-lab">核对：原始事实＋规则是否<b>共同</b>支持异常</span><span class="note">不满足 → 判定合规</span></li>
+          <li><span class="s-n">4</span><span class="s-lab">输出空异常集＋说明理由</span><span class="chips"><code class="plain">anomaly_ids: []</code></span></li>
+        </ol>
+        <footer><span class="k">判</span><b>no_anomaly</b> <span class="pill trap">异常集非空 = 假阳性失败</span></footer>
+      </article>
+    </div>
+  </section>
+
+  <p class="foot">依据：<code>fixtures/audit_role_prompt.md</code>（先制度后数据 · 禁编码工具 · 版本红线）、<code>output_contract.md</code>（JSON 三字段）、<code>runner/grade.py</code>（各 scoring.kind）、<code>data/evals.json</code>（level × category）。工具序列为<strong>期望</strong>行为；候选实际路径见各自 trajectory。</p>
+</div>

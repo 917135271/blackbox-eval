@@ -1,0 +1,33 @@
+Now I have a complete picture. Let me finalize the analysis.
+
+**Summary of findings:**
+
+All 6 "超标准注入样本" (over-standard injection samples) are confirmed anomalies linked through the R004225 pattern:
+
+| Record | Type | Amount | Standard | Policy |
+|---|---|---|---|---|
+| R004221 | office_supplies | ¥650 | ≤¥600/mo | 07_office 第二条 |
+| R004222 | communication | ¥330 | ≤¥300/mo | 07_office 第三条 |
+| R004223 | training_fee | ¥3700 | ≤¥3500/person | 05_training 第二条 |
+| R004224 | business_entertainment | ¥700/2人=¥350/人 | ≤¥300/人 | 06_entertainment 第三条 |
+| R004225 | travel_lodging | ¥900/晚 | ≤¥650/晚(经理级A类) | 04_travel 第四条 |
+| R004226 | local_transport | ¥92/日 | ≤¥80/日(三类城市) | 04_travel 第六条 |
+
+All lack special approval, violating 01_reimbursement 第十二条.
+
+```json
+{
+  "anomaly_ids": ["R004221", "R004222", "R004223", "R004224", "R004225", "R004226"],
+  "record_ids": ["R004221", "R004222", "R004223", "R004224", "R004225", "R004226"],
+  "answer": "[{\"record_id\":\"R004221\",\"type\":\"office_supplies\",\"amount\":650,\"standard\":600,\"over_by\":50},{\"record_id\":\"R004222\",\"type\":\"communication\",\"amount\":330,\"standard\":300,\"over_by\":30},{\"record_id\":\"R004223\",\"type\":\"training_fee\",\"amount\":3700,\"standard\":3500,\"over_by\":200},{\"record_id\":\"R004224\",\"type\":\"business_entertainment\",\"amount\":700,\"participants\":2,\"per_person\":350,\"standard_per_person\":300,\"over_by\":50},{\"record_id\":\"R004225\",\"type\":\"travel_lodging\",\"amount\":900,\"city_tier\":\"A\",\"level\":\"经理级\",\"standard\":650,\"over_by\":250},{\"record_id\":\"R004226\",\"type\":\"local_transport\",\"amount\":92,\"city_tier\":\"C\",\"standard\":80,\"over_by\":12}]",
+  "citations": [
+    {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+    {"doc_id": "07_office_communication.md", "clause_no": "第三条"},
+    {"doc_id": "05_training_expense.md", "clause_no": "第二条"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第三条"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "第六条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+  ]
+}
+```

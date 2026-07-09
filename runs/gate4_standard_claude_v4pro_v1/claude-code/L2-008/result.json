@@ -1,0 +1,51 @@
+{
+  "completed": true,
+  "candidate": "claude-code",
+  "task_id": "L2-008",
+  "level": "L2",
+  "category": "policy_data_comparison",
+  "variant": "precise",
+  "repeat_index": 1,
+  "elapsed_seconds": 45.83,
+  "exit_code": 0,
+  "timeout": false,
+  "format_failure": false,
+  "format_repaired": false,
+  "parse_error": null,
+  "contract_warnings": [
+    "extra_text_outside_json_code_block"
+  ],
+  "answer_json": {
+    "anomaly_ids": [
+      "ANM-SPLIT-001"
+    ],
+    "record_ids": [
+      "R004212",
+      "R004213"
+    ],
+    "answer": "员工E0009(张婷)在2025年4月10日和4月15日(间隔5天)分别提交两笔travel_lodging报销,金额均为5100元,合计10200元。单笔5100元属于AR-02档(部门经理+财务复核),但合计10200元已达AR-03档(需部门总经理审批)。两笔报销理由均为拆分报销注入样本3,符合同一员工同一费用类型7天内多笔报销且合计金额跨越较高审批线的拆分规避审批特征,依据费用报销管理办法第十一条认定为拆分报销异常。",
+    "citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "final_text": "分析已完整。以下是核查结论：\n\n**拆分报销异常判定：**\n\n- **R004212**：员工E0009(张婷)，travel_lodging，¥5,100，2025-04-10\n- **R004213**：同一员工E0009，同一费用类型travel_lodging，¥5,100，2025-04-15\n- 两笔间隔仅5天（在7天窗口内），合计¥10,200\n- 单笔¥5,100属AR-02档（3000-10000，部门经理+财务复核），但合计¥10,200已达AR-03档（≥10000，需部门总经理审批），构成拆分规避审批\n\n```json\n{\n  \"anomaly_ids\": [\"ANM-SPLIT-001\"],\n  \"record_ids\": [\"R004212\", \"R004213\"],\n  \"answer\": \"员工E0009(张婷)在2025年4月10日和4月15日(间隔5天)分别提交两笔travel_lodging报销,金额均为5100元,合计10200元。单笔5100元属于AR-02档(部门经理+财务复核),但合计10200元已达AR-03档(需部门总经理审批)。两笔报销理由均为拆分报销注入样本3,符合同一员工同一费用类型7天内多笔报销且合计金额跨越较高审批线的拆分规避审批特征,依据费用报销管理办法第十一条认定为拆分报销异常。\",\n  \"citations\": [\n    {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十一条\"},\n    {\"doc_id\": \"03_authorization_management.md\", \"clause_no\": \"附件二\"}\n  ]\n}\n```",
+  "tool_calls_count": 8,
+  "tool_log_present": true,
+  "workdir_diff_empty": true,
+  "files": {
+    "stdout": "stdout.log",
+    "stderr": "stderr.log",
+    "tool_calls": "tool_calls.jsonl",
+    "trajectory": "trajectory.json",
+    "result": "result.json",
+    "workdir_diff": "workdir_diff.txt",
+    "last_message": "last_message.txt"
+  }
+}

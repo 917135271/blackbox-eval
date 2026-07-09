@@ -1,0 +1,26 @@
+现在我已经完整核查了以 R004221 为线索的所有超标准注入样本。以下是最终分析：
+
+**R004221** → office_supplies / 650元，标准 ≤600元（办公用品月度控制）
+**R004222** → communication / 330元，标准 ≤300元（通讯费月度控制）
+**R004223** → training_fee / 3700元，标准 ≤3500元（培训课程费按人次）
+**R004224** → business_entertainment / 700元/2人=350元/人，标准 ≤300元/人
+**R004225** → travel_lodging / 900元/晚，D1级一类城市标准 ≤850元/晚
+
+全部 special_approval=0，违反《费用报销管理办法》第十二条。
+
+```json
+{
+  "anomaly_ids": ["R004221", "R004222", "R004223", "R004224", "R004225"],
+  "record_ids": ["R004221", "R004222", "R004223", "R004224", "R004225"],
+  "answer": "以R004221为线索，共核查出5笔超标准异常记录，均为无专项审批情况下超出对应制度标准：R004221办公用品650元超600元标准；R004222通讯费330元超300元标准；R004223培训费3700元超3500元标准；R004224业务招待费人均350元超300元标准；R004225差旅住宿费900元超850元标准。全部违反费用报销管理办法第十二条。",
+  "citations": [
+    {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+    {"doc_id": "07_office_communication.md", "clause_no": "第三条"},
+    {"doc_id": "05_training_expense.md", "clause_no": "第二条"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第三条"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "第五条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+  ]
+}
+```

@@ -9,13 +9,6 @@
 - no_inline_secret: ok (ok)
 - version_check: ok (0.19.6)
 
-### goose - ok
-- command_exists: ok (D:\算法LLM\项目篇\东方证券\agent\blackbox-eval\candidates\goose\install\v1.41.0\extracted\goose-package\goose.exe)
-- setup_md_exists: ok (candidates\goose\setup.md)
-- config_files_exist: ok (ok)
-- no_inline_secret: ok (ok)
-- version_check: ok (1.41.0)
-
 ### trae-agent - ok
 - command_exists: ok (D:\算法LLM\项目篇\东方证券\agent\blackbox-eval\candidates\trae-agent\vendor\trae-agent\.venv\Scripts\trae-cli.exe)
 - setup_md_exists: ok (candidates\trae-agent\setup.md)
@@ -31,17 +24,27 @@
 - no_inline_secret: ok (ok)
 - version_check: ok (1.17.14)
 
+### claude-code - ok
+- command_exists: ok (D:\算法LLM\项目篇\东方证券\agent\blackbox-eval\candidates\claude-code\runtime\node_modules\.bin\ccb.cmd)
+- setup_md_exists: ok (candidates\claude-code\setup.md)
+- config_files_exist: ok (ok)
+- no_inline_secret: ok (ok)
+- version_check: ok (2.8.3 (Claude Code))
+- pinned_commit: ok (7680c291ee7d8aa9cb291d518273352ad32256ec)
+
+### codex - ok
+- command_exists: ok (D:\算法LLM\项目篇\东方证券\agent\blackbox-eval\candidates\codex\runtime\node_modules\.bin\codex.cmd)
+- setup_md_exists: ok (candidates\codex\setup.md)
+- config_files_exist: ok (ok)
+- no_inline_secret: ok (ok)
+- version_check: ok (codex-cli 0.80.0)
+
 ## Canaries
 
 ### qwen-code - ok
 - canary-bash: ok (exit=0; probe_diff=none; unavailable_answer=yes; runs\gate2\qwen-code\canary-bash)
 - canary-write: ok (exit=0; probe_diff=none; unavailable_answer=yes; runs\gate2\qwen-code\canary-write)
 - canary-mcp: ok (exit=0; mcp_answer_checked; runs\gate2\qwen-code\canary-mcp)
-
-### goose - ok
-- canary-bash: ok (exit=0; probe_diff=none; unavailable_answer=yes; runs\gate2\goose\canary-bash)
-- canary-write: ok (exit=0; probe_diff=none; unavailable_answer=yes; runs\gate2\goose\canary-write)
-- canary-mcp: ok (exit=0; mcp_answer_checked; runs\gate2\goose\canary-mcp)
 
 ### trae-agent - ok
 - canary-bash: ok (exit=0; probe_diff=none; unavailable_answer=yes; runs\gate2\trae-agent\canary-bash)
@@ -52,3 +55,13 @@
 - canary-bash: ok (exit=0; probe_diff=none; unavailable_answer=yes; runs\gate2\opencode\canary-bash)
 - canary-write: ok (exit=0; probe_diff=none; unavailable_answer=yes; runs\gate2\opencode\canary-write)
 - canary-mcp: ok (exit=0; mcp_answer_checked; runs\gate2\opencode\canary-mcp)
+
+### claude-code - ok
+- canary-bash: ok (exit=0; probe_diff=none; unavailable_answer=yes; runs\gate2\claude-code\canary-bash)
+- canary-write: ok (exit=0; probe_diff=none; unavailable_answer=yes; runs\gate2\claude-code\canary-write)
+- canary-mcp: ok (exit=0; mcp_answer_checked; runs\gate2\claude-code\canary-mcp)
+
+### codex - ok
+- canary-bash: ok (exit=0; probe_diff=none; unavailable_answer=yes; runs\gate2\codex\canary-bash)
+- canary-write: ok (exit=0; probe_diff=none; unavailable_answer=yes; runs\gate2\codex\canary-write)
+- canary-mcp: ok (exit=0; mcp_answer_checked; runs\gate2\codex\canary-mcp)

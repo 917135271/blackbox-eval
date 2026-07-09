@@ -1,5 +1,8 @@
 # goose setup
 
+Status: disabled for the current standard-55 benchmark. This candidate remains
+only for historical result reproducibility.
+
 Status: installed and configured for GATE 2 setup checks.
 
 ## Official Sources
@@ -19,11 +22,11 @@ Status: installed and configured for GATE 2 setup checks.
 
 ## Runtime
 
-- Headless command: `goose.exe run --no-session --no-profile --provider openai --model deepseek-v4-flash`
+- Headless command if re-enabled: `goose.exe run --no-session --no-profile --provider openai --model deepseek-v4-pro`
 - Workdir: `candidates/goose/workdir`
 - Provider: built-in `openai`
 - Base URL mapping: `OPENAI_HOST=https://api.deepseek.com`
-- Model mapping: `GOOSE_MODEL=deepseek-v4-flash`
+- Model mapping if re-enabled: `GOOSE_MODEL=deepseek-v4-pro`
 - API key mapping: `OPENAI_API_KEY` is populated from `LLM_API_KEY` by the runner.
 
 ## MCP

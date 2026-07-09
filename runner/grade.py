@@ -105,6 +105,29 @@ def citation_ok(task: dict[str, Any], answer_json: dict[str, Any]) -> bool:
     return bool(expected_docs & cited_docs)
 
 
+def string_set(value: Any) -> set[str]:
+    if not isinstance(value, list):
+        return set()
+    return {str(item) for item in value if item is not None and str(item).strip()}
+
+
+def record_text_hits(expected_records: list[str], answer_json: dict[str, Any], final_text: str) -> list[dict[str, Any]]:
+    structured = string_set(answer_json.get("record_ids"))
+    answer_text = " ".join(
+        [
+            str(answer_json.get("answer", "")),
+            json.dumps(answer_json.get("citations", []), ensure_ascii=False),
+            final_text,
+        ]
+    )
+    normalized_answer = normalize(answer_text)
+    hits = []
+    for record_id in expected_records:
+        hit = record_id in structured or normalize(record_id) in normalized_answer
+        hits.append({"record_id": record_id, "hit": hit})
+    return hits
+
+
 def base_grade_fields(result: dict[str, Any], task: dict[str, Any], run_path: Path) -> dict[str, Any]:
     scoring = task.get("scoring") or {}
     return {
@@ -132,23 +155,39 @@ def rule_grade_result(result: dict[str, Any], task: dict[str, Any], run_path: Pa
     if answer_json is None:
         return {**base, "score": 0.0, "failure_layer": "format_failure"}
 
-    predicted_ids = answer_json.get("anomaly_ids", [])
-    if not isinstance(predicted_ids, list):
-        predicted_ids = []
-    predicted_set = {str(item) for item in predicted_ids}
+    predicted_set = string_set(answer_json.get("anomaly_ids"))
+    predicted_record_set = string_set(answer_json.get("record_ids"))
 
     if kind in {"anomaly_id_set", "no_anomaly"}:
         expected_set = {str(item) for item in scoring.get("expected_anomaly_ids", [])}
+        expected_records = [str(item) for item in scoring.get("expected_record_ids", [])]
+        expected_record_set = set(expected_records)
+        record_hits = record_text_hits(expected_records, answer_json, result.get("final_text", ""))
+        records_ok = bool(expected_records) and all(item["hit"] for item in record_hits)
         true_positive = len(predicted_set & expected_set)
         precision = true_positive / len(predicted_set) if predicted_set else (1.0 if not expected_set else 0.0)
         recall = true_positive / len(expected_set) if expected_set else (1.0 if not predicted_set else 0.0)
-        score = 1.0 if predicted_set == expected_set else 0.0
-        failure_layer = None if score == 1.0 else "reasoning_or_retrieval_error"
+        if kind == "no_anomaly":
+            score = 1.0 if not predicted_set else 0.0
+            failure_layer = None if score == 1.0 else "no_anomaly_false_positive"
+        else:
+            anomaly_ok = predicted_set == expected_set
+            exact_record_set_ok = bool(expected_record_set) and predicted_record_set == expected_record_set
+            score = 1.0 if anomaly_ok or exact_record_set_ok or records_ok else 0.0
+            if score == 1.0:
+                failure_layer = None
+            elif expected_records and not records_ok:
+                failure_layer = "record_id_miss"
+            else:
+                failure_layer = "reasoning_or_retrieval_error"
         return {
             **base,
             "score": score,
             "expected_anomaly_ids": sorted(expected_set),
             "predicted_anomaly_ids": sorted(predicted_set),
+            "expected_record_ids": expected_records,
+            "predicted_record_ids": sorted(predicted_record_set),
+            "record_hits": record_hits,
             "precision": round(precision, 4),
             "recall": round(recall, 4),
             "failure_layer": failure_layer,
@@ -157,36 +196,26 @@ def rule_grade_result(result: dict[str, Any], task: dict[str, Any], run_path: Pa
     if kind == "record_id_set":
         expected_set = {str(item) for item in scoring.get("expected_anomaly_ids", [])}
         expected_records = [str(item) for item in scoring.get("expected_record_ids", [])]
-        answer_text = " ".join(
-            [
-                str(answer_json.get("answer", "")),
-                json.dumps(answer_json.get("citations", []), ensure_ascii=False),
-                result.get("final_text", ""),
-            ]
-        )
-        normalized_answer = normalize(answer_text)
-        record_hits = [
-            {"record_id": record_id, "hit": normalize(record_id) in normalized_answer}
-            for record_id in expected_records
-        ]
+        record_hits = record_text_hits(expected_records, answer_json, result.get("final_text", ""))
         records_ok = all(item["hit"] for item in record_hits)
         true_positive = len(predicted_set & expected_set)
         precision = true_positive / len(predicted_set) if predicted_set else (1.0 if not expected_set else 0.0)
         recall = true_positive / len(expected_set) if expected_set else (1.0 if not predicted_set else 0.0)
         anomaly_ok = predicted_set == expected_set
-        score = 1.0 if anomaly_ok and records_ok else 0.0
+        score = 1.0 if records_ok else 0.0
         if score == 1.0:
             failure_layer = None
-        elif not anomaly_ok:
-            failure_layer = "reasoning_or_retrieval_error"
-        else:
+        elif not records_ok:
             failure_layer = "record_id_miss"
+        else:
+            failure_layer = "reasoning_or_retrieval_error"
         return {
             **base,
             "score": score,
             "expected_anomaly_ids": sorted(expected_set),
             "predicted_anomaly_ids": sorted(predicted_set),
             "expected_record_ids": expected_records,
+            "predicted_record_ids": sorted(predicted_record_set),
             "record_hits": record_hits,
             "precision": round(precision, 4),
             "recall": round(recall, 4),
@@ -387,8 +416,9 @@ class LLMJudge:
             "请对候选 agent 的回答做语义判卷。\n"
             "判卷原则:\n"
             "1. anomaly_id_set/no_anomaly: 判断候选是否识别了同一个标准异常集合。若候选没有写标准异常ID, "
-            "但明确给出了正确规则、正确记录集合,可视为语义命中; 若混入无关异常或把干净陷阱计为异常,判错。\n"
-            "2. record_id_set: 必须覆盖期望 record_id, 且不能用无关记录替代。\n"
+            "但在 record_ids 或回答正文中明确给出了正确规则、正确业务记录集合,可视为语义命中; "
+            "若混入无关异常或把干净陷阱计为异常,判错。\n"
+            "2. record_id_set: 必须覆盖期望 record_id; record_ids 字段是优先证据,正文中的记录 ID 可作为辅助证据,且不能用无关记录替代。\n"
             "3. expected_facts: 关键事实必须语义完整; citation 应支持答案,但不要求逐字相同。\n"
             "4. llm_rubric: 逐条判断 rubric_assertions 是否满足。\n"
             "5. format_failure 只作为诊断信号; 本次 score 主要衡量内容语义是否正确。\n\n"

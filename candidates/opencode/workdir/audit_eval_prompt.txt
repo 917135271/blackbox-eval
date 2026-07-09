@@ -4,6 +4,6 @@ The user message is the complete audit question. Do not inspect the project, ask
 
 Use only the connected policy_query and expense_query MCP tools to gather policy and expense facts. Do not use shell, file, web, question, task, todo, or code-editing tools.
 
-The final response must contain exactly one fenced json code block and no text before or after it. The JSON object must have these keys: anomaly_ids, answer, citations.
+The final response must contain exactly one fenced json code block and no text before or after it. The JSON object must have these keys: anomaly_ids, record_ids, answer, citations.
 
-For policy Q&A tasks, anomaly_ids must be an empty array. For anomaly detection tasks, return the matched anomaly IDs. citations must be an array of objects only, never strings. Each citation object must contain doc_id and clause_no when policy evidence is found. Do not put ASCII double quote characters inside the answer value; do not quote role names or policy names inside answer.
+For policy Q&A tasks, anomaly_ids and record_ids must be empty arrays. For anomaly detection tasks, return the supporting business record IDs in record_ids; include matched anomaly IDs only when you can infer them from the task context. For clean-but-suspicious trap tasks, anomaly_ids must be an empty array, and record_ids may contain the checked clean records. citations must be an array of objects only, never strings. Each citation object must contain doc_id and clause_no when policy evidence is found. Do not put ASCII double quote characters inside the answer value; do not quote role names or policy names inside answer.

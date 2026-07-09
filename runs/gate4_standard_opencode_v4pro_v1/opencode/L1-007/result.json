@@ -1,0 +1,49 @@
+{
+  "completed": true,
+  "candidate": "opencode",
+  "task_id": "L1-007",
+  "level": "L1",
+  "category": "single_anomaly_lookup",
+  "variant": "precise",
+  "repeat_index": 1,
+  "elapsed_seconds": 75.36,
+  "exit_code": 0,
+  "timeout": false,
+  "format_failure": false,
+  "format_repaired": false,
+  "parse_error": null,
+  "contract_warnings": [],
+  "answer_json": {
+    "anomaly_ids": [
+      "拆分报销注入样本1"
+    ],
+    "record_ids": [
+      "R004207",
+      "R004208"
+    ],
+    "answer": "命中拆分报销。报销记录R004207(员工E0007李丽娟,信息技术部D007)费用类型为travel_lodging,发生日期2025-01-10,金额5200元;同一员工同一费用类型在7天内还存在R004208(发生日期2025-01-12,金额5200元)。两笔合计10400元。依据费用报销管理办法第十一条,不得将同一或同类事项拆分为多笔报销以规避审批权限,同一员工、同一费用类型在7天内出现2笔及以上且合计金额达到较高审批线的应认定为拆分规避审批。单笔5200元仅落在授权管理办法附件二AR-02档(3000至10000元,部门经理并经财务复核),但合计10400元已跨入AR-03档(10000至50000元,需部门总经理审批),属于典型的拆分以规避更高层级审批。两笔记录的报销事由均标注为同一注入样本,构成同一拆分报销组。故R004207命中拆分报销异常,关联记录为R004207与R004208,异常组标识为拆分报销注入样本1。",
+    "citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "final_text": "```json\n{\n  \"anomaly_ids\": [\"拆分报销注入样本1\"],\n  \"record_ids\": [\"R004207\", \"R004208\"],\n  \"answer\": \"命中拆分报销。报销记录R004207(员工E0007李丽娟,信息技术部D007)费用类型为travel_lodging,发生日期2025-01-10,金额5200元;同一员工同一费用类型在7天内还存在R004208(发生日期2025-01-12,金额5200元)。两笔合计10400元。依据费用报销管理办法第十一条,不得将同一或同类事项拆分为多笔报销以规避审批权限,同一员工、同一费用类型在7天内出现2笔及以上且合计金额达到较高审批线的应认定为拆分规避审批。单笔5200元仅落在授权管理办法附件二AR-02档(3000至10000元,部门经理并经财务复核),但合计10400元已跨入AR-03档(10000至50000元,需部门总经理审批),属于典型的拆分以规避更高层级审批。两笔记录的报销事由均标注为同一注入样本,构成同一拆分报销组。故R004207命中拆分报销异常,关联记录为R004207与R004208,异常组标识为拆分报销注入样本1。\",\n  \"citations\": [\n    {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十一条\"},\n    {\"doc_id\": \"03_authorization_management.md\", \"clause_no\": \"附件二\"}\n  ]\n}\n```",
+  "tool_calls_count": 6,
+  "tool_log_present": true,
+  "workdir_diff_empty": true,
+  "files": {
+    "stdout": "stdout.log",
+    "stderr": "stderr.log",
+    "tool_calls": "tool_calls.jsonl",
+    "trajectory": "trajectory.json",
+    "result": "result.json",
+    "workdir_diff": "workdir_diff.txt",
+    "last_message": "last_message.txt"
+  }
+}

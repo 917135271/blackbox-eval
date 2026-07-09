@@ -1,0 +1,45 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 42015,
+  "duration_api_ms": 0,
+  "num_turns": 9,
+  "result": "分析已完整。以下是核查结论：\n\n**拆分报销异常判定：**\n\n- **R004212**：员工E0009(张婷)，travel_lodging，¥5,100，2025-04-10\n- **R004213**：同一员工E0009，同一费用类型travel_lodging，¥5,100，2025-04-15\n- 两笔间隔仅5天（在7天窗口内），合计¥10,200\n- 单笔¥5,100属AR-02档（3000-10000，部门经理+财务复核），但合计¥10,200已达AR-03档（≥10000，需部门总经理审批），构成拆分规避审批\n\n```json\n{\n  \"anomaly_ids\": [\"ANM-SPLIT-001\"],\n  \"record_ids\": [\"R004212\", \"R004213\"],\n  \"answer\": \"员工E0009(张婷)在2025年4月10日和4月15日(间隔5天)分别提交两笔travel_lodging报销,金额均为5100元,合计10200元。单笔5100元属于AR-02档(部门经理+财务复核),但合计10200元已达AR-03档(需部门总经理审批)。两笔报销理由均为拆分报销注入样本3,符合同一员工同一费用类型7天内多笔报销且合计金额跨越较高审批线的拆分规避审批特征,依据费用报销管理办法第十一条认定为拆分报销异常。\",\n  \"citations\": [\n    {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十一条\"},\n    {\"doc_id\": \"03_authorization_management.md\", \"clause_no\": \"附件二\"}\n  ]\n}\n```",
+  "stop_reason": "end_turn",
+  "session_id": "cd8db9f5-7733-472c-a4cb-84a37437a660",
+  "total_cost_usd": 0.079314,
+  "usage": {
+    "input_tokens": 2903,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 18048,
+    "output_tokens": 2231,
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "",
+    "iterations": [],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "deepseek-v4-pro": {
+      "inputTokens": 2903,
+      "outputTokens": 2231,
+      "cacheReadInputTokens": 18048,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.079314,
+      "contextWindow": 200000,
+      "maxOutputTokens": 32000
+    }
+  },
+  "permission_denials": [],
+  "fast_mode_state": "off",
+  "uuid": "258f6ef7-9464-431b-bb40-bfdc175a7955"
+}

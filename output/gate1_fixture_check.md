@@ -12,10 +12,16 @@
 ## expense_query_mcp
 
 - initialize: ok
-- tools/list count: 7
+- tools/list count: 13
 - list_expenses: ok
 - get_expense_detail: ok
 - find_invoice_usage: ok
+- list_invoices: ok
+- find_reused_invoices: ok
+- summarize_expenses: ok
+- summarize_department_budgets: ok
+- list_records_by_reimburse_delay: ok
+- list_records_missing_approval: ok
 - list_employees: ok
 - get_employee: ok
 - get_department_budget: ok

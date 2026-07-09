@@ -1,0 +1,20 @@
+Now I have all the evidence needed. Let me summarize the findings:
+
+**Split reimbursement analysis:**
+
+- **R004207**: E0007 李丽娟, travel_lodging, ¥5,200, 2025-01-10, AR-02 (部门经理)
+- **R004208**: E0007 李丽娟, travel_lodging, ¥5,200, 2025-01-12, AR-02 (部门经理)
+
+Same employee, same expense type, 2 days apart. Combined ¥10,400 crosses the AR-03 threshold (¥10,000+ requiring 部门总经理) but each was individually approved at AR-02 only. Both explicitly labeled "拆分报销注入样本1".
+
+```json
+{
+  "anomaly_ids": ["ANOM-SPLIT-001"],
+  "record_ids": ["R004207", "R004208"],
+  "answer": "员工E0007李丽娟(信息技术部)在2025年1月10日和1月12日(间隔仅2天)先后提交两笔差旅住宿费报销,每笔5200元、合计10400元。两笔报销各自仅经过AR-02档位(部门经理+财务复核)审批。但根据授权管理办法附件二,合计金额10400元已达到AR-03档位(10000元至50000元区间),本应经过部门总经理审批。两笔报销事由均为'拆分报销注入样本1',且住宿期间存在重叠(各7晚,分别从1月10日和1月12日起),属于将同一类事项拆分为多笔以规避更高审批权限的行为,违反费用报销管理办法(2025修订版)第十一条。",
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+  ]
+}
+```

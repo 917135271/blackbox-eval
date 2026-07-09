@@ -1,0 +1,16 @@
+{
+  "args": [
+    "opencode",
+    "run",
+    "--dir",
+    "D:\\算法LLM\\项目篇\\东方证券\\agent\\blackbox-eval\\candidates\\opencode\\workdir",
+    "--format",
+    "json",
+    "--model",
+    "deepseek/deepseek-v4-pro",
+    "--agent",
+    "audit-eval",
+    "请直接回答这个审计问题: 结合制度和业务数据,核查以R004221为线索的超标准异常,返回异常ID和记录ID集合。\n\n这是完整任务,不要要求用户再提供任务或文件,不要探索项目目录,不要寻找评测入口。\n\n必须使用已连接的 MCP 工具查询制度或业务事实后再回答。\n\n你是费用审计助手,只处理本轮提供的虚构 XX证券 数据与制度语料。\n\n可用工具域:\n- policy_query_mcp: 查询制度文档、条款片段和制度原文。\n- expense_query_mcp: 查询费用报销 SQLite 中的原始业务事实。\n\n工作要求:\n- 先查制度依据,再查业务事实,最后给出结论。\n- 题面就是当前要回答的审计问题;不要检查本地工作目录、不要寻找评测脚本、不要等待下一条指令。\n- 不要回答“请提供具体任务”“环境已就绪”“我需要更多信息”;题面已经是完整任务。\n- 审计检测题必须返回支撑判断的 record_ids;若能确定标准 anomaly_ids 也一并返回,无法确定时 anomaly_ids 可为空数组。\n- 没有异常时 anomaly_ids 必须为空数组;record_ids 可填写被核查且判定为合规的记录 ID。\n- 制度问答题必须给出制度出处,至少包含 doc_id 和 clause_no。\n- 不要调用 shell、文件写入、网络访问或候选 harness 的编码工具。\n- 不要把旧版废止制度当作现行依据;如命中废止条款,必须说明其已废止。\n- 不要将题面中的陷阱位计为异常,除非原始事实和制度规则共同支持。\n\n最终回答必须只包含一个 JSON 代码块。JSON 必须能被标准 JSON 解析器解析,不要在 JSON 内写注释。\n为避免格式失败,`answer` 字段的值必须是标准 JSON 字符串,外层英文双引号必须保留。\n硬性约束: 禁止的是 `answer` 字符串内容内部出现额外 ASCII 双引号字符;角色名、制度名、档位名不要加英文引号。\n不要在 JSON 代码块之前或之后输出任何说明文字。\n\n格式:\n\n```json\n{\"anomaly_ids\": [\"A013\"], \"record_ids\": [\"R000001\"], \"answer\": \"结论摘要\", \"citations\": [{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"费用报销管理办法-6.1\"}]}\n```\n\n字段要求:\n- `anomaly_ids`: 字符串数组。审计检测题填命中的异常 ID;无异常或陷阱题填空数组。\n- `record_ids`: 字符串数组。审计检测题填支撑结论的报销记录 ID;制度问答题填空数组;无异常陷阱题可填被核查且判定为合规的记录 ID。\n- `answer`: 简短中文结论,说明关键事实和判断。\n- `citations`: 对象数组,不能是字符串数组。每个元素必须是 `{\"doc_id\": \"...\", \"clause_no\": \"...\"}`;无法找到制度依据时填空数组并在 `answer` 中说明。\n\n判卷规则:\n- 没有可解析 JSON 代码块时记为 `format_failure`,该题得 0 分。\n- 审计检测题优先按 `record_ids` 是否覆盖真实业务记录判定;如候选也能输出标准 `anomaly_ids`,则同步记录 ID 命中情况。\n- 制度问答题按必要事实命中和引用出处比对。\n- 陷阱题期望 `anomaly_ids` 为空数组。\n\n任务元数据: id=L2-011; level=L2; category=policy_data_comparison.\n\n现在开始,最终只输出一个可解析 JSON 代码块。"
+  ],
+  "cwd": "D:\\算法LLM\\项目篇\\东方证券\\agent\\blackbox-eval\\candidates\\opencode\\workdir"
+}

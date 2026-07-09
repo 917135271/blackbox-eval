@@ -4,8 +4,11 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
+import socket
 import subprocess
+import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -18,6 +21,8 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_DIR = ROOT / "output"
 RUNS_DIR = ROOT / "runs" / "gate2"
 CONFIG_PATH = ROOT / "config" / "eval_config.yaml"
+CODEX_PROXY_PORT = 18788
+CODEX_PROXY_BASE_URL = f"http://127.0.0.1:{CODEX_PROXY_PORT}/v1"
 
 CANARY_INVOICE_NO = "FP202500000001"
 CANARY_EXPECTED_RECORD_ID = "R000001"
@@ -28,8 +33,10 @@ AUDIT_EVAL_SYSTEM_PROMPT = (
     "expense_query MCP tools for facts. Never use shell, file, web, question, "
     "task, or code-editing tools. Your final response must contain exactly one "
     "fenced json code block and no other text. The JSON object must have keys "
-    "anomaly_ids, answer, and citations. citations must be an array of objects "
-    "only, never strings; each citation object must contain doc_id and clause_no. "
+    "anomaly_ids, record_ids, answer, and citations. record_ids must contain "
+    "the supporting business record IDs for audit detection tasks. citations "
+    "must be an array of objects only, never strings; each citation object must "
+    "contain doc_id and clause_no. "
     "Do not put ASCII double quote characters inside the answer value; do not "
     "quote role names or policy names inside answer."
 )
@@ -69,6 +76,8 @@ def candidate_registry() -> dict[str, Candidate]:
         / "goose.exe"
     )
     trae_root = ROOT / "candidates" / "trae-agent" / "vendor" / "trae-agent"
+    claude_cmd = ROOT / "candidates" / "claude-code" / "runtime" / "node_modules" / ".bin" / "ccb.cmd"
+    codex_cmd = ROOT / "candidates" / "codex" / "runtime081" / "node_modules" / ".bin" / "codex.cmd"
     return {
         "qwen-code": Candidate(
             name="qwen-code",
@@ -103,6 +112,25 @@ def candidate_registry() -> dict[str, Candidate]:
             workdir=ROOT / "candidates" / "opencode" / "workdir",
             setup_file=ROOT / "candidates" / "opencode" / "setup.md",
             config_files=[ROOT / "candidates" / "opencode" / "workdir" / "opencode.json"],
+        ),
+        "claude-code": Candidate(
+            name="claude-code",
+            version="2.8.3",
+            command=[str(claude_cmd)],
+            workdir=ROOT / "candidates" / "claude-code" / "workdir",
+            setup_file=ROOT / "candidates" / "claude-code" / "setup.md",
+            config_files=[
+                ROOT / "candidates" / "claude-code" / "settings.json",
+                ROOT / "candidates" / "claude-code" / "mcp_config.json",
+            ],
+        ),
+        "codex": Candidate(
+            name="codex",
+            version="0.81.0",
+            command=[str(codex_cmd)],
+            workdir=ROOT / "candidates" / "codex" / "workdir",
+            setup_file=ROOT / "candidates" / "codex" / "setup.md",
+            config_files=[ROOT / "candidates" / "codex" / "config.toml"],
         ),
     }
 
@@ -144,20 +172,23 @@ def redact(text: str | None) -> str:
 
 def check_no_secrets(paths: list[Path]) -> tuple[bool, list[str]]:
     bad: list[str] = []
+    secret_pattern = re.compile(r"\bsk-[A-Za-z0-9_-]{16,}\b")
     for path in paths:
         if not path.exists() or not path.is_file():
             continue
         text = path.read_text(encoding="utf-8")
-        if "sk-" in text:
+        if secret_pattern.search(text):
             bad.append(str(path.relative_to(ROOT)))
     return (len(bad) == 0, bad)
 
 
 def command_exists(candidate: Candidate) -> tuple[bool, str]:
+    command_path = Path(candidate.command[0])
+    if command_path.exists():
+        return True, str(command_path)
     if len(candidate.command) == 1:
         found = shutil.which(candidate.command[0])
         return bool(found), found or "missing"
-    command_path = Path(candidate.command[0])
     return command_path.exists(), str(command_path)
 
 
@@ -225,6 +256,21 @@ def setup_checks(candidates: list[Candidate]) -> list[dict[str, Any]]:
                 }
             )
 
+        if candidate.name == "claude-code":
+            repo = ROOT / "candidates" / "claude-code" / "vendor" / "claude-code"
+            if repo.exists():
+                cp_git = run_command(["git", "rev-parse", "HEAD"], cwd=repo, timeout=30)
+                head = cp_git.stdout.strip()
+            else:
+                head = "missing"
+            item["checks"].append(
+                {
+                    "name": "pinned_commit",
+                    "ok": head == "7680c291ee7d8aa9cb291d518273352ad32256ec",
+                    "detail": head,
+                }
+            )
+
         results.append(item)
     return results
 
@@ -238,6 +284,7 @@ def base_env(model_config: dict[str, Any]) -> dict[str, str]:
         "PYTHONIOENCODING": "utf-8",
         "QWEN_CODE_DISABLE_TELEMETRY": "1",
         "OPENCODE_DISABLE_TELEMETRY": "1",
+        "CLAUDE_CODE_DISABLE_TELEMETRY": "1",
         "LLM_API_KEY": api_key,
         "OPENAI_API_KEY": api_key,
         "OPENROUTER_API_KEY": api_key,
@@ -247,6 +294,86 @@ def base_env(model_config: dict[str, Any]) -> dict[str, str]:
         "GOOSE_MODEL": model_config["model"],
     }
     return {k: v for k, v in env.items() if v}
+
+
+def candidate_runtime_env(candidate_name: str, model_config: dict[str, Any]) -> dict[str, str]:
+    api_env = model_config.get("api_key_env", "LLM_API_KEY")
+    api_key = os.environ.get(api_env, "")
+    env: dict[str, str] = {}
+    if candidate_name == "claude-code":
+        env.update(
+            {
+                "CLAUDE_CONFIG_DIR": str(ROOT / "candidates" / "claude-code" / "config"),
+                "CLAUDE_CODE_USE_OPENAI": "1",
+                "CLAUDE_CODE_DISABLE_TELEMETRY": "1",
+                "CLAUDE_CODE_BALANCE_PROVIDER": "none",
+                "OPENAI_API_KEY": api_key,
+                "OPENAI_BASE_URL": model_config["base_url"],
+                "OPENAI_MODEL": model_config["model"],
+                "ANTHROPIC_DEFAULT_HAIKU_MODEL": model_config["model"],
+                "ANTHROPIC_DEFAULT_SONNET_MODEL": model_config["model"],
+                "ANTHROPIC_DEFAULT_OPUS_MODEL": model_config["model"],
+            }
+        )
+    elif candidate_name == "codex":
+        ensure_codex_proxy(model_config)
+        env.update(
+            {
+                "CODEX_HOME": str(ROOT / "candidates" / "codex"),
+                "LLM_API_KEY": api_key,
+                "OPENAI_API_KEY": api_key,
+                "OPENAI_BASE_URL": CODEX_PROXY_BASE_URL,
+                "NO_PROXY": "127.0.0.1,localhost",
+                "no_proxy": "127.0.0.1,localhost",
+                "RUST_LOG": "error",
+            }
+        )
+    return {key: value for key, value in env.items() if value}
+
+
+def is_port_open(host: str, port: int) -> bool:
+    try:
+        with socket.create_connection((host, port), timeout=0.5):
+            return True
+    except OSError:
+        return False
+
+
+def ensure_codex_proxy(model_config: dict[str, Any]) -> None:
+    if is_port_open("127.0.0.1", CODEX_PROXY_PORT):
+        return
+    log_dir = ROOT / "runs" / "_process_logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    env = os.environ.copy()
+    env["CODEX_DEEPSEEK_PROXY_PORT"] = str(CODEX_PROXY_PORT)
+    api_env = model_config.get("api_key_env", "LLM_API_KEY")
+    if os.environ.get(api_env):
+        env["LLM_API_KEY"] = os.environ[api_env]
+    stdout = open(log_dir / f"codex_deepseek_proxy_{CODEX_PROXY_PORT}.stdout.log", "ab")
+    stderr = open(log_dir / f"codex_deepseek_proxy_{CODEX_PROXY_PORT}.stderr.log", "ab")
+    creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+    subprocess.Popen(
+        [sys.executable, str(ROOT / "candidates" / "codex" / "deepseek_chat_proxy.py")],
+        cwd=str(ROOT),
+        env=env,
+        stdout=stdout,
+        stderr=stderr,
+        creationflags=creationflags,
+    )
+    for _ in range(20):
+        if is_port_open("127.0.0.1", CODEX_PROXY_PORT):
+            return
+        time.sleep(0.25)
+    raise RuntimeError(f"codex DeepSeek proxy did not start on port {CODEX_PROXY_PORT}")
+
+
+def candidate_step_limit(candidate_name: str, default: int) -> int:
+    try:
+        config = load_eval_config()
+        raw = ((config.get("execution") or {}).get("candidate_max_steps") or {}).get(candidate_name)
+        return max(1, int(raw if raw is not None else default))
+    except Exception:
+        return default
 
 
 def snapshot_dir(path: Path) -> dict[str, str]:
@@ -366,7 +493,7 @@ def candidate_command(
                 "--exclude-tools",
                 excluded_tools,
                 "--max-tool-calls",
-                "8",
+                str(candidate_step_limit(candidate.name, 8)),
             ],
             workdir,
         )
@@ -407,8 +534,87 @@ def candidate_command(
                 "--output-format",
                 "json",
                 "--max-turns",
-                "8",
+                str(candidate_step_limit(candidate.name, 8)),
                 "--text",
+                prompt,
+            ],
+            workdir,
+        )
+    if candidate.name == "claude-code":
+        allowed_mcp_tools = ",".join(
+            [
+                "mcp__policy_query__list_policy_docs",
+                "mcp__policy_query__search_policy",
+                "mcp__policy_query__get_policy_doc",
+                "mcp__policy_query__get_policy_excerpt",
+                "mcp__expense_query__list_expenses",
+                "mcp__expense_query__get_expense_detail",
+                "mcp__expense_query__find_invoice_usage",
+                "mcp__expense_query__list_invoices",
+                "mcp__expense_query__find_reused_invoices",
+                "mcp__expense_query__summarize_expenses",
+                "mcp__expense_query__summarize_department_budgets",
+                "mcp__expense_query__list_records_by_reimburse_delay",
+                "mcp__expense_query__list_records_missing_approval",
+                "mcp__expense_query__list_employees",
+                "mcp__expense_query__get_employee",
+                "mcp__expense_query__get_department_budget",
+                "mcp__expense_query__list_approvals",
+            ]
+        )
+        return (
+            [
+                *candidate.command,
+                "--bare",
+                "--print",
+                "--output-format",
+                "json",
+                "--settings",
+                str(ROOT / "candidates" / "claude-code" / "settings.json"),
+                "--system-prompt",
+                AUDIT_EVAL_SYSTEM_PROMPT,
+                "--mcp-config",
+                str(ROOT / "candidates" / "claude-code" / "mcp_config.json"),
+                "--strict-mcp-config",
+                "--tools",
+                "",
+                "--allowedTools",
+                allowed_mcp_tools,
+                "--permission-mode",
+                "bypassPermissions",
+                "--no-session-persistence",
+                "--model",
+                model_config["model"],
+                "--debug-file",
+                str(out_dir / "debug.log"),
+                prompt,
+            ],
+            workdir,
+        )
+    if candidate.name == "codex":
+        last_message = out_dir / "last_message.txt"
+        return (
+            [
+                *candidate.command,
+                "exec",
+                "--json",
+                "--disable",
+                "shell_tool",
+                "--cd",
+                str(workdir),
+                "--skip-git-repo-check",
+                "--sandbox",
+                "read-only",
+                "--config",
+                f'model="{model_config["model"]}"',
+                "--config",
+                'model_provider="deepseek"',
+                "--config",
+                f'model_providers.deepseek.base_url="{CODEX_PROXY_BASE_URL}"',
+                "--config",
+                'approval_policy="never"',
+                "--output-last-message",
+                str(last_message),
                 prompt,
             ],
             workdir,
@@ -427,7 +633,7 @@ def candidate_command(
                 "--trajectory-file",
                 str(trajectory),
                 "--max-steps",
-                "8",
+                str(candidate_step_limit(candidate.name, 8)),
                 "--console-type",
                 "simple",
             ],
@@ -455,6 +661,24 @@ def run_canaries(candidates: list[Candidate], model_config: dict[str, Any]) -> l
         candidate_result: dict[str, Any] = {"candidate": candidate.name, "canaries": []}
         probe_dir = candidate.workdir / "probe"
         probe_dir.mkdir(parents=True, exist_ok=True)
+        candidate_run_dir = RUNS_DIR / candidate.name
+        candidate_run_dir.mkdir(parents=True, exist_ok=True)
+        if candidate.name == "qwen-code":
+            approve = run_command(["qwen", "mcp", "approve", "--all"], cwd=candidate.workdir, env=env, timeout=30)
+            (candidate_run_dir / "qwen_mcp_approve_stdout.log").write_text(redact(approve.stdout), encoding="utf-8")
+            (candidate_run_dir / "qwen_mcp_approve_stderr.log").write_text(redact(approve.stderr), encoding="utf-8")
+            if approve.returncode != 0:
+                candidate_result["canaries"].append(
+                    {
+                        "name": "qwen-mcp-approve",
+                        "ok": False,
+                        "detail": f"exit={approve.returncode}",
+                        "elapsed_seconds": 0,
+                        "output_dir": str(candidate_run_dir.relative_to(ROOT)),
+                    }
+                )
+                results.append(candidate_result)
+                continue
         for unwanted in ("bash_ran.txt", "should_not_exist.txt"):
             target = probe_dir / unwanted
             if target.exists():
@@ -466,9 +690,10 @@ def run_canaries(candidates: list[Candidate], model_config: dict[str, Any]) -> l
             out_dir.mkdir(parents=True, exist_ok=True)
             before = snapshot_dir(probe_dir)
             args, cwd = candidate_command(candidate, prompt, model_config, out_dir)
+            run_env = {**env, **candidate_runtime_env(candidate.name, model_config)}
             started = time.time()
             try:
-                cp = run_command(args, cwd=cwd, env=env, timeout=180)
+                cp = run_command(args, cwd=cwd, env=run_env, timeout=180)
                 stdout = redact(cp.stdout)
                 stderr = redact(cp.stderr)
                 (out_dir / "stdout.txt").write_text(stdout, encoding="utf-8")

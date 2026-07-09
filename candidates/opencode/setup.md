@@ -24,7 +24,7 @@ Status: installed and configured for GATE 2 setup checks.
 - Project config: `candidates/opencode/workdir/opencode.json`
 - Provider id: `deepseek`
 - Base URL: `https://api.deepseek.com`
-- Model: `deepseek/deepseek-v4-flash`
+- Model: `deepseek/deepseek-v4-pro`
 - API key source: `LLM_API_KEY` environment variable only
 
 ## MCP

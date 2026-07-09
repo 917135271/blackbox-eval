@@ -1,0 +1,51 @@
+{
+  "completed": true,
+  "candidate": "claude-code",
+  "task_id": "L1-007",
+  "level": "L1",
+  "category": "single_anomaly_lookup",
+  "variant": "precise",
+  "repeat_index": 1,
+  "elapsed_seconds": 62.43,
+  "exit_code": 0,
+  "timeout": false,
+  "format_failure": false,
+  "format_repaired": false,
+  "parse_error": null,
+  "contract_warnings": [
+    "extra_text_outside_json_code_block"
+  ],
+  "answer_json": {
+    "anomaly_ids": [
+      "ANOMALY-SPLIT-R004207-R004208"
+    ],
+    "record_ids": [
+      "R004207",
+      "R004208"
+    ],
+    "answer": "是，报销记录R004207命中拆分报销。R004207与R004208为同一员工E0007（李丽娟）、同一费用类型travel_lodging，分别在2025-01-10和2025-01-12（间隔2天，在7天内）各报销5200元，合计10400元。单笔5200元仅需AR-02审批（部门经理+财务复核），而合计10400元达到AR-03审批线（需部门总经理），构成拆分以规避较高审批权限的违规行为。",
+    "citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "final_text": "Now I have all the information needed. Let me compile the analysis.\n\n**Findings:**\n\n- **R004207**: Employee E0007 (李丽娟), travel_lodging, ¥5,200.00, expense_date 2025-01-10, reason \"拆分报销注入样本1\"\n- **R004208**: Employee E0007 (李丽娟), travel_lodging, ¥5,200.00, expense_date 2025-01-12, reason \"拆分报销注入样本1\"\n\nBoth records share: same employee (E0007), same expense type (travel_lodging), within 7 days (Jan 10 → Jan 12 = 2 days). Individual amounts ¥5,200 each fall under AR-02 (¥3,000–¥10,000, requires 部门经理+财务复核). Combined ¥10,400 reaches AR-03 (¥10,000–¥50,000, requires 部门总经理). This matches the split reimbursement rule in 第十一条.\n\n```json\n{\n  \"anomaly_ids\": [\"ANOMALY-SPLIT-R004207-R004208\"],\n  \"record_ids\": [\"R004207\", \"R004208\"],\n  \"answer\": \"是，报销记录R004207命中拆分报销。R004207与R004208为同一员工E0007（李丽娟）、同一费用类型travel_lodging，分别在2025-01-10和2025-01-12（间隔2天，在7天内）各报销5200元，合计10400元。单笔5200元仅需AR-02审批（部门经理+财务复核），而合计10400元达到AR-03审批线（需部门总经理），构成拆分以规避较高审批权限的违规行为。\",\n  \"citations\": [\n    {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十一条\"},\n    {\"doc_id\": \"03_authorization_management.md\", \"clause_no\": \"附件二\"}\n  ]\n}\n```",
+  "tool_calls_count": 7,
+  "tool_log_present": true,
+  "workdir_diff_empty": true,
+  "files": {
+    "stdout": "stdout.log",
+    "stderr": "stderr.log",
+    "tool_calls": "tool_calls.jsonl",
+    "trajectory": "trajectory.json",
+    "result": "result.json",
+    "workdir_diff": "workdir_diff.txt",
+    "last_message": "last_message.txt"
+  }
+}

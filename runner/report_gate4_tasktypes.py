@@ -11,17 +11,19 @@ from gate2_candidate_check import ROOT, load_eval_config
 
 
 RUNS = {
-    "qwen-code": "gate4_baseline_qwen_v1",
-    "goose": "gate4_baseline_goose_v1",
-    "trae-agent": "gate4_baseline_trae_v1",
-    "opencode": "gate4_baseline_opencode_v1",
+    "qwen-code": "gate4_standard_qwen_v4pro_v1",
+    "trae-agent": "gate4_standard_trae_v4pro_v2",
+    "opencode": "gate4_standard_opencode_v4pro_v1",
+    "claude-code": "gate4_standard_claude_v4pro_v1",
+    "codex": "gate4_standard_codex_v4pro_v2",
 }
 
 AGENT_TITLES = {
     "qwen-code": "Qwen Code",
-    "goose": "Goose",
     "trae-agent": "Trae Agent",
     "opencode": "OpenCode",
+    "claude-code": "Claude Code",
+    "codex": "Codex",
 }
 
 CATEGORY_NAMES = {

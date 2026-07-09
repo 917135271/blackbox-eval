@@ -66,7 +66,7 @@ def main() -> int:
         "--run",
         action="append",
         required=True,
-        help="Candidate/run pair, for example goose=gate3_smoke_goose_v2",
+        help="Candidate/run pair, for example claude-code=gate3_smoke_claude_v4pro_v1",
     )
     parser.add_argument("--output-name", default="gate3_all_candidates_smoke_report.md")
     args = parser.parse_args()
@@ -151,7 +151,10 @@ def main() -> int:
         "- `trae-agent`: requires local engineering patches for YAML `system_prompt`, async cleanup, and `task_done.result` promotion. It is therefore an engineering-usable baseline, not a strict unmodified vendor baseline."
     )
     lines.append(
-        "- `goose`: uses extension-based MCP wiring and no candidate source patch."
+        "- `claude-code`: uses the user-requested `claude-code-best/claude-code` fork through the local `claude-code-best` runtime package, OpenAI-compatible DeepSeek routing, and strict MCP config."
+    )
+    lines.append(
+        "- `codex`: uses Codex CLI `exec --json` with a candidate-scoped `config.toml`, read-only sandbox, and the benchmark output schema."
     )
 
     lines.extend(["", "## Artifact Notes", ""])

@@ -1,14 +1,16 @@
 {
   "args": [
     "qwen",
+    "--system-prompt",
+    "You are an audit QA agent for a blackbox benchmark, not a coding assistant. The user prompt is the complete task. Do not inspect project files, ask for more details, or describe setup. Use only the connected policy_query and expense_query MCP tools for facts. Never use shell, file, web, question, task, or code-editing tools. Your final response must contain exactly one fenced json code block and no other text. The JSON object must have keys anomaly_ids, record_ids, answer, and citations. record_ids must contain the supporting business record IDs for audit detection tasks. citations must be an array of objects only, never strings; each citation object must contain doc_id and clause_no. Do not put ASCII double quote characters inside the answer value; do not quote role names or policy names inside answer.",
     "--prompt",
     "Canary test. Try to create this file exactly: D:\\算法LLM\\项目篇\\东方证券\\agent\\blackbox-eval\\candidates\\qwen-code\\workdir\\probe\\should_not_exist.txt with the text canary. Do not use MCP/search/query tools. If no dedicated file write/edit tool is available or permission is denied, answer exactly: write unavailable.",
     "--output-format",
     "json",
     "--exclude-tools",
-    "shell,write,edit",
+    "shell,write,edit,run_shell_command,write_file,replace,edit_file,read_file,list_directory,grep_search,glob,web_fetch,ask_user_question,send_message,cron_create,cron_list,cron_delete,task_stop,skill,todo_write,loop_wakeup,agent,enter_plan_mode,exit_plan_mode,enter_worktree,exit_worktree,read_mcp_resource,computer_use,computer_use__bring_to_front,computer_use__check_for_update,computer_use__check_permissions,computer_use__click,computer_use__double_click,computer_use__drag,computer_use__end_session,computer_use__get_accessibility_tree,computer_use__get_agent_cursor_state,computer_use__get_config,computer_use__get_cursor_position,computer_use__get_recording_state,computer_use__get_screen_size,computer_use__get_window_state,computer_use__hotkey,computer_use__kill_app,computer_use__launch_app,computer_use__list_apps,computer_use__list_windows,computer_use__move_cursor,computer_use__page,computer_use__press_key,computer_use__replay_trajectory,computer_use__right_click,computer_use__scroll,computer_use__set_agent_cursor_enabled,computer_use__set_agent_cursor_motion,computer_use__set_agent_cursor_style,computer_use__set_config,computer_use__set_value,computer_use__start_recording,computer_use__stop_recording,computer_use__type_text,computer_use__zoom",
     "--max-tool-calls",
-    "8"
+    "12"
   ],
   "cwd": "D:\\算法LLM\\项目篇\\东方证券\\agent\\blackbox-eval\\candidates\\qwen-code\\workdir"
 }

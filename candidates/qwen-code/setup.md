@@ -23,7 +23,7 @@ Status: installed and configured for GATE 2 setup checks.
 - Project config: `candidates/qwen-code/workdir/.qwen/settings.json`
 - Model protocol: OpenAI-compatible
 - Base URL: `https://api.deepseek.com`
-- Model: `deepseek-v4-flash`
+- Model: `deepseek-v4-pro`
 - API key source: `LLM_API_KEY` environment variable only
 
 ## MCP

@@ -20,7 +20,7 @@
       "tools": [
         {
           "name": "list_expenses",
-          "description": "List reimbursement records with optional filters and fixed 50-row pages.",
+          "description": "List reimbursement records with optional filters, paging, and safe sorting.",
           "inputSchema": {
             "type": "object",
             "properties": {
@@ -35,6 +35,10 @@
               "expense_type": {
                 "type": "string",
                 "description": "expense_type parameter for list_expenses."
+              },
+              "status": {
+                "type": "string",
+                "description": "status parameter for list_expenses."
               },
               "date_from": {
                 "type": "string",
@@ -52,11 +56,41 @@
                 "type": "number",
                 "description": "max_amount parameter for list_expenses."
               },
+              "special_approval": {
+                "type": "boolean",
+                "description": "special_approval parameter for list_expenses."
+              },
               "page": {
                 "type": "integer",
                 "minimum": 1,
                 "default": 1,
                 "description": "page parameter for list_expenses."
+              },
+              "page_size": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 500,
+                "default": 50,
+                "description": "page_size parameter for list_expenses."
+              },
+              "order_by": {
+                "type": "string",
+                "enum": [
+                  "record_id",
+                  "expense_date",
+                  "reimburse_date",
+                  "amount",
+                  "employee_id",
+                  "department_id",
+                  "expense_type"
+                ],
+                "default": "expense_date",
+                "description": "order_by parameter for list_expenses."
+              },
+              "sort_desc": {
+                "type": "boolean",
+                "default": false,
+                "description": "sort_desc parameter for list_expenses."
               }
             },
             "additionalProperties": false
@@ -92,6 +126,276 @@
             },
             "required": [
               "invoice_no"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "list_invoices",
+          "description": "List invoice facts with usage counts and linked reimbursement record IDs.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "invoice_no": {
+                "type": "string",
+                "description": "invoice_no parameter for list_invoices."
+              },
+              "expense_type": {
+                "type": "string",
+                "description": "expense_type parameter for list_invoices."
+              },
+              "vendor_name_contains": {
+                "type": "string",
+                "description": "vendor_name_contains parameter for list_invoices."
+              },
+              "date_from": {
+                "type": "string",
+                "description": "date_from parameter for list_invoices."
+              },
+              "date_to": {
+                "type": "string",
+                "description": "date_to parameter for list_invoices."
+              },
+              "min_amount": {
+                "type": "number",
+                "description": "min_amount parameter for list_invoices."
+              },
+              "max_amount": {
+                "type": "number",
+                "description": "max_amount parameter for list_invoices."
+              },
+              "min_usage_count": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "min_usage_count parameter for list_invoices."
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 1,
+                "description": "page parameter for list_invoices."
+              },
+              "page_size": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 500,
+                "default": 50,
+                "description": "page_size parameter for list_invoices."
+              },
+              "order_by": {
+                "type": "string",
+                "enum": [
+                  "invoice_no",
+                  "invoice_date",
+                  "amount",
+                  "usage_count"
+                ],
+                "default": "invoice_date",
+                "description": "order_by parameter for list_invoices."
+              },
+              "sort_desc": {
+                "type": "boolean",
+                "default": false,
+                "description": "sort_desc parameter for list_invoices."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "find_reused_invoices",
+          "description": "List invoices used by at least min_usage_count reimbursement records.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "min_usage_count": {
+                "type": "integer",
+                "minimum": 2,
+                "default": 2,
+                "description": "min_usage_count parameter for find_reused_invoices."
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 1,
+                "description": "page parameter for find_reused_invoices."
+              },
+              "page_size": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 500,
+                "default": 50,
+                "description": "page_size parameter for find_reused_invoices."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "summarize_expenses",
+          "description": "Summarize reimbursement records by safe dimensions such as department, employee, type, or month.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "group_by": {
+                "type": "string",
+                "description": "Comma-separated safe dimensions: employee_id, department_id, expense_type, city_tier, status, budget_year, month.",
+                "default": "department_id"
+              },
+              "employee_id": {
+                "type": "string",
+                "description": "employee_id parameter for summarize_expenses."
+              },
+              "department_id": {
+                "type": "string",
+                "description": "department_id parameter for summarize_expenses."
+              },
+              "expense_type": {
+                "type": "string",
+                "description": "expense_type parameter for summarize_expenses."
+              },
+              "status": {
+                "type": "string",
+                "description": "status parameter for summarize_expenses."
+              },
+              "date_from": {
+                "type": "string",
+                "description": "date_from parameter for summarize_expenses."
+              },
+              "date_to": {
+                "type": "string",
+                "description": "date_to parameter for summarize_expenses."
+              },
+              "min_amount": {
+                "type": "number",
+                "description": "min_amount parameter for summarize_expenses."
+              },
+              "max_amount": {
+                "type": "number",
+                "description": "max_amount parameter for summarize_expenses."
+              },
+              "special_approval": {
+                "type": "boolean",
+                "description": "special_approval parameter for summarize_expenses."
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 500,
+                "default": 100,
+                "description": "limit parameter for summarize_expenses."
+              },
+              "sort_by": {
+                "type": "string",
+                "enum": [
+                  "total_amount",
+                  "record_count",
+                  "avg_amount",
+                  "max_amount"
+                ],
+                "default": "total_amount",
+                "description": "sort_by parameter for summarize_expenses."
+              },
+              "sort_desc": {
+                "type": "boolean",
+                "default": true,
+                "description": "sort_desc parameter for summarize_expenses."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "summarize_department_budgets",
+          "description": "Return all departments with annual budget, used amount, remaining amount, and usage rate.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "default": "approved",
+                "description": "status parameter for summarize_department_budgets."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "list_records_by_reimburse_delay",
+          "description": "List reimbursement records ordered by days between expense_date and reimburse_date.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "min_delay_days": {
+                "type": "integer",
+                "minimum": 0,
+                "default": 0,
+                "description": "min_delay_days parameter for list_records_by_reimburse_delay."
+              },
+              "max_delay_days": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "max_delay_days parameter for list_records_by_reimburse_delay."
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 1,
+                "description": "page parameter for list_records_by_reimburse_delay."
+              },
+              "page_size": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 500,
+                "default": 50,
+                "description": "page_size parameter for list_records_by_reimburse_delay."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        {
+          "name": "list_records_missing_approval",
+          "description": "List records that do not have an approval row for the required approver role.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "required_role": {
+                "type": "string",
+                "description": "required_role parameter for list_records_missing_approval."
+              },
+              "min_amount": {
+                "type": "number",
+                "description": "min_amount parameter for list_records_missing_approval."
+              },
+              "max_amount": {
+                "type": "number",
+                "description": "max_amount parameter for list_records_missing_approval."
+              },
+              "date_from": {
+                "type": "string",
+                "description": "date_from parameter for list_records_missing_approval."
+              },
+              "date_to": {
+                "type": "string",
+                "description": "date_to parameter for list_records_missing_approval."
+              },
+              "page": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 1,
+                "description": "page parameter for list_records_missing_approval."
+              },
+              "page_size": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 500,
+                "default": 50,
+                "description": "page_size parameter for list_records_missing_approval."
+              }
+            },
+            "required": [
+              "required_role"
             ],
             "additionalProperties": false
           }
@@ -210,7 +514,7 @@
       "content": [
         {
           "type": "text",
-          "text": "{\"department_id\": \"D001\", \"employees\": [{\"employee_id\": \"E0001\", \"employee_name\": \"何英\", \"employee_level\": \"D1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"部门经理\", \"hire_date\": \"2022-01-06\"}, {\"employee_id\": \"E0011\", \"employee_name\": \"杨凤兰\", \"employee_level\": \"D1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"部门总经理\", \"hire_date\": \"2022-07-05\"}, {\"employee_id\": \"E0025\", \"employee_name\": \"王丹丹\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2020-12-11\"}, {\"employee_id\": \"E0033\", \"employee_name\": \"郑刚\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2023-04-19\"}, {\"employee_id\": \"E0040\", \"employee_name\": \"郑丹丹\", \"employee_level\": \"D1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2020-06-19\"}, {\"employee_id\": \"E0045\", \"employee_name\": \"吴磊\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2020-03-05\"}, {\"employee_id\": \"E0046\", \"employee_name\": \"杨英\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2024-08-12\"}, {\"employee_id\": \"E0054\", \"employee_name\": \"曾凤英\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2019-06-19\"}, {\"employee_id\": \"E0067\", \"employee_name\": \"毛艳\", \"employee_level\": \"M1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2024-08-18\"}, {\"employee_id\": \"E0074\", \"employee_name\": \"陈桂花\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2022-02-04\"}]}"
+          "text": "{\"page\": 1, \"page_size\": 3, \"total\": 4234, \"has_next\": true, \"invoices\": [{\"invoice_id\": \"INV000002\", \"invoice_no\": \"FP202500000002\", \"vendor_name\": \"XX供应商7753\", \"invoice_date\": \"2025-08-19\", \"amount\": 423.79, \"expense_type\": \"office_supplies\", \"usage_count\": 2, \"record_ids\": [\"R000002\", \"R004201\"]}, {\"invoice_id\": \"INV000005\", \"invoice_no\": \"FP202500000005\", \"vendor_name\": \"XX供应商5450\", \"invoice_date\": \"2025-06-07\", \"amount\": 88.83, \"expense_type\": \"local_transport\", \"usage_count\": 2, \"record_ids\": [\"R000005\", \"R004202\"]}, {\"invoice_id\": \"INV000020\", \"invoice_no\": \"FP202500000020\", \"vendor_name\": \"XX供应商2706\", \"invoice_date\": \"2025-01-05\", \"amount\": 669.5, \"expense_type\": \"travel_lodging\", \"usage_count\": 2, \"record_ids\": [\"R000020\", \"R004203\"]}]}"
         }
       ],
       "isError": false
@@ -223,7 +527,7 @@
       "content": [
         {
           "type": "text",
-          "text": "{\"employee\": {\"employee_id\": \"E0001\", \"employee_name\": \"何英\", \"employee_level\": \"D1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"部门经理\", \"hire_date\": \"2022-01-06\"}}"
+          "text": "{\"page\": 1, \"page_size\": 3, \"total\": 6, \"has_next\": true, \"invoices\": [{\"invoice_id\": \"INV000002\", \"invoice_no\": \"FP202500000002\", \"vendor_name\": \"XX供应商7753\", \"invoice_date\": \"2025-08-19\", \"amount\": 423.79, \"expense_type\": \"office_supplies\", \"usage_count\": 2, \"record_ids\": [\"R000002\", \"R004201\"]}, {\"invoice_id\": \"INV000005\", \"invoice_no\": \"FP202500000005\", \"vendor_name\": \"XX供应商5450\", \"invoice_date\": \"2025-06-07\", \"amount\": 88.83, \"expense_type\": \"local_transport\", \"usage_count\": 2, \"record_ids\": [\"R000005\", \"R004202\"]}, {\"invoice_id\": \"INV000020\", \"invoice_no\": \"FP202500000020\", \"vendor_name\": \"XX供应商2706\", \"invoice_date\": \"2025-01-05\", \"amount\": 669.5, \"expense_type\": \"travel_lodging\", \"usage_count\": 2, \"record_ids\": [\"R000020\", \"R004203\"]}]}"
         }
       ],
       "isError": false
@@ -236,7 +540,7 @@
       "content": [
         {
           "type": "text",
-          "text": "{\"department\": {\"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"annual_budget\": 230395.17, \"manager_employee_id\": \"E0001\"}, \"cumulative_amount\": 363614.58, \"record_count\": 525}"
+          "text": "{\"group_by\": [\"department_id\", \"expense_type\"], \"limit\": 3, \"rows\": [{\"department_id\": \"D006\", \"expense_type\": \"training_fee\", \"record_count\": 107, \"total_amount\": 245514.52, \"avg_amount\": 2294.53, \"max_amount\": 3209.95, \"min_amount\": 1255.96}, {\"department_id\": \"D005\", \"expense_type\": \"training_fee\", \"record_count\": 88, \"total_amount\": 207522.75, \"avg_amount\": 2358.21, \"max_amount\": 3188.68, \"min_amount\": 1251.43}, {\"department_id\": \"D004\", \"expense_type\": \"training_fee\", \"record_count\": 87, \"total_amount\": 187827.24, \"avg_amount\": 2158.93, \"max_amount\": 3076.46, \"min_amount\": 1235.8}]}"
         }
       ],
       "isError": false
@@ -245,6 +549,84 @@
   {
     "jsonrpc": "2.0",
     "id": 9,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"status\": \"approved\", \"departments\": [{\"department_id\": \"D006\", \"department_name\": \"运营管理部\", \"annual_budget\": 340961.75, \"manager_employee_id\": \"E0006\", \"used_amount\": 530241.29, \"record_count\": 833, \"remaining_amount\": -189279.54, \"usage_rate\": 1.5551}, {\"department_id\": \"D005\", \"department_name\": \"机构业务部\", \"annual_budget\": 278540.94, \"manager_employee_id\": \"E0005\", \"used_amount\": 433442.76, \"record_count\": 616, \"remaining_amount\": -154901.82, \"usage_rate\": 1.5561}, {\"department_id\": \"D004\", \"department_name\": \"研究所\", \"annual_budget\": 264890.39, \"manager_employee_id\": \"E0004\", \"used_amount\": 408832.95, \"record_count\": 611, \"remaining_amount\": -143942.56, \"usage_rate\": 1.5434}, {\"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"annual_budget\": 230395.17, \"manager_employee_id\": \"E0001\", \"used_amount\": 363614.58, \"record_count\": 525, \"remaining_amount\": -133219.41, \"usage_rate\": 1.5782}, {\"department_id\": \"D008\", \"department_name\": \"合规风控部\", \"annual_budget\": 381600.0, \"manager_employee_id\": \"E0008\", \"used_amount\": 297095.29, \"record_count\": 376, \"remaining_amount\": 84504.71, \"usage_rate\": 0.7786}, {\"department_id\": \"D007\", \"department_name\": \"信息技术部\", \"annual_budget\": 301500.0, \"manager_employee_id\": \"E0007\", \"used_amount\": 252588.38, \"record_count\": 342, \"remaining_amount\": 48911.62, \"usage_rate\": 0.8378}, {\"department_id\": \"D003\", \"department_name\": \"财富管理部\", \"annual_budget\": 109772.07, \"manager_employee_id\": \"E0003\", \"used_amount\": 174150.67, \"record_count\": 249, \"remaining_amount\": -64378.6, \"usage_rate\": 1.5865}, {\"department_id\": \"D002\", \"department_name\": \"固定收益部\", \"annual_budget\": 107785.42, \"manager_employee_id\": \"E0002\", \"used_amount\": 164928.12, \"record_count\": 254, \"remaining_amount\": -57142.7, \"usage_rate\": 1.5302}, {\"department_id\": \"D009\", \"department_name\": \"财务管理部\", \"annual_budget\": 191300.0, \"manager_employee_id\": \"E0009\", \"used_amount\": 159294.06, \"record_count\": 253, \"remaining_amount\": 32005.94, \"usage_rate\": 0.8327}, {\"department_id\": \"D010\", \"department_name\": \"人力资源部\", \"annual_budget\": 164500.0, \"manager_employee_id\": \"E0010\", \"used_amount\": 139536.39, \"record_count\": 181, \"remaining_amount\": 24963.61, \"usage_rate\": 0.8482}]}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 10,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"page\": 1, \"page_size\": 3, \"total\": 65, \"has_next\": true, \"records\": [{\"record_id\": \"R004231\", \"record_no\": \"BX2025X004231\", \"employee_id\": \"E0007\", \"employee_name\": \"李丽娟\", \"department_id\": \"D007\", \"department_name\": \"信息技术部\", \"expense_date\": \"2025-08-02\", \"reimburse_date\": \"2025-11-30\", \"delay_days\": 120, \"expense_type\": \"communication\", \"amount\": 185.0, \"status\": \"approved\", \"invoice_no\": \"FP2025X0004225\"}, {\"record_id\": \"R004232\", \"record_no\": \"BX2025X004232\", \"employee_id\": \"E0008\", \"employee_name\": \"杨丹\", \"department_id\": \"D008\", \"department_name\": \"合规风控部\", \"expense_date\": \"2025-09-04\", \"reimburse_date\": \"2025-12-23\", \"delay_days\": 110, \"expense_type\": \"communication\", \"amount\": 186.0, \"status\": \"approved\", \"invoice_no\": \"FP2025X0004226\"}, {\"record_id\": \"R004230\", \"record_no\": \"BX2025X004230\", \"employee_id\": \"E0010\", \"employee_name\": \"闭想\", \"department_id\": \"D010\", \"department_name\": \"人力资源部\", \"expense_date\": \"2025-05-06\", \"reimburse_date\": \"2025-08-09\", \"delay_days\": 95, \"expense_type\": \"communication\", \"amount\": 184.0, \"status\": \"approved\", \"invoice_no\": \"FP2025X0004224\"}]}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 11,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"required_role\": \"部门总经理\", \"page\": 1, \"page_size\": 3, \"total\": 95, \"has_next\": true, \"records\": [{\"record_id\": \"R004233\", \"record_no\": \"BX2025X004233\", \"employee_id\": \"E0012\", \"employee_name\": \"杨丽华\", \"department_id\": \"D008\", \"department_name\": \"合规风控部\", \"expense_date\": \"2025-10-03\", \"reimburse_date\": \"2025-10-09\", \"expense_type\": \"travel_lodging\", \"amount\": 9990.0, \"status\": \"approved\", \"invoice_no\": \"FP2025X0004227\"}, {\"record_id\": \"R004207\", \"record_no\": \"BX2025X004207\", \"employee_id\": \"E0007\", \"employee_name\": \"李丽娟\", \"department_id\": \"D007\", \"department_name\": \"信息技术部\", \"expense_date\": \"2025-01-10\", \"reimburse_date\": \"2025-01-16\", \"expense_type\": \"travel_lodging\", \"amount\": 5200.0, \"status\": \"approved\", \"invoice_no\": \"FP2025X0004201\"}, {\"record_id\": \"R004208\", \"record_no\": \"BX2025X004208\", \"employee_id\": \"E0007\", \"employee_name\": \"李丽娟\", \"department_id\": \"D007\", \"department_name\": \"信息技术部\", \"expense_date\": \"2025-01-12\", \"reimburse_date\": \"2025-01-18\", \"expense_type\": \"travel_lodging\", \"amount\": 5200.0, \"status\": \"approved\", \"invoice_no\": \"FP2025X0004202\"}]}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 12,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"department_id\": \"D001\", \"employees\": [{\"employee_id\": \"E0001\", \"employee_name\": \"何英\", \"employee_level\": \"D1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"部门经理\", \"hire_date\": \"2022-01-06\"}, {\"employee_id\": \"E0011\", \"employee_name\": \"杨凤兰\", \"employee_level\": \"D1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"部门总经理\", \"hire_date\": \"2022-07-05\"}, {\"employee_id\": \"E0025\", \"employee_name\": \"王丹丹\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2020-12-11\"}, {\"employee_id\": \"E0033\", \"employee_name\": \"郑刚\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2023-04-19\"}, {\"employee_id\": \"E0040\", \"employee_name\": \"郑丹丹\", \"employee_level\": \"D1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2020-06-19\"}, {\"employee_id\": \"E0045\", \"employee_name\": \"吴磊\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2020-03-05\"}, {\"employee_id\": \"E0046\", \"employee_name\": \"杨英\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2024-08-12\"}, {\"employee_id\": \"E0054\", \"employee_name\": \"曾凤英\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2019-06-19\"}, {\"employee_id\": \"E0067\", \"employee_name\": \"毛艳\", \"employee_level\": \"M1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2024-08-18\"}, {\"employee_id\": \"E0074\", \"employee_name\": \"陈桂花\", \"employee_level\": \"E1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"员工\", \"hire_date\": \"2022-02-04\"}]}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 13,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"employee\": {\"employee_id\": \"E0001\", \"employee_name\": \"何英\", \"employee_level\": \"D1\", \"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"position_role\": \"部门经理\", \"hire_date\": \"2022-01-06\"}}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 14,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"department\": {\"department_id\": \"D001\", \"department_name\": \"投资银行部\", \"annual_budget\": 230395.17, \"manager_employee_id\": \"E0001\"}, \"cumulative_amount\": 363614.58, \"record_count\": 525}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  {
+    "jsonrpc": "2.0",
+    "id": 15,
     "result": {
       "content": [
         {

@@ -3,7 +3,7 @@ model:
   # Note: https://api.deepseek.com is not a local endpoint; this is a recorded deviation
   # from the original "local model only / no cloud API" baseline requirement.
   base_url: "https://api.deepseek.com"
-  model: "deepseek-v4-flash"
+  model: "deepseek-v4-pro"
   api_key_env: "LLM_API_KEY"
   temperature: 0
   max_tokens: 4096
@@ -13,11 +13,11 @@ judge:
   # The API key is read from api_key_env; never write secrets into this file.
   mode: "llm"
   base_url: "https://api.deepseek.com"
-  model: "deepseek-v4-flash"
+  model: "deepseek-v4-pro"
   api_key_env: "LLM_API_KEY"
   temperature: 0
-  max_tokens: 1200
-  timeout_seconds: 90
+  max_tokens: 4096
+  timeout_seconds: 180
   retries: 4
   workers: 4
   final_text_max_chars: 12000
@@ -39,10 +39,14 @@ fixtures:
 
 execution:
   task_timeout_seconds: 900
+  candidate_max_steps:
+    qwen-code: 12
+    trae-agent: 16
+    opencode: 12
+    claude-code: 12
+    codex: 12
   prompt_variants:
     - precise
-    - casual
-    - distracted
   repeats_per_variant: 1
   variance_probe:
     enabled: false
@@ -53,9 +57,13 @@ candidates:
   - name: qwen-code
     enabled: true
   - name: goose
-    enabled: true
+    enabled: false
   - name: trae-agent
     enabled: true
   - name: opencode
+    enabled: true
+  - name: claude-code
+    enabled: true
+  - name: codex
     enabled: true
 

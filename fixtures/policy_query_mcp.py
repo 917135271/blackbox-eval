@@ -53,7 +53,8 @@ def preview(value: Any) -> Any:
 
 
 def corpus_dir() -> Path:
-    return Path(os.environ.get("EVAL_POLICY_CORPUS_DIR", str(DEFAULT_CORPUS_DIR)))
+    path = Path(os.environ.get("EVAL_POLICY_CORPUS_DIR", str(DEFAULT_CORPUS_DIR)))
+    return path if path.is_absolute() else PROJECT_ROOT / path
 
 
 def load_documents() -> list[dict[str, str]]:
