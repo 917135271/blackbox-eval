@@ -1,0 +1,136 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-DUP-001",
+      "record_ids": ["R900001", "R900002"],
+      "citations": [{"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}],
+      "facts": ["发票INV900001(FPDEV900001)被记录R900001(2025-01-05,480元)和R900002(2025-01-06,480元)两次报销", "同一发票同一金额同一员工E9001，第二次报销构成重复报销"],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-SPLIT-001",
+      "record_ids": ["R900003", "R900004"],
+      "citations": [{"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"}, {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}],
+      "facts": ["E9001 travel_transport: R900003(2025-02-03,5200元)和R900004(2025-02-06,5200元)间隔3天≤7天", "单笔各自属AR-02档，合计10400元达AR-03档较高审批线", "事由均为'同一客户路演交通费'，构成拆分规避审批"],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-STD-001",
+      "record_ids": ["R900005"],
+      "citations": [{"doc_id": "06_business_entertainment.md", "clause_no": "第三条"}, {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}],
+      "facts": ["R900005业务招待费3600元/10人=360元/人", "人均标准300元，实测360元>300元，超标60元/人"],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-STD-002",
+      "record_ids": ["R900017"],
+      "citations": [{"doc_id": "06_business_entertainment.md", "clause_no": "第二条"}, {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}],
+      "facts": ["R900017业务招待费单次5200元", "单次标准5000元，实测5200元>5000元，超标200元"],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-STD-003",
+      "record_ids": ["R900013"],
+      "citations": [{"doc_id": "04_travel_expense.md", "clause_no": "第四条"}, {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}],
+      "facts": ["R900013 E9002(经理级)一类城市住宿2晚共1400元，700元/晚", "经理级一类城市标准650元/晚，实测700元/晚>650元/晚，超标50元/晚"],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-STD-004",
+      "record_ids": ["R900016"],
+      "citations": [{"doc_id": "05_training_expense.md", "clause_no": "第三条"}, {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}],
+      "facts": ["R900016内部培训费1天850元，850元/天", "内部培训标准800元/天，实测850元/天>800元/天，超标50元/天"],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-STD-005",
+      "record_ids": ["R900001", "R900002"],
+      "citations": [{"doc_id": "07_office_communication.md", "clause_no": "第二条"}, {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}],
+      "facts": ["E9001 2025年1月办公用品: R900001(480元)+R900002(480元)=960元", "月度标准600元/人，实测960元>600元，超标360元"],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-STD-006",
+      "record_ids": ["R900007"],
+      "citations": [{"doc_id": "07_office_communication.md", "clause_no": "第二条"}, {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}],
+      "facts": ["E9001 2025年4月办公用品: R900007=650元", "月度标准600元/人，实测650元>600元，超标50元"],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-STD-007",
+      "record_ids": ["R900014", "R900015"],
+      "citations": [{"doc_id": "07_office_communication.md", "clause_no": "第三条"}, {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}],
+      "facts": ["E9001 2025年9月通讯费: R900014(180元)+R900015(160元)=340元", "月度标准300元/人，实测340元>300元，超标40元"],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-DELAY-001",
+      "record_ids": ["R900006"],
+      "citations": [{"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第七条"}],
+      "facts": ["R900006费用发生日期2025-03-01，报销提交日期2025-05-05，间隔65天", "60天期限，65天>60天，超期5天。不适用年末例外(非12月费用)"],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-BUDGET-001",
+      "record_ids": ["R900019"],
+      "citations": [{"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"}, {"doc_id": "08_budget_management.md", "clause_no": "第三条"}],
+      "facts": ["D902年度预算50000元，R900018(45000元)后余额5000元，R900019(6000元)使累计达51000元>50000元", "R900019无专项审批(special_approval=0)，为首次突破预算且无豁免的记录", "R900020有专项审批(special_approval=1)已豁免"],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900001","R900002","R900003","R900004","R900005","R900006","R900007","R900013","R900014","R900015","R900016","R900017","R900019"],
+  "submitted_record_ids": ["R900001","R900002","R900003","R900004","R900005","R900006","R900007","R900013","R900014","R900015","R900016","R900017","R900019"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true,
+    "searched_population": "全部21条2025年已审批报销记录",
+    "query_conditions": "按5条规则逐条全量SQL扫描",
+    "checked_rules": ["重复报销(第十条)", "拆分报销(第十一条)", "超标准(第十二条)", "超期(第七条)", "超预算(第十三条)"],
+    "population_count": 21,
+    "cleared_records": {
+      "R900008": "E9001 5月办公用品590元≤600元月控标准",
+      "R900009": "E9002 5月办公用品590元≤600元月控标准",
+      "R900010": "travel_transport 5300元与R900011间隔8天>7天拆分窗",
+      "R900011": "travel_transport 5300元与R900010间隔8天>7天拆分窗",
+      "R900012": "12月费用900元次年1月10日提交适用第九条年末例外",
+      "R900018": "D902预算累计上下文R900018后余额5000元未超",
+      "R900020": "special_approval=1专项审批豁免",
+      "R900021": "培训住宿一类城市480元≤500元标准"
+    },
+    "conclusion": "11项异常涉及13条记录，其余8条经逐项核查均未违反5类规则"
+  },
+  "reconciled_figures": {
+    "total_anomalies": 11,
+    "total_anomaly_records": 13,
+    "total_population": 21,
+    "cleared_records": 8
+  },
+  "unresolved_items": []
+}

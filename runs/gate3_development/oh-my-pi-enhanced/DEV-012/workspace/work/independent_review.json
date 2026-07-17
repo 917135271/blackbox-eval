@@ -1,0 +1,22 @@
+{
+  "decision": "pass",
+  "challenged_findings": [
+    {"anomaly_id": "ANOM-DUP-001", "challenge": "是否可能是同一事项分次提交但不同发票？", "resolution": "确认INV900001被R900001和R900002共用，同一发票号，驳回挑战"},
+    {"anomaly_id": "ANOM-STD-005", "challenge": "R900002为重复报销，是否应从1月办公用品月控中剔除？", "resolution": "R900002已审批入账，月度实际报销总额=960元>600元月控标准；重复报销和月超标是独立规则违规，保留双项"},
+    {"anomaly_id": "ANOM-SPLIT-001", "challenge": "交通费5200+5200是否可能为不同行程的正常报销？", "resolution": "同一客户路演、3天间隔、合并10400达AR-03线、各自仍在AR-02，满足拆分条件"},
+    {"anomaly_id": "ANOM-DELAY-001", "challenge": "是否适用年末例外？", "resolution": "R900006费用日期2025-03-01非12月，不适用第九条年末例外"},
+    {"anomaly_id": "ANOM-BUDGET-001", "challenge": "R900018已达45000接近预算，R900019的6000是否仅部分超标？", "resolution": "政策使用1.0倍硬阈值，累计51000>50000即突破；R900019无special_approval，保留"}
+  ],
+  "exemptions_reviewed": [
+    {"record_id": "R900020", "exemption": "special_approval=1", "status": "有效豁免，不计入超预算异常"},
+    {"record_id": "R900012", "exemption": "第九条年末例外(12月费用次年1月15日前)", "status": "有效豁免，不计入超期异常"}
+  ],
+  "boundary_checks": [
+    {"check": "R900010+R900011间隔8天>7天", "result": "不构成拆分，已排除"},
+    {"check": "R900021培训住宿480≤500", "result": "未超标，已排除"},
+    {"check": "D901累计36760<200000", "result": "未超预算，已排除"},
+    {"check": "R900008/R900009分别不同员工各590≤600", "result": "未超标，已排除"}
+  ],
+  "required_changes": [],
+  "rationale": "所有11项异常经逐项复核，证据充分、制度适用正确、无有效豁免遗漏，维持原结论。"
+}

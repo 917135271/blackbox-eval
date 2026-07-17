@@ -1,0 +1,43 @@
+FROM rust:1.95.0-bookworm AS toolchain
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get -o Acquire::Retries=5 update \
+    && apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+        build-essential \
+        ca-certificates \
+        clang \
+        cmake \
+        git \
+        libcap-dev \
+        libssl-dev \
+        pkg-config \
+        protobuf-compiler \
+    && rm -rf /var/lib/apt/lists/*
+
+FROM toolchain AS builder
+
+WORKDIR /src
+COPY codex-rs ./codex-rs
+WORKDIR /src/codex-rs
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/usr/local/cargo/git \
+    --mount=type=cache,target=/src/codex-rs/target \
+    cp Cargo.lock /tmp/Cargo.lock.upstream \
+    && cargo build --release -p codex-cli --bin codex \
+    && cargo build --locked --release -p codex-cli --bin codex \
+    && cp Cargo.lock /tmp/Cargo.lock.resolved \
+    && cp target/release/codex /tmp/codex
+
+FROM debian:bookworm-slim
+
+RUN apt-get -o Acquire::Retries=5 update \
+    && apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+        ca-certificates git python3 ripgrep sqlite3 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /tmp/codex /usr/local/bin/codex
+COPY --from=builder /tmp/Cargo.lock.upstream /opt/codex-source/Cargo.lock.upstream
+COPY --from=builder /tmp/Cargo.lock.resolved /opt/codex-source/Cargo.lock.resolved
+
+ENTRYPOINT ["codex"]

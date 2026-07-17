@@ -1,0 +1,140 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 45.0,
+  "case_score_raw": 45.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "无异常。",
+      "id": "clean-conclusion",
+      "reason": "结论明确为无异常，无矛盾表述",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "无矛盾输出"
+    },
+    {
+      "answer_evidence": "record_ids: [\"R004201\", \"R004202\", \"R004203\", \"R004204\", \"R004205\", \"R004206\"]",
+      "id": "record-scope",
+      "reason": "未核查核心记录R004239和R004240，核查的记录R004201-R004206与本题无关",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "对R004201-R004206及部分R0000xx记录调用了get_expense_detail，但未触及R004239和R004240"
+    },
+    {
+      "answer_evidence": "经核查，记录R004201至R004206的费用事由中均明确标注为“重复发票注入样本”...不构成重复报销风险...",
+      "id": "case-specific-reason",
+      "reason": "未提供预期的合规原因（unique invoices, within entertainment standards, total below approval line），而是基于“注入样本”的错误推理",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "find_reused_invoices结果显示重复发票，但未进一步核查R004239/R004240的标准和审批线"
+    },
+    {
+      "answer_evidence": "未在提交中体现对R004239/R004240的核查",
+      "id": "reverse-check",
+      "reason": "未对预期记录R004239和R004240进行任何核查，没有针对本题边界条件的工具证据",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用完全聚焦于R004201-R004206系列及对应的原始记录，未出现R004239或R004240"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的R004201等记录ID在数据库中存在，但为无关记录",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "结论为无异常，未误判合规记录为异常",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 469.378,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004239",
+      "R004240"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 6,
+      "f1": 0.0,
+      "missing_count": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:24:21+08:00",
+  "group": "ccb-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "结论正确但过程完全错误：候选未核查题目指定的核心记录R004239和R004240，而是分析了无关的测试注入样本，导致合规原因完全偏差。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2438,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1864
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 9943,
+      "prompt_tokens": 9943,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 12381
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/ccb-baseline/TRAP-005",
+  "task_id": "TRAP-005"
+}

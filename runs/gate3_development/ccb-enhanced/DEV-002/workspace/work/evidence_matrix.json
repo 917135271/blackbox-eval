@@ -1,0 +1,44 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "DEV-002-001",
+      "record_ids": ["R900016"],
+      "citations": [
+        {"doc_id": "05_training_expense.md", "clause_no": "第三条"},
+        {"doc_id": "05_training_expense.md", "clause_no": "第四条"}
+      ],
+      "facts": [
+        "记录R900016：员工E9001（开发员工甲），expense_type=training_fee，金额850元，事由为「内部培训综合费用一天」，日期2025-08-02",
+        "制度第三条规定内部培训综合费用每日不超过800元",
+        "制度第四条规定外部培训综合费用每日不超过1200元",
+        "850元 > 800元，超出内部培训日上限50元，构成违规"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900016", "R900021"],
+  "submitted_record_ids": ["R900016"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true,
+    "searched_population": "list_expenses全量21条记录",
+    "query_conditions": "筛选expense_type为training_fee和training_lodging的记录",
+    "checked_rules": ["第三条 内部培训综合费用日上限800元", "第四条 外部培训综合费用日上限1200元", "第五条 培训住宿标准"],
+    "population_count": 2,
+    "conclusion": "R900021（training_lodging 480元）在一类城市培训住宿标准500元以内，无违规；R900016（training_fee 850元）超出内部培训日上限800元，存在违规。数据库中无外部培训（external training）费用记录。"
+  },
+  "reconciled_figures": {
+    "internal_training_limit": 800,
+    "external_training_limit": 1200,
+    "r900016_amount": 850,
+    "r900016_excess": 50
+  },
+  "unresolved_items": []
+}

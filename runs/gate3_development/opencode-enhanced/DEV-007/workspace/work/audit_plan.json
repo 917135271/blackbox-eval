@@ -1,0 +1,67 @@
+{
+  "task_id": "DEV-007",
+  "task_type": "batch_analysis",
+  "question": "扫描开发库中的个人办公用品和通讯费月度标准，返回全部超标准异常记录；应按员工和自然月聚合。",
+  "scope": {
+    "expense_types": ["office_supplies", "communication"],
+    "audit_period": "all available records",
+    "aggregation": "employee_id + expense_type + natural_month",
+    "thresholds": {
+      "office_supplies": 600,
+      "communication": 300
+    }
+  },
+  "policy": {
+    "doc_id": "07_office_communication.md",
+    "title": "XX证券办公与通讯费用管理办法",
+    "applicable_clauses": [
+      {"clause_no": "第二条", "content": "员工个人办公用品报销按月控制，每人每月不超过600元。"},
+      {"clause_no": "第三条", "content": "员工通讯费用报销按月控制，每人每月不超过300元。"},
+      {"clause_no": "第四条", "content": "办公费用和通讯费用不得以其他费用类型绕开月度控制。"}
+    ]
+  },
+  "data_questions": [
+    "Retrieve all office_supplies records with employee_id, amount, expense_date",
+    "Retrieve all communication records with employee_id, amount, expense_date",
+    "Group by employee_id, expense_type, natural_month (YYYY-MM from expense_date)",
+    "Compare monthly sum against threshold (600 for office_supplies, 300 for communication)",
+    "Return records where monthly sum exceeds threshold",
+    "Also check for records using 'other' expense_type that might circumvent monthly control (Article 4)"
+  ],
+  "required_fields": ["record_id", "employee_id", "amount", "expense_date", "expense_type", "status", "department_id"],
+  "evidence_requirements": [
+    "Full list of office_supplies records with amounts and dates",
+    "Full list of communication records with amounts and dates",
+    "Monthly aggregation results with employee and type",
+    "Comparison against policy thresholds",
+    "Policy clause citations"
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "Plan and policy research", "status": "completed"},
+    {"step": 2, "action": "Authorize and invoke data_analyst subagent for full data aggregation", "status": "pending"},
+    {"step": 3, "action": "Complete subagent and process summary", "status": "pending"},
+    {"step": 4, "action": "Evidence coverage check", "status": "pending"},
+    {"step": 5, "action": "Audit report and final result", "status": "pending"},
+    {"step": 6, "action": "Validation and submission", "status": "pending"}
+  ],
+  "complexity": 3,
+  "complexity_reasons": [
+    "Aggregation, grouping, and batch filtering required",
+    "Two business rules (office_supplies + communication thresholds)",
+    "Threshold comparison with date boundaries"
+  ],
+  "subagent_plan": {
+    "role": "data_analyst",
+    "reason_code": "AGGREGATION_REQUIRED",
+    "task": "Query all office_supplies and communication records, group by employee_id, expense_type, natural_month (YYYY-MM), compute monthly sums, compare against thresholds (600 for office_supplies, 300 for communication), return all over-standard anomaly records with full detail",
+    "artifact_paths": ["work/audit_plan.json"],
+    "requested_token_budget": 8000
+  },
+  "stopping_conditions": [
+    "All office_supplies and communication records retrieved and aggregated",
+    "All over-standard records identified with employee, month, type, and amount",
+    "Evidence matrix fully populated",
+    "Validation passes"
+  ],
+  "unresolved_items": []
+}

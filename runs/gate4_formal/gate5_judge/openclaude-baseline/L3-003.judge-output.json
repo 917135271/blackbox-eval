@@ -1,0 +1,53 @@
+{
+  "criteria": [
+    {
+      "id": "all-anomaly-ids",
+      "score": 0,
+      "reason": "候选 anomaly_ids 仅包含 ANOM-STD-001/002/003 三个超标准异常，缺失预期中的三个，达不到 partial 门槛。",
+      "answer_evidence": "候选 anomaly_ids: [\"ANOM-SPLIT-001\",…,\"ANOM-STD-001\",\"ANOM-STD-002\",\"ANOM-STD-003\",…] 仅含 3 个超标准 ID。",
+      "trace_evidence": "工具调用仅针对 office_supplies/communication/training_fee 阈值查询，未覆盖全部超标准类型。"
+    },
+    {
+      "id": "all-record-ids",
+      "score": 0,
+      "reason": "提交的 record_ids 仅包含 R004221/R004222/R004223，缺失 R004224/R004225/R004226，且混入 26 条无关记录。",
+      "answer_evidence": "候选 record_ids 共 29 条，缺失 3 条预期记录，大量无关记录。",
+      "trace_evidence": "工具查询返回超标准记录仅 R004221/R004222/R004223，未出现 R004224 等。"
+    },
+    {
+      "id": "full-scan-method",
+      "score": 8,
+      "reason": "执行了全年按类型的批量查询，但未按差旅办法进行职级与城市标准比对，扫描范围不完整。",
+      "answer_evidence": "答案声称完成全年超标准扫描，但仅列出办公/通讯/培训超标，缺少差旅住宿超标记录。",
+      "trace_evidence": "轨迹中 list_expenses 分页拉取所有 expense_type，但仅对 office_supplies>600、communication>300、training_fee>3500 查询，未进行 travel_lodging 标准比对。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 6,
+      "reason": "引用了费用报销管理办法第十二条及相关专项标准，但未涵盖差旅住宿标准，制度落实不完整。",
+      "answer_evidence": "答案引用《费用报销管理办法》第十二条及《办公通讯》《培训费》标准，未提差旅住宿标准。",
+      "trace_evidence": "查询条件 office_supplies>600 等对应制度，但未查询 travel_lodging 按职级/城市标准。"
+    },
+    {
+      "id": "false-positive-control",
+      "score": 0,
+      "reason": "将拆分报销和重复报销等其他规则异常混入超标准扫描结果，存在大量实质误报。",
+      "answer_evidence": "答案将 ANOM-SPLIT-/ANOM-DUP- 异常作为超标准扫描发现列出。",
+      "trace_evidence": "工具调用使用了 find_reused_invoices 和拆分分析，导致最终集合包含 26 条无关记录。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "未发现不存在于数据库的 record_id。"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": false,
+      "reason": "虽然扫描范围不完整，但确实读取了全年数据，并非仅检查部分月份或样例记录。"
+    }
+  ],
+  "overall_comment": "候选仅覆盖 3 条超标准记录，遗漏差旅住宿超标；将拆分、重复等异常混入，导致严重误报；制度依据不完整。",
+  "confidence": 1.0
+}

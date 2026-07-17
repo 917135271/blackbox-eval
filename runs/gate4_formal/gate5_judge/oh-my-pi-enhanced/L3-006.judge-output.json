@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "current-value",
+      "score": 30,
+      "reason": "明确指出现行部门总经理审批线为10000元",
+      "answer_evidence": "根据《XX证券授权管理办法》附件二AR-03档，单笔金额大于等于10000元且小于50000元",
+      "trace_evidence": "调用get_policy_doc获取03_authorization_management.md，返回AR-03: 大于等于10000元且小于50000元，部门总经理"
+    },
+    {
+      "id": "deprecated-value",
+      "score": 12.5,
+      "reason": "正确指出旧版已废止，但未明确提及废止金额8000元",
+      "answer_evidence": "2022版已被2025修订版第十四条正式废止，且2022版自身声明仅作制度沿革留档、审批金额已失效。",
+      "trace_evidence": "调用get_policy_doc获取02_expense_reimbursement_2022_deprecated.md，其中旧版规定8000元部门总经理审批，且声明废止。"
+    },
+    {
+      "id": "applicable-version",
+      "score": 20,
+      "reason": "明确选择2025修订版，并说明2022版已废止的理由",
+      "answer_evidence": "费用报销审批线应采用2025修订版（XX证财规〔2025〕甲号），而非2022版。",
+      "trace_evidence": "轨迹中查阅了01和02文档，确认2025为现行版，2022已废止。"
+    },
+    {
+      "id": "two-version-evidence",
+      "score": 10,
+      "reason": "提供了2025版文档引用，但未引用2022版文档",
+      "answer_evidence": "citations中包含01_expense_reimbursement_2025.md的第五条和第十四条。",
+      "trace_evidence": "轨迹中调用了02_expense_reimbursement_2022_deprecated.md，但未在答案或citations中提供该文档引用。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "未提交任何record_id"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未使用废止制度形成现行适用结论，明确采用2025版"
+    }
+  ],
+  "overall_comment": "回答正确采用2025修订版，部门总经理审批线准确，但未明确提及旧版8000元废止金额，且缺少旧版文档引用。",
+  "confidence": 0.95
+}

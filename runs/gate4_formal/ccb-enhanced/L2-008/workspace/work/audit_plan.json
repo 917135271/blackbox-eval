@@ -1,0 +1,94 @@
+{
+  "task_id": "L2-008",
+  "task_type": "policy_data_comparison",
+  "audit_scope": {
+    "clue_record": "R004212",
+    "rule": "拆分报销 (Split Reimbursement)",
+    "policy_clause": "01_expense_reimbursement_2025.md 第十一条",
+    "employee": "E0009",
+    "expense_type": "travel_lodging",
+    "period": "2025-04-10 to 2025-04-17 (7-day window from clue record)"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "Does Article 11 of the 2025 Expense Reimbursement Policy define split reimbursement, and what are the criteria?",
+      "clause": "第十一条",
+      "criteria": [
+        "同一员工 (same employee)",
+        "同一费用类型 (same expense type)",
+        "7天内2笔及以上 (2+ records within 7 days)",
+        "合计金额达到较高审批线 (combined amount reaches higher approval tier)"
+      ]
+    },
+    {
+      "id": "PQ-02",
+      "question": "What are the approval tier thresholds per the Authorization Management Policy?",
+      "clause": "附件二",
+      "tiers": {
+        "AR-01": "0-3000: 部门经理",
+        "AR-02": "3000-10000: 部门经理+财务复核",
+        "AR-03": "10000-50000: 部门总经理",
+        "AR-04": "50000-200000: 分管副总",
+        "AR-05": "200000+: 总经理办公会"
+      }
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-01",
+      "question": "What are the details of R004212 and R004213 (same employee, same expense type, within 7 days)?",
+      "records": ["R004212", "R004213"],
+      "required_fields": ["record_id", "employee_id", "expense_type", "amount", "expense_date", "approval_tier", "invoice_id"]
+    },
+    {
+      "id": "DQ-02",
+      "question": "Does the combined amount (10200) trigger a higher approval tier than the individual amounts (5100 each)?",
+      "analysis": "5100 x 2 = 10200. Individual: AR-02. Combined: AR-03.",
+      "conclusion": "Split evades 部门总经理 approval"
+    }
+  ],
+  "evidence_requirements": [
+    "Record details for R004212 and R004213",
+    "Policy text for Article 11 (split reimbursement)",
+    "Authorization table (附件二) thresholds",
+    "Invoice usage verification for both invoices"
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "Write audit plan", "output": "work/audit_plan.json", "status": "in_progress"},
+    {"step": 2, "action": "Record planning_completed checkpoint", "output": "checkpoint"},
+    {"step": 3, "action": "Policy-version-check for applicable policy", "output": "policy analysis"},
+    {"step": 4, "action": "Investigation: verify split reimbursement criteria", "output": "evidence"},
+    {"step": 5, "action": "Record investigation_completed checkpoint", "output": "checkpoint"},
+    {"step": 6, "action": "Form preliminary findings", "output": "work/final_result.json draft"},
+    {"step": 7, "action": "Evidence coverage check", "output": "work/evidence_matrix.json"},
+    {"step": 8, "action": "Review-ready checkpoint", "output": "checkpoint"},
+    {"step": 9, "action": "Run audit-report skill", "output": "finalized report"},
+    {"step": 10, "action": "Run result-validator skill", "output": "work/validation_report.json"},
+    {"step": 11, "action": "Validate and submit", "output": "submission"}
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "Two policies involved (expense reimbursement + authorization)",
+      "Threshold comparison required against AR tiers"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "Single rule, two records, straightforward threshold comparison. Compact mode sufficient."
+  },
+  "stopping_conditions": [
+    "All split reimbursement criteria are verified or refuted",
+    "Evidence coverage reaches 100%",
+    "Validation report passes",
+    "Submit result receives acceptance"
+  ],
+  "unresolved_items": [],
+  "preliminary_finding": {
+    "anomaly_type": "split_reimbursement",
+    "anomaly_id": "SPLIT-001",
+    "records": ["R004212", "R004213"],
+    "description": "E0009 split a single lodging expense across two records (R004212 and R004213) within 5 days, both travel_lodging at 5100 each, total 10200 evading AR-03 approval tier"
+  }
+}

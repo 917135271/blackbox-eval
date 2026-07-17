@@ -1,0 +1,54 @@
+{
+  "task_id": "L3-010",
+  "applicable_policies": [
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "effective_date": "2025-01-01",
+      "status": "current",
+      "applicable_clauses": ["第五条（审批权限按授权管理办法附件二执行）", "第十条（同一发票最多报销1次）"],
+      "applicability_reason": "2025年1月1日起施行，现行有效制度"
+    },
+    {
+      "doc_id": "03_authorization_management.md",
+      "title": "XX证券授权管理办法",
+      "effective_date": "2025-01-01",
+      "status": "current",
+      "applicable_clauses": ["附件二 费用报销审批权限表（AR-01至AR-05五档审批线）"],
+      "applicability_reason": "2025版报销制度第五条明确引用，附件二为现行审批线依据"
+    }
+  ],
+  "excluded_policies": [
+    {
+      "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+      "title": "XX证券费用报销管理办法(2022版)",
+      "status": "repealed",
+      "repeal_date": "2025-01-01",
+      "repealed_by": "01_expense_reimbursement_2025.md",
+      "exclusion_reason": "2025修订版第十四条明确规定原2022版同时废止；仅作为制度沿革留档，不得作为现行审批依据",
+      "historical_approval_lines": {
+        "threshold_8000": "单笔≥8000元→部门总经理审批",
+        "threshold_30000": "单笔≥30000元→分管副总审批"
+      }
+    }
+  ],
+  "version_trap_summary": {
+    "old_approval_lines": [
+      {"threshold": 8000, "approver": "部门总经理"},
+      {"threshold": 30000, "approver": "分管副总"}
+    ],
+    "new_approval_lines": [
+      {"tier": "AR-01", "range": "[0, 3000)", "approver": "部门经理"},
+      {"tier": "AR-02", "range": "[3000, 10000)", "approver": "部门经理+财务复核"},
+      {"tier": "AR-03", "range": "[10000, 50000)", "approver": "部门总经理"},
+      {"tier": "AR-04", "range": "[50000, 200000)", "approver": "分管副总"},
+      {"tier": "AR-05", "range": "[200000, ∞)", "approver": "总经理办公会"}
+    ],
+    "misjudgment_zones": [
+      {"amount_range": "[8000, 9999]", "old_approver": "部门总经理", "new_approver": "部门经理+财务复核(AR-02)", "misjudgment_type": "过度升级审批", "example_record": "R004233"},
+      {"amount_range": "[30000, 49999]", "old_approver": "分管副总", "new_approver": "部门总经理(AR-03)", "misjudgment_type": "过度升级审批", "example_record": "该区间无实际数据记录"},
+      {"amount_range": "[200000, ∞)", "old_approver": "分管副总", "new_approver": "总经理办公会(AR-05)", "misjudgment_type": "审批层级不足（更严重）", "example_record": "该区间无实际数据记录"}
+    ]
+  },
+  "unresolved_items": []
+}

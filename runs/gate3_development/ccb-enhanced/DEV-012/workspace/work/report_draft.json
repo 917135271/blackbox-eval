@@ -1,0 +1,116 @@
+{
+  "audit_scope": {
+    "task_id": "DEV-012",
+    "audit_period": "2025-01-01至2025-12-31",
+    "departments": ["D901开发审计一部", "D902开发审计二部"],
+    "records_total": 21,
+    "rules_checked": ["重复报销", "拆分报销", "超标准", "超期", "超预算"],
+    "applicable_policies": [
+      "01_expense_reimbursement_2025.md (2025修订版, 2025-01-01施行)",
+      "03_authorization_management.md (授权审批权限)",
+      "04_travel_expense.md (差旅费标准)",
+      "05_training_expense.md (培训费标准)",
+      "06_business_entertainment.md (业务招待费标准)",
+      "07_office_communication.md (办公与通讯费标准)",
+      "08_budget_management.md (预算管理)"
+    ]
+  },
+  "verified_facts": {
+    "total_records": 21,
+    "departments": {"D901": {"records": 18, "total": 36760, "budget": 200000, "rate": "18.38%"}, "D902": {"records": 3, "total": 56000, "budget": 50000, "rate": "112.00%"}},
+    "date_range": "2025-01-05至2025-12-20",
+    "employees": ["E9001开发员工甲", "E9002开发经理乙", "E9003开发员工丙"]
+  },
+  "findings": [
+    {
+      "anomaly_id": "ANOM-DUP-001",
+      "rule": "重复报销",
+      "policy": "01_expense_reimbursement_2025.md Art.10",
+      "record_ids": ["R900001", "R900002"],
+      "description": "员工E9001将同一发票FPDEV900001在R900001(2025-01-05)和R900002(2025-01-06)中分别报销480元，违反同一发票最多报销1次的规定",
+      "impact": "重复支付480元"
+    },
+    {
+      "anomaly_id": "ANOM-SPLIT-002",
+      "rule": "拆分报销",
+      "policy": "01_expense_reimbursement_2025.md Art.11; 03_authorization_management.md Annex2",
+      "record_ids": ["R900003", "R900004"],
+      "description": "员工E9001将同一客户路演交通费拆分为R900003(5200元,2025-02-03)和R900004(5200元,2025-02-06)，间隔3天，合计10400元。单笔均属AR-02(3000-10000,部门经理+财务复核)，合计达到AR-03(10000-50000,部门总经理)，涉嫌规避更高审批层级",
+      "impact": "规避部门总经理审批，涉及10400元"
+    },
+    {
+      "anomaly_id": "ANOM-STD-003",
+      "rule": "超标准",
+      "policy": "01_expense_reimbursement_2025.md Art.12; 07_office_communication.md Art.2",
+      "record_ids": ["R900007"],
+      "description": "员工E9001四月办公用品报销650元，超过600元/人/月标准50元",
+      "impact": "超标50元"
+    },
+    {
+      "anomaly_id": "ANOM-STD-004",
+      "rule": "超标准",
+      "policy": "01_expense_reimbursement_2025.md Art.12; 07_office_communication.md Art.3",
+      "record_ids": ["R900014", "R900015"],
+      "description": "员工E9001九月通讯费分两笔报销：R900014(180元,9-3)和R900015(160元,9-20)，合计340元，超过300元/人/月标准40元",
+      "impact": "超标40元"
+    },
+    {
+      "anomaly_id": "ANOM-STD-005",
+      "rule": "超标准",
+      "policy": "01_expense_reimbursement_2025.md Art.12; 04_travel_expense.md Art.4",
+      "record_ids": ["R900013"],
+      "description": "开发经理乙(E9002)一类城市住宿2晚共1400元，折合700元/晚，超过经理级一类城市650元/晚标准50元/晚",
+      "impact": "超标100元(2晚)"
+    },
+    {
+      "anomaly_id": "ANOM-STD-006",
+      "rule": "超标准",
+      "policy": "01_expense_reimbursement_2025.md Art.12; 05_training_expense.md Art.3",
+      "record_ids": ["R900016"],
+      "description": "内部培训综合费用一天850元，超过800元/天标准50元",
+      "impact": "超标50元"
+    },
+    {
+      "anomaly_id": "ANOM-STD-007",
+      "rule": "超标准",
+      "policy": "01_expense_reimbursement_2025.md Art.12; 06_business_entertainment.md Art.2",
+      "record_ids": ["R900017"],
+      "description": "客户交流活动二十人，金额5200元，人均260元合规，但单次活动总额超过5000元上限200元",
+      "impact": "超标200元"
+    },
+    {
+      "anomaly_id": "ANOM-OVD-001",
+      "rule": "超期",
+      "policy": "01_expense_reimbursement_2025.md Art.7",
+      "record_ids": ["R900006"],
+      "description": "费用发生2025-03-01，报销2025-05-05，间隔65天，超过60天报销期限5天",
+      "impact": "超期5天"
+    },
+    {
+      "anomaly_id": "ANOM-BUD-001",
+      "rule": "超预算",
+      "policy": "08_budget_management.md Art.3; 01_expense_reimbursement_2025.md Art.13",
+      "record_ids": ["R900019"],
+      "description": "部门D902年度预算50000元，R900018(45000元)后余额5000元，R900019(6000元,special_approval=0)报销后累计51000元突破预算限额，超出1000元。R900020已获专项审批(special_approval=1)予以豁免",
+      "impact": "超预算1000元"
+    }
+  ],
+  "anomaly_ids": ["ANOM-DUP-001","ANOM-SPLIT-002","ANOM-STD-003","ANOM-STD-004","ANOM-STD-005","ANOM-STD-006","ANOM-STD-007","ANOM-OVD-001","ANOM-BUD-001"],
+  "record_ids": ["R900001","R900002","R900003","R900004","R900006","R900007","R900013","R900014","R900015","R900016","R900017","R900019"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "Art.7"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "Art.10"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "Art.11"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "Art.12"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "Art.13"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "Annex2"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "Art.4"},
+    {"doc_id": "05_training_expense.md", "clause_no": "Art.3"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "Art.2"},
+    {"doc_id": "07_office_communication.md", "clause_no": "Art.2"},
+    {"doc_id": "07_office_communication.md", "clause_no": "Art.3"},
+    {"doc_id": "08_budget_management.md", "clause_no": "Art.3"}
+  ],
+  "answer": "对开发库2025年度21条费用记录执行综合审计，覆盖重复报销、拆分报销、超标准、超期和超预算五项规则，共发现9项异常涉及12条记录。\n\n一、重复报销(1项)：R900001与R900002共用发票FPDEV900001，各报销480元，违反《费用报销管理办法(2025)》第10条同一发票最多报销1次的规定。\n\n二、拆分报销(1项)：R900003与R900004均为E9001差旅交通费，同一事项3天内分两笔各5200元，单笔属AR-02审批级，合计10400元达AR-03级，违反第11条拆分规避审批规定。\n\n三、超标准(5项)：(1)R900007办公用品650元超600元/月标准(第12条+办公通讯办法第2条)；(2)R900014+R900015通讯费9月合计340元超300元/月标准(第12条+第3条)；(3)R900013经理级住宿700元/晚超650元/晚标准(第12条+差旅办法第4条)；(4)R900016内部培训850元/天超800元/天标准(第12条+培训办法第3条)；(5)R900017招待费5200元超5000元/次上限(第12条+招待办法第2条)。\n\n四、超期(1项)：R900006费用发生至报销间隔65天，超过第7条60天期限。\n\n五、超预算(1项)：D902部门预算50000元，R900019(6000元,无专项审批)报销后累计51000元，突破预算限额，违反预算办法第3条及报销办法第13条。R900020已获专项审批予以豁免，R900018属预算累计背景记录。\n\n其余9条记录经核查未发现违规。",
+  "limitations": ["R900005业务招待费缺少人数信息，人均标准无法精确核查，但总金额3600元在5000元限额内"]
+}

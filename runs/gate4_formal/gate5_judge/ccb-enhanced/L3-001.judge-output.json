@@ -1,0 +1,28 @@
+{
+  "criteria": [
+    {
+      "id": "full-scan-method",
+      "score": 15,
+      "reason": "候选明确声明对全年4240条记录执行重复报销专项扫描，工具调用使用find_reused_invoices返回全部重复发票，并逐条获取详情，范围、查询和统计均体现全量扫描。",
+      "answer_evidence": "“经对2025年全年4240条费用报销记录进行重复报销专项扫描”",
+      "trace_evidence": "list_expenses获取全部记录（预览显示has_next:true，后续调用覆盖全部），find_reused_invoices返回所有重复发票及其关联记录ID。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 10,
+      "reason": "候选取证费用报销管理办法(2025修订版)第十条，该条款与规则费用报销管理办法-6.1对应，且查询条件（同一发票计数>1）直接落实条款要求。",
+      "answer_evidence": "“依据《XX证券费用报销管理办法(2025修订版)》第十条‘同一发票最多报销1次’”",
+      "trace_evidence": "search_policy查询‘重复报销 重复 报销 重复提交’，结果包含第十条；get_policy_doc获取全文；find_reused_invoices基于该规则找出记录。"
+    },
+    {
+      "id": "false-positive-control",
+      "score": 15,
+      "reason": "候选报告6个异常、12条记录，与预期完全一致，未混入任何其他规则异常或TRAP记录，误报率为零。",
+      "answer_evidence": "“共发现6起重复报销异常……涉及12条报销记录”，且与预期记录ID精确匹配。",
+      "trace_evidence": "find_reused_invoices返回的重复发票仅含预期6组，未出现拆分、超标准等其他违规类型；rule_diagnostics显示precision=1.0, recall=1.0, trap_false_positive=false。"
+    }
+  ],
+  "critical_failures": [],
+  "overall_comment": "候选完成全年全量重复报销扫描，制度依据准确，误报控制完美，异常ID和记录ID完全覆盖预期，任务执行质量优秀。",
+  "confidence": 1.0
+}

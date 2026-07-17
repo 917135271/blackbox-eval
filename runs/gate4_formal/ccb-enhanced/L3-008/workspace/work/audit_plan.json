@@ -1,0 +1,62 @@
+{
+  "task_id": "L3-008",
+  "task_type": "near_clause_disambiguation",
+  "question": "比较差旅住宿和培训住宿标准，说明为什么不能混用。",
+  "audit_object": "差旅住宿标准 (travel_lodging) vs 培训住宿标准 (training lodging)",
+  "audit_period": "2025年1月起（现行制度有效期间）",
+  "scope": {
+    "expense_types": ["travel_lodging", "training_fee"],
+    "policy_docs": ["04_travel_expense.md", "05_training_expense.md"],
+    "rules": [
+      "差旅费管理办法第四条：差旅住宿标准（按职级+城市档位）",
+      "差旅费管理办法第七条：培训期间住宿不适用差旅住宿表",
+      "培训费管理办法第五条：培训住宿标准（仅按城市档位）",
+      "培训费管理办法第六条：培训住宿标准不得与差旅住宿标准混用"
+    ]
+  },
+  "policy_questions": [
+    "差旅住宿标准的结构和金额是什么？（按职级×城市档位）",
+    "培训住宿标准的结构和金额是什么？（仅按城市档位）",
+    "两者的适用场景和互斥条款是什么？",
+    "为什么不能混用——制度层面的理由和实际后果"
+  ],
+  "data_questions": [
+    "是否存在培训期间住宿错误使用差旅住宿标准报销的记录？",
+    "是否存在差旅住宿按培训标准报销的记录？"
+  ],
+  "required_fields": ["record_id", "expense_type", "amount", "reason", "employee_id", "department", "expense_date"],
+  "evidence_requirements": [
+    "制度原文对比（差旅住宿标准表 vs 培训住宿标准表）",
+    "互斥条款原文引用",
+    "如发现混用记录，提供具体record_id和判定依据"
+  ],
+  "execution_steps": [
+    {"step": "policy_research", "description": "提取两条住宿标准的完整文本、金额表、适用条件和互斥条款", "status": "completed"},
+    {"step": "data_analysis", "description": "检索培训相关的travel_lodging记录和差旅相关的training住宿记录，识别混用情况", "status": "pending"},
+    {"step": "evidence_check", "description": "逐条对比分析，确认混用记录并说明为什么混用不合理", "status": "pending"},
+    {"step": "report", "description": "汇总制度对比结论和证据", "status": "pending"},
+    {"step": "validation", "description": "校验结果并提交", "status": "pending"}
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "涉及两条不同的制度政策（差旅费管理办法 + 培训费管理办法）",
+      "涉及两条独立的住宿标准规则",
+      "存在不同阈值和适用条件需要对比"
+    ]
+  },
+  "subagent_plan": {
+    "role": "data-analyst",
+    "reason_code": "MULTI_RECORD_SCOPE",
+    "context": "任务L3-008：比较差旅住宿和培训住宿标准，说明为什么不能混用。需要从expense数据库中检索所有可能涉及标准混用的记录。具体包括：1) 搜索expense_type=travel_lodging且reason包含'培训'的记录（培训住宿错误使用差旅标准）；2) 搜索expense_type=training_fee且可能包含住宿费用的记录；3) 对发现的可疑记录，查询对应employee信息以确定职级和城市档位，然后对照两套标准判断是否存在混用。",
+    "artifact_paths": ["work/audit_plan.json"],
+    "requested_token_budget": 50000
+  },
+  "stopping_conditions": [
+    "完成制度对比分析",
+    "完成数据检索和混用记录识别",
+    "通过evidence_coverage_check和result_validator",
+    "通过validate_audit_result并成功submit"
+  ],
+  "unresolved_items": []
+}

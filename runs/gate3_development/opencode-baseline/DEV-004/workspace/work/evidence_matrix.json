@@ -1,0 +1,38 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "DEV-004-SPLIT-001",
+      "record_ids": ["R900003", "R900004"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "R900003和R900004均为员工E9001（开发员工甲）的差旅交通费报销，金额各5200元",
+        "两笔报销费用日期分别为2025-02-03和2025-02-06，间隔3天，在7天窗口内",
+        "两笔报销理由分别为'同一客户路演交通费第一笔'和'同一客户路演交通费第二笔'，属同一事项",
+        "单笔5200元属于AR-02档位（3000-10000元），由部门经理审批",
+        "两笔合计10400元属于AR-03档位（10000-50000元），应需部门总经理审批",
+        "拆分后每笔均按AR-02档位审批，规避了AR-03档位的部门总经理审批要求"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900003", "R900004"],
+  "submitted_record_ids": ["R900003", "R900004"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "total_anomaly_ids": 1,
+    "total_record_ids": 2,
+    "total_citations": 2
+  },
+  "unresolved_items": []
+}

@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "clean-conclusion",
+      "score": 30,
+      "reason": "答案明确表示无异常，且无矛盾表述",
+      "answer_evidence": "answer: 无异常, anomaly_ids: []",
+      "trace_evidence": "candidate_evidence_matrix 中明确结论为合规无异常"
+    },
+    {
+      "id": "record-scope",
+      "score": 0,
+      "reason": "未核查预期记录 R004239 和 R004240，提交了无关记录 R000037 和 R004205",
+      "answer_evidence": "submitted record_ids: ['R000037', 'R004205']",
+      "trace_evidence": "轨迹中无任何对 R004239 或 R004240 的工具调用，仅出现 R000037、R004205 等"
+    },
+    {
+      "id": "case-specific-reason",
+      "score": 0,
+      "reason": "原因基于无关记录，与本题专属合规原因（unique invoices, within entertainment standards, total below approval line）不符，且与数据矛盾",
+      "answer_evidence": "candidate_evidence_matrix 理由为发票重复与测试注入样本，未提及招待标准或总金额低于审批线",
+      "trace_evidence": "轨迹核查发票 FP202500000037 的重复使用，与本题真实记录无关"
+    },
+    {
+      "id": "reverse-check",
+      "score": 0,
+      "reason": "未针对正确记录 R004239 和 R004240 进行任何边界条件核查",
+      "answer_evidence": "提交中无针对正确记录的核查说明",
+      "trace_evidence": "所有工具调用均不涉及 R004239 或 R004240，未核查招待标准、总金额或审批线"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": true,
+      "reason": "使用无关记录 R000037 和 R004205 支撑核心结论，这些记录与 TRAP-005 不相关"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "未将合规记录判为实质异常"
+    }
+  ],
+  "overall_comment": "候选提交错误地将 TRAP-005 关联到无关记录，结论虽为无异常但基于错误分析，总分受关键失败限制为20。",
+  "confidence": 1.0
+}

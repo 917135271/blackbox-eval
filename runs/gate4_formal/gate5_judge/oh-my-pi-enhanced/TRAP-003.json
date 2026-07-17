@@ -1,0 +1,146 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 45.0,
+  "case_score_raw": 45.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "answer: \"无异常。...全部12条记录均不构成异常。\"",
+      "id": "clean-conclusion",
+      "reason": "候选明确输出“无异常”，且答案中无矛盾表述，符合满分条件。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "无"
+    },
+    {
+      "answer_evidence": "record_ids: [\"R000002\", \"R000005\", \"R000020\", \"R000028\", \"R000037\", \"R000055\", \"R004201\", \"R004202\", \"R004203\", \"R004204\", \"R004205\", \"R004206\"]，未见R004236、R004237。",
+      "id": "record-scope",
+      "reason": "候选未核查预期记录R004236和R004237，反而核查了大量无关记录，完全偏离题目要求的核心记录集。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "find_reused_invoices(min_usage_count=2)返回6张发票共12条记录，从未查询R004236、R004237。"
+    },
+    {
+      "answer_evidence": "answer: \"6条R0042XX记录...为系统测试注入数据而非真实业务报销\"。",
+      "id": "case-specific-reason",
+      "reason": "候选给出的合规原因（测试注入数据）与本题专属原因“outside aggregation window”完全不同，内容错误。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_excerpt查询未涉及窗口、聚合等关键概念。"
+    },
+    {
+      "answer_evidence": "无",
+      "id": "reverse-check",
+      "reason": "轨迹中仅核查了发票重复，未针对聚合窗口、阈值、日期等本题边界条件进行任何工具核查，完全依赖题目暗示直接断定无异常。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用仅有find_reused_invoices、get_expense_detail，无任何窗口或聚合相关检查。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "候选提交的所有record_id均存在于数据库中。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "候选未将合规记录判为实质异常，结论为无异常。",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R000002",
+      "R000005",
+      "R000020",
+      "R000028",
+      "R000037",
+      "R000055",
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 327.119,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 12,
+      "f1": 0.0,
+      "missing_count": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:27:48+08:00",
+  "group": "oh-my-pi-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.95,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选完全偏离了题目要求的记录范围，错误地围绕无关注入记录展开核查，虽结论正确但原因和核查过程均不满足要求。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1601,
+      "completion_tokens_details": {
+        "reasoning_tokens": 996
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 6251,
+      "prompt_tokens": 7275,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 8876
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/oh-my-pi-enhanced/TRAP-003",
+  "task_id": "TRAP-003"
+}

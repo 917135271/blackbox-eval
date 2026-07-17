@@ -1,0 +1,28 @@
+{
+  "criteria": [
+    {
+      "id": "full-scan-method",
+      "score": 15,
+      "reason": "对全年数据执行了完整的重复发票查询，范围覆盖全部记录，工具调用和结果统计均证明全量扫描。",
+      "answer_evidence": "提交的异常ID和记录ID集合完整覆盖了所有重复报销案例，共6项异常，12条记录。",
+      "trace_evidence": "调用find_reused_invoices(min_usage_count=2)获取所有重复使用的发票列表，返回6张发票及其关联记录；随后逐一调用get_expense_detail验证每条记录，确认全部合规。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 10,
+      "reason": "明确引用了《XX证券费用报销管理办法(2025修订版)》第十条，并将规则落实到查询条件中。",
+      "answer_evidence": "答案中写明‘违反《XX证券费用报销管理办法(2025修订版)》第十条“同一发票最多报销1次”的规定’，并在证据矩阵中为每项异常提供第十条引用。",
+      "trace_evidence": "search_policy搜索“重复报销 重复提交 同一发票 多次报销”获取第十条原文；find_reused_invoices使用min_usage_count=2精确对应同一发票被报销超过一次的条件。"
+    },
+    {
+      "id": "false-positive-control",
+      "score": 15,
+      "reason": "提交结果无任何误报，所有记录ID与预期完全一致，未混入其他规则异常或TRAP记录。",
+      "answer_evidence": "候选提交的record_ids集合与预期record_ids完全匹配，无多余或缺失项；anomaly_ids虽采用自定义命名但一对一对应。",
+      "trace_evidence": "find_reused_invoices返回的发票及其record_ids经后续逐条核实，仅输出重复报销记录，未引入无关数据。"
+    }
+  ],
+  "critical_failures": [],
+  "overall_comment": "候选准确完成了全年重复报销专项扫描，方法、制度依据和误报控制均符合要求，结果无误。",
+  "confidence": 1.0
+}

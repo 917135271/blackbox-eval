@@ -1,0 +1,75 @@
+{
+  "task_scope": {
+    "task_id": "DEV-010",
+    "type": "clean_trap",
+    "audit_object": "拆分报销核查（R900010与R900011）",
+    "business_period": "2025-06-01 至 2025-06-09",
+    "organization_scope": "E9001（开发员工甲，开发审计一部 D901）",
+    "deliverable": "判定是否构成7天内拆分报销，准确处理日期边界"
+  },
+  "audit_period": {
+    "records": ["R900010", "R900011"],
+    "date_range": "2025-06-01 ~ 2025-06-09"
+  },
+  "policy_questions": [
+    {
+      "question": "拆分报销的定义和判定条件",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十一条"
+    },
+    {
+      "question": "较高审批线金额阈值",
+      "policy_doc": "03_authorization_management.md",
+      "clause": "附件二 AR-02, AR-03"
+    },
+    {
+      "question": "政策有效期确认",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十四条（2025年1月1日施行）"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "R900010与R900011是否同一员工、同一费用类型、7天内",
+      "fields": ["employee_id", "expense_type", "expense_date", "amount", "invoice_id", "special_approval"]
+    },
+    {
+      "question": "合计金额是否达到较高审批线（AR-03: ≥10000元）",
+      "fields": ["amount"]
+    }
+  ],
+  "required_fields": ["record_id", "employee_id", "expense_type", "expense_date", "amount", "invoice_no", "special_approval"],
+  "evidence_requirements": [
+    "两份报销记录的完整详情",
+    "拆分报销制度条款全文",
+    "授权审批线制度全文",
+    "日期边界精确计算"
+  ],
+  "execution_steps": [
+    "1. 规划阶段：定义范围、规则、数据、证据",
+    "2. 政策核查（compact）：确认拆分明细条款和审批线阈值",
+    "3. 数据分析（compact）：核查R900010和R900011的关键字段",
+    "4. 证据覆盖检查：验证所有条件均已覆盖",
+    "5. 误判复核：日期边界（8天vs7天）复核",
+    "6. 审计报告：形成最终结论",
+    "7. 结果校验与提交"
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "单一规则（拆分报销）",
+      "仅两条记录，无需批量聚合",
+      "涉及日期边界（+1）"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "complexity=1，compact模式，主上下文完成"
+  },
+  "stopping_conditions": [
+    "所有拆分报销判定条件均已检查",
+    "日期边界（7天）精确计算并确认",
+    "证据覆盖率100%"
+  ],
+  "unresolved_items": []
+}

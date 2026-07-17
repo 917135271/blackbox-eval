@@ -1,0 +1,35 @@
+{
+  "criteria": [
+    {
+      "id": "threshold",
+      "score": 35,
+      "reason": "金额和边界正确，明确部门总经理审批线为10000元，边界清晰。",
+      "answer_evidence": "候选回答中写明AR-03：大于等于10000元且小于50000元，部门总经理审批。",
+      "trace_evidence": "工具调用获取03文档，附件二显示审批权限表，确认AR-03。无错误。"
+    },
+    {
+      "id": "two-hop-path",
+      "score": 30,
+      "reason": "两跳路径完整可复核：第一跳费用报销办法第五条引用授权管理办法附件二；第二跳授权管理办法附件二列出审批档位。",
+      "answer_evidence": "候选回答明确描述第一跳和第二跳。",
+      "trace_evidence": "轨迹中先get_policy_doc 01，后get_policy_doc 03和get_policy_excerpt 03附件二。"
+    },
+    {
+      "id": "citations",
+      "score": 20,
+      "reason": "两份证据均有效，引用01和03文档的具体条款。",
+      "answer_evidence": "citations字段引用01_expense_reimbursement_2025.md第五条和03_authorization_management.md附件二、第二条。",
+      "trace_evidence": "轨迹显示成功获取两份文档内容。"
+    },
+    {
+      "id": "no-premature-stop",
+      "score": 10,
+      "reason": "轨迹证明继续检索，未因首份制度未列金额而提前停止。",
+      "answer_evidence": "最终答案正确。",
+      "trace_evidence": "轨迹中在获取01后继续获取03并提取附件二。"
+    }
+  ],
+  "critical_failures": [],
+  "overall_comment": "候选准确遵循两跳交叉引用，从费用报销办法追踪到授权管理办法附件二，正确给出部门总经理审批线10000元及完整审批档位，证据充分，无异常。",
+  "confidence": 1.0
+}

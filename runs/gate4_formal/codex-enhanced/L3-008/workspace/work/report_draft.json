@@ -1,0 +1,92 @@
+{
+  "audit_scope": {
+    "task_id": "L3-008",
+    "question": "比较差旅住宿和培训住宿标准,说明为什么不能混用",
+    "expense_types": ["travel_lodging", "training_fee"],
+    "period": "2025年度",
+    "policies": ["04_travel_expense.md", "05_training_expense.md", "01_expense_reimbursement_2025.md"]
+  },
+  "verified_facts": {
+    "policy_comparison": {
+      "travel_lodging_standard": {
+        "description": "差旅住宿标准(04第四条)按职级和城市档位矩阵制定",
+        "matrix": {
+          "员工级": {"一类": 450, "二类": 380, "三类": 300},
+          "经理级": {"一类": 650, "二类": 550, "三类": 450},
+          "部门负责人级": {"一类": 850, "二类": 700, "三类": 600},
+          "高管级": {"一类": 1100, "二类": 900, "三类": 750}
+        },
+        "design_logic": "按职级分层,职级越高住宿标准越高,体现差旅待遇差异化"
+      },
+      "training_lodging_standard": {
+        "description": "培训住宿标准(05第五条)仅按城市档位制定",
+        "matrix": {"一类": 500, "二类": 420, "三类": 350},
+        "design_logic": "不区分职级,所有参训人员统一标准,体现培训活动平等性"
+      },
+      "prohibition_clauses": {
+        "04_travel_expense_art7": "培训期间住宿不适用本办法住宿表,应按《XX证券培训费管理办法》执行",
+        "05_training_expense_art6": "培训住宿标准仅适用于培训期间住宿,不得与差旅住宿标准混用"
+      }
+    },
+    "data_evidence": {
+      "total_travel_lodging_with_training": 48,
+      "scenario_breakdown": {
+        "type_A_diff达标_training超标": {"count": 8, "description": "在差旅标准内但超出培训标准——典型的标准混用套利"},
+        "type_B_double超标": {"count": 23, "description": "同时超出两种标准,且培训标准超幅更大"},
+        "type_D_double达标_分类违规": {"count": 17, "description": "两种标准内但仍属分类违规"}
+      },
+      "special_approval_count": 0,
+      "employees_involved": 34,
+      "departments_involved": 10
+    }
+  },
+  "applicable_policies": [
+    {"doc_id": "04_travel_expense.md", "clause_no": "第四条", "content": "差旅住宿费标准表"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "第七条", "content": "培训期间住宿不适用差旅住宿表"},
+    {"doc_id": "05_training_expense.md", "clause_no": "第五条", "content": "培训期间住宿标准表"},
+    {"doc_id": "05_training_expense.md", "clause_no": "第六条", "content": "培训住宿标准不得与差旅住宿标准混用"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条", "content": "无专项审批时报销不得超过制度标准1.0倍"}
+  ],
+  "findings": [
+    {
+      "anomaly_id": "ANOM-L3-008-001",
+      "type": "培训住宿混用差旅住宿标准",
+      "description": "48条travel_lodging记录报销事由含'培训'关键词,业务实质为培训期间住宿,应按培训住宿标准报销却归类为差旅住宿并使用差旅住宿标准。其中31条金额超出培训住宿标准,含8条在差旅标准内但超出培训标准(典型套利)。",
+      "impact": "制度设计层面:两类标准计价维度不同(职级vs城市档位),混用破坏费用分类管理原则。操作层面:经理级及以上员工在培训时若使用差旅标准可多报150-600元/晚;员工级在差旅时若使用培训标准可多报50元/晚。",
+      "recommendation": "将48条记录的expense_type更正为training_fee并适用培训住宿标准重新核定金额;加强费用报销事由审核,培训相关住宿不得以travel_lodging申报"
+    }
+  ],
+  "impact": {
+    "violation_count": 48,
+    "affected_departments": 10,
+    "affected_employees": 34,
+    "systemic_concern": "分散于10个部门,反映费用分类审核机制存在系统性不足"
+  },
+  "recommendations": [
+    "系统层面增加费用类型与事由关键词的自动校验规则",
+    "对48条违规记录按培训住宿标准重新核定报销金额,超出部分追回",
+    "加强部门经理对费用分类准确性的审核责任"
+  ],
+  "anomaly_ids": ["ANOM-L3-008-001"],
+  "record_ids": [
+    "R000132","R000166","R000214","R000245","R000328","R000347","R000392",
+    "R000442","R000481","R000620","R000634","R000661","R000751","R000797",
+    "R001150","R001239","R001247","R001395","R001481","R001600","R001652",
+    "R001663","R001664","R001829","R001862","R001870","R002003","R002180",
+    "R002303","R002457","R002576","R002602","R002688","R002877","R002897",
+    "R003306","R003346","R003382","R003389","R003507","R003509","R003618",
+    "R003771","R003992","R004094","R004138","R004180","R004182"
+  ],
+  "citations": [
+    {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "第七条"},
+    {"doc_id": "05_training_expense.md", "clause_no": "第五条"},
+    {"doc_id": "05_training_expense.md", "clause_no": "第六条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+  ],
+  "answer": "差旅住宿标准(04第四条)按四个职级×三个城市档位矩阵制定,职级越高标准越高(高管一类1100元vs员工级一类450元),设计逻辑为差旅待遇差异化。培训住宿标准(05第五条)仅按城市档位统一定价(一类500/二类420/三类350元),不区分职级,设计逻辑为培训活动平等对待。两类标准计价维度根本不同,不可互相替代。混用的后果:(1)经理级及以上员工参加培训时若使用差旅标准可多报销150-600元/人/晚(如D1级郑丹丹R001481在上海培训住宿按差旅标准2196.38元vs培训标准1500元,多报696.38元);(2)员工级在差旅时若按培训标准申报可规避差旅限额。制度明确规定:04第七条'培训期间住宿不适用本办法住宿表'、05第六条'不得与差旅住宿标准混用'。实际发现48条travel_lodging记录事由含'培训'关键词,违规混用标准,其中31条超出培训住宿标准,构成费用分类管理违规。",
+  "limitations": [
+    "training_fee记录的city_tier字段为null,无法逐一正向核查培训住宿是否超标",
+    "R004223(training_fee ¥3700超出课程费上限3500元)不属于本题混用问题范围,未列入"
+  ]
+}

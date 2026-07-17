@@ -1,0 +1,39 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "L2-013-ANOM-001",
+      "record_ids": ["R004223"],
+      "citations": [
+        {"doc_id": "05_training_expense.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R004223为培训费(training_fee)记录,金额3700.00元,由员工E0009(张婷,D1/部门经理,财务管理部)于2025-05-18发生,2025-05-23报销,状态approved",
+        "XX证券培训费管理办法(05_training_expense.md)第二条规定培训课程费按人次控制,每人每期不超过3500元",
+        "R004223金额3700.00元超过3500.00元标准上限200.00元,超标比例5.71%",
+        "R004223的special_approval字段为0,无专项审批",
+        "XX证券费用报销管理办法(2025修订版,01_expense_reimbursement_2025.md)第十二条规定:无专项审批时,报销金额不得超过对应制度标准的1.0倍",
+        "对expense.db中全部578条training_fee记录进行金额-标准比对,R004223是唯一金额超过3500.00元的记录,最高金额即为3700.00元"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004223"],
+  "submitted_record_ids": ["R004223"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "queried_population": 578,
+    "matched_candidates": 1,
+    "submitted_records": 1,
+    "amount_reconciled": true
+  },
+  "unresolved_items": []
+}

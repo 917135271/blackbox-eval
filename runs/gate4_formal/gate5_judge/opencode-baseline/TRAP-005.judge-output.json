@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "clean-conclusion",
+      "score": 0,
+      "reason": "结论虽为无异常，但基于错误记录集，未针对本题记录(R004239,R004240)，实质未完成本题要求。",
+      "answer_evidence": "候选回答声称核查了R000002等12条记录，未提及本题记录。",
+      "trace_evidence": "无工具调用痕迹，无法确认核查过程。"
+    },
+    {
+      "id": "record-scope",
+      "score": 0,
+      "reason": "提交记录集完全错误，未包含期望记录R004239和R004240，反而包含12条无关记录。",
+      "answer_evidence": "提交的record_ids为[R000002, R000005, R000020, R000028, R000037, R000055, R004201, R004202, R004203, R004204, R004205, R004206]。",
+      "trace_evidence": "无工具调用，记录集完全偏离。"
+    },
+    {
+      "id": "case-specific-reason",
+      "score": 0,
+      "reason": "所述合规原因与本题不符，未涉及娱乐标准、总计低于审批线等专属原因。",
+      "answer_evidence": "回答仅提及'重复发票注入样本'及第十条，未提及unique invoices、娱乐标准等。",
+      "trace_evidence": "无工具调用，缺乏数据支撑。"
+    },
+    {
+      "id": "reverse-check",
+      "score": 0,
+      "reason": "没有任何工具调用痕迹，未进行任何阈值、日期、发票等核查。",
+      "answer_evidence": "无相关证据。",
+      "trace_evidence": "工具调用计数为0。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": true,
+      "reason": "候选提交的record_ids虽可能存在，但与本题无关，完全未核查本题记录R004239和R004240，以无关记录支撑结论。"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "未将合规记录判为异常。"
+    }
+  ],
+  "overall_comment": "候选提交核查了错误的记录集，结论虽为无异常但未针对本题记录，且无任何工具核查，完全不符合题目要求。",
+  "confidence": 1.0
+}

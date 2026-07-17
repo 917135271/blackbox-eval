@@ -1,0 +1,135 @@
+{
+  "task_scope": "GATE2 领域增强集成 Canary — 验证 MCP 工具链路、子智能体授权调度机制、制度版本核查的集成能力",
+  "audit_period": "2025-01-01 至 2025-12-31",
+  "audit_object": "expense_query 与 policy_query MCP 工具链路集成验证",
+  "organization_scope": "全组织",
+  "requested_deliverable": "集成链路验证通过，确认 R000001 记录存在，子智能体授权与调度链路完整",
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "核实 01_expense_reimbursement_2025.md 第十条的适用版本、生效日期及条款内容",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十条",
+      "boundaries": "版本有效性、生效日期范围",
+      "reason": "多制度版本核查"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-01",
+      "question": "验证 R000001 记录在 expense 业务库中存在",
+      "tables": ["expenses"],
+      "fields": ["record_id", "amount", "date", "employee_id", "department", "status"],
+      "boundaries": "记录存在性检查"
+    }
+  ],
+  "required_fields": ["record_id", "amount", "date", "employee_id", "department", "status", "policy_clause_text", "policy_version", "effective_date"],
+  "evidence_requirements": [
+    "R000001 在 expense 库中的记录详情",
+    "01_expense_reimbursement_2025.md 第十条的条款原文",
+    "制度版本适用的生效日期与版本号"
+  ],
+  "execution_steps": [
+    {
+      "step": 1,
+      "name": "audit-query-planner",
+      "description": "生成审计计划，复杂度 3",
+      "artifact": "work/audit_plan.json",
+      "stopping_condition": "计划写入完成"
+    },
+    {
+      "step": 2,
+      "name": "checkpoint_planning_completed",
+      "description": "记录 planning_completed Checkpoint",
+      "artifact": "work/context_checkpoint.json",
+      "stopping_condition": "Checkpoint 记录成功"
+    },
+    {
+      "step": 3,
+      "name": "authorize_policy_researcher",
+      "description": "调用 authorize_audit_subagent 授权 policy_researcher 子智能体",
+      "artifact": "authorization token (invocation_id)",
+      "stopping_condition": "授权成功返回 invocation_id"
+    },
+    {
+      "step": 4,
+      "name": "launch_policy_researcher",
+      "description": "使用框架原生 Agent 工具启动 securities-expense-audit:policy-researcher 子智能体，读取 01_expense_reimbursement_2025.md 第十条",
+      "artifact": "work/subagents/policy_researcher/policy_applicability.json 与 summary.json",
+      "stopping_condition": "子智能体完成并保存产物"
+    },
+    {
+      "step": 5,
+      "name": "complete_subagent",
+      "description": "调用 complete_audit_subagent 完成子智能体登记",
+      "artifact": "completion 确认",
+      "stopping_condition": "completed=true"
+    },
+    {
+      "step": 6,
+      "name": "verify_record",
+      "description": "主智能体调用 expense_query.get_expense_detail 验证 R000001",
+      "artifact": "记录详情返回",
+      "stopping_condition": "R000001 存在且返回数据"
+    },
+    {
+      "step": 7,
+      "name": "create_evidence_matrix",
+      "description": "创建 work/evidence_matrix.json",
+      "artifact": "work/evidence_matrix.json",
+      "stopping_condition": "status=pass, coverage_percent=100"
+    },
+    {
+      "step": 8,
+      "name": "create_validation_report",
+      "description": "创建 work/validation_report.json",
+      "artifact": "work/validation_report.json",
+      "stopping_condition": "status=pass, submission_allowed=true"
+    },
+    {
+      "step": 9,
+      "name": "create_final_result",
+      "description": "创建 work/final_result.json",
+      "artifact": "work/final_result.json",
+      "stopping_condition": "文件写入完成"
+    },
+    {
+      "step": 10,
+      "name": "checkpoint_validation_ready",
+      "description": "记录 validation_ready Checkpoint",
+      "artifact": "work/context_checkpoint.json",
+      "stopping_condition": "Checkpoint 记录成功"
+    },
+    {
+      "step": 11,
+      "name": "result_validator_and_submit",
+      "description": "运行 result-validator Skill 复核，然后调用 submit_audit_result",
+      "artifact": "提交确认",
+      "stopping_condition": "status=accepted"
+    }
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "多制度版本核查：需确认 policy 文档的适用版本、生效日期",
+      "涉及 policy_query 与 expense_query 两个独立 MCP 域的跨域集成",
+      "子智能体授权-调度-完成-结果消费的完整链路需串联验证",
+      "阈值/日期边界：制度第十条可能存在生效日期与废止日期边界条件"
+    ]
+  },
+  "subagent_plan": {
+    "requested": true,
+    "role": "policy_researcher",
+    "reason_code": "MULTI_POLICY_VERSION_CHECK",
+    "complexity": 3,
+    "context": "GATE2 领域增强集成 Canary：需要读取 01_expense_reimbursement_2025.md 的第十条，确认制度版本、生效日期和条款内容。将详细结果和六字段摘要分别保存到 work/subagents/policy_researcher/policy_applicability.json 和 summary.json。",
+    "artifact_paths": ["work/subagents/policy_researcher/policy_applicability.json", "work/subagents/policy_researcher/summary.json"],
+    "requested_token_budget": 4000
+  },
+  "stopping_conditions": {
+    "overall": "提交后获得 status=accepted",
+    "per_step": "各步骤产物验证通过",
+    "on_failure": "按结构化错误修复一次，不重试第二次"
+  },
+  "unresolved_items": []
+}

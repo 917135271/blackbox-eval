@@ -1,0 +1,61 @@
+{
+  "task_id": "L2-008",
+  "audit_scope": {
+    "object": "拆分报销异常核查",
+    "clue_record": "R004212",
+    "employee": "E0009 (张婷)",
+    "department": "D009 (财务管理部)",
+    "expense_type": "travel_lodging",
+    "period": "2025-04-10 至 2025-04-17 (7天窗口)"
+  },
+  "verified_facts": [
+    "R004212: 员工E0009(张婷), travel_lodging, 金额5100.00元, 发生日期2025-04-10, 报销日期2025-04-16, 发票FP2025X0004206, A类城市7晚, 审批档位AR-02(部门经理+财务复核)",
+    "R004213: 员工E0009(张婷), travel_lodging, 金额5100.00元, 发生日期2025-04-15, 报销日期2025-04-21, 发票FP2025X0004207, A类城市7晚, 审批档位AR-02(部门经理+财务复核)",
+    "两笔记录间隔5天, 在7天窗口内",
+    "两笔记录发票不同, 各使用1次, 无重复报销"
+  ],
+  "applicable_policies": [
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "clause": "第十一条",
+      "rule": "不得将同一事项或同类事项拆分为多笔报销以规避审批权限。同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到《授权管理办法》附件二较高审批线的,应重点核查拆分规避审批。"
+    },
+    {
+      "doc_id": "03_authorization_management.md",
+      "title": "XX证券授权管理办法",
+      "clause": "附件二",
+      "rule": "AR-02: 3000-10000元(部门经理+财务复核); AR-03: 10000-50000元(部门总经理)"
+    }
+  ],
+  "findings": [
+    {
+      "anomaly_id": "SPLIT-001",
+      "type": "拆分报销规避审批",
+      "description": "员工E0009(张婷)将同一差旅住宿费用拆分为两笔各5100元报销,规避了部门总经理审批",
+      "record_ids": ["R004212", "R004213"],
+      "threshold_analysis": {
+        "individual_amount": 5100,
+        "individual_tier": "AR-02 (3000-10000元)",
+        "combined_amount": 10200,
+        "combined_tier": "AR-03 (10000-50000元)",
+        "days_between": 5,
+        "max_allowed_days": 7,
+        "evaded_role": "部门总经理"
+      }
+    }
+  ],
+  "impact": "拆分报销导致合计10200元的差旅住宿费用绕过了部门总经理(AR-03)审批,实际仅经部门经理和财务复核(AR-02)审批通过",
+  "recommendations": [
+    "将R004212和R004213合并,补充部门总经理审批",
+    "对拆分报销行为按制度进行处理"
+  ],
+  "anomaly_ids": ["SPLIT-001"],
+  "record_ids": ["R004212", "R004213"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+  ],
+  "answer": "结合《XX证券费用报销管理办法(2025修订版)》第十一条及《XX证券授权管理办法》附件二审批权限表，员工E0009(张婷)在2025年4月10日至4月15日(间隔5天,7天内)就同一费用类型travel_lodging提交2笔报销(R004212金额5100元、R004213金额5100元),单笔均处于AR-02审批档位(3000-10000元,部门经理+财务复核),但合计金额10200元已达到AR-03审批档位(10000-50000元,部门总经理)。该行为符合拆分报销规避审批权限的认定标准,构成拆分报销异常。",
+  "limitations": []
+}

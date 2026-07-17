@@ -1,0 +1,35 @@
+{
+  "audit_scope": {
+    "task_id": "DEV-009",
+    "audited_object": "R900008 and R900009 duplicate reimbursement check",
+    "period": "2025-05-05",
+    "organization": "D901 (开发审计一部)",
+    "data_scope": "Records R900008 and R900009"
+  },
+  "verified_facts": [
+    "R900008: 员工E9001(开发员工甲), 费用日期2025-05-05, 金额590.00, 类型office_supplies, 发票FPDEV900008, 供应商开发供应商08",
+    "R900009: 员工E9002(开发经理乙), 费用日期2025-05-05, 金额590.00, 类型office_supplies, 发票FPDEV900009, 供应商开发供应商09",
+    "FPDEV900008仅被R900008使用1次",
+    "FPDEV900009仅被R900009使用1次",
+    "两笔记录使用不同发票(FPDEV900008 ≠ FPDEV900009)"
+  ],
+  "applicable_policies": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条", "content": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。"}
+  ],
+  "findings": [
+    {
+      "id": "no_anomaly_different_invoices",
+      "type": "无异常",
+      "description": "R900008与R900009虽同日(2025-05-05)、同额(590.00)、同费用类型(office_supplies),但使用不同发票(FPDEV900008 vs FPDEV900009),不构成重复报销。"
+    }
+  ],
+  "impact": "无",
+  "recommendations": [],
+  "anomaly_ids": [],
+  "record_ids": ["R900008", "R900009"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
+  ],
+  "answer": "无异常。R900008发票FPDEV900008与R900009发票FPDEV900009为不同发票,不构成重复报销。",
+  "limitations": []
+}

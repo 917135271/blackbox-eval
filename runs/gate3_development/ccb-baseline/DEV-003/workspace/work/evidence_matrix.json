@@ -1,0 +1,37 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-DEV003-001",
+      "record_ids": ["R900001", "R900002"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
+      ],
+      "facts": [
+        "发票INV900001(FPDEV900001)由开发供应商01开具，发票日期2025-01-05，金额480元，费用类型为office_supplies",
+        "该发票在R900001(项目装订用品第一次报销，报销日期2025-01-12)和R900002(项目装订用品第二次报销，报销日期2025-01-13)中重复使用",
+        "两笔报销均为同一员工E9001(开发员工甲)，同一部门D901(开发审计一部)，状态均为approved",
+        "find_reused_invoices确认INV900001的usage_count为2，涉及record_ids为R900001和R900002"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900001", "R900002"],
+  "submitted_record_ids": ["R900001", "R900002"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": false
+  },
+  "reconciled_figures": {
+    "total_invoice_amount": 480.0,
+    "total_reimbursed": 960.0,
+    "duplicate_amount": 480.0
+  },
+  "unresolved_items": []
+}

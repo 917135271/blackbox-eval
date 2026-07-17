@@ -1,0 +1,47 @@
+{
+  "task_id": "L1-001",
+  "task_type": "policy_qa",
+  "question": "现行制度下,单笔费用报销达到多少金额需要部门总经理审批?",
+  "audit_scope": {
+    "audit_object": "policy_threshold",
+    "expense_types": ["差旅", "培训", "招待", "办公", "通讯"],
+    "business_period": "current (2025-01-01 onward)",
+    "organization_scope": "XX证券全体部门",
+    "deliverable": "policy answer with supporting citations"
+  },
+  "policy_questions": [
+    "现行制度下,部门总经理审批的单笔报销金额阈值是多少?"
+  ],
+  "relevant_policies": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "reason": "现行费用报销制度,第五条将审批权限委托至授权管理办法附件二"},
+    {"doc_id": "03_authorization_management.md", "reason": "附件二包含费用报销审批权限表(现行有效审批线)"},
+    {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "reason": "旧版已废止,仅作排除参考"}
+  ],
+  "data_questions": [],
+  "required_fields": ["policy_doc_id", "clause_no", "approval_threshold_amount"],
+  "execution_steps": [
+    {"step": "policy_query", "description": "查询现行费用报销制度和授权管理办法,定位部门总经理审批金额阈值", "agent": "main"},
+    {"step": "policy_applicability", "description": "确认为现行制度,排除已废止的2022版", "agent": "main"},
+    {"step": "evidence_build", "description": "建立证据矩阵", "agent": "main"},
+    {"step": "result_build", "description": "生成最终结果", "agent": "main"},
+    {"step": "validation", "description": "校验并提交", "agent": "main"}
+  ],
+  "complexity": {
+    "score": 0,
+    "reasons": [
+      "纯政策事实类问题,单规则查询",
+      "一条现行政策明确给出答案,无版本冲突",
+      "无需聚合、分组、批处理或跨表连接",
+      "无阈值/日期边界判断"
+    ]
+  },
+  "subagent_plan": {
+    "required": false,
+    "reason": "复杂度0,无需子智能体"
+  },
+  "stopping_conditions": [
+    "取得现行有效审批权限表中的部门总经理审批金额阈值",
+    "确认2025版为现行制度,2022版已废止"
+  ],
+  "unresolved_items": []
+}

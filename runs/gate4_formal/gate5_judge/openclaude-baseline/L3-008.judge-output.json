@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "travel-policy",
+      "score": 25,
+      "reason": "明确说明差旅住宿适用差旅费管理办法，引用04_travel_expense.md第四条，场景清晰。",
+      "answer_evidence": "差旅住宿标准（04_travel_expense.md 第四条）：按员工职级和城市档位双重分级，共4×3=12个费率档位。",
+      "trace_evidence": "get_policy_doc 04_travel_expense.md 返回第四条差旅住宿费标准表。"
+    },
+    {
+      "id": "training-policy",
+      "score": 25,
+      "reason": "明确说明培训住宿适用培训费管理办法，引用05_training_expense.md第五条，场景清晰。",
+      "answer_evidence": "培训住宿标准（05_training_expense.md 第五条）：仅按城市档位分级，不区分职级，共3个费率档位。",
+      "trace_evidence": "get_policy_doc 05_training_expense.md 返回第五条培训住宿标准表。"
+    },
+    {
+      "id": "no-mixing",
+      "score": 25,
+      "reason": "完整说明了差旅与培训是不同业务场景，标准结构、数值差异，并结合两项制度的禁止条款和风险解释不能混用。",
+      "answer_evidence": "不能混用的原因：制度明确禁止（04第七条、05第六条）、适用场景不同、混用实质风险（如部门负责人一级差旅850 vs 培训500）、预算核算分离。",
+      "trace_evidence": "无特定工具输出，基于政策文档比较推理。"
+    },
+    {
+      "id": "comparison-evidence",
+      "score": 20,
+      "reason": "直接引用04和05文档的具体条款，并给出可核查的标准对比表（如4×3矩阵与1×3向量对比），证据完整。",
+      "answer_evidence": "一、标准对比：1. 差旅住宿标准...4×3矩阵；2. 培训住宿标准...一维向量。具体数值对比。",
+      "trace_evidence": "get_policy_doc 04_travel_expense.md 和 05_training_expense.md 分别获取了完整标准表，用于对比。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的record_ids均为系统返回的有效记录，无虚构或无关记录。"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "仅引用了现行有效的04_travel_expense.md和05_training_expense.md，未使用废止制度。"
+    }
+  ],
+  "overall_comment": "答案完整准确地比较了两类住宿标准，明确了各自适用的制度，并详细说明了不能混用的原因，证据引用充分。所有评分点均为满分。",
+  "confidence": 1.0
+}

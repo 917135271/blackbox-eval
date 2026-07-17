@@ -1,0 +1,41 @@
+{
+  "criteria": [
+    {
+      "id": "audit-conclusion",
+      "score": 0,
+      "reason": "结论包含非超标准异常（缺少财务复核），类型错误。",
+      "answer_evidence": "候选回答中称“发现两项超标准异常：(2)缺少财务复核审批”，该异常不是超标准。",
+      "trace_evidence": "无额外证据。"
+    },
+    {
+      "id": "anomaly-id",
+      "score": 0,
+      "reason": "未返回预期异常ID OVERSTD-003，返回了自定义ID。",
+      "answer_evidence": "submitted_json中anomaly_ids为[\"ANOMALY_L2_013_01\", \"ANOMALY_L2_013_02\"]。",
+      "trace_evidence": "无额外证据。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 15,
+      "reason": "引用了《费用报销管理办法》第十二条（对应6.3）和《培训费管理办法》第二条，有效支持超标准结论。",
+      "answer_evidence": "citations中包含01_expense_reimbursement_2025.md第十二条和05_training_expense.md第二条。",
+      "trace_evidence": "工具调用get_policy_doc获取了这两个文档，确认条款内容匹配。"
+    },
+    {
+      "id": "case-reasoning",
+      "score": 20,
+      "reason": "完整说明了费用类型、金额、标准和超标情况，事实与计算一致。",
+      "answer_evidence": "evidence_matrix中列出R004223 training_fee 3700元，标准3500元，超标200元，无专项审批。",
+      "trace_evidence": "get_expense_detail返回金额3700，培训费标准get_policy_doc显示3500。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有record_id均存在于数据库。"
+    }
+  ],
+  "overall_comment": "候选正确识别了R004223的培训费超标准事实，但错误增加了非超标准异常且异常ID未匹配预期，导致结论和ID得分丢失。",
+  "confidence": 0.95
+}

@@ -1,0 +1,138 @@
+{
+  "case_family": "record_audit",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "policy_data_comparison",
+  "criteria": [
+    {
+      "answer_evidence": "经核查...构成拆分报销异常。异常ID：SPLIT-001",
+      "id": "audit-conclusion",
+      "reason": "结论明确为拆分报销，异常类型为SPLIT，符合预期。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_expense_detail返回R004212/R004213金额均为5100元，间隔5天；search_policy检索到第十一条拆分条款。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "anomaly-id",
+      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
+      "score": 15.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "record-set",
+      "reason": "record_ids集合F1=1.000",
+      "score": 25.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "《XX证券费用报销管理办法(2025修订版)》第十一条",
+      "id": "policy-basis",
+      "reason": "引用了费用报销管理办法第十一条（对应评测规则6.2），条款有效且直接支持拆分报销判定。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_excerpt返回第十一条原文：不得将同一事项拆分为多笔报销以规避审批权限...7天内...合计金额达到较高审批线..."
+    },
+    {
+      "answer_evidence": "4月10日和4月15日...每笔5100元，合计10200元...合计达AR-03档位",
+      "id": "case-reasoning",
+      "reason": "明确给出7天窗口内合计10200元，超过10000元审批线，计算完整一致。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_expense_detail证实R004212金额5100、R004213金额5100；list_expenses确认日期间隔5天。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的R004212和R004213均在数据库中存在，未使用无关记录。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "SPLIT-001"
+    ],
+    "actual_record_ids": [
+      "R004212",
+      "R004213"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "SPLIT": 1
+      },
+      "count_exact": true,
+      "expected_types": {
+        "SPLIT": 1
+      },
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 3,
+    "elapsed_seconds": 426.415,
+    "expected_anomaly_ids": [
+      "SPLIT-003"
+    ],
+    "expected_record_ids": [
+      "R004212",
+      "R004213"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [
+      "clause:费用报销管理办法-6.2"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:26:20+08:00",
+  "group": "codex-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选准确识别拆分报销异常，制度依据正确，推理数据完整，结论与预期一致（异常ID虽不同但类型正确且不影响核心判断）。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1321,
+      "completion_tokens_details": {
+        "reasoning_tokens": 864
+      },
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 6674,
+      "prompt_tokens": 7570,
+      "prompt_tokens_details": {
+        "cached_tokens": 896
+      },
+      "total_tokens": 8891
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/codex-enhanced/L2-008",
+  "task_id": "L2-008"
+}

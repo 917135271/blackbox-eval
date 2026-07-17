@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "audit-event.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "framework",
+    "experiment_group",
+    "role",
+    "timestamp",
+    "sequence",
+    "event_type",
+    "source",
+    "summary",
+    "artifact_paths",
+    "token_usage"
+  ],
+  "properties": {
+    "task_id": {"type": "string", "minLength": 1},
+    "framework": {"type": "string", "minLength": 1},
+    "experiment_group": {"type": "string", "minLength": 1},
+    "role": {"type": "string", "minLength": 1},
+    "timestamp": {"type": "number"},
+    "sequence": {"type": "integer", "minimum": 1},
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "task_started",
+        "skill_selected",
+        "tool_started",
+        "tool_completed",
+        "tool_failed",
+        "subagent_requested",
+        "subagent_authorized",
+        "subagent_rejected",
+        "subagent_completed",
+        "artifact_written",
+        "context_checkpoint",
+        "context_compacted",
+        "validation_started",
+        "validation_completed",
+        "submission_attempted",
+        "submission_accepted",
+        "submission_rejected",
+        "task_completed",
+        "task_timeout"
+      ]
+    },
+    "source": {"type": "string", "minLength": 1},
+    "reason_code": {"type": ["string", "null"]},
+    "summary": {"type": "object"},
+    "artifact_paths": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "token_usage": {
+      "type": "object",
+      "additionalProperties": {"type": "integer", "minimum": 0}
+    },
+    "duration_ms": {"type": ["integer", "null"], "minimum": 0},
+    "error_code": {"type": ["string", "null"]}
+  }
+}

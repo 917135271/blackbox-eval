@@ -1,0 +1,72 @@
+{
+  "audit_scope": {
+    "object": "XX证券费用报销",
+    "period": "2025-01-01至2025-12-31",
+    "organization": "XX证券各部门及全体员工",
+    "data_scope": "全年4,240笔已批准报销记录",
+    "policy_version": "XX证财规〔2025〕甲号（2025修订版），2025年1月1日起施行"
+  },
+  "verified_facts": {
+    "total_records_reviewed": 4240,
+    "total_anomalies": 35,
+    "total_unique_records_in_violation": 3126,
+    "rule_summary": {
+      "R01_发票重复报销": {"count": 6, "records": 12},
+      "R02_拆分报销": {"count": 11, "records": 27},
+      "R03_超标准报销": {"count": 6, "records": 6},
+      "R04_预算超支": {"count": 6, "records": 3088},
+      "R05_超期报销": {"count": 6, "records": 6}
+    }
+  },
+  "applicable_policies": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause": "第七条、第十条、第十一条、第十二条、第十三条"},
+    {"doc_id": "03_authorization_management.md", "clause": "附件二"},
+    {"doc_id": "04_travel_expense.md", "clause": "第四条、第六条"},
+    {"doc_id": "05_training_expense.md", "clause": "第二条"},
+    {"doc_id": "06_business_entertainment.md", "clause": "第二条、第三条"},
+    {"doc_id": "07_office_communication.md", "clause": "第二条、第三条"},
+    {"doc_id": "08_budget_management.md", "clause": "第三条"}
+  ],
+  "findings": [
+    {
+      "rule": "R01",
+      "description": "6张发票被重复报销，同一发票对应2笔不同报销记录，违反第十条",
+      "anomaly_ids": ["R01-INV-FP202500000002","R01-INV-FP202500000005","R01-INV-FP202500000020","R01-INV-FP202500000028","R01-INV-FP202500000037","R01-INV-FP202500000055"]
+    },
+    {
+      "rule": "R02",
+      "description": "11个拆分报销群组（6个注入样本+5个真实群组），同一员工/类型/7天内多笔合计达较高审批线，违反第十一条",
+      "anomaly_ids": ["R02-SPLIT-G1","R02-SPLIT-G2","R02-SPLIT-G3","R02-SPLIT-G4","R02-SPLIT-G5","R02-SPLIT-G6","R02-GEN-R000105","R02-GEN-R000241","R02-GEN-R001875","R02-GEN-R001937","R02-GEN-R001994"]
+    },
+    {
+      "rule": "R03",
+      "description": "6笔费用超过对应制度标准且无专项审批，违反第十二条",
+      "anomaly_ids": ["R03-R004221","R03-R004222","R03-R004223","R03-R004224","R03-R004225","R03-R004226"]
+    },
+    {
+      "rule": "R04",
+      "description": "6个部门年度预算使用率超过100%（153%-159%），违反第十三条及预算管理办法第三条",
+      "anomaly_ids": ["R04-D001","R04-D002","R04-D003","R04-D004","R04-D005","R04-D006"]
+    },
+    {
+      "rule": "R05",
+      "description": "6笔通讯费报销延迟65-120天，超过60天法定时限，违反第七条",
+      "anomaly_ids": ["R05-R004227","R05-R004228","R05-R004229","R05-R004230","R05-R004231","R05-R004232"]
+    }
+  ],
+  "impact": "五类违规合计35项异常，涉及3,126条记录。发票重复和拆分报销构成财务合规风险，超标准报销和预算超支构成内部控制缺陷，超期报销反映流程效率问题。",
+  "recommendations": [
+    "建议对6张重复发票涉及的经办人进行核查追责",
+    "建议审查AR-02至AR-03拆分审批规避的系统控制机制",
+    "建议对超预算部门启动专项审批流程并调整下年度预算编制",
+    "建议优化报销时限提醒机制"
+  ],
+  "anomaly_ids": [],
+  "record_ids": [],
+  "citations": [],
+  "answer_text": "参见work/final_result.json中的answer字段",
+  "limitations": [
+    "R04预算超支未逐笔确定耗尽时点，以部门整体超标报告",
+    "R02真实培训集群未区分是否为不同课程主题"
+  ]
+}

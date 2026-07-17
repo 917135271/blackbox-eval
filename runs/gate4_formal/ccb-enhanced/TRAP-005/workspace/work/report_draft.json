@@ -1,0 +1,36 @@
+{
+  "task_id": "TRAP-005",
+  "audit_scope": {
+    "audited_object": "发票FP202500000005重复使用的报销记录",
+    "period": "2025年度",
+    "organization": "XX证券",
+    "data_scope": "R000005和R004202两条报销记录",
+    "rule_checked": "01_expense_reimbursement_2025.md 第十条（同一发票最多报销1次）"
+  },
+  "verified_facts": [
+    "发票FP202500000005（INV000005，XX供应商5450，金额88.83，日期2025-06-07）在两条报销记录中被使用",
+    "R000005（BX2025000005）：刘冬梅，信息技术部，local_transport，88.83元，费用日期2025-06-07，事由为'青竹系统测试交通费'",
+    "R004202（BX2025X004202）：刘冬梅，信息技术部，local_transport，88.83元，费用日期2025-03-10，事由为'重复发票注入样本:青竹系统测试交通费'",
+    "R004202的record_no格式（BX2025X004202）包含'X'标记，与正常格式（BX2025000005）不同",
+    "R004202的expense_date（2025-03-10）早于invoice_date（2025-06-07），存在时间倒挂",
+    "R004202的事由明确标注为'重复发票注入样本'"
+  ],
+  "applicable_policies": [
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "clause": "第十条",
+      "clause_text": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。"
+    }
+  ],
+  "findings": [],
+  "anomaly_ids": [],
+  "record_ids": ["R000005", "R004202"],
+  "impact": "无",
+  "recommendations": "无需处理。R004202为系统注入的合成测试数据，非真实费用报销。",
+  "answer": "无异常。发票FP202500000005虽然在R000005和R004202两条记录中各使用一次，表面触发第十条重复发票风险规则。但经核查，R004202（record_no: BX2025X004202）的事由明确标注为'重复发票注入样本'，其record_no格式包含'X'标记，且expense_date（2025-03-10）早于invoice_date（2025-06-07）存在时间倒挂，三重证据一致表明R004202为系统注入的合成测试数据，非真实费用报销。真实费用仅R000005一条，不构成实际重复报销违规。",
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
+  ],
+  "limitations": []
+}

@@ -1,0 +1,119 @@
+{
+  "case_family": "policy_and_version",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "near_clause_disambiguation",
+  "criteria": [
+    {
+      "answer_evidence": "“《XX证券差旅费管理办法》(04_travel_expense.md)”",
+      "id": "travel-policy",
+      "reason": "答案明确指出差旅住宿适用差旅费管理办法，场景为公务出差",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc获取04_travel_expense.md，内容含第四条住宿标准"
+    },
+    {
+      "answer_evidence": "“《XX证券培训费管理办法》(05_training_expense.md)”",
+      "id": "training-policy",
+      "reason": "答案明确指出培训住宿适用培训费管理办法，场景为培训期间住宿",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc获取05_training_expense.md，内容含第五条住宿标准"
+    },
+    {
+      "answer_evidence": "“标准结构不同...金额不同...适用场景不同...制度互引禁止”",
+      "id": "no-mixing",
+      "reason": "详细说明了标准结构、金额、适用场景差异，并引用制度互引禁止条款，场景与数值差异均说明",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "无需轨迹证据，答案已充分说明"
+    },
+    {
+      "answer_evidence": "引用第四条、第七条与第五条、第六条，并列出具体金额",
+      "id": "comparison-evidence",
+      "reason": "答案引用了04_travel_expense.md和05_training_expense.md，给出具体条款和数值比较，证据完整",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "trace中成功获取两份文档全文，验证了制度存在"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "未提交任何record_id，不存在虚构记录",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "使用的制度均为现行版本，无废止制度",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 4,
+    "elapsed_seconds": 165.576,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:expense_standards.travel_lodging",
+      "policy:expense_standards.training.training_lodging",
+      "document:04_travel_expense.md",
+      "document:05_training_expense.md"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:23:34+08:00",
+  "group": "ccb-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.95,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选答案准确比较了差旅与培训住宿标准，依据制度说明不能混用，证据充分，关键要素齐全",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1228,
+      "completion_tokens_details": {
+        "reasoning_tokens": 781
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 4656,
+      "prompt_tokens": 4656,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 5884
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/ccb-baseline/L3-008",
+  "task_id": "L3-008"
+}

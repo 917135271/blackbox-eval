@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "threshold",
+      "score": 0,
+      "reason": "未给出部门总经理审批线10000元，只讨论了AR-02档。",
+      "answer_evidence": "所有记录金额均未超过10000元，不涉及AR-03及以上档位。",
+      "trace_evidence": "未明确提及10000元。"
+    },
+    {
+      "id": "two-hop-path",
+      "score": 30,
+      "reason": "明确说明从费用报销办法第五条交叉引用到授权管理办法附件二。",
+      "answer_evidence": "费用报销管理办法（2025修订版）第五条载明...统一按《XX证券授权管理办法》附件二执行。",
+      "trace_evidence": "先获取01_expense_reimbursement_2025.md，再获取03_authorization_management.md。"
+    },
+    {
+      "id": "citations",
+      "score": 20,
+      "reason": "引用两份制度中的相关内容。",
+      "answer_evidence": "citations包含01_expense_reimbursement_2025.md第五条和03_authorization_management.md附件二。",
+      "trace_evidence": "轨迹中获取了这两份文档。"
+    },
+    {
+      "id": "no-premature-stop",
+      "score": 10,
+      "reason": "轨迹证明继续检索，未因首份制度未列金额而停止。",
+      "answer_evidence": "未提前停止。",
+      "trace_evidence": "在获取01后继续获取03，然后进行数据库查询。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有record_ids均来自真实查询结果，无捏造。"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "仅使用2025修订版费用报销办法和授权管理办法，均为现行制度。"
+    }
+  ],
+  "overall_comment": "候选正确执行了两跳检索，但未得出部门总经理审批线10000元的结论，导致阈值项失分。",
+  "confidence": 0.9
+}

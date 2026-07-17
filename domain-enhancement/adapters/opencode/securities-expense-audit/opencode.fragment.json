@@ -1,0 +1,37 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "shared/shared-audit-core/references/main_workflow.md",
+    "shared/shared-audit-core/references/workspace_contract.md"
+  ],
+  "permission": {
+    "skill": {
+      "*": "allow"
+    },
+    "task": {
+      "*": "deny",
+      "policy-researcher": "allow",
+      "data-analyst": "allow",
+      "independent-reviewer": "allow"
+    },
+    "webfetch": "deny",
+    "websearch": "deny"
+  },
+  "agent": {
+    "policy-researcher": {
+      "description": "Resolve applicable policy versions, conflicts, exceptions, and clauses.",
+      "mode": "subagent",
+      "prompt": "{file:./.opencode/agents/policy-researcher.md}"
+    },
+    "data-analyst": {
+      "description": "Execute complete read-only SQLite and Python expense analysis.",
+      "mode": "subagent",
+      "prompt": "{file:./.opencode/agents/data-analyst.md}"
+    },
+    "independent-reviewer": {
+      "description": "Challenge findings for exceptions, boundaries, omissions, and false positives.",
+      "mode": "subagent",
+      "prompt": "{file:./.opencode/agents/independent-reviewer.md}"
+    }
+  }
+}

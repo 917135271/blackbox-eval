@@ -1,0 +1,56 @@
+{
+  "task_id": "DEV-007",
+  "analysis_type": "office_supplies_communication_monthly_control",
+  "complete_population_count": 8,
+  "population": {
+    "office_supplies": {
+      "count": 5,
+      "records": [
+        {"record_id": "R900001", "employee_id": "E9001", "employee_name": "开发员工甲", "department_id": "D901", "expense_date": "2025-01-05", "amount": 480.0, "invoice_no": "FPDEV900001", "status": "approved"},
+        {"record_id": "R900002", "employee_id": "E9001", "employee_name": "开发员工甲", "department_id": "D901", "expense_date": "2025-01-06", "amount": 480.0, "invoice_no": "FPDEV900001", "status": "approved"},
+        {"record_id": "R900007", "employee_id": "E9001", "employee_name": "开发员工甲", "department_id": "D901", "expense_date": "2025-04-08", "amount": 650.0, "invoice_no": "FPDEV900007", "status": "approved"},
+        {"record_id": "R900008", "employee_id": "E9001", "employee_name": "开发员工甲", "department_id": "D901", "expense_date": "2025-05-05", "amount": 590.0, "invoice_no": "FPDEV900008", "status": "approved"},
+        {"record_id": "R900009", "employee_id": "E9002", "employee_name": "开发经理乙", "department_id": "D901", "expense_date": "2025-05-05", "amount": 590.0, "invoice_no": "FPDEV900009", "status": "approved"}
+      ]
+    },
+    "communication": {
+      "count": 3,
+      "records": [
+        {"record_id": "R900006", "employee_id": "E9001", "employee_name": "开发员工甲", "department_id": "D901", "expense_date": "2025-03-01", "amount": 200.0, "invoice_no": "FPDEV900006", "status": "approved"},
+        {"record_id": "R900014", "employee_id": "E9001", "employee_name": "开发员工甲", "department_id": "D901", "expense_date": "2025-09-03", "amount": 180.0, "invoice_no": "FPDEV900014", "status": "approved"},
+        {"record_id": "R900015", "employee_id": "E9001", "employee_name": "开发员工甲", "department_id": "D901", "expense_date": "2025-09-20", "amount": 160.0, "invoice_no": "FPDEV900015", "status": "approved"}
+      ]
+    }
+  },
+  "cross_verification": {
+    "summarize_office_supplies": [
+      {"employee_id": "E9001", "month": "2025-01", "record_count": 2, "total_amount": 960.0},
+      {"employee_id": "E9001", "month": "2025-04", "record_count": 1, "total_amount": 650.0},
+      {"employee_id": "E9001", "month": "2025-05", "record_count": 1, "total_amount": 590.0},
+      {"employee_id": "E9002", "month": "2025-05", "record_count": 1, "total_amount": 590.0}
+    ],
+    "summarize_communication": [
+      {"employee_id": "E9001", "month": "2025-03", "record_count": 1, "total_amount": 200.0},
+      {"employee_id": "E9001", "month": "2025-09", "record_count": 2, "total_amount": 340.0}
+    ]
+  },
+  "invoice_analysis": {
+    "FPDEV900001": {
+      "usage_count": 2,
+      "records": ["R900001", "R900002"],
+      "total_amount": 960.0,
+      "flag": "reused_invoice_for_split_claim"
+    }
+  },
+  "secondary_findings": {
+    "article_4_circumvention_flag": {
+      "record_id": "R900012",
+      "employee_id": "E9001",
+      "expense_type": "other",
+      "amount": 900.0,
+      "expense_date": "2025-12-20",
+      "reason": "年末发生费用补充提交",
+      "status": "Potential circumvention per Article 4 - expense classified as 'other'"
+    }
+  }
+}

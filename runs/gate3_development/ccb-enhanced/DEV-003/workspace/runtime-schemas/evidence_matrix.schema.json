@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "evidence-matrix.schema.json",
+  "type": "object",
+  "required": ["status", "coverage_percent", "evidence_rows", "candidate_record_ids", "submitted_record_ids", "unowned_record_ids", "unused_candidate_record_ids", "unused_citations", "missing_evidence", "no_anomaly_coverage", "reconciled_figures", "unresolved_items"],
+  "properties": {
+    "status": {"enum": ["pass", "blocked"]},
+    "coverage_percent": {"type": "number", "minimum": 0, "maximum": 100},
+    "evidence_rows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["anomaly_id", "record_ids", "citations", "facts", "fact_supported", "rule_supported", "coverage_status"]
+      }
+    },
+    "candidate_record_ids": {"type": "array", "uniqueItems": true},
+    "submitted_record_ids": {"type": "array", "uniqueItems": true},
+    "unowned_record_ids": {"type": "array", "uniqueItems": true},
+    "unused_candidate_record_ids": {"type": "array", "uniqueItems": true},
+    "unused_citations": {"type": "array"},
+    "missing_evidence": {"type": "array"},
+    "no_anomaly_coverage": {"type": "object"},
+    "reconciled_figures": {"type": "object"},
+    "unresolved_items": {"type": "array"}
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "case_family": "full_year_audit",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "full_year_rule_audit",
+  "criteria": [
+    {
+      "answer_evidence": "",
+      "id": "all-anomaly-ids",
+      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
+      "score": 25.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "all-record-ids",
+      "reason": "record_ids集合F1=1.000",
+      "score": 30.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "答案明确说明“全年重复报销专项扫描共发现6项异常”，列出所有异常ID和记录ID。",
+      "id": "full-scan-method",
+      "reason": "使用 find_reused_invoices 工具对全年数据进行全量重复发票扫描，返回所有使用次数>=2的发票，并逐条核验记录详情，扫描范围完整。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用 find_reused_invoices(min_usage_count=2) 返回6对重复记录；后续逐一调用 get_expense_detail 核验所有12条记录。"
+    },
+    {
+      "answer_evidence": "答案中明确引用“《XX证券费用报销管理办法(2025修订版)》第十条‘同一发票最多报销1次’”，并据此解释异常。",
+      "id": "policy-basis",
+      "reason": "正确引用《XX证券费用报销管理办法(2025修订版)》第十条“同一发票最多报销1次”作为制度依据，并在查询中落实为重复发票条件。",
+      "score": 10.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具 search_policy 检索到第十条条文；find_reused_invoices 直接使用发票重复使用次数作为条件，与制度对应。"
+    },
+    {
+      "answer_evidence": "anomaly_ids 为 DUP-001 至 DUP-006，record_ids 全部12条，与期望一致。",
+      "id": "false-positive-control",
+      "reason": "提交的异常ID和记录ID集合与期望完全一致，无任何误报，未混入其他规则异常或TRAP记录。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "find_reused_invoices 返回的6对记录与提交一致，后续核验未发现无关记录。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的所有 record_id 均通过 get_expense_detail 成功查询，不存在数据库中不存在的记录。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": false,
+      "reason": "通过 find_reused_invoices 对全年数据扫描，并核验所有记录，无片面扫描冒充完整之嫌。",
+      "score_cap": 50,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "DUP-001",
+      "DUP-002",
+      "DUP-003",
+      "DUP-004",
+      "DUP-005",
+      "DUP-006"
+    ],
+    "actual_record_ids": [
+      "R000002",
+      "R004201",
+      "R000005",
+      "R004202",
+      "R000020",
+      "R004203",
+      "R000028",
+      "R004204",
+      "R000037",
+      "R004205",
+      "R000055",
+      "R004206"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "DUP": 6
+      },
+      "count_exact": true,
+      "expected_types": {
+        "DUP": 6
+      },
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 128.28,
+    "expected_anomaly_ids": [
+      "DUP-001",
+      "DUP-002",
+      "DUP-003",
+      "DUP-004",
+      "DUP-005",
+      "DUP-006"
+    ],
+    "expected_record_ids": [
+      "R000002",
+      "R000005",
+      "R000020",
+      "R000028",
+      "R000037",
+      "R000055",
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:28:09+08:00",
+  "group": "openclaude-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选提交正确完成了全年重复报销专项扫描，方法完整，制度依据准确，无任何误报，表现优异。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 642,
+      "completion_tokens_details": {
+        "reasoning_tokens": 67
+      },
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 6280,
+      "prompt_tokens": 7432,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152
+      },
+      "total_tokens": 8074
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/openclaude-enhanced/L3-001",
+  "task_id": "L3-001"
+}

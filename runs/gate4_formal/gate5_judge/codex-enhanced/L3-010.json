@@ -1,0 +1,119 @@
+{
+  "case_family": "retrieval_and_report",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "audit_report",
+  "criteria": [
+    {
+      "answer_evidence": "新版（2025版）审批线（依据《XX证券授权管理办法》附件二）：... AR-03 [10000, 50000)：部门总经理",
+      "id": "current-threshold",
+      "reason": "准确指出现行值为10000元。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc('03_authorization_management.md') 返回 AR-03 | 大于等于10000元且小于50000元 | 部门总经理"
+    },
+    {
+      "answer_evidence": "旧版（2022版）审批线：- 第二条：单笔报销金额达到8000元，应提交部门总经理审批。... 自2025年1月1日起被...废止替代",
+      "id": "old-threshold-status",
+      "reason": "明确给出8000元旧值并注明已废止。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc('02_expense_reimbursement_2022_deprecated.md') 返回 '单笔报销金额达到8000元的，应提交部门总经理审批' 和 '本办法的审批金额已被后续制度替代，不得作为现行审批依据'"
+    },
+    {
+      "answer_evidence": "新版（2025版）审批线（依据《XX证券授权管理办法》附件二）... 审批合规性必须以《授权管理办法》附件二的五档审批线为准",
+      "id": "cross-reference",
+      "reason": "完整说明报销办法通过授权管理办法附件二取得现行金额。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc('01_expense_reimbursement_2025.md') 返回 '统一按《XX证券授权管理办法》附件二执行'"
+    },
+    {
+      "answer_evidence": "三、三种版本陷阱误判区间... 四、审计建议：1. 确认报销日对应的有效制度版本... 2. 系统设置制度版本强制校验...",
+      "id": "risk-explanation",
+      "reason": "具体解释了三个误判区间的风险，并给出了版本校验等审计建议。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "标题【版本陷阱审计说明：旧版审批线可能导致的误判】... 结论：无异常。",
+      "id": "report-shape",
+      "reason": "审计说明形式完整，事实、规则、判断和建议一致，与提交的JSON无冲突。",
+      "score": 5.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "R004233 为数据库有效记录，且与版本陷阱说明相关。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "明确区分旧版废止和现行有效制度，未将旧版作为当前审批依据。",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R004233"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 6,
+    "elapsed_seconds": 378.83,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:26:51+08:00",
+  "group": "codex-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "全部评分点均获满分，输出准确识别并解释版本陷阱，制度关系清晰，风险说明详尽。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1589,
+      "completion_tokens_details": {
+        "reasoning_tokens": 926
+      },
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 5041,
+      "prompt_tokens": 6193,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152
+      },
+      "total_tokens": 7782
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/codex-enhanced/L3-010",
+  "task_id": "L3-010"
+}

@@ -1,0 +1,85 @@
+{
+  "task_id": "DEV-008",
+  "task_type": "batch_analysis",
+  "question": "扫描开发库中的超期报销，返回全部异常记录，并对年末补充提交记录进行核对。",
+  "scope": {
+    "audit_period": "2025-01-01 to 2026-01-15",
+    "target": "全量开发库报销记录（21条）",
+    "rule_focus": "超期报销（制度第七条60天时限）+ 年末补充提交（制度第九条）",
+    "departments": ["D901", "D902"],
+    "expense_types": "all"
+  },
+  "applicable_policy": {
+    "doc_id": "01_expense_reimbursement_2025.md",
+    "title": "XX证券费用报销管理办法(2025修订版)",
+    "effective_date": "2025-01-01",
+    "key_clauses": [
+      {"clause_no": "第七条", "rule": "费用发生后60天内提交报销；超过期限原则上不得报销"},
+      {"clause_no": "第九条", "rule": "会计年度末发生的费用，最迟可在财政年度结束后15天内补充提交，逾期按超期报销处理"}
+    ]
+  },
+  "policy_questions": [
+    {
+      "question": "哪些记录的费用发生日至提交报销日超过60天？",
+      "rule": "第七条",
+      "data_needed": ["expense_date", "reimburse_date"],
+      "exclusion": "年末费用适用第九条豁免"
+    },
+    {
+      "question": "年末补充提交记录是否在允许的15天窗口内？",
+      "rule": "第九条",
+      "data_needed": ["expense_date", "reimburse_date", "reason"],
+      "boundary": "财政年度结束日=2025-12-31，允许提交截止=2026-01-15",
+      "year_end_definition": "12月发生的费用视为会计年度末费用"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "计算每笔报销的expense_date到reimburse_date的天数差",
+      "method": "date_diff",
+      "threshold": "> 60 days"
+    },
+    {
+      "question": "识别年末费用记录并验证是否在第九条豁免窗口内",
+      "method": "filter expense_date in 2025-12, check reimburse_date <= 2026-01-15"
+    }
+  ],
+  "required_fields": ["record_id", "employee_name", "expense_date", "reimburse_date", "expense_type", "amount", "reason", "status"],
+  "evidence_requirements": [
+    "逐笔计算日期差",
+    "制度第七条和第九条原文",
+    "年末补充提交记录的日期差和豁免判定"
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "audit-query-planner", "artifact": "work/audit_plan.json", "status": "in_progress"},
+    {"step": 2, "action": "authorize and invoke data_analyst subagent", "reason": "AGGREGATION_REQUIRED + DATE_AMOUNT_BOUNDARY", "artifact": "work/subagents/data_analyst/"},
+    {"step": 3, "action": "main agent reviews year-end exclusion per Article 9", "artifact": "year_end_analysis"},
+    {"step": 4, "action": "complete_audit_subagent and merge findings"},
+    {"step": 5, "action": "evidence-coverage-check", "artifact": "work/evidence_matrix.json"},
+    {"step": 6, "action": "audit-report", "artifact": "work/final_result.json"},
+    {"step": 7, "action": "result-validator", "artifact": "work/validation_report.json"},
+    {"step": 8, "action": "validate_audit_result + submit_audit_result"}
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "aggregation/grouping/batch filtering (+1)",
+      "thresholds/dates/exemptions — year-end 15-day exclusion (+1)",
+      "date boundary calculation (+1)"
+    ]
+  },
+  "subagent_plan": {
+    "role": "data_analyst",
+    "reason_code": "AGGREGATION_REQUIRED",
+    "task": "Calculate date differences for all 21 expense records; identify records where (reimburse_date - expense_date) > 60 days; exclude year-end records under Article 9; identify duplicate invoices per Article 10",
+    "artifact_paths": ["work/subagents/data_analyst/"],
+    "requested_token_budget": 50000
+  },
+  "stopping_conditions": [
+    "all 21 records checked for 60-day rule",
+    "year-end supplementary records verified per Article 9",
+    "evidence matrix at 100% coverage with status=pass",
+    "validation_report with status=pass and submission_allowed=true"
+  ],
+  "unresolved_items": []
+}

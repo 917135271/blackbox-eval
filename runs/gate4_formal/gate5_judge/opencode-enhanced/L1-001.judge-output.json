@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "current-threshold",
+      "score": 45.0,
+      "reason": "金额为10000元，且明确包含边界（大于等于10000元），完全正确。",
+      "answer_evidence": "单笔费用报销金额达到10000元(1万元)且小于50000元时需要部门总经理审批",
+      "trace_evidence": "无工具调用；答案源自提交JSON中的final_answer。"
+    },
+    {
+      "id": "current-version",
+      "score": 20.0,
+      "reason": "明确识别2025修订版为现行制度。",
+      "answer_evidence": "《XX证券费用报销管理办法(2025修订版)》",
+      "trace_evidence": "无工具调用；答案中自述。"
+    },
+    {
+      "id": "policy-citation",
+      "score": 20.0,
+      "reason": "引用授权管理办法附件二和费用报销管理办法第五条，有效支持10000元。",
+      "answer_evidence": "依据《XX证券授权管理办法》附件二费用报销审批权限表AR-03档位...由《XX证券费用报销管理办法(2025修订版)》第五条引用确认",
+      "trace_evidence": "无工具调用；提交JSON中citations包含01_expense_reimbursement_2025.md第五条和03_authorization_management.md附件二。"
+    },
+    {
+      "id": "old-value-control",
+      "score": 10.0,
+      "reason": "明确排除旧版8000元，仅将10000元作为当前值。",
+      "answer_evidence": "2022版旧制度规定8000元但已废止。",
+      "trace_evidence": "无工具调用；答案自述。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "未使用任何record_id，不触发伪造ID。"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未使用已废止制度形成当前结论，且明确排除旧版。"
+    }
+  ],
+  "overall_comment": "回答准确，依据清晰，完整满足要求，无异常。",
+  "confidence": 1.0
+}

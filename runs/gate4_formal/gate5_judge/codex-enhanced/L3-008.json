@@ -1,0 +1,170 @@
+{
+  "case_family": "policy_and_version",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "near_clause_disambiguation",
+  "criteria": [
+    {
+      "answer_evidence": "“差旅住宿按职级×城市档位矩阵制定...；04差旅费管理办法第七条...”",
+      "id": "travel-policy",
+      "reason": "明确指出差旅住宿适用差旅费管理办法，场景清晰，制度正确。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc('04_travel_expense.md') 返回文档，包含第四条住宿标准和第七条有关培训期间住宿不适用本办法住宿表的规定。"
+    },
+    {
+      "answer_evidence": "“培训住宿仅按城市档位统一定价...；05培训费管理办法第六条...”",
+      "id": "training-policy",
+      "reason": "明确指出培训住宿适用培训费管理办法，场景清晰，制度正确。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc('05_training_expense.md') 返回文档，包含第五条住宿标准和第六条不得与差旅住宿标准混用的规定。"
+    },
+    {
+      "answer_evidence": "“原因有三:(1)计价维度不同——差旅住宿按职级×城市档位矩阵制定,职级越高标准越高...培训住宿仅按城市档位统一定价...不区分职级...两类标准设计逻辑截然不同,不可互相替代。(2)制度明确禁止... (3)混用产生套利...”",
+      "id": "no-mixing",
+      "reason": "从计价维度、制度禁止和套利风险三方面说明不可混用，同时说明了场景与数值差异。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "无"
+    },
+    {
+      "answer_evidence": "引用04_travel_expense.md第四条、第七条和05_training_expense.md第五条、第六条，并列出具体数值对比。",
+      "id": "comparison-evidence",
+      "reason": "引用了两份制度文档及具体条款，并给出了可核查的数值对比，证据完整。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc获取04_travel_expense.md和05_training_expense.md，search_policy和get_policy_excerpt进一步检索混用禁止条款。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "候选提交的record_ids均通过数据库验证，无伪造记录，且相关记录支撑核心结论。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未使用已废止制度（如2022版费用报销管理办法）形成当前适用结论，所有引用均为现行有效制度。",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "ANOM-L3-008-001"
+    ],
+    "actual_record_ids": [
+      "R000132",
+      "R000166",
+      "R000214",
+      "R000245",
+      "R000328",
+      "R000347",
+      "R000392",
+      "R000442",
+      "R000481",
+      "R000620",
+      "R000634",
+      "R000661",
+      "R000751",
+      "R000797",
+      "R001150",
+      "R001239",
+      "R001247",
+      "R001395",
+      "R001481",
+      "R001600",
+      "R001652",
+      "R001663",
+      "R001664",
+      "R001829",
+      "R001862",
+      "R001870",
+      "R002003",
+      "R002180",
+      "R002303",
+      "R002457",
+      "R002576",
+      "R002602",
+      "R002688",
+      "R002877",
+      "R002897",
+      "R003306",
+      "R003346",
+      "R003382",
+      "R003389",
+      "R003507",
+      "R003509",
+      "R003618",
+      "R003771",
+      "R003992",
+      "R004094",
+      "R004138",
+      "R004180",
+      "R004182"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": false,
+      "expected_types": {},
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "citation_count": 5,
+    "elapsed_seconds": 856.443,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:expense_standards.travel_lodging",
+      "policy:expense_standards.training.training_lodging",
+      "document:04_travel_expense.md",
+      "document:05_training_expense.md"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:26:19+08:00",
+  "group": "codex-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选回答全面准确地比较了差旅住宿和培训住宿标准，从适用制度、标准差异、禁止混用规定和套利风险进行说明，并提供了完整的制度证据。未发现任何关键错误。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1962,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1291
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 11034,
+      "prompt_tokens": 12058,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 14020
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/codex-enhanced/L3-008",
+  "task_id": "L3-008"
+}

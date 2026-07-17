@@ -1,0 +1,117 @@
+{
+  "case_family": "policy_and_version",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "policy_qa",
+  "criteria": [
+    {
+      "answer_evidence": "大于等于10,000元（含）且小于50,000元时，需要部门总经理审批",
+      "id": "current-threshold",
+      "reason": "答案正确指出部门总经理审批线为10,000元，且表达清晰包含边界。",
+      "score": 45.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用get_policy_doc返回授权管理办法附件二，档位AR-03明确该金额区间。"
+    },
+    {
+      "answer_evidence": "现行《XX证券费用报销管理办法(2025修订版)》",
+      "id": "current-version",
+      "reason": "明确提及现行2025修订版制度，并区分旧版。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "list_policy_docs列出2025版文件名，get_policy_doc获取了现行制度内容。"
+    },
+    {
+      "answer_evidence": "依据《XX证券授权管理办法》附件二「费用报销审批权限表」档位AR-03执行，第五条明确规定...",
+      "id": "policy-citation",
+      "reason": "引用了授权管理办法附件二和2025版费用报销管理办法第五条，两者有效且支持金额结论。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc调用获取01_expense_reimbursement_2025.md和03_authorization_management.md，其中第五条和附件二内容与答案一致。"
+    },
+    {
+      "answer_evidence": "旧版2022制度中部门总经理审批线为8,000元，已废止。",
+      "id": "old-value-control",
+      "reason": "明确排除旧版8000元，使其不被作为当前标准。",
+      "score": 10.0,
+      "source": "llm_judge",
+      "trace_evidence": "search_policy结果中显示2022版相关条款，但答案未采信。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "答案未提交任何record_id，未用无关记录支撑核心结论。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "答案明确区分现行与废止制度，结论基于2025修订版。",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 2,
+    "elapsed_seconds": 128.438,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:21:19+08:00",
+  "group": "ccb-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选答案准确引用现行制度，正确识别审批金额与版本，无关键错误，得分95。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1750,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1188
+      },
+      "prompt_cache_hit_tokens": 3456,
+      "prompt_cache_miss_tokens": 12,
+      "prompt_tokens": 3468,
+      "prompt_tokens_details": {
+        "cached_tokens": 3456
+      },
+      "total_tokens": 5218
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/ccb-baseline/L1-001",
+  "task_id": "L1-001"
+}

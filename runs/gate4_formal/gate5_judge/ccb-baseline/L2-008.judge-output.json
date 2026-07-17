@@ -1,0 +1,34 @@
+{
+  "criteria": [
+    {
+      "id": "audit-conclusion",
+      "score": 20,
+      "reason": "结论准确判定为拆分报销，异常类型正确，与预期一致。",
+      "answer_evidence": "异常编号ANO-SPLIT-001，明确认定为拆分报销规避审批权限。",
+      "trace_evidence": "工具调用获取R004212、R004213详情，确认同员工、同费用类型、短期拆分。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 15,
+      "reason": "引用了现行有效的《费用报销管理办法》第十一条（对应评分要求6.2），且直接支撑结论。",
+      "answer_evidence": "引用01_expense_reimbursement_2025.md第十一条和03_authorization_management.md附件二。",
+      "trace_evidence": "search_policy返回第十一条禁止拆分报销的条文，get_policy_doc完整获取制度文本。"
+    },
+    {
+      "id": "case-reasoning",
+      "score": 20,
+      "reason": "清晰展示了7天内（间隔5天）合计10200元超过10000元审批线的事实，逻辑完整无矛盾。",
+      "answer_evidence": "两笔金额5100元，合计10200元，达到AR-03审批线，规避部门总经理审批。",
+      "trace_evidence": "get_expense_detail显示金额和日期，find_invoice_usage确认发票不同，list_expenses确认同一员工仅这两笔住宿费。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的R004212和R004213均为有效记录，无虚构。"
+    }
+  ],
+  "overall_comment": "候选提交准确识别了拆分报销异常，制度引用和事实推理均正确，无关键错误。",
+  "confidence": 1.0
+}

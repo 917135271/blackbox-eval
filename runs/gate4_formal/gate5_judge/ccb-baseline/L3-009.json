@@ -1,0 +1,206 @@
+{
+  "case_family": "retrieval_and_report",
+  "case_score": 50,
+  "case_score_raw": 77.5,
+  "category": "audit_report",
+  "criteria": [
+    {
+      "answer_evidence": "答案指出“识别出5项关键异常”，并列出ANOM-001至005，未提及30个异常和5个TRAP",
+      "id": "overall-count",
+      "reason": "报告仅列出5个异常，未提30个异常总数及5个陷阱位，数量错误",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用中无统计全量异常操作，未产出30异常结论"
+    },
+    {
+      "answer_evidence": "报告章节分别对应超期(ANOM-001)、重复(ANOM-002)、超预算(ANOM-003)、拆分(ANOM-004)、超标准(ANOM-005)",
+      "id": "five-rule-coverage",
+      "reason": "报告明确覆盖重复、拆分、超标准、超预算、超期五类规则",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "超期: R004227等；重复: R000002/R004201等；超预算: R004030等；拆分: R004207-R004220；超标准: R004223",
+      "id": "representative-ids",
+      "reason": "每类规则均提供了至少一个正确异常ID及详细记录证据",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_expense_detail调用验证了R004201、R004207、R004223等记录，事实与报告一致"
+    },
+    {
+      "answer_evidence": "超期引用第七条，重复引用第十条，超预算引用第十三条及预算管理办法第二、三条，拆分引用第十一条及授权办法附件二，超标引用培训费管理办法第二条",
+      "id": "policy-coverage",
+      "reason": "制度引用准确，费用类引用费用报销管理办法，预算类引用预算管理办法",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具获取了01_expense_reimbursement_2025.md、08_budget_management.md、05_training_expense.md等制度文档"
+    },
+    {
+      "answer_evidence": "",
+      "id": "trap-control",
+      "reason": "未将TRAP记录计为异常",
+      "score": 15.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "报告有制度依据、异常概述、涉及记录和审计结论建议，但未独立说明影响",
+      "id": "report-shape",
+      "reason": "报告缺少明确的影响分析部分，结构不够完整",
+      "score": 2.5,
+      "source": "llm_judge",
+      "trace_evidence": "无"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的所有record_ids均在工具调用和系统记录中出现，无虚构",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": true,
+      "reason": "工具仅对部分记录进行抽样检查（list_expenses仅一页，get_expense_detail仅18次），未实施全量4240条扫描，却声称覆盖全量，且异常总数远低于预期30个，属于部分扫描冒充完整",
+      "score_cap": 50,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-included-as-anomaly",
+      "triggered": false,
+      "reason": "未将任何TRAP开头的记录计入异常",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "ANOM-001",
+      "ANOM-002",
+      "ANOM-003",
+      "ANOM-004",
+      "ANOM-005"
+    ],
+    "actual_record_ids": [
+      "R000002",
+      "R000005",
+      "R000020",
+      "R000028",
+      "R000037",
+      "R000055",
+      "R000085",
+      "R000256",
+      "R000339",
+      "R000347",
+      "R000367",
+      "R000381",
+      "R000589",
+      "R000759",
+      "R000777",
+      "R000884",
+      "R001125",
+      "R001201",
+      "R001255",
+      "R001300",
+      "R001574",
+      "R001690",
+      "R001920",
+      "R001942",
+      "R001990",
+      "R002138",
+      "R002250",
+      "R002311",
+      "R002463",
+      "R002483",
+      "R002599",
+      "R002604",
+      "R002644",
+      "R002707",
+      "R002867",
+      "R002888",
+      "R002924",
+      "R002983",
+      "R003516",
+      "R003766",
+      "R003769",
+      "R004030",
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206",
+      "R004207",
+      "R004208",
+      "R004209",
+      "R004210",
+      "R004211",
+      "R004212",
+      "R004213",
+      "R004214",
+      "R004215",
+      "R004216",
+      "R004217",
+      "R004218",
+      "R004219",
+      "R004220",
+      "R004223",
+      "R004227",
+      "R004228",
+      "R004229",
+      "R004230",
+      "R004231",
+      "R004232"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": false,
+      "expected_types": {},
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "citation_count": 8,
+    "elapsed_seconds": 526.431,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:22:13+08:00",
+  "group": "ccb-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.85,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "报告准确覆盖五类规则并提供了制度依据与记录证据，但异常总数错误（仅5个而非30个），且因仅进行部分扫描却声称全量，适用50分上限，总体得分50分。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 4748,
+      "completion_tokens_details": {
+        "reasoning_tokens": 3969
+      },
+      "prompt_cache_hit_tokens": 1280,
+      "prompt_cache_miss_tokens": 14149,
+      "prompt_tokens": 15429,
+      "prompt_tokens_details": {
+        "cached_tokens": 1280
+      },
+      "total_tokens": 20177
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/ccb-baseline/L3-009",
+  "task_id": "L3-009"
+}

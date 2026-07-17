@@ -1,0 +1,44 @@
+{
+  "audit_scope": {
+    "task_id": "DEV-010",
+    "object": "R900010与R900011合计超过10000元，核查7天内拆分报销",
+    "period": "2025-06-01至2025-06-09",
+    "organization": "E9001 (开发员工甲), D901 (开发审计一部)",
+    "data_scope": "E9001的travel_transport费用记录，查询窗口2025-05-25至2025-06-16"
+  },
+  "verified_facts": [
+    "R900010: E9001员工, travel_transport, 2025-06-01, 5300元, AR-02审批, 状态approved",
+    "R900011: E9001员工, travel_transport, 2025-06-09, 5300元, AR-02审批, 状态approved",
+    "两笔合计金额: 10600元",
+    "日期间隔: 8个日历日 (2025-06-01至2025-06-09)"
+  ],
+  "applicable_policies": [
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第十一条",
+      "summary": "同一员工、同一费用类型在7天内出现2笔及以上报销，且合计金额达到附件二较高审批线的，应重点核查拆分规避审批"
+    },
+    {
+      "doc_id": "03_authorization_management.md",
+      "clause_no": "附件二",
+      "summary": "AR-02: 3000≤金额<10000 (部门经理+财务复核); AR-03: 10000≤金额<50000 (部门总经理)"
+    }
+  ],
+  "findings": [
+    {
+      "anomaly_id": null,
+      "description": "无异常 - 拆分报销条件不满足",
+      "detail": "合计10600元达到AR-03较高审批线，但日期间隔8天超出第十一条7天窗口，不构成拆分报销"
+    }
+  ],
+  "impact": "无",
+  "recommendations": [],
+  "anomaly_ids": [],
+  "record_ids": ["R900010", "R900011"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+  ],
+  "answer": "无异常。R900010（2025-06-01, 5300元）与R900011（2025-06-09, 5300元）合计10600元达到AR-03较高审批线，但日期间隔8天（6月1日至6月9日）超出第十一条规定的7天窗口，不构成拆分报销。",
+  "limitations": []
+}

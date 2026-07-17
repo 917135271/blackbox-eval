@@ -1,0 +1,119 @@
+{
+  "case_family": "retrieval_and_report",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "audit_report",
+  "criteria": [
+    {
+      "answer_evidence": "现行（2025/授权管理办法附件二）审批线：AR-03 [10,000, 50,000)：部门总经理",
+      "id": "current-threshold",
+      "reason": "准确指出2025修订版现行部门总经理审批线为10000元",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具 get_policy_excerpt 返回 03_authorization_management.md 附件二 含行列 'AR-03 | 大于等于10000元且小于50000元 | 部门总经理'"
+    },
+    {
+      "answer_evidence": "旧版（2022）审批线：单笔报销金额≥8,000元 → 需部门总经理审批……原2022版……同时废止",
+      "id": "old-threshold-status",
+      "reason": "明确8000元为旧版阈值且已废止",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具 get_policy_doc 返回 02_expense_reimbursement_2022_deprecated.md 含 '旧版制度曾规定…8000元…' 及 '第四条…审批金额已被后续制度替代，不得作为现行审批依据'"
+    },
+    {
+      "answer_evidence": "第五条明确规定，单笔费用报销的审批权限统一按《XX证券授权管理办法》附件二执行",
+      "id": "cross-reference",
+      "reason": "清楚说明报销管理办法通过授权管理办法附件二取得现行审批金额",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具 get_policy_excerpt 返回 01_expense_reimbursement_2025.md 含 '第五条 单笔费用报销的审批权限……统一按《XX证券授权管理办法》附件二执行'"
+    },
+    {
+      "answer_evidence": "陷阱一（8,000-10,000元区间）…陷阱二（30,000-50,000元区间）…建议：(1)强制标注版本号…(2)内置审批线映射表…(3)对高敏区间设置版本校验提醒",
+      "id": "risk-explanation",
+      "reason": "详细解释了两个陷阱区间的误判风险并给出具体版本校验建议",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具 list_expenses 获取 R004233 实证数据；工具 get_expense_detail 确认 AR-02 审批，与旧版规则对比，支持陷阱说明"
+    },
+    {
+      "answer_evidence": "一、制度沿革背景 二、新旧审批线关键差异 三、版本陷阱表现 四、实证案例 五、结论与建议，最后注明无异常",
+      "id": "report-shape",
+      "reason": "审计说明结构完整，事实、规则、判断、建议一致，无内部冲突",
+      "score": 5.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中依次获取新旧制度证明、附件二与实例数据，支撑全篇论述，无矛盾调用"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所用 R004233 经工具获取，与数据库记录一致，未使用虚构记录",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "明确区分旧版已废止，整篇审计说明均以2025版和现行附件二为依据，无误用作废制度",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R004233"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 6,
+    "elapsed_seconds": 143.107,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:31:34+08:00",
+  "group": "oh-my-pi-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选回答准确呈现新旧审批线差异，厘清制度引用关系，风险分析充分且有实证支持，表达一致，无致命错误。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2012,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1190
+      },
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 5956,
+      "prompt_tokens": 7108,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152
+      },
+      "total_tokens": 9120
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/oh-my-pi-baseline/L3-010",
+  "task_id": "L3-010"
+}

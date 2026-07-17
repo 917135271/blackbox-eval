@@ -1,0 +1,208 @@
+{
+  "task": "policy_researcher",
+  "invocation_id": "c483655e-2bd3-4031-98b1-f8e870138148",
+  "analysis_date": "2026-07-16",
+  "business_date": "2025全年",
+  "policy_documents_reviewed": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "title": "XX证券费用报销管理办法(2025修订版)", "doc_number": "XX证财规〔2025〕甲号", "effective_date": "2025-01-01"},
+    {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "title": "XX证券费用报销管理办法(2022版)", "doc_number": "XX证财规〔2022〕乙号", "status": "废止,仅存档"},
+    {"doc_id": "03_authorization_management.md", "title": "XX证券授权管理办法", "doc_number": "XX证综规〔2025〕丙号", "effective_date": "2025-01-01"},
+    {"doc_id": "04_travel_expense.md", "title": "XX证券差旅费管理办法", "doc_number": "XX证行规〔2025〕丁号"},
+    {"doc_id": "05_training_expense.md", "title": "XX证券培训费管理办法", "doc_number": "XX证人规〔2025〕戊号"},
+    {"doc_id": "06_business_entertainment.md", "title": "XX证券业务招待费管理办法", "doc_number": "XX证客规〔2025〕己号"},
+    {"doc_id": "07_office_communication.md", "title": "XX证券办公与通讯费用管理办法", "doc_number": "XX证办规〔2025〕庚号"},
+    {"doc_id": "08_budget_management.md", "title": "XX证券预算管理办法", "doc_number": "XX证财规〔2025〕辛号"}
+  ],
+
+  "section_1_version_analysis": {
+    "heading": "制度版本与适用性分析",
+    "findings": [
+      {
+        "item": "2025版生效与2022版废止",
+        "detail": "01_expense_reimbursement_2025.md第十四条明确规定自2025-01-01施行,原2022版同时废止。02_deprecated第一条声明仅为制度沿革留档,第四条明确'不得作为现行审批依据'。"
+      },
+      {
+        "item": "2022版旧审批线(已废止)",
+        "detail": "02_deprecated第二条(8000元→部门总经理)、第三条(30000元→分管副总)已被附件二的五档审批表完全替代,不得引用。"
+      },
+      {
+        "item": "跨制度引用关系",
+        "detail": "2025版第五条将审批权限统一委托至03_authorization_management.md附件二,实现审批线的集中管理。"
+      }
+    ],
+    "conclusion": "2025全年唯一适用的费用报销制度为01_expense_reimbursement_2025.md(XX证财规〔2025〕甲号),02_deprecated全程无效。"
+  },
+
+  "section_2_approval_authority": {
+    "heading": "审批权限体系(03_authorization_management.md 附件二)",
+    "source": "03_authorization_management.md, XX证综规〔2025〕丙号, 附件二",
+    "table": [
+      {"tier": "AR-01", "range": "[0, 3000)", "amount_lower": 0, "amount_upper_exclusive": 3000, "approver": "部门经理"},
+      {"tier": "AR-02", "range": "[3000, 10000)", "amount_lower": 3000, "amount_upper_exclusive": 10000, "approver": "部门经理,并经财务复核"},
+      {"tier": "AR-03", "range": "[10000, 50000)", "amount_lower": 10000, "amount_upper_exclusive": 50000, "approver": "部门总经理"},
+      {"tier": "AR-04", "range": "[50000, 200000)", "amount_lower": 50000, "amount_upper_exclusive": 200000, "approver": "分管副总"},
+      {"tier": "AR-05", "range": "[200000, ∞)", "amount_lower": 200000, "amount_upper_exclusive": null, "approver": "总经理办公会"}
+    ],
+    "key_rules": [
+      "系统自动派生审批角色,不得以口头授权替代系统流程(03第三条)",
+      "单笔金额为确定审批档位的唯一依据(03附件二)",
+      "费用报销制度(01第五条)委托至本附件二执行"
+    ]
+  },
+
+  "section_3_five_expense_rules": {
+    "heading": "五类费用报销规则详解",
+
+    "rule_1_travel": {
+      "category": "差旅费",
+      "source": "04_travel_expense.md (XX证行规〔2025〕丁号)",
+      "sub_rules": {
+        "accommodation": {
+          "description": "住宿标准(元/人/晚),按职级×城市档位",
+          "table": [
+            {"level": "员工级", "tier1": 450, "tier2": 380, "tier3": 300},
+            {"level": "经理级", "tier1": 650, "tier2": 550, "tier3": 450},
+            {"level": "部门负责人级", "tier1": 850, "tier2": 700, "tier3": 600},
+            {"level": "高管级", "tier1": 1100, "tier2": 900, "tier3": 750}
+          ],
+          "boundary": "超标部分无专项审批不得报销(第四条、第五条)",
+          "city_tiers": {"tier1": "一类城市", "tier2": "二类城市", "tier3": "三类城市"}
+        },
+        "city_transport": {
+          "description": "市内交通包干标准(元/日)",
+          "table": [
+            {"city_tier": "一类城市", "amount": 120},
+            {"city_tier": "二类城市", "amount": 100},
+            {"city_tier": "三类城市", "amount": 80}
+          ]
+        },
+        "cross_ref": "培训期间住宿不适用本表,按培训费管理办法执行(第七条)"
+      }
+    },
+
+    "rule_2_training": {
+      "category": "培训费",
+      "source": "05_training_expense.md (XX证人规〔2025〕戊号)",
+      "sub_rules": {
+        "course_fee": {"description": "培训课程费", "limit": "3500元/人/期", "clause": "第二条"},
+        "internal_training": {"description": "内部培训综合费用", "limit": "800元/日", "clause": "第三条"},
+        "external_training": {"description": "外部培训综合费用", "limit": "1200元/日", "clause": "第四条"},
+        "accommodation": {
+          "description": "培训住宿标准(元/人/晚)",
+          "table": [
+            {"city_tier": "一类城市", "amount": 500},
+            {"city_tier": "二类城市", "amount": 420},
+            {"city_tier": "三类城市", "amount": 350}
+          ],
+          "clause": "第五条"
+        }
+      },
+      "boundary": "培训住宿标准仅适用培训期间,不得与差旅住宿标准混用(第六条)"
+    },
+
+    "rule_3_entertainment": {
+      "category": "业务招待费",
+      "source": "06_business_entertainment.md (XX证客规〔2025〕己号)",
+      "sub_rules": {
+        "per_event": {"description": "单次活动上限", "limit": "5000元", "clause": "第二条"},
+        "per_person": {"description": "人均上限", "limit": "300元", "clause": "第三条"},
+        "anti_splitting": {"description": "同一客户拜访或同一会议安排不得拆分", "clause": "第四条"}
+      },
+      "boundary": "单次≤5000元且人均≤300元,双重约束同时适用"
+    },
+
+    "rule_4_office": {
+      "category": "办公费",
+      "source": "07_office_communication.md (XX证办规〔2025〕庚号)",
+      "sub_rules": {
+        "office_supplies": {"description": "个人办公用品", "limit": "600元/人/月", "clause": "第二条"},
+        "communication": {"description": "通讯费用", "limit": "300元/人/月", "clause": "第三条"}
+      },
+      "boundary": "按月控制,不得以其他费用类型绕开(第四条)"
+    },
+
+    "rule_5_budget": {
+      "category": "预算管理(横向约束)",
+      "source": "08_budget_management.md (XX证财规〔2025〕辛号)",
+      "sub_rules": {
+        "budget_cap": "部门费用累计达年度预算1.0倍后原则上不得继续报销(第三条)",
+        "special_approval_exception": "因监管要求、客户服务或经营连续性确需超预算的,应履行专项审批(第四条)",
+        "concurrent_application": "与费用报销制度共同构成费用控制依据(第五条)"
+      }
+    }
+  },
+
+  "section_4_general_rules": {
+    "heading": "通用约束规则(01_expense_reimbursement_2025.md)",
+    "source": "01_expense_reimbursement_2025.md (XX证财规〔2025〕甲号)",
+    "rules": [
+      {"clause": "第七条", "rule": "时限管理", "detail": "费用发生后60天内提交报销;超过期限原则上不得报销"},
+      {"clause": "第八条", "rule": "差旅借款冲销", "detail": "行程结束后30天内完成冲销"},
+      {"clause": "第九条", "rule": "年末宽限", "detail": "会计年度末费用最迟可在财政年度结束后15天内补充提交,逾期按超期处理"},
+      {"clause": "第十条", "rule": "禁止重复报销", "detail": "同一发票最多报销1次;不同报销单中出现同一发票认定为重复报销风险"},
+      {"clause": "第十一条", "rule": "禁止拆分报销", "detail": "同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到附件二较高审批线的,应重点核查拆分规避审批"},
+      {"clause": "第十二条", "rule": "制度标准上限", "detail": "无专项审批时,报销金额不得超过对应制度标准的1.0倍"},
+      {"clause": "第十三条", "rule": "预算约束", "detail": "部门年度预算不足时不得继续报销;预算达1.0倍后确需发生的费用应履行专项审批"}
+    ]
+  },
+
+  "section_5_exemptions_and_exceptions": {
+    "heading": "豁免与特殊审批例外汇总",
+    "items": [
+      {
+        "type": "超标住宿专项审批",
+        "source": "04_travel_expense.md 第五条",
+        "detail": "超过住宿标准且无专项审批的不得报销超出部分;反向推论:有专项审批可报销超出部分"
+      },
+      {
+        "type": "超预算专项审批",
+        "source": "08_budget_management.md 第四条, 01_expense_reimbursement_2025.md 第十三条",
+        "detail": "因监管要求、客户服务或经营连续性确需超预算支出,经专项审批后可报销"
+      },
+      {
+        "type": "超制度标准专项审批",
+        "source": "01_expense_reimbursement_2025.md 第十二条",
+        "detail": "无专项审批时不得超过对应制度标准的1.0倍;反向推论:有专项审批可超过1.0倍"
+      },
+      {
+        "type": "年末补充提交宽限",
+        "source": "01_expense_reimbursement_2025.md 第九条",
+        "detail": "会计年度末费用最迟可在财政年度结束后15天内补充提交,为唯一时限例外"
+      },
+      {
+        "type": "无专项金额豁免条款",
+        "source": "全部八份制度",
+        "detail": "五类费用制度中均无直接金额豁免条款;所有超标情形均需通过专项审批通道"
+      }
+    ]
+  },
+
+  "section_6_cross_references": {
+    "heading": "制度间交叉引用关系",
+    "items": [
+      {"from": "01第五条", "to": "03附件二", "nature": "审批权限委托"},
+      {"from": "01第十一条", "to": "03附件二", "nature": "拆分核查触发线"},
+      {"from": "01第十三条", "to": "08第三条/第四条", "nature": "预算约束协同"},
+      {"from": "04第七条", "to": "05第五条/第六条", "nature": "培训住宿排他适用"},
+      {"from": "08第五条", "to": "01", "nature": "预算与报销制度共同构成控制依据"}
+    ]
+  },
+
+  "section_7_conflict_resolution": {
+    "heading": "潜在冲突与解决规则",
+    "items": [
+      {
+        "conflict": "差旅住宿标准 vs 培训住宿标准",
+        "resolution": "培训期间一律适用培训住宿标准(04第七条+05第六条),差旅住宿标准不适用"
+      },
+      {
+        "conflict": "2022版审批线 vs 2025版附件二",
+        "resolution": "2022版已废止(01第十四条,02第四条),仅附件二审批线有效"
+      },
+      {
+        "conflict": "预算1.0倍 vs 制度标准1.0倍",
+        "resolution": "两者独立适用:预算1.0倍来自08第三条(部门总预算),制度标准1.0倍来自01第十二条(单项制度上限);任一触及即停止报销,专项审批可豁免"
+      }
+    ]
+  }
+}

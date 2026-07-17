@@ -1,0 +1,172 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-001",
+      "record_ids": ["R900001", "R900002"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
+      ],
+      "facts": [
+        "发票FPDEV900001在R900001(2025-01-05,480元)和R900002(2025-01-06,480元)各报销一次",
+        "INV900001 usage_count=2，同一发票重复使用",
+        "两笔记录均无special_approval豁免"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "record_ids": ["R900003", "R900004"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "E9001同一员工在travel_transport类型下，R900003(2025-02-03,5200元)和R900004(2025-02-06,5200元)间隔3天",
+        "合计金额10400元，达到AR-03审批线(≥10000元)",
+        "单笔为AR-02级(3000-10000)，拆分后规避了更高审批层级"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-003",
+      "record_ids": ["R900007"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"},
+        {"doc_id": "07_office_communication.md", "clause_no": "第二条"}
+      ],
+      "facts": [
+        "R900007: E9001 2025年4月办公用品报销650元",
+        "办公用品月标准为每人每月不超过600元",
+        "650 > 600，超出50元，无special_approval"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-004",
+      "record_ids": ["R900014", "R900015"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"},
+        {"doc_id": "07_office_communication.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "E9001 2025年9月通讯费：R900014(9月3日,180元)+R900015(9月20日,160元)=340元",
+        "通讯费用月标准为每人每月不超过300元",
+        "340 > 300，超出40元，无special_approval"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-005",
+      "record_ids": ["R900013"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"}
+      ],
+      "facts": [
+        "R900013: E9002(经理级)一类城市(city_tier=A)住宿2晚共1400元，折合700元/晚",
+        "差旅住宿标准：经理级一类城市650元/晚",
+        "700 > 650，超出50元/晚，无special_approval"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-006",
+      "record_ids": ["R900016"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"},
+        {"doc_id": "05_training_expense.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "R900016: E9001内部培训1天(days=1)共850元",
+        "内部培训综合费用标准为每日不超过800元",
+        "850 > 800，超出50元，无special_approval"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-007",
+      "record_ids": ["R900005", "R900017"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"},
+        {"doc_id": "06_business_entertainment.md", "clause_no": "第二条"},
+        {"doc_id": "06_business_entertainment.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "R900005: 3600元/10人=360元/人，超出人均300元标准，单次3600元≤5000元达标",
+        "R900017: 5200元超出单次5000元上限，人均5200/20=260元≤300元达标",
+        "两笔均无special_approval"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-008",
+      "record_ids": ["R900006"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第七条"}
+      ],
+      "facts": [
+        "R900006: 费用日期2025-03-01，报销日期2025-05-05，间隔65天",
+        "制度第七条要求费用发生后60天内提交报销",
+        "65 > 60，超出5天，非年末费用不适用第九条豁免，无special_approval"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-009",
+      "record_ids": ["R900019"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"},
+        {"doc_id": "08_budget_management.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "D902(开发审计二部)年度预算50000元",
+        "按日期累计：R900018(45000,累计45000,0.90倍)、R900019(6000,累计51000,1.02倍突破预算)",
+        "R900019 special_approval=0，无专项审批豁免",
+        "R900020(5000,累计56000)有special_approval=1，豁免"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900001","R900002","R900003","R900004","R900005","R900006","R900007","R900008","R900009","R900010","R900011","R900012","R900013","R900014","R900015","R900016","R900017","R900018","R900019","R900020","R900021"],
+  "submitted_record_ids": ["R900001","R900002","R900003","R900004","R900005","R900006","R900007","R900013","R900014","R900015","R900016","R900017","R900019"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true,
+    "searched_population": "全部21条费用报销记录(R900001-R900021) across D901和D902",
+    "query_conditions": "获取全部21条detail含participants/days/nights/city_tier/special_approval, 查复用发票, 按员工/类型/7天窗口聚合, 按月按人聚合办公通讯, 按部门累计预算",
+    "checked_rules": ["重复报销(第十条)", "拆分报销(第十一条)", "超标准(第十二条+各子标准)", "超期(第七条/第九条)", "超预算(第十三条/预算管理办法第三条)"],
+    "population_count": 21,
+    "conclusion": "共发现13条异常记录分布在9个审计发现中。8条记录经核查无违规：R900008/R900009办公用品在月标准内、R900010/R900011交通费间隔8天不符合拆分、R900012年末费用在第九条豁免期、R900018预算累计背景记录、R900020有专项审批豁免、R900021培训住宿在标准内。"
+  },
+  "reconciled_figures": {
+    "total_records_analyzed": 21,
+    "anomalous_records": 13,
+    "non_anomalous_records": 8,
+    "rules_with_findings": 5,
+    "total_anomaly_ids": 9
+  },
+  "unresolved_items": []
+}

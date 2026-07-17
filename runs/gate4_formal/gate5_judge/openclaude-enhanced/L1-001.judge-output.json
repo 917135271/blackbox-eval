@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "current-threshold",
+      "score": 45,
+      "reason": "答案明确给出10000元且包含边界（大于等于），符合现行审批线",
+      "answer_evidence": "根据现行《XX证券授权管理办法》...第AR-03档的规定，单笔费用报销金额大于等于10000元...需要部门总经理审批",
+      "trace_evidence": "get_policy_doc返回03_authorization_management.md显示AR-03范围大于等于10000元且小于50000元，部门总经理审批"
+    },
+    {
+      "id": "current-version",
+      "score": 20,
+      "reason": "答案引用了2025修订版费用报销管理办法和2025丙号授权管理办法，明确现行版本",
+      "answer_evidence": "《XX证券费用报销管理办法（2025修订版）》（XX证财规〔2025〕甲号）",
+      "trace_evidence": "list_policy_docs列出01_expense_reimbursement_2025.md，get_policy_doc获取2025版"
+    },
+    {
+      "id": "policy-citation",
+      "score": 20,
+      "reason": "引用了授权管理办法附件二AR-03和费用报销管理办法第五条，均是有效且直接支撑10000元的依据",
+      "answer_evidence": "附件二「费用报销审批权限表」第AR-03档...第五条引用",
+      "trace_evidence": "get_policy_doc 03_authorization_management.md显示附件二表格AR-03；get_policy_excerpt 01_expense_reimbursement_2025.md显示第五条引用附件二"
+    },
+    {
+      "id": "old-value-control",
+      "score": 5,
+      "reason": "未提及旧版8000元，但当前值正确10000元，未明确排除旧值",
+      "answer_evidence": "（答案中未出现8000元）",
+      "trace_evidence": "search_policy结果中出现了2022版8000元旧值，但候选未采用"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "未使用任何record_id，没有虚构数据库记录"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未使用废止制度，基于2025修订版和现行授权管理办法形成结论"
+    }
+  ],
+  "overall_comment": "答案正确识别现行制度下部门总经理审批线为10000元，并提供了有效制度依据和版本依据，但未明确排除旧版8000元，因此旧值排除项仅得部分分数。",
+  "confidence": 0.95
+}

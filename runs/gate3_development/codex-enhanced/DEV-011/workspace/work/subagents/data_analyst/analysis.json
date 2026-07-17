@@ -1,0 +1,79 @@
+{
+  "task": "D902部门预算超限分析",
+  "analysis_date": "2026-07-16",
+  "department": {
+    "department_id": "D902",
+    "department_name": "开发审计二部",
+    "annual_budget": 50000.00,
+    "cumulative_amount": 56000.00,
+    "record_count": 3
+  },
+  "records_chronological": [
+    {
+      "record_id": "R900018",
+      "expense_date": "2025-01-15",
+      "amount": 45000.00,
+      "cumulative_after": 45000.00,
+      "budget_ratio": 0.90,
+      "special_approval": 0,
+      "status": "approved",
+      "within_budget": true,
+      "reason": "年度基础服务采购",
+      "anomaly": false
+    },
+    {
+      "record_id": "R900019",
+      "expense_date": "2025-02-15",
+      "amount": 6000.00,
+      "cumulative_after": 51000.00,
+      "budget_ratio": 1.02,
+      "special_approval": 0,
+      "status": "approved",
+      "within_budget": false,
+      "reason": "新增业务服务采购",
+      "anomaly": true,
+      "anomaly_detail": "首次使累计金额超过年度预算50,000元,累计51,000元已达预算1.02倍,且special_approval=0未取得专项审批"
+    },
+    {
+      "record_id": "R900020",
+      "expense_date": "2025-03-15",
+      "amount": 5000.00,
+      "cumulative_after": 56000.00,
+      "budget_ratio": 1.12,
+      "special_approval": 1,
+      "status": "approved",
+      "within_budget": false,
+      "reason": "专项批准的连续性支出",
+      "anomaly": false,
+      "special_approval_note": "已取得专项审批(special_approval=1),符合08_budget_management第四条和01_expense_reimbursement_2025第十三条,不应误报为异常"
+    }
+  ],
+  "policies_cited": [
+    {
+      "doc_id": "08_budget_management.md",
+      "title": "XX证券预算管理办法",
+      "clauses": [
+        {"clause_no": "第二条", "text": "各部门应在年度预算额度内发生费用。"},
+        {"clause_no": "第三条", "text": "部门费用累计使用达到年度预算额度的1.0倍后,原则上不得继续报销。"},
+        {"clause_no": "第四条", "text": "因监管要求、客户服务或经营连续性确需超预算支出的,应履行专项审批。"}
+      ]
+    },
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "clauses": [
+        {"clause_no": "第十三条", "text": "部门年度预算不足时不得继续报销。预算使用达到预算额度的1.0倍后,确需发生的费用应履行专项审批。"}
+      ]
+    }
+  ],
+  "cumulative_calculation": {
+    "method": "按expense_date时间顺序累加",
+    "steps": [
+      {"after_record": "R900018", "cumulative": 45000.00, "within_budget": true},
+      {"after_record": "R900019", "cumulative": 51000.00, "within_budget": false, "first_exceed": true},
+      {"after_record": "R900020", "cumulative": 56000.00, "within_budget": false}
+    ],
+    "first_exceed_record": "R900019"
+  },
+  "conclusion": "R900019是唯一应在本次审计中报告的异常记录。R900018在预算额度内,不构成异常。R900020虽累计超预算但已取得专项审批(special_approval=1),符合08_budget_management.md第四条和01_expense_reimbursement_2025.md第十三条,不应报告为异常。"
+}

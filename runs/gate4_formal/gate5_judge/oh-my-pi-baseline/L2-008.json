@@ -1,0 +1,138 @@
+{
+  "case_family": "record_audit",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "policy_data_comparison",
+  "criteria": [
+    {
+      "answer_evidence": "候选回答指出“构成拆分报销以规避更高审批权限的违规行为”，anomaly_ids 为 ANOM-L2-008-SPLIT，对应拆分类型。",
+      "id": "audit-conclusion",
+      "reason": "结论明确指出构成拆分报销，异常类型正确，与预期一致。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用 get_expense_detail 获取 R004212 和 R004213 的审批均为 AR-02，search_policy 查询“拆分报销”返回第十一条，确认拆分规则。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "anomaly-id",
+      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
+      "score": 15.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "record-set",
+      "reason": "record_ids集合F1=1.000",
+      "score": 25.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "citations 包含 01_expense_reimbursement_2025.md 第十一条和 03_authorization_management.md 附件二。",
+      "id": "policy-basis",
+      "reason": "正确引用了《XX证券费用报销管理办法(2025修订版)》第十一条和《授权管理办法》附件二，条款有效且直接支持结论。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_excerpt 返回第十一条“不得将同一事项或同类事项拆分为多笔报销以规避审批权限”，明确拆分界定；get_policy_doc 获取附件二审批线。"
+    },
+    {
+      "answer_evidence": "回答中“2025年4月10日和4月15日（间隔5天）分别提交两笔...合计10200元...达到AR-03（10000-50000元）审批线”。",
+      "id": "case-reasoning",
+      "reason": "完整呈现关键数值和关联事实：两笔报销间隔5天，合计10,200元，达到AR-03审批线，计算一致，推理与数据吻合。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_expense_detail 返回 R004212 expense_date 2025-04-10 amount 5100，R004213 expense_date 2025-04-15 amount 5100；list_expenses 确认两笔记录；get_policy_doc 附件二显示AR-03区间10000-50000元。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的 record_ids 均为数据库中存在的记录，无虚构或无关记录支撑核心结论。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "ANOM-L2-008-SPLIT"
+    ],
+    "actual_record_ids": [
+      "R004212",
+      "R004213"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "SPLIT": 1
+      },
+      "count_exact": true,
+      "expected_types": {
+        "SPLIT": 1
+      },
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 2,
+    "elapsed_seconds": 100.394,
+    "expected_anomaly_ids": [
+      "SPLIT-003"
+    ],
+    "expected_record_ids": [
+      "R004212",
+      "R004213"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [
+      "clause:费用报销管理办法-6.2"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:31:06+08:00",
+  "group": "oh-my-pi-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.95,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选准确识别拆分报销异常，正确引用制度条款，推理过程完整，所有指标均达到满分标准。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1285,
+      "completion_tokens_details": {
+        "reasoning_tokens": 702
+      },
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 5074,
+      "prompt_tokens": 5970,
+      "prompt_tokens_details": {
+        "cached_tokens": 896
+      },
+      "total_tokens": 7255
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/oh-my-pi-baseline/L2-008",
+  "task_id": "L2-008"
+}

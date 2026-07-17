@@ -1,0 +1,34 @@
+{
+  "criteria": [
+    {
+      "id": "audit-conclusion",
+      "score": 20,
+      "reason": "结论正确，明确识别重复报销",
+      "answer_evidence": "发票FP202500000020同时用于R000020和R004203两笔报销记录...违反第十条",
+      "trace_evidence": "find_invoice_usage返回FP202500000020在R000020和R004203中，均为travel_lodging、669.5元"
+    },
+    {
+      "id": "policy-basis",
+      "score": 15,
+      "reason": "正确引用第十条，条款有效",
+      "answer_evidence": "违反《XX证券费用报销管理办法(2025修订版)》第十条'同一发票最多报销1次'的规定",
+      "trace_evidence": "search_policy/get_policy_excerpt返回第十条内容"
+    },
+    {
+      "id": "case-reasoning",
+      "score": 20,
+      "reason": "完整说明同一发票金额669.5元重复使用",
+      "answer_evidence": "发票FP202500000020...金额各¥669.50...重复报销",
+      "trace_evidence": "get_expense_detail返回R000020和R004203的amount均为669.5"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "未发现捏造记录"
+    }
+  ],
+  "overall_comment": "异常结论正确，制度依据充分，推理完整，无关键错误。",
+  "confidence": 1.0
+}

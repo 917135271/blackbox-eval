@@ -1,0 +1,79 @@
+{
+  "task_id": "L3-010",
+  "task_type": "audit_report",
+  "task_question": "请专门写一段版本陷阱审计说明,解释旧版审批线可能导致的误判。",
+  "audit_scope": {
+    "audit_object": "费用报销审批线版本差异",
+    "expense_types": ["all"],
+    "business_period": "2025-01-01至今",
+    "organization_scope": "XX证券全部门",
+    "deliverable": "版本陷阱审计说明 — 旧版审批线误判分析"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-1",
+      "question": "2022版与2025版费用报销审批线有何差异？",
+      "applicable_docs": ["01_expense_reimbursement_2025.md", "02_expense_reimbursement_2022_deprecated.md", "03_authorization_management.md"],
+      "boundaries": ["8000元", "10000元", "30000元", "50000元"]
+    },
+    {
+      "id": "PQ-2",
+      "question": "旧版审批线被新版替代后,哪些金额区间的记录会产生版本误判？",
+      "applicable_docs": ["02_expense_reimbursement_2022_deprecated.md", "03_authorization_management.md"],
+      "boundaries": ["[8000, 10000)", "[30000, 50000)"]
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-1",
+      "question": "查找落入版本陷阱区间的报销记录 (8000 ≤ amount < 10000 和 30000 ≤ amount < 50000)",
+      "required_fields": ["record_id", "amount", "expense_date", "employee_id", "department_id", "expense_type", "approval_chain"],
+      "evidence_needed": "记录详情+审批链"
+    }
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "policy-version-check: 对比新旧审批线差异", "output": "work/policy_applicability.json"},
+    {"step": 2, "action": "batch-expense-analysis: 查询版本陷阱区间记录", "output": "work/analysis/data_findings.json"},
+    {"step": 3, "action": "evidence-coverage-check", "output": "work/evidence_matrix.json"},
+    {"step": 4, "action": "false-positive-review", "output": "work/independent_review.json"},
+    {"step": 5, "action": "audit-report: 撰写版本陷阱审计说明", "output": "work/report_draft.json"},
+    {"step": 6, "action": "result-validator", "output": "work/validation_report.json"},
+    {"step": 7, "action": "submit_audit_result", "output": "submission response"}
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "policy version comparison with repeal relationship (+1)",
+      "two policies involved: 2022 deprecated vs 2025 current (+1)",
+      "aggregation and batch filtering for boundary records (+0, compact query suffices)",
+      "threshold and boundary analysis (+1)",
+      "single-rule focus on approval lines (+0)",
+      "audit report deliverable (+0, standard workflow requirement)"
+    ]
+  },
+  "subagent_plan": {
+    "policy_researcher": {
+      "needed": true,
+      "reason_code": "MULTI_POLICY_VERSION_CHECK",
+      "role": "policy_researcher",
+      "task": "Compare approval lines between 2022 (02_expense_reimbursement_2022_deprecated.md) and 2025 (01_expense_reimbursement_2025.md + 03_authorization_management.md) policies. Identify exact threshold differences and version trap intervals."
+    },
+    "data_analyst": {
+      "needed": true,
+      "reason_code": "DATE_AMOUNT_BOUNDARY",
+      "role": "data_analyst",
+      "task": "Query reimbursement records with amounts in version trap intervals [8000, 10000) and [30000, 50000). For each record, retrieve full detail including approval chain. Identify which records would be misjudged under old thresholds."
+    },
+    "independent_reviewer": {
+      "needed": false,
+      "reason": "This is an explanatory note, not a finding-based report. False-positive review triggers only after preliminary findings exist."
+    }
+  },
+  "stopping_conditions": [
+    "Policy comparison confirms exact threshold differences between versions",
+    "Version trap interval records are fully queried and evidence is complete",
+    "Audit note explains the misjudgment risk with concrete data examples",
+    "Evidence matrix shows 100% coverage"
+  ],
+  "unresolved_items": []
+}

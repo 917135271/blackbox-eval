@@ -1,0 +1,140 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 15.0,
+  "case_score_raw": 15.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "候选答案称'无异常'，但明确指向记录R004201-R004206，这些并非TRAP-002涉及记录。",
+      "id": "clean-conclusion",
+      "reason": "结论针对的是无关记录R004201-R004206，而非本题所需核查的R004234和R004235，因此未对本题记录做出有效判断。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中所有查询（如get_expense_detail）均只针对R004201等记录，未触及R004234、R004235。"
+    },
+    {
+      "answer_evidence": "提交的record_ids列表为['R004201','R004202','R004203','R004204','R004205','R004206']。",
+      "id": "record-scope",
+      "reason": "核查的记录集完全错误，未包含目标记录R004234、R004235，反而全部是无关的R004201-R004206。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用仅涉及R004201-R004206，无任何对R004234或R004235的查询。"
+    },
+    {
+      "answer_evidence": "候选答案称'记录R004201-R004206均为系统测试注入数据'，并以此作为不构成异常的理由。",
+      "id": "case-specific-reason",
+      "reason": "未说明正确的合规原因（不同发票且总额低于审批线），而是错误地将记录解释为测试注入数据，与本题实际数据不符。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "无任何证据显示核查了不同发票或金额阈值等关键合规条件。"
+    },
+    {
+      "answer_evidence": "最终答案中未体现针对本题记录的任何反向验证。",
+      "id": "reverse-check",
+      "reason": "未对本题的边界条件（阈值、日期、发票或聚合窗口）进行任何核查，仅仅处理了错误的记录集。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中所有工具调用均指向无关记录，无阈值、日期或发票差异对比操作。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": true,
+      "reason": "候选提交使用无关记录R004201-R004206支撑核心结论，这些记录不是TRAP-002涉及的记录，构成用无关记录支撑核心结论。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "候选未将任何记录判定为异常，未触发此关键失败。",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 167.985,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004234",
+      "R004235"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 6,
+      "f1": 0.0,
+      "missing_count": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:25:52+08:00",
+  "group": "openclaude-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选完全忽略了TRAP-002应核查的记录R004234和R004235，转而对一组测试注入数据进行分析并得出无异常的结论。由于使用了无关记录支撑核心结论，触发了关键失败，总分上限为20。所有评分项因脱离本题基本事实均得0分，最终得分为0。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2322,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1635
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 5592,
+      "prompt_tokens": 6616,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 8938
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/openclaude-baseline/TRAP-002",
+  "task_id": "TRAP-002"
+}

@@ -1,0 +1,53 @@
+{
+  "criteria": [
+    {
+      "id": "current-threshold",
+      "score": 30,
+      "reason": "准确指出2025修订版现行部门总经理审批线为10000元",
+      "answer_evidence": "现行（2025/授权管理办法附件二）审批线：AR-03 [10,000, 50,000)：部门总经理",
+      "trace_evidence": "工具 get_policy_excerpt 返回 03_authorization_management.md 附件二 含行列 'AR-03 | 大于等于10000元且小于50000元 | 部门总经理'"
+    },
+    {
+      "id": "old-threshold-status",
+      "score": 25,
+      "reason": "明确8000元为旧版阈值且已废止",
+      "answer_evidence": "旧版（2022）审批线：单笔报销金额≥8,000元 → 需部门总经理审批……原2022版……同时废止",
+      "trace_evidence": "工具 get_policy_doc 返回 02_expense_reimbursement_2022_deprecated.md 含 '旧版制度曾规定…8000元…' 及 '第四条…审批金额已被后续制度替代，不得作为现行审批依据'"
+    },
+    {
+      "id": "cross-reference",
+      "score": 20,
+      "reason": "清楚说明报销管理办法通过授权管理办法附件二取得现行审批金额",
+      "answer_evidence": "第五条明确规定，单笔费用报销的审批权限统一按《XX证券授权管理办法》附件二执行",
+      "trace_evidence": "工具 get_policy_excerpt 返回 01_expense_reimbursement_2025.md 含 '第五条 单笔费用报销的审批权限……统一按《XX证券授权管理办法》附件二执行'"
+    },
+    {
+      "id": "risk-explanation",
+      "score": 20,
+      "reason": "详细解释了两个陷阱区间的误判风险并给出具体版本校验建议",
+      "answer_evidence": "陷阱一（8,000-10,000元区间）…陷阱二（30,000-50,000元区间）…建议：(1)强制标注版本号…(2)内置审批线映射表…(3)对高敏区间设置版本校验提醒",
+      "trace_evidence": "工具 list_expenses 获取 R004233 实证数据；工具 get_expense_detail 确认 AR-02 审批，与旧版规则对比，支持陷阱说明"
+    },
+    {
+      "id": "report-shape",
+      "score": 5,
+      "reason": "审计说明结构完整，事实、规则、判断、建议一致，无内部冲突",
+      "answer_evidence": "一、制度沿革背景 二、新旧审批线关键差异 三、版本陷阱表现 四、实证案例 五、结论与建议，最后注明无异常",
+      "trace_evidence": "轨迹中依次获取新旧制度证明、附件二与实例数据，支撑全篇论述，无矛盾调用"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所用 R004233 经工具获取，与数据库记录一致，未使用虚构记录"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "明确区分旧版已废止，整篇审计说明均以2025版和现行附件二为依据，无误用作废制度"
+    }
+  ],
+  "overall_comment": "候选回答准确呈现新旧审批线差异，厘清制度引用关系，风险分析充分且有实证支持，表达一致，无致命错误。",
+  "confidence": 1.0
+}

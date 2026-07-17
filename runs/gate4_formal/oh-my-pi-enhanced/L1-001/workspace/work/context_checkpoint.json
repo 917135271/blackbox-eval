@@ -1,0 +1,118 @@
+{
+  "artifact_paths": [
+    "final_submission.json",
+    "submission_receipt.json",
+    "traces/context_events.jsonl",
+    "traces/events.jsonl",
+    "traces/native_events.jsonl",
+    "traces/subagents.jsonl",
+    "traces/tool_calls.jsonl",
+    "work/artifact_index.json",
+    "work/audit_plan.json",
+    "work/context_checkpoint.json",
+    "work/decision_log.jsonl",
+    "work/evidence_index.json",
+    "work/evidence_matrix.json",
+    "work/final_result.json",
+    "work/policy_applicability.json",
+    "work/report_draft.json",
+    "work/task_state.json",
+    "work/validation_report.json"
+  ],
+  "compacted": false,
+  "context_usage_percent": 0.0,
+  "created_at": 1784205065.4516938,
+  "estimation_method": "outer_runner_finalization",
+  "retained_state": {
+    "applicable_policies": [
+      "01_expense_reimbursement_2025.md",
+      "03_authorization_management.md"
+    ],
+    "artifact_index": [
+      "final_submission.json",
+      "submission_receipt.json",
+      "traces/context_events.jsonl",
+      "traces/events.jsonl",
+      "traces/native_events.jsonl",
+      "traces/subagents.jsonl",
+      "traces/tool_calls.jsonl",
+      "work/artifact_index.json",
+      "work/audit_plan.json",
+      "work/context_checkpoint.json",
+      "work/decision_log.jsonl",
+      "work/evidence_index.json",
+      "work/evidence_matrix.json",
+      "work/final_result.json",
+      "work/policy_applicability.json",
+      "work/report_draft.json",
+      "work/task_state.json",
+      "work/validation_report.json"
+    ],
+    "audit_plan": {
+      "complexity": {
+        "reasons": [
+          "Single policy fact lookup",
+          "No aggregation, joins, or batch filtering",
+          "No multi-rule or multi-policy"
+        ],
+        "score": 0
+      },
+      "data_questions": [],
+      "evidence_requirements": [
+        "Policy document specifying the approval threshold",
+        "Exact threshold amount in RMB"
+      ],
+      "execution_steps": [
+        "1. Search/query policy for department general manager approval threshold",
+        "2. Run policy-version-check if multiple versions or date boundaries are found",
+        "3. Record evidence and construct answer",
+        "4. Run evidence-coverage-check",
+        "5. Run audit-report",
+        "6. Run result-validator",
+        "7. Submit via audit_control.submit_audit_result"
+      ],
+      "policy_questions": [
+        "What is the current expense reimbursement amount threshold requiring department general manager (部门总经理) approval?"
+      ],
+      "question": "现行制度下,单笔费用报销达到多少金额需要部门总经理审批?",
+      "required_fields": [],
+      "scope": {
+        "audit_object": "policy threshold lookup",
+        "deliverable": "threshold amount and policy citation",
+        "period": "current (现行制度)",
+        "rule": "expense reimbursement approval threshold for department general manager"
+      },
+      "stopping_conditions": [
+        "Policy threshold found and cited",
+        "Evidence coverage passes",
+        "Validation passes",
+        "Submission accepted"
+      ],
+      "subagent_plan": {
+        "data_analyst": false,
+        "independent_reviewer": false,
+        "note": "Complexity 0-1, all work in main agent",
+        "policy_researcher": false
+      },
+      "task_id": "L1-001",
+      "task_type": "policy_qa"
+    },
+    "constraints": [
+      "isolated GATE3 workspace",
+      "formal answer assets prohibited",
+      "outer runner timeout enforced"
+    ],
+    "evidence_status": "pass",
+    "record_ids": [],
+    "remaining_budget": {
+      "elapsed_seconds": 145.188,
+      "remaining_seconds": 754.812,
+      "timeout_seconds": 900
+    },
+    "submission_status": "accepted",
+    "task": "你正在执行 GATE4 正式证券费用审计评测，当前为领域增强组。\n\n任务ID：L1-001\n题型：policy_qa\n问题：现行制度下,单笔费用报销达到多少金额需要部门总经理审批?\n\n必须遵循已安装的证券费用审计 Skills；先规划并记录Checkpoint，再按触发条件调查、复核、校验并通过统一工具提交。若复杂度至少为2且存在符合路由规则的角色，必须先授权原生子智能体，并在角色结束后登记结构化摘要和产物。\n\n\n要求：\n1. 必须查询制度和只读业务库后作答，可以使用 Shell、Python、SQLite 和当前工作区临时文件。\n2. 只处理当前独立任务。禁止读取 ground_truth、cases.json、Rubric、判卷代码、历史答案、其他任务或候选轨迹，也不得访问与题目无关的互联网。\n3. anomaly_ids 必须与审计发现一一对应、稳定且类型明确；不得为了迎合未知答案猜测隐藏编号。record_ids 必须完整、准确且只覆盖本题范围。\n4. 有异常时，record_ids 只包含参与本题所问违规的记录，不含累计计算背景、有效豁免或无关规则记录；无异常时仍保留题目直接核查或结论覆盖的记录，并在 answer 中明确写“无异常”。\n5. 必须维护 work/final_result.json、work/evidence_matrix.json 和 work/validation_report.json 三个预置文件。只读取 /runtime-schemas 或当前工作区 runtime-schemas 下的明确 Schema，禁止猜测路径或另建替代提交格式。\n6. 先调用 audit_control.validate_audit_result；取得 valid=true 后，再以 result_path=\"work/final_result.json\" 调用 audit_control.submit_audit_result。不得把完整结果直接打印出来代替提交。\n7. 提交成功后最终只输出 GATE4_TASK_PASS；无法提交时只输出 GATE4_TASK_FAIL。\n",
+    "unresolved_items": []
+  },
+  "stage": "submission_ready",
+  "task_id": "L1-001"
+}

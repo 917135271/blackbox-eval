@@ -1,0 +1,58 @@
+{
+  "criteria": [
+    {
+      "id": "overall-count",
+      "score": 0,
+      "reason": "报告中未说明异常总数30和陷阱位5个",
+      "answer_evidence": "答案及提交的异常ID列表仅列出26个异常，未提及30或5",
+      "trace_evidence": "轨迹中未见任何关于异常总数或陷阱位的陈述"
+    },
+    {
+      "id": "five-rule-coverage",
+      "score": 10,
+      "reason": "覆盖了重复、拆分、超预算、超期四类规则，缺失'超标准'",
+      "answer_evidence": "答案中列出：重复报销、部门预算超支、超期报销、拆分报销，以及缺少财务复核审批（非超标准）",
+      "trace_evidence": "find_reused_invoices（重复）、list_records_by_reimburse_delay（超期）、summarize_department_budgets（预算）、分组查询拆分，无标准对比工具调用"
+    },
+    {
+      "id": "representative-ids",
+      "score": 12.5,
+      "reason": "四类规则（重复、拆分、超预算、超期）有异常ID和记录证据，缺失'超标准'类别",
+      "answer_evidence": "重复：ANOM-REUSE-001等；拆分：ANOM-SPLIT-001等；超预算：ANOM-BUDGET-001等；超期：ANOM-DELAY-001等；无超标准ID",
+      "trace_evidence": "find_reused_invoices返回FP202500000002等；拆分检查R004207等；budget来自summarize_department_budgets；delay来自list_records_by_reimburse_delay返回R004231等"
+    },
+    {
+      "id": "policy-coverage",
+      "score": 15,
+      "reason": "费用类规则引用费用报销制度，预算规则引用预算制度，对应准确",
+      "answer_evidence": "重复引用第十条，拆分引用第十一条，超期引用第七条，预算引用第十三条及预算管理办法第三条",
+      "trace_evidence": "get_policy_doc获取01_expense_reimbursement_2025.md和08_budget_management.md，条款存在"
+    },
+    {
+      "id": "report-shape",
+      "score": 5,
+      "reason": "报告包含事实、规则、判断、影响和建议，与结构化结果一致",
+      "answer_evidence": "答案包含'审计范围'、'异常发现摘要'（事实与判断）、'总体评估'（影响与建议）",
+      "trace_evidence": "提交的anomaly_ids列表与报告中列出的异常ID完全一致"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有record_id均通过工具调用返回，无捏造记录"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": false,
+      "reason": "工具调用覆盖全年数据（如find_reused_invoices返回全部重复发票，list_records_missing_approval返回4240条记录），无部分扫描冒充"
+    },
+    {
+      "id": "trap-included-as-anomaly",
+      "triggered": false,
+      "reason": "未将任何TRAP开头的记录计入异常"
+    }
+  ],
+  "overall_comment": "报告覆盖了除'超标准'以外的四类规则，但未按要求说明异常总数和陷阱位数量，整体证据较完整，制度引用基本准确。",
+  "confidence": 0.9
+}

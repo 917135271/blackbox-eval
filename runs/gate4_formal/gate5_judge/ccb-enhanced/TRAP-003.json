@@ -1,0 +1,142 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 85.0,
+  "case_score_raw": 85.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "答案中明确“无异常”，anomaly_ids为空。",
+      "id": "clean-conclusion",
+      "reason": "候选明确判断无异常，anomaly_ids为空，答案结论与预期一致，无矛盾表述。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具最终输出与提交一致，无异常标记。"
+    },
+    {
+      "answer_evidence": "提交的record_ids为R004233-R004240共8条，多出6条。",
+      "id": "record-scope",
+      "reason": "提交的record_ids包含8条记录，超出了预期的R004236与R004237，加入了无关记录。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用获取了多条expense详情，但未局限于预期核心记录。"
+    },
+    {
+      "answer_evidence": "答案中说明“R004236与R004237日期相隔8天...超出第十一条7天拆分核查窗口”。",
+      "id": "case-specific-reason",
+      "reason": "针对核心记录明确指出了超出7天聚合窗口（outside aggregation window）的合规原因，解释完整。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用包括list_expenses与get_expense_detail，结合政策条款进行了日期比对。"
+    },
+    {
+      "answer_evidence": "答案中展示了具体的金额、日期、发票号及政策条款比对。",
+      "id": "reverse-check",
+      "reason": "轨迹中调用了find_reused_invoices、get_expense_detail等工具，对阈值、日期、发票进行了反向核查，未仅凭提示直接下结论。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中多次调用get_expense_detail获取记录详情，并使用find_reused_invoices核查发票重复情况。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的record_id均存在于数据库中，无虚构记录。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "候选将记录正确判定为无异常，未误报成异常。",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R004233",
+      "R004234",
+      "R004235",
+      "R004236",
+      "R004237",
+      "R004238",
+      "R004239",
+      "R004240"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 9,
+    "elapsed_seconds": 902.024,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 6,
+      "f1": 0.4,
+      "missing_count": 0,
+      "precision": 0.25,
+      "recall": 1.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": true,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:25:06+08:00",
+  "group": "ccb-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.95,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选准确判断无异常并给出合规原因，但核查范围超出预期，引入了无关记录，导致record-scope失分。其余项表现良好。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2520,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1953
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 8029,
+      "prompt_tokens": 8029,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 10549
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/ccb-enhanced/TRAP-003",
+  "task_id": "TRAP-003"
+}

@@ -1,0 +1,123 @@
+{
+  "case_family": "policy_and_version",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "policy_qa",
+  "criteria": [
+    {
+      "answer_evidence": "答案写明“达到10,000元（含）且低于50,000元时，需要部门总经理审批”",
+      "id": "current-threshold",
+      "reason": "金额明确10000元且包含边界",
+      "score": 45.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用get_policy_excerpt和get_policy_doc确认AR-03为大于等于10000元，需部门总经理"
+    },
+    {
+      "answer_evidence": "引用《XX证券授权管理办法》（XX证综规〔2025〕丙号）和《XX证券费用报销管理办法（2025修订版）》",
+      "id": "current-version",
+      "reason": "明确识别现行版本为2025修订版",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "list_policy_docs列出2025修订版，get_policy_doc返回授权管理办法发文字号2025丙号"
+    },
+    {
+      "answer_evidence": "引用“附件二费用报销审批权限表AR-03档位”及“《XX证券费用报销管理办法（2025修订版）》第五条”",
+      "id": "policy-citation",
+      "reason": "引用了有效制度且定位到正确审批档位",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_excerpt返回附件二AR-03，金额10000-50000需部门总经理；费用报销管理办法第五条指向授权管理办法附件二"
+    },
+    {
+      "answer_evidence": "答案仅涉及现行制度下10000元，未出现8000元",
+      "id": "old-value-control",
+      "reason": "未提及旧值但当前值正确，无错误使用8000元",
+      "score": 10.0,
+      "source": "llm_judge",
+      "trace_evidence": "无使用2022版记录，工具调用都针对2025版"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的record_ids均在数据库中存在，未用无关记录支撑结论",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未使用已废止制度，均引用2025修订版",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R000001",
+      "R000002",
+      "R000003",
+      "R000004",
+      "R000005"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 2,
+    "elapsed_seconds": 119.531,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:21:48+08:00",
+  "group": "openclaude-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选回答完全正确，明确现行审批线为10000元（含），引用有效制度，无使用旧版或虚假记录。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2168,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1666
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 2737,
+      "prompt_tokens": 3761,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 5929
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/openclaude-baseline/L1-001",
+  "task_id": "L1-001"
+}

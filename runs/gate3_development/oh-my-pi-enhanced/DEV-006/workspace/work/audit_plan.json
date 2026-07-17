@@ -1,0 +1,52 @@
+{
+  "task_id": "DEV-006",
+  "task_scope": {
+    "audit_object": "R900013",
+    "rule": "travel_lodging标准检查",
+    "expense_type": "travel_lodging",
+    "business_period": "2025-07-10",
+    "organization_scope": "D901 / E9002"
+  },
+  "policy_questions": [
+    "经理级员工在一类城市的住宿标准是多少元/人/晚",
+    "超标准住宿是否需要专项审批",
+    "住宿标准是否按住宿晚数累计计算"
+  ],
+  "data_questions": [
+    "R900013的员工职级、城市档位、住宿晚数和报销金额",
+    "R900013是否有专项审批",
+    "实际金额与标准金额的比较"
+  ],
+  "required_fields": [
+    "employee_level", "city_tier", "nights", "amount", "special_approval"
+  ],
+  "evidence_requirements": [
+    "差旅费管理办法住宿标准表",
+    "R900013完整报销记录",
+    "超标金额计算过程"
+  ],
+  "execution_steps": [
+    "获取R900013完整记录",
+    "获取差旅费管理办法住宿标准",
+    "计算标准金额 = 每晚标准 × 晚数",
+    "比较实际金额与标准金额",
+    "证据覆盖检查",
+    "报告与提交"
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "单一已知记录的单规则任务",
+      "无需聚合或批处理",
+      "无历史政策版本问题",
+      "无需子智能体"
+    ]
+  },
+  "subagent_plan": null,
+  "stopping_conditions": [
+    "已获取R900013全部字段",
+    "已确认适用住宿标准",
+    "已完成金额比较"
+  ],
+  "unresolved_items": []
+}

@@ -1,0 +1,97 @@
+{
+  "task_id": "L3-009",
+  "task_type": "audit_report",
+  "audit_period": "2025-01-01 to 2025-12-31 (全年)",
+  "description": "基于全年数据出具异常审计摘要报告，覆盖五类规则并列出关键异常ID",
+  "five_rule_categories": [
+    {
+      "rule_id": "R1",
+      "name": "重复报销",
+      "policy_source": "01_expense_reimbursement_2025.md 第十条",
+      "description": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的，应认定为重复报销风险。",
+      "data_requirements": ["invoice_number", "expense records"]
+    },
+    {
+      "rule_id": "R2",
+      "name": "拆分报销规避审批",
+      "policy_source": "01_expense_reimbursement_2025.md 第十一条 + 03_authorization_management.md 附件二",
+      "description": "同一员工、同一费用类型在7天内出现2笔及以上报销，且合计金额达到较高审批线(AR-02=3000元)的，应重点核查。",
+      "data_requirements": ["employee_id", "expense_type", "amount", "expense_date"]
+    },
+    {
+      "rule_id": "R3",
+      "name": "超标准报销",
+      "policy_source": "01_expense_reimbursement_2025.md 第十二条 + 04_travel_expense.md + 05_training_expense.md + 06_business_entertainment.md + 07_office_communication.md",
+      "description": "无专项审批时，报销金额不得超过对应制度标准的1.0倍。涵盖差旅住宿、培训费、招待费、办公用品、通讯费等标准。",
+      "standards": {
+        "travel_accommodation": {"员工级": {"一类":450,"二类":380,"三类":300}, "经理级": {"一类":650,"二类":550,"三类":450}, "部门负责人级": {"一类":850,"二类":700,"三类":600}, "高管级": {"一类":1100,"二类":900,"三类":750}},
+        "training_course": {"每人每期": 3500},
+        "training_internal": {"每日": 800},
+        "training_external": {"每日": 1200},
+        "training_accommodation": {"一类":500,"二类":420,"三类":350},
+        "business_entertainment_per_event": 5000,
+        "business_entertainment_per_person": 300,
+        "office_supplies_monthly": 600,
+        "communication_monthly": 300
+      },
+      "data_requirements": ["expense_type", "amount", "standard fields", "special approval flag"]
+    },
+    {
+      "rule_id": "R4",
+      "name": "超预算报销",
+      "policy_source": "01_expense_reimbursement_2025.md 第十三条 + 08_budget_management.md 第二条、第三条",
+      "description": "部门年度预算不足时不得继续报销。预算使用达到1.0倍后需专项审批。",
+      "data_requirements": ["department_id", "cumulative_expense", "annual_budget"]
+    },
+    {
+      "rule_id": "R5",
+      "name": "超期报销",
+      "policy_source": "01_expense_reimbursement_2025.md 第七条",
+      "description": "员工应在费用发生后60天内提交报销申请；超过期限的，原则上不得报销。",
+      "data_requirements": ["expense_date", "submit_date", "days_diff"]
+    }
+  ],
+  "complexity": 6,
+  "complexity_reasons": [
+    "多政策版本（2025版 vs 2022版废止）",
+    "涉及5个以上政策文档",
+    "需要聚合、分组、联表、批量筛选",
+    "五类业务规则",
+    "多重阈值、日期边界、豁免条件",
+    "综合审计摘要报告"
+  ],
+  "subagent_plan": {
+    "policy_researcher": {
+      "role": "policy-researcher",
+      "reason_code": "MULTI_CLAUSE_SUPPORT",
+      "task": "确认五类规则适用的政策版本、生效日期、废止关系、豁免和例外条款",
+      "artifact_paths": ["work/subagents/policy-researcher/"],
+      "requested_token_budget": 50000
+    },
+    "data_analyst": {
+      "role": "data-analyst",
+      "reason_code": "MULTI_TABLE_JOIN",
+      "task": "对全年数据进行五类规则的批量分析：重复发票检测、拆分报销检测、超标检测、超预算检测、超期检测",
+      "artifact_paths": ["work/subagents/data-analyst/"],
+      "requested_token_budget": 100000
+    }
+  },
+  "steps": [
+    "1. audit-query-planner → work/audit_plan.json",
+    "2. authorize_audit_subagent + launch policy-researcher and data-analyst in parallel",
+    "3. policy-version-check skill",
+    "4. batch-expense-analysis skill",
+    "5. evidence-coverage-check skill",
+    "6. false-positive-review skill",
+    "7. audit-report skill",
+    "8. result-validator skill",
+    "9. validate_audit_result → submit_audit_result"
+  ],
+  "stopping_conditions": [
+    "all five rule categories analyzed",
+    "evidence matrix coverage >= 100%",
+    "validation_report passes",
+    "valid=true from validate_audit_result"
+  ],
+  "unresolved_items": []
+}

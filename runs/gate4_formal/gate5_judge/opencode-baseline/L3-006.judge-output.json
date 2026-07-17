@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "current-value",
+      "score": 30,
+      "reason": "明确给出部门总经理审批线为10000元，现行值准确。",
+      "answer_evidence": "部门总经理审批线为单笔报销金额大于等于10000元且小于50000元（AR-03档位）",
+      "trace_evidence": "无工具调用，答案直接给出。"
+    },
+    {
+      "id": "deprecated-value",
+      "score": 12.5,
+      "reason": "正确指出2022版已废止，但未说明旧值为8000元，仅满足废止状态正确一项。",
+      "answer_evidence": "2022版（XX证财规〔2022〕乙号）已随2025修订版施行而废止，不得作为现行审批依据。",
+      "trace_evidence": "无工具调用，未提供旧版金额证据。"
+    },
+    {
+      "id": "applicable-version",
+      "score": 20,
+      "reason": "明确选择2025修订版，并阐述废止原因，推理充分。",
+      "answer_evidence": "费用报销审批线应采用2025修订版（XX证财规〔2025〕甲号）。2022版已废止。",
+      "trace_evidence": "无工具调用，版本选择基于制度废止关系。"
+    },
+    {
+      "id": "two-version-evidence",
+      "score": 20,
+      "reason": "引用了01_expense_reimbursement_2025.md和02_expense_reimbursement_2022_deprecated.md，两份制度证据完整。",
+      "answer_evidence": "citations中包含01_expense_reimbursement_2025.md和02_expense_reimbursement_2022_deprecated.md的条款。",
+      "trace_evidence": "无工具调用，引用来自候选提交的citations。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "候选未提交任何record_id，不存在虚构记录。"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "候选未将废止制度作为现行依据，明确2022版已废止。"
+    }
+  ],
+  "overall_comment": "候选答案准确识别版本陷阱，指出2025修订版及现行审批线，但对旧版具体金额未提及，略有不足。",
+  "confidence": 1
+}

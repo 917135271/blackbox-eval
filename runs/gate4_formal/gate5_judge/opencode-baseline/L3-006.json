@@ -1,0 +1,119 @@
+{
+  "case_family": "policy_and_version",
+  "case_score": 87.5,
+  "case_score_raw": 87.5,
+  "category": "version_trap",
+  "criteria": [
+    {
+      "answer_evidence": "部门总经理审批线为单笔报销金额大于等于10000元且小于50000元（AR-03档位）",
+      "id": "current-value",
+      "reason": "明确给出部门总经理审批线为10000元，现行值准确。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用，答案直接给出。"
+    },
+    {
+      "answer_evidence": "2022版（XX证财规〔2022〕乙号）已随2025修订版施行而废止，不得作为现行审批依据。",
+      "id": "deprecated-value",
+      "reason": "正确指出2022版已废止，但未说明旧值为8000元，仅满足废止状态正确一项。",
+      "score": 12.5,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用，未提供旧版金额证据。"
+    },
+    {
+      "answer_evidence": "费用报销审批线应采用2025修订版（XX证财规〔2025〕甲号）。2022版已废止。",
+      "id": "applicable-version",
+      "reason": "明确选择2025修订版，并阐述废止原因，推理充分。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用，版本选择基于制度废止关系。"
+    },
+    {
+      "answer_evidence": "citations中包含01_expense_reimbursement_2025.md和02_expense_reimbursement_2022_deprecated.md的条款。",
+      "id": "two-version-evidence",
+      "reason": "引用了01_expense_reimbursement_2025.md和02_expense_reimbursement_2022_deprecated.md，两份制度证据完整。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用，引用来自候选提交的citations。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "候选未提交任何record_id，不存在虚构记录。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "候选未将废止制度作为现行依据，明确2022版已废止。",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 4,
+    "elapsed_seconds": 81.751,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount",
+      "document:01_expense_reimbursement_2025.md",
+      "document:02_expense_reimbursement_2022_deprecated.md"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:29:07+08:00",
+  "group": "opencode-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选答案准确识别版本陷阱，指出2025修订版及现行审批线，但对旧版具体金额未提及，略有不足。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2172,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1609
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 1058,
+      "prompt_tokens": 2082,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 4254
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/opencode-baseline/L3-006",
+  "task_id": "L3-006"
+}

@@ -1,0 +1,102 @@
+{
+  "audit_scope": {
+    "object": "2025年度全年费用超标准专项扫描",
+    "period": "2025-01-01至2025-12-31",
+    "organization": "XX证券全体10个部门80名员工",
+    "expense_types": ["travel_lodging", "local_transport", "training_fee", "business_entertainment", "office_supplies", "communication"],
+    "rules_checked": ["R1差旅住宿", "R2市内交通", "R3培训课程费", "R4内部培训综合", "R5外部培训综合", "R6培训住宿", "R7招待费单次", "R8招待费人均", "R9办公用品月度", "R10通讯费月度", "R11部门预算超支"],
+    "population": 4240
+  },
+  "verified_facts": [
+    "数据库共4240条2025年度6类费用记录,全部special_approval字段为0(false)",
+    "training_fee类型578条记录的participants/days/nights字段均为0, R3-R6无法执行人均/每日/每晚比对",
+    "business_entertainment类型675条记录中最高单次金额1884.07元,均未超过R7的5000元标准",
+    "发现2张重复发票(office_supplies FP202500000002, communication FP202500000028),已在R9/R10月度聚合中按发票号去重",
+    "D001-D006共6个部门年度预算使用率超过1.0倍"
+  ],
+  "applicable_policies": [
+    {"doc_id": "04_travel_expense.md", "clauses": ["4(住宿标准)", "6(市内交通标准)"]},
+    {"doc_id": "05_training_expense.md", "clauses": ["2(课程费)", "3(内部培训)", "4(外部培训)", "5(培训住宿)"]},
+    {"doc_id": "06_business_entertainment.md", "clauses": ["2(单次上限)", "3(人均上限)"]},
+    {"doc_id": "07_office_communication.md", "clauses": ["2(办公用品月度)", "3(通讯费月度)"]},
+    {"doc_id": "08_budget_management.md", "clauses": ["3(预算1.0倍限制)"]},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clauses": ["12(不得超标准1.0倍)"]}
+  ],
+  "findings": [
+    {
+      "rule": "R1差旅住宿超标准",
+      "count": 1,
+      "anomaly_id": "ANO_R1_R004225",
+      "record_ids": ["R004225"],
+      "details": "员工E0007李丽娟(部门负责人级/D1) 2025-08-15出差至A类城市,住宿费900元/1晚=900元/晚,超过部门负责人级一类城市标准850元/晚,超出50元",
+      "threshold": "850元/晚(一类/部门负责人级)",
+      "observed": "900元/晚",
+      "policy": "04_travel_expense.md#4"
+    },
+    {
+      "rule": "R2市内交通超标准",
+      "count": 1,
+      "anomaly_id": "ANO_R2_R004226",
+      "record_ids": ["R004226"],
+      "details": "员工E0008杨丹(D1) 2025-10-16 C类城市市内交通92元/1日=92元/日,超过三类城市标准80元/日,超出12元",
+      "threshold": "80元/日(三类城市)",
+      "observed": "92元/日",
+      "policy": "04_travel_expense.md#6"
+    },
+    {
+      "rule": "R8招待费人均超标准",
+      "count": 1,
+      "anomaly_id": "ANO_R8_R004224",
+      "record_ids": ["R004224"],
+      "details": "员工E0010闭想(D1) 2025-07-18业务招待费700元/2人=350元/人,超过人均标准300元/人,超出50元",
+      "threshold": "300元/人",
+      "observed": "350元/人",
+      "policy": "06_business_entertainment.md#3"
+    },
+    {
+      "rule": "R9办公用品月度超标准",
+      "count_groups": 114,
+      "count_records": 285,
+      "details": "114个员工×月度组合的办公用品累计超过600元(已去重发票),涉及285条记录。超标幅度从4.48元至960.54元不等",
+      "threshold": "600元/人/月",
+      "policy": "07_office_communication.md#2"
+    },
+    {
+      "rule": "R10通讯费月度超标准",
+      "count_groups": 132,
+      "count_records": 307,
+      "details": "132个员工×月度组合的通讯费累计超过300元(已去重发票),涉及307条记录。超标幅度从0.17元至645.10元不等",
+      "threshold": "300元/人/月",
+      "policy": "07_office_communication.md#3"
+    },
+    {
+      "rule": "R11部门预算超支",
+      "count": 6,
+      "details": "D001投资银行部(R000079)、D002固定收益部(R002009)、D003财富管理部(R003968)、D004研究所(R000894)、D005机构业务部(R003479)、D006运营管理部(R000312)共6个部门首个导致预算超支的未审批记录",
+      "threshold": "部门年度预算1.0倍",
+      "policy": "08_budget_management.md#3"
+    }
+  ],
+  "impact": "2025年度共发现255项异常(601条异常记录),涉及R1/R2/R8/R9/R10/R11六条规则。R9办公用品月度超标和R10通讯费月度超标为系统性高频问题,涉及大部分员工。R3-R6培训费因数据库participants/days/nights字段全为0无法完成比对,578条training_fee记录的合规性无法判定。",
+  "recommendations": [
+    "对R9/R10月度超标进行全面整改,加强月度费用控制和预警机制",
+    "补全training_fee相关记录的participants/days/nights字段数据以完成R3-R6合规检查",
+    "对D001-D006部门预算管理加强,建立预算使用率达到80%时的预警机制"
+  ],
+  "anomaly_ids": "参见evidence_matrix.json中255条anomaly_id",
+  "record_ids": "参见evidence_matrix.json中601条record_id",
+  "citations": [
+    {"doc_id": "04_travel_expense.md", "clause_no": "4"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "6"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "3"},
+    {"doc_id": "07_office_communication.md", "clause_no": "2"},
+    {"doc_id": "07_office_communication.md", "clause_no": "3"},
+    {"doc_id": "08_budget_management.md", "clause_no": "3"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "12"}
+  ],
+  "answer": "2025年度超标准专项扫描完成。对6种费用类型4240条记录按11条子规则逐一比对: R3-R7无异常; R1发现1条差旅住宿超标(R004225, 900元/晚>850标准); R2发现1条市内交通超标(R004226, 92元/日>80标准); R8发现1条招待费人均超标(R004224, 350元/人>300标准); R9发现114组办公用品月度超标共285条记录; R10发现132组通讯费月度超标共307条记录; R11发现6个部门预算超支首个未审批记录。共计255项异常,601条异常记录。training_fee全部578条记录因participants/days/nights字段为0,R3-R6无法完成比对。",
+  "limitations": [
+    "training_fee全部578条记录的participants/days/nights字段为0, R3(人均课程费)、R4(内部培训每日)、R5(外部培训每日)、R6(培训住宿)无法执行比对",
+    "R4/R5需区分内部培训与外部培训类型,数据中无分类字段"
+  ]
+}

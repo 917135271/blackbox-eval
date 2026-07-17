@@ -1,0 +1,142 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANO-001",
+      "record_ids": ["R900006"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第七条"}
+      ],
+      "facts": [
+        "R900006费用发生日期2025-03-01，报销日期2025-05-05，延迟65天，超过制度第七条规定的60天报销时限",
+        "该记录状态为approved，无特殊审批即通过"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANO-002",
+      "record_ids": ["R900001", "R900002"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
+      ],
+      "facts": [
+        "R900001和R900002使用同一发票FPDEV900001，金额均为480元，费用类型均为office_supplies",
+        "同一发票被两次报销，usage_count=2"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANO-003",
+      "record_ids": ["R900003", "R900004"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"}
+      ],
+      "facts": [
+        "R900003(2025-02-03, travel_transport, 5200元)和R900004(2025-02-06, travel_transport, 5200元)同为员工E9001、同一费用类型",
+        "间隔3天在7天窗口内，合计10400元达AR-03审批线，单笔仅AR-02",
+        "事由为同一客户路演交通费分笔，属同一事项拆分"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANO-004",
+      "record_ids": ["R900019"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"},
+        {"doc_id": "08_budget_management.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "D902年度预算50000元，R900018占用45000元后余额5000元",
+        "R900019金额6000元使累计使用达51000元(102%)，超出预算额度",
+        "R900019无专项审批(special_approval=0)"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANO-005",
+      "record_ids": ["R900017"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"},
+        {"doc_id": "06_business_entertainment.md", "clause_no": "第二条"}
+      ],
+      "facts": [
+        "R900017业务招待费5200元，20人参与",
+        "单次活动费用5200元超过制度规定上限5000元",
+        "无专项审批(special_approval=0)"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANO-006",
+      "record_ids": ["R900007"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"},
+        {"doc_id": "07_office_communication.md", "clause_no": "第二条"}
+      ],
+      "facts": [
+        "R900007办公用品费650元，超过每人每月600元上限",
+        "无专项审批(special_approval=0)"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANO-007",
+      "record_ids": ["R900013"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"}
+      ],
+      "facts": [
+        "R900013差旅住宿费1400元，一类城市经理级住宿两晚(nights=2)",
+        "经理级一类城市标准650元/晚，两晚上限1300元，实际1400元超出",
+        "无专项审批(special_approval=0)"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANO-008",
+      "record_ids": ["R900016"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"},
+        {"doc_id": "05_training_expense.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "R900016内部培训综合费用850元/天(days=1)，超过每日800元上限",
+        "无专项审批(special_approval=0)"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900001","R900002","R900003","R900004","R900006","R900007","R900013","R900016","R900017","R900019"],
+  "submitted_record_ids": ["R900001","R900002","R900003","R900004","R900006","R900007","R900013","R900016","R900017","R900019"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": false
+  },
+  "reconciled_figures": {
+    "total_candidates": 10,
+    "total_anomalies": 8,
+    "total_anomaly_records": 10
+  },
+  "unresolved_items": []
+}

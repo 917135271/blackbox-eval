@@ -1,0 +1,119 @@
+{
+  "case_family": "retrieval_and_report",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "audit_report",
+  "criteria": [
+    {
+      "answer_evidence": "2025修订版改为引用...部门总经理审批线从8,000元上调至10,000元",
+      "id": "current-threshold",
+      "reason": "明确给出2025修订版部门总经理审批线为10000元，且版本清晰。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md 第五条要求按授权管理办法附件二执行；03_authorization_management.md 附件二 AR-03 行显示 '大于等于10000元且小于50000元' 部门总经理"
+    },
+    {
+      "answer_evidence": "2022版制度(已废止)规定的审批线为:单笔≥8,000元需部门总经理审批",
+      "id": "old-threshold-status",
+      "reason": "准确指出2022版8000元审批线已废止。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc 02_expense_reimbursement_2022_deprecated.md 第二条明确 '旧版制度曾规定，单笔报销金额达到8000元的，应提交部门总经理审批'，且文档标注为 deprecated，第一条声明仅作为沿革留档，不得作为现行依据"
+    },
+    {
+      "answer_evidence": "2025修订版改为引用《授权管理办法》附件二的五档审批体系",
+      "id": "cross-reference",
+      "reason": "正确说明了现行报销办法引用授权管理办法附件二取得审批金额。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md 第五条：'单笔费用报销的审批权限，不在本办法正文列示具体金额，统一按《XX证券授权管理办法》附件二执行'；03_authorization_management.md 附件二表格列出具体审批线"
+    },
+    {
+      "answer_evidence": "区间一 [8,000元, 10,000元):...若审计人员误用2022版标准,会将此区间内的报销错误地判定为'缺少部门总经理审批'。审计人员应以费用发生日对应的有效制度版本为准,严禁以旧版审批线衡量新版制度下的报销行为。",
+      "id": "risk-explanation",
+      "reason": "详细解释了使用旧线会错误扩大升级审批范围，并提出了版本校验措施。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "无需工具证据，从答案即可验证"
+    },
+    {
+      "answer_evidence": "全文分背景、版本陷阱分析、数据核查、结论四部分，事实、规则、判断和建议一致",
+      "id": "report-shape",
+      "reason": "以结构清晰、逻辑一致的审计说明形式呈现，无冲突。",
+      "score": 5.0,
+      "source": "llm_judge",
+      "trace_evidence": "提交的anomaly_ids为空，record_ids包含核查的记录，与答案中无异常结论一致"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的R004233在数据库中真实存在，且被工具调用多次返回，未虚构",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未使用已废止制度形成当前适用结论，反而多次强调旧版已废止，并指出应以现行版本为准",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R004233"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 4,
+    "elapsed_seconds": 390.495,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:32:41+08:00",
+  "group": "oh-my-pi-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选答案准确指出了现行审批线10000元和旧版8000元已废止，清楚说明了制度跨引关系，详细分析了版本陷阱风险并给出校验建议，报告结构完整、无矛盾，完全满足题目要求。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2575,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1737
+      },
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 5334,
+      "prompt_tokens": 6486,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152
+      },
+      "total_tokens": 9061
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/oh-my-pi-enhanced/L3-010",
+  "task_id": "L3-010"
+}

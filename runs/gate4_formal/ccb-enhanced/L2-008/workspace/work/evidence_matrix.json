@@ -1,0 +1,39 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "SPLIT-001",
+      "record_ids": ["R004212", "R004213"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "R004212: E0009张婷, travel_lodging, 5100元, 2025-04-10, AR-02审批",
+        "R004213: E0009张婷, travel_lodging, 5100元, 2025-04-15, AR-02审批",
+        "两笔记录同一员工(E0009)、同一费用类型(travel_lodging)、间隔5天(7天内)",
+        "单笔5100元在AR-02档位(3000-10000)，合计10200元达到AR-03档位(10000-50000)",
+        "两笔发票不同(FP2025X0004206 vs FP2025X0004207)，各使用1次，无重复报销"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004212", "R004213"],
+  "submitted_record_ids": ["R004212", "R004213"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "individual_amounts": [5100, 5100],
+    "combined_amount": 10200,
+    "individual_tier": "AR-02",
+    "combined_tier": "AR-03",
+    "days_between": 5
+  },
+  "unresolved_items": []
+}

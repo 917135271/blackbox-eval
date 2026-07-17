@@ -1,0 +1,134 @@
+{
+  "task": "扫描office_supplies和communication全部记录，按employee_id+自然月聚合金额，与月度标准比较",
+  "method": "按employee_id和expense_date(Y-m)分组聚合，分别比对办公用品600元/月和通讯费300元/月的上限",
+  "policy": {
+    "doc_id": "07_office_communication.md",
+    "clause_2": "员工个人办公用品报销按月控制,每人每月不超过600元",
+    "clause_3": "员工通讯费用报销按月控制,每人每月不超过300元",
+    "clause_4": "办公费用和通讯费用不得以其他费用类型绕开月度控制"
+  },
+  "aggregation_results": {
+    "office_supplies": [
+      {
+        "employee_id": "E9001",
+        "employee_name": "开发员工甲",
+        "month": "2025-01",
+        "records": [
+          "R900001",
+          "R900002"
+        ],
+        "total": 960.0,
+        "limit": 600.0,
+        "excess": 360.0,
+        "exceeded": true
+      },
+      {
+        "employee_id": "E9001",
+        "employee_name": "开发员工甲",
+        "month": "2025-04",
+        "records": [
+          "R900007"
+        ],
+        "total": 650.0,
+        "limit": 600.0,
+        "excess": 50.0,
+        "exceeded": true
+      },
+      {
+        "employee_id": "E9001",
+        "employee_name": "开发员工甲",
+        "month": "2025-05",
+        "records": [
+          "R900008"
+        ],
+        "total": 590.0,
+        "limit": 600.0,
+        "excess": 0,
+        "exceeded": false
+      },
+      {
+        "employee_id": "E9002",
+        "employee_name": "开发经理乙",
+        "month": "2025-05",
+        "records": [
+          "R900009"
+        ],
+        "total": 590.0,
+        "limit": 600.0,
+        "excess": 0,
+        "exceeded": false
+      }
+    ],
+    "communication": [
+      {
+        "employee_id": "E9001",
+        "employee_name": "开发员工甲",
+        "month": "2025-03",
+        "records": [
+          "R900006"
+        ],
+        "total": 200.0,
+        "limit": 300.0,
+        "excess": 0,
+        "exceeded": false
+      },
+      {
+        "employee_id": "E9001",
+        "employee_name": "开发员工甲",
+        "month": "2025-09",
+        "records": [
+          "R900014",
+          "R900015"
+        ],
+        "total": 340.0,
+        "limit": 300.0,
+        "excess": 40.0,
+        "exceeded": true
+      }
+    ]
+  },
+  "anomalies": [
+    {
+      "anomaly_id": "ANOM-DEV007-001",
+      "employee_id": "E9001",
+      "month": "2025-01",
+      "expense_type": "office_supplies",
+      "total": 960.0,
+      "limit": 600.0,
+      "excess": 360.0,
+      "record_ids": [
+        "R900001",
+        "R900002"
+      ],
+      "note": "同一发票FPDEV900001被拆分两次报销，月度合计超出标准"
+    },
+    {
+      "anomaly_id": "ANOM-DEV007-002",
+      "employee_id": "E9001",
+      "month": "2025-04",
+      "expense_type": "office_supplies",
+      "total": 650.0,
+      "limit": 600.0,
+      "excess": 50.0,
+      "record_ids": [
+        "R900007"
+      ],
+      "note": "单笔报销金额即超出月度标准"
+    },
+    {
+      "anomaly_id": "ANOM-DEV007-003",
+      "employee_id": "E9001",
+      "month": "2025-09",
+      "expense_type": "communication",
+      "total": 340.0,
+      "limit": 300.0,
+      "excess": 40.0,
+      "record_ids": [
+        "R900014",
+        "R900015"
+      ],
+      "note": "同一月份两次通讯费报销合计超出标准"
+    }
+  ],
+  "invoice_reuse_finding": "R900001和R900002共用发票FPDEV900001，属发票复用，配合第四条不得绕开月度控制"
+}

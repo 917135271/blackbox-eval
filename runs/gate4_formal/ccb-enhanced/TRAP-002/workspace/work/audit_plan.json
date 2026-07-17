@@ -1,0 +1,147 @@
+{
+  "task_id": "TRAP-002",
+  "task_type": "clean_but_suspicious",
+  "task_description": "请核查TRAP-002涉及的记录是否构成异常,正确时应说明无异常。",
+  "audit_period": {
+    "start": "2025-01-01",
+    "end": "2025-12-31"
+  },
+  "scope": {
+    "target_invoice": "FP202500000002",
+    "target_invoice_id": "INV000002",
+    "target_records": ["R000002", "R004201"],
+    "expense_type": "office_supplies",
+    "department": "D008 (合规风控部)",
+    "employee": "E0050 (姚瑜)"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "是否违反《费用报销管理办法》第十条(同一发票最多报销1次)?",
+      "applicable_clause": "第十条 同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。",
+      "policy_doc": "01_expense_reimbursement_2025.md"
+    },
+    {
+      "id": "PQ-02",
+      "question": "R004201的'重复发票注入样本'标记是否表明该记录为测试注入数据而非真实费用?",
+      "applicable_clause": "N/A — 数据特征分析",
+      "policy_doc": null
+    },
+    {
+      "id": "PQ-03",
+      "question": "是否违反《办公与通讯费用管理办法》第二条(办公用品每人每月不超过600元)?",
+      "applicable_clause": "第二条 员工个人办公用品报销按月控制,每人每月不超过600元。",
+      "policy_doc": "07_office_communication.md"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-01",
+      "question": "R000002和R004201是否使用同一发票FP202500000002?",
+      "answer": "是",
+      "evidence": "find_reused_invoices返回INV000002包含R000002和R004201"
+    },
+    {
+      "id": "DQ-02",
+      "question": "R004201的记录编号是否包含特殊标记?",
+      "answer": "是,记录编号为BX2025X004201,含'X'前缀",
+      "evidence": "get_expense_detail返回record_no=BX2025X004201"
+    },
+    {
+      "id": "DQ-03",
+      "question": "R004201的报销事由是否明确标注为注入样本?",
+      "answer": "是,事由为'重复发票注入样本:清源项目资料装订用品费'",
+      "evidence": "get_expense_detail返回reason字段"
+    },
+    {
+      "id": "DQ-04",
+      "question": "R004201的费用日期与发票日期是否合理?",
+      "answer": "否,expense_date=2025-02-10但invoice_date=2025-08-19,发票日期晚于费用日期6个月",
+      "evidence": "get_expense_detail返回的日期对比"
+    }
+  ],
+  "required_fields": [
+    "record_id", "record_no", "employee_id", "employee_name", "department_name",
+    "expense_date", "reimburse_date", "expense_type", "amount", "reason",
+    "invoice_no", "invoice_date", "invoice_amount", "status", "special_approval",
+    "budget_year", "annual_budget", "approvals"
+  ],
+  "evidence_requirements": [
+    "发票FP202500000002的详细使用记录",
+    "R000002和R004201的完整费用详情",
+    "相关政策条款原文"
+  ],
+  "execution_steps": [
+    {
+      "step": 1,
+      "name": "查询发票FP202500000002的使用记录",
+      "tool": "find_invoice_usage / list_invoices / find_reused_invoices",
+      "status": "completed"
+    },
+    {
+      "step": 2,
+      "name": "获取R000002和R004201的费用详情",
+      "tool": "get_expense_detail",
+      "status": "completed"
+    },
+    {
+      "step": 3,
+      "name": "查询相关政策条款",
+      "tool": "get_policy_doc / search_policy",
+      "status": "completed"
+    },
+    {
+      "step": 4,
+      "name": "核对R004201是否为测试注入记录",
+      "tool": "数据分析",
+      "status": "in_progress"
+    },
+    {
+      "step": 5,
+      "name": "证据覆盖检查",
+      "skill": "evidence-coverage-check",
+      "status": "pending"
+    },
+    {
+      "step": 6,
+      "name": "生成审计报告",
+      "skill": "audit-report",
+      "status": "pending"
+    },
+    {
+      "step": 7,
+      "name": "结果校验",
+      "skill": "result-validator",
+      "status": "pending"
+    },
+    {
+      "step": 8,
+      "name": "提交审计结果",
+      "tool": "validate_audit_result + submit_audit_result",
+      "status": "pending"
+    }
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "涉及日期边界问题(发票日期与费用日期不匹配)",
+      "涉及测试注入数据的判定(是否为真实异常)",
+      "单规则(第十条)的no-anomaly陷阱"
+    ]
+  },
+  "subagent_plan": {
+    "required": false,
+    "reason": "复杂度为2,属于no-anomaly陷阱型单规则任务,主agent可直接完成。无需子智能体。"
+  },
+  "stopping_conditions": [
+    "已获取R000002和R004201的完整详情",
+    "已查询所有相关发票使用记录",
+    "已确认相关政策条款原文",
+    "已验证证据矩阵覆盖率达到100%",
+    "已通过result-validator校验"
+  ],
+  "preliminary_finding": {
+    "nature": "R004201的记录编号含'X'前缀(BX2025X004201),事由明确标注'重复发票注入样本',表明该记录为系统测试注入数据而非真实费用报销。R000002为正常费用报销记录。虽然两记录使用同一发票FP202500000002,形式上触发第十条重复报销风险,但R004201作为测试注入样本不应被视为真实费用异常。",
+    "expected_conclusion": "无异常"
+  }
+}

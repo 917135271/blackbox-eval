@@ -1,0 +1,41 @@
+{
+  "criteria": [
+    {
+      "id": "clean-conclusion",
+      "score": 30,
+      "reason": "候选明确给出无异常结论，anomaly_ids为空，无矛盾表述。",
+      "answer_evidence": "answer: '无异常', anomaly_ids: []",
+      "trace_evidence": "候选无工具调用，但最终答案与预期一致。"
+    },
+    {
+      "id": "record-scope",
+      "score": 0,
+      "reason": "候选提交完全无关记录ID，未核查预期核心记录R004234和R004235。",
+      "answer_evidence": "record_ids: [R000002, R004201, ...] 共12条，非预期记录。",
+      "trace_evidence": "无工具调用显示核查正确记录，no_anomaly_coverage描述重复发票扫描，非题目要求。"
+    },
+    {
+      "id": "case-specific-reason",
+      "score": 0,
+      "reason": "候选理由错误，未说明不同发票和总金额低于审批线，而是归因于注入样本。",
+      "answer_evidence": "no_anomaly_coverage: '重复发票注入样本...不构成异常'，未涉及不同发票和总额。",
+      "trace_evidence": "无工具调用验证发票差异和金额聚合。"
+    },
+    {
+      "id": "reverse-check",
+      "score": 0,
+      "reason": "无工具调用证据，未对阈值、日期、发票等边界条件进行核查。",
+      "answer_evidence": "无相关验证。",
+      "trace_evidence": "tool_trace_summary: call_count: 0，无任何工具使用痕迹。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": true,
+      "reason": "候选用无关记录（重复发票扫描得到的12条记录）支撑核心结论，实际应核查R004234和R004235，构成无关记录支撑核心结论。"
+    }
+  ],
+  "overall_comment": "候选答案结论表面正确，但核查记录范围完全错误，未针对题目要求的边界条件，且无工具调用证据。因触发虚构记录关键错误，总分限制在20分。",
+  "confidence": 0.95
+}

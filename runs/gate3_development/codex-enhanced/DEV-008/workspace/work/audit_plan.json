@@ -1,0 +1,89 @@
+{
+  "task_id": "DEV-008",
+  "task_scope": {
+    "audit_object": "超期报销（Overdue Reimbursement）",
+    "question": "扫描开发库中的超期报销，返回全部异常记录，并对年末补充提交记录进行核对",
+    "expense_types": "all",
+    "business_period": "2025-01-01 to 2025-12-31 (all records in development database)",
+    "organization_scope": "all departments (D901, D902)",
+    "deliverable": "All overdue reimbursement anomaly records + verification of year-end supplementary submissions"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ1",
+      "rule": "Article 7 - 60-day submission rule",
+      "description": "员工应在费用发生后60天内提交报销申请;超过期限的,原则上不得报销",
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "boundary": "reimburse_date - expense_date > 60 days",
+      "exemptions": "special_approval flag, year-end provision (Article 9)"
+    },
+    {
+      "id": "PQ2",
+      "rule": "Article 9 - Year-end supplementary submission",
+      "description": "会计年度末发生的费用,最迟可在财政年度结束后15天内补充提交,逾期按超期报销处理",
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "boundary": "December expenses with reimburse_date > Jan 15 of next year are overdue",
+      "exemptions": "special_approval flag"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ1",
+      "description": "Calculate days between expense_date and reimburse_date for all records",
+      "tables": ["expense records"],
+      "fields": ["record_id","expense_date","reimburse_date","expense_type","amount","special_approval","status"]
+    },
+    {
+      "id": "DQ2",
+      "description": "Identify records where gap > 60 days per Article 7, excluding year-end exceptions",
+      "tables": ["expense records"],
+      "condition": "reimburse_date - expense_date > 60 AND NOT (month(expense_date)=12 AND reimburse_date <= fiscal_year_end+15)"
+    },
+    {
+      "id": "DQ3",
+      "description": "Verify year-end supplementary records per Article 9",
+      "tables": ["expense records"],
+      "condition": "month(expense_date)=12 AND reimburse_date year differs from expense_date year"
+    }
+  ],
+  "required_fields": ["record_id","expense_date","reimburse_date","expense_type","amount","special_approval","status","reason","employee_id","department_id"],
+  "evidence_requirements": [
+    "Policy: Article 7, Article 9 from 01_expense_reimbursement_2025.md",
+    "Data: All 21 records from development database",
+    "Year-end analysis: Separate handling for December expenses"
+  ],
+  "execution_steps": [
+    {"step": "audit-query-planner", "artifact": "work/audit_plan.json"},
+    {"step": "authorize data_analyst subagent", "artifact": "authorization + subagent dispatch"},
+    {"step": "policy-version-check (compact)", "artifact": "work/policy_applicability.json"},
+    {"step": "batch-expense-analysis via data_analyst", "artifact": "work/analysis/data_findings.json"},
+    {"step": "complete_audit_subagent", "artifact": "subagent summary registration"},
+    {"step": "evidence-coverage-check", "artifact": "work/evidence_matrix.json"},
+    {"step": "false-positive-review (if triggered)", "artifact": "review decision"},
+    {"step": "audit-report", "artifact": "work/final_result.json"},
+    {"step": "result-validator", "artifact": "work/validation_report.json"},
+    {"step": "validate + submit", "artifact": "submission"}
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "aggregation/grouping/batch filtering: need to scan all 21 records and compute date differences",
+      "thresholds/dates/exemptions: 60-day threshold + year-end 15-day rule + special approval exemption",
+      "year-end exclusion boundary: separate handling for December expenses"
+    ]
+  },
+  "subagent_plan": {
+    "role": "data_analyst",
+    "reason_code": "DATE_AMOUNT_BOUNDARY",
+    "task": "Compute days between expense_date and reimburse_date for all 21 records. Identify records where gap > 60 days per Article 7 (excluding year-end records handled separately). Verify year-end December records per Article 9: reimburse_date must be within 15 days after fiscal year-end (i.e., by Jan 15). Check special_approval flag for any overdue records.",
+    "artifact_paths": ["work/audit_plan.json"],
+    "output": "work/analysis/data_findings.json with matched record IDs, SQL, and reconciliation"
+  },
+  "stopping_conditions": [
+    "All 21 records evaluated for overdue status",
+    "Year-end records separately verified per Article 9",
+    "Evidence coverage at 100%",
+    "Validation passes"
+  ],
+  "unresolved_items": []
+}

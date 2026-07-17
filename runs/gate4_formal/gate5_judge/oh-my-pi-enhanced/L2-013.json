@@ -1,0 +1,136 @@
+{
+  "case_family": "record_audit",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "policy_data_comparison",
+  "criteria": [
+    {
+      "answer_evidence": "确认存在超标准异常。",
+      "id": "audit-conclusion",
+      "reason": "结论明确判定为超标准异常，与预期一致，异常ID不同但不影响类型正确。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_expense_detail 返回 R004223 金额 3700，培训费管理办法第二条标准 3500，比较后判断超标。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "anomaly-id",
+      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
+      "score": 15.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "record-set",
+      "reason": "record_ids集合F1=1.000",
+      "score": 25.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "违反报销管理办法(2025修订版)第十二条无专项审批不得超标准的规定。",
+      "id": "policy-basis",
+      "reason": "引用了费用报销管理办法第十二条（对应6.3）并说明无专项审批不得超标准，条款直接支持结论。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "调用 get_policy_doc 获取 01_expense_reimbursement_2025.md，其中第十二条对应费用报销管理办法-6.3。"
+    },
+    {
+      "answer_evidence": "R004223 费用类型为培训费，金额 ¥3,700.00，超过培训费管理办法第二条规定标准 ¥3,500.00，超出 ¥200.00。",
+      "id": "case-reasoning",
+      "reason": "完整给出了费用类型、金额、标准、差额，推理清晰且与数据一致。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_expense_detail 返回 amount:3700，培训费管理办法第二条标准 3500，计算差额 200。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的 record_id R004223 存在于数据库，且为相关记录。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "L2-013-ANOM-001"
+    ],
+    "actual_record_ids": [
+      "R004223"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "OVERSTD": 1
+      },
+      "count_exact": true,
+      "expected_types": {
+        "OVERSTD": 1
+      },
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 2,
+    "elapsed_seconds": 228.264,
+    "expected_anomaly_ids": [
+      "OVERSTD-003"
+    ],
+    "expected_record_ids": [
+      "R004223"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [
+      "clause:费用报销管理办法-6.3"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:32:04+08:00",
+  "group": "oh-my-pi-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选正确识别了超标准异常，引用了对应的制度条款，推理事实清晰，无关键错误。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1453,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1048
+      },
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 3021,
+      "prompt_tokens": 3917,
+      "prompt_tokens_details": {
+        "cached_tokens": 896
+      },
+      "total_tokens": 5370
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/oh-my-pi-enhanced/L2-013",
+  "task_id": "L2-013"
+}

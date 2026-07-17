@@ -1,0 +1,99 @@
+{
+  "task_id": "TRAP-003",
+  "task_type": "clean_but_suspicious",
+  "task_question": "请核查TRAP-003涉及的记录是否构成异常,正确时应说明无异常。",
+  "audit_scope": {
+    "description": "核查标记为'陷阱样本'的报销记录是否构成异常。TRAP-003涉及8条陷阱样本记录(R004233-R004240)，这些记录被设计为看似可疑但实际合规的场景。",
+    "record_ids": ["R004233", "R004234", "R004235", "R004236", "R004237", "R004238", "R004239", "R004240"],
+    "audit_period": "2025-01-01 至 2025-12-31",
+    "expense_types": ["travel_lodging", "office_supplies", "communication", "business_entertainment"],
+    "departments": ["D008", "D009", "D010", "D007"]
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "R004233(金额9990元,travel_lodging)是否超出住宿费标准或审批权限？",
+      "rules": ["差旅费管理办法第4条住宿标准", "授权管理办法附件二审批线"],
+      "boundaries": ["AR-02上限10000元", "高管级住宿标准"]
+    },
+    {
+      "id": "PQ-02",
+      "question": "R004234-R004235(同日同额不同发票)是否构成重复报销或拆分报销？",
+      "rules": ["费用报销管理办法第10条(同一发票最多报销1次)", "费用报销管理办法第11条(拆分报销7天规则)"],
+      "boundaries": ["发票号不同", "7天窗口", "合计金额500元 vs AR-02 3000元"]
+    },
+    {
+      "id": "PQ-03",
+      "question": "R004236-R004237(相隔8日,各5200元)是否构成拆分报销？",
+      "rules": ["费用报销管理办法第11条(同一员工、同一费用类型、7天内)"],
+      "boundaries": ["8天 > 7天窗口"]
+    },
+    {
+      "id": "PQ-04",
+      "question": "R004238(reimburse_date vs expense_date)是否超出60天报销期限？",
+      "rules": ["费用报销管理办法第7条(60天期限)"],
+      "boundaries": ["正好60天的边界"]
+    },
+    {
+      "id": "PQ-05",
+      "question": "R004239-R004240(同供应商,近似金额,连续两天)是否构成异常？",
+      "rules": ["费用报销管理办法第10条(发票唯一性)", "业务招待费管理办法第2-4条"],
+      "boundaries": ["不同发票", "不同金额"]
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-01",
+      "description": "获取8条陷阱样本的完整信息,包括发票、审批、员工职级等",
+      "tables": ["expense_records", "invoices", "employees", "approvals", "departments"],
+      "required_fields": ["record_id", "record_no", "employee_id", "employee_level", "position_role", "expense_date", "reimburse_date", "expense_type", "amount", "reason", "invoice_id", "invoice_no", "vendor_name", "city_tier", "nights", "participants", "special_approval", "status"]
+    },
+    {
+      "id": "DQ-02",
+      "description": "获取R004233的员工职级信息,对照差旅住宿标准",
+      "tables": ["employees"],
+      "required_fields": ["employee_level", "city_tier"]
+    },
+    {
+      "id": "DQ-03",
+      "description": "获取R004238的reimburse_date,计算与expense_date的天数差",
+      "tables": ["expense_records"],
+      "required_fields": ["expense_date", "reimburse_date"]
+    }
+  ],
+  "evidence_requirements": [
+    "每条陷阱样本的完整记录数据",
+    "对应政策条款原文引用",
+    "日期计算证明(R004238的60天边界)",
+    "发票唯一性验证(R004234-R004235的不同发票)",
+    "审批层级验证(R004233的AR-02级别)"
+  ],
+  "execution_steps": [
+    {"step": 1, "name": "planning", "description": "编写审计计划", "artifact": "work/audit_plan.json"},
+    {"step": 2, "name": "policy_check", "description": "读取相关政策文档,确认适用版本和条款", "artifact": "work/policy_check.json"},
+    {"step": 3, "name": "data_analysis", "description": "获取8条陷阱样本完整数据,逐条对照政策分析", "artifact": "work/data_analysis.json"},
+    {"step": 4, "name": "evidence_coverage", "description": "检查证据覆盖度", "artifact": "work/evidence_matrix.json"},
+    {"step": 5, "name": "false_positive_review", "description": "对初步结论进行假阳性复核", "artifact": "work/false_positive_review.json"},
+    {"step": 6, "name": "audit_report", "description": "生成审计报告", "artifact": "work/audit_report.json"},
+    {"step": 7, "name": "validation", "description": "结果校验", "artifact": "work/validation_report.json"},
+    {"step": 8, "name": "submission", "description": "验证并提交最终结果", "artifact": "work/final_result.json"}
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "单规则核查(多条政策条款,但均为已知记录的点检查)",
+      "无政策版本/生效日期/废止歧义(均为2025年)",
+      "无多表聚合/分组需求(逐条核查即可)",
+      "有阈值和日期边界检查(60天边界、7天窗口、审批线)",
+      "无综合报告需求(简洁结论即可)"
+    ],
+    "subagent_plan": null,
+    "subagent_reason": "复杂度0-1,保持在主智能体中执行"
+  },
+  "stopping_conditions": [
+    "所有8条陷阱样本均已完成逐条政策对照分析",
+    "evidence_matrix覆盖率达到100%",
+    "validation_report状态为pass"
+  ],
+  "unresolved_items": []
+}

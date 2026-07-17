@@ -1,0 +1,48 @@
+{
+  "task_id": "DEV-002",
+  "task_type": "policy_qa",
+  "question": "现行培训制度中，内部培训和外部培训的综合费用每日上限分别是多少？",
+  "task_scope": {
+    "audit_object": "培训费用每日上限",
+    "expense_types": ["培训"],
+    "business_period": "现行制度",
+    "organization_scope": "全公司",
+    "deliverable": "内部培训和外部培训的综合费用每日上限金额"
+  },
+  "policy_questions": [
+    "现行培训制度中内部培训的综合费用每日上限是多少？",
+    "现行培训制度中外部培训的综合费用每日上限是多少？"
+  ],
+  "material_boundaries": {
+    "dates": "现行制度（当前有效）",
+    "amounts": "每日上限金额",
+    "conditions": "内部培训 vs 外部培训",
+    "exemptions": "无",
+    "approvals": "无",
+    "exceptions": "无"
+  },
+  "data_requirements": {
+    "tables": [],
+    "fields": [],
+    "policy_documents": ["培训相关制度文档"]
+  },
+  "execution_steps": [
+    {"step": "policy_research", "description": "查询培训制度文档，获取内部培训和外部培训每日费用上限", "stopping_condition": "找到明确的每日上限金额"},
+    {"step": "evidence_coverage", "description": "运行evidence-coverage-check", "stopping_condition": "coverage_percent=100, status=pass"},
+    {"step": "report", "description": "运行audit-report生成final_result", "stopping_condition": "final_result.json填写完成"},
+    {"step": "validation", "description": "运行result-validator校验", "stopping_condition": "validation_report.json status=pass"},
+    {"step": "submission", "description": "validate + submit", "stopping_condition": "提交成功"}
+  ],
+  "complexity": 0,
+  "complexity_reasons": [
+    "单一制度规则查询，无版本冲突",
+    "仅涉及一项业务规则（培训费用上限）",
+    "无需聚合、分组或批处理",
+    "明确的事实性问题，无异常判定"
+  ],
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "complexity=0, compact main-agent flow sufficient"
+  },
+  "unresolved_items": []
+}

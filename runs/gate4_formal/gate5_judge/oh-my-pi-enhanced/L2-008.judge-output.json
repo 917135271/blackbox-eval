@@ -1,0 +1,34 @@
+{
+  "criteria": [
+    {
+      "id": "audit-conclusion",
+      "score": 10,
+      "reason": "正确识别拆分报销行为，但提交的异常ID（SPLIT-001）与预期（SPLIT-003）不符，故未达满分。",
+      "answer_evidence": "提交答案：anomaly_ids: [\"SPLIT-001\"]，结论为拆分报销。",
+      "trace_evidence": "无直接轨迹证据表明ID分配逻辑。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 15,
+      "reason": "准确引用了《费用报销管理办法》第十一条（对应规则6.2），并说明了其适用性。",
+      "answer_evidence": "提交答案：citations包含\"第十一条\"，doc_id: \"01_expense_reimbursement_2025.md\"。",
+      "trace_evidence": "工具调用get_policy_excerpt返回第十一条内容，明确拆分报销定义。"
+    },
+    {
+      "id": "case-reasoning",
+      "score": 20,
+      "reason": "完整阐述了7天窗口内合计10200元，超过10000元审批线的关键事实和计算。",
+      "answer_evidence": "提交答案：'间隔5天...合计¥10,200达到授权管理办法附件二AR-03档位'。",
+      "trace_evidence": "get_expense_detail返回R004212（5100元，2025-04-10）、R004213（5100元，2025-04-15），list_expenses确认员工E0009、类型travel_lodging。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的record_ids均为数据库中存在，无虚构。"
+    }
+  ],
+  "overall_comment": "候选答案正确识别了拆分报销行为与关键证据，唯一缺陷是异常ID编号与预期不一致，其余均符合要求。",
+  "confidence": 0.9
+}

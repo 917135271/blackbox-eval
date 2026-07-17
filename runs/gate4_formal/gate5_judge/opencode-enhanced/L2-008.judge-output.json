@@ -1,0 +1,34 @@
+{
+  "criteria": [
+    {
+      "id": "audit-conclusion",
+      "score": 20.0,
+      "reason": "正确识别拆分报销异常，异常类型SPLIT正确。",
+      "answer_evidence": "anomaly_ids: SPLIT-001, answer描述：员工E0009分两笔提交费用，间隔5天在7天窗口内，合计10200元，构成拆分报销规避审批权限。",
+      "trace_evidence": ""
+    },
+    {
+      "id": "policy-basis",
+      "score": 15.0,
+      "reason": "引用了费用报销管理办法第十一条，即规则中的6.2，有效支持结论。",
+      "answer_evidence": "citations: 01_expense_reimbursement_2025.md 第十一条。",
+      "trace_evidence": ""
+    },
+    {
+      "id": "case-reasoning",
+      "score": 20.0,
+      "reason": "明确说明R004212和R004213两笔记录合计10200元，在7天窗口内，超过10000元审批线，构成拆分。",
+      "answer_evidence": "answer: 'R004212,5100元...R004213,5100元...间隔5天在7天窗口内,合计10200元达到AR-03档位...构成拆分报销'",
+      "trace_evidence": ""
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的record_ids R004212和R004213均存在于数据库中，无虚构记录。"
+    }
+  ],
+  "overall_comment": "候选提交准确识别了拆分报销异常，引用了正确的制度条款，推理充分。",
+  "confidence": 1.0
+}

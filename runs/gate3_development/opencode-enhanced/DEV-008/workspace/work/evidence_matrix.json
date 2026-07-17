@@ -1,0 +1,46 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-001",
+      "record_ids": ["R900006"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第七条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第九条"}
+      ],
+      "facts": [
+        "R900006 expense_date=2025-03-01, reimburse_date=2025-05-05, delay=65天, 超过第七条规定的60天期限",
+        "R900006费用日期为3月,非会计年度末(12月),不适用第九条年末补充提交豁免",
+        "R900006状态为approved但未取得special_approval,无豁免依据",
+        "全库21条记录中仅R900006延迟超过60天,其余20条均符合时限规定",
+        "年末记录R900012(12月费用,次年1月10日报销,21天)与R900021(12月费用,当月报销,6天)经核对均不超期,第九条年末补充提交核对无异常"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900001","R900002","R900003","R900004","R900005","R900006","R900007","R900008","R900009","R900010","R900011","R900012","R900013","R900014","R900015","R900016","R900017","R900018","R900019","R900020","R900021"],
+  "submitted_record_ids": ["R900006"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true,
+    "searched_population": "全部报销记录(21条)",
+    "query_conditions": "list_expenses获取全量; list_records_by_reimburse_delay(min_delay_days=60)确认超期集; get_expense_detail逐条核实",
+    "checked_rules": ["第七条:费用发生后60天内提交","第九条:会计年度末费用可次年1月15日前补充提交"],
+    "population_count": 21,
+    "conclusion": "仅R900006一条超期记录(65天,非年末),其余20条均合规。年末补充提交记录(R900012, R900021)核对无异常。"
+  },
+  "reconciled_figures": {
+    "total_records": 21,
+    "overdue_count": 1,
+    "year_end_checked": 2,
+    "year_end_anomaly": 0,
+    "analysis_artifact": "work/subagents/data_analyst/analysis.json"
+  },
+  "unresolved_items": []
+}

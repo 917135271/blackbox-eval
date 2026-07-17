@@ -1,0 +1,30 @@
+{
+  "decision": "pass",
+  "challenged_findings": [
+    {
+      "anomaly_id": "DEV-011-BUDGET-OVERRUN-001",
+      "record_id": "R900019",
+      "challenge": "是否可能误报？检查special_approval、预算边界、审批链",
+      "result": "确认非误报"
+    },
+    {
+      "anomaly_id": "none",
+      "record_id": "R900020",
+      "challenge": "special_approval=1已豁免，确认不在异常列表中",
+      "result": "确认正确排除"
+    }
+  ],
+  "supporting_evidence": [
+    "R900019: special_approval=0, cumulative=51000>50000, 首次超限无专项审批",
+    "R900020: special_approval=1, 正确豁免，不在异常记录中"
+  ],
+  "opposing_evidence": [],
+  "exceptions_or_boundaries": [
+    "预算边界: 50000元 → R900019使累计达51000元(1.02×)，确认超限",
+    "专项审批豁免: R900020的special_approval=1, 08_budget_management第四条和01_expense_reimbursement_2025第十三条适用"
+  ],
+  "required_changes": [],
+  "supplemental_query": null,
+  "rationale": "R900019是唯一首次使累计预算超过年度预算50,000元且special_approval=0的记录，明确违规。R900020虽累计超预算但special_approval=1，根据08_budget_management第四条和01_expense_reimbursement_2025第十三条属于有效专项审批，不应误报。R900018为预算内记录，不构成异常。无歧义、无边界争议、无豁免遗漏。",
+  "unresolved_conflicts": []
+}

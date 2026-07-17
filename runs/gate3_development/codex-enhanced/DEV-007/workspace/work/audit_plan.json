@@ -1,0 +1,62 @@
+{
+  "task_id": "DEV-007",
+  "task_type": "batch_analysis",
+  "question": "扫描开发库中的个人办公用品和通讯费月度标准，返回全部超标准异常记录；应按员工和自然月聚合。",
+  "scope": {
+    "expense_types": ["个人办公用品", "通讯费"],
+    "audit_rule": "个人办公用品和通讯费月度标准超限",
+    "aggregation": "员工+自然月",
+    "period": "全部可用期间",
+    "organization_scope": "全部部门/员工"
+  },
+  "policy_questions": [
+    "个人办公用品的月度报销标准是多少？",
+    "通讯费的月度报销标准是多少？",
+    "是否有按员工级别分档的标准？",
+    "标准是否有生效日期和历史版本？"
+  ],
+  "data_questions": [
+    "列出所有个人办公用品类型的报销记录及金额",
+    "列出所有通讯费类型的报销记录及金额",
+    "按员工和自然月聚合计算月度总金额",
+    "与月度标准比较，找出超标记录"
+  ],
+  "required_fields": ["record_id", "employee_id", "expense_type", "expense_date", "amount", "department_id"],
+  "evidence_requirements": [
+    "政策文档中个人办公用品月度标准条款",
+    "政策文档中通讯费月度标准条款",
+    "超标记录的完整信息和发票",
+    "按员工按月的聚合金额与标准对比"
+  ],
+  "execution_steps": [
+    {"step": "policy_research", "action": "查询个人办公用品和通讯费月度标准政策", "stopping_condition": "找到明确的月度金额标准"},
+    {"step": "data_analysis", "action": "查询全部相关报销记录，按员工+自然月聚合，与标准对比", "stopping_condition": "完成全部聚合对比，列出超标记录"},
+    {"step": "evidence_review", "action": "核对超标记录的发票、审批链、制度条款", "stopping_condition": "每条超标记录有完整的证据链"},
+    {"step": "report", "action": "生成审计结论和异常标识", "stopping_condition": "结论与证据一致，无遗漏"},
+    {"step": "validation", "action": "校验结果格式和一致性", "stopping_condition": "validation_report status=pass"},
+    {"step": "submission", "action": "提交审计结果", "stopping_condition": "submit返回成功"}
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "aggregation/grouping/joins: 按员工+自然月聚合",
+      "thresholds: 月度金额标准比较",
+      "batch filtering: 扫描全部两个费用类型的记录"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": true,
+    "role": "data_analyst",
+    "reason_code": "AGGREGATION_REQUIRED",
+    "task": "扫描开发库中全部个人办公用品和通讯费报销记录，按员工和自然月聚合金额，将聚合后的月度金额与已确认的政策月度标准比较，返回所有超标记录及其详细信息",
+    "allowed_tools": ["exec_command", "mcp__expense_query__*", "mcp__policy_query__*"]
+  },
+  "stopping_conditions": [
+    "找到个人办公用品和通讯费的月度标准金额",
+    "完成全部相关记录的聚合和对比",
+    "超标记录有完整的证据链",
+    "validation_report通过",
+    "submit成功"
+  ],
+  "unresolved_items": []
+}

@@ -1,0 +1,106 @@
+{
+  "task_id": "L2-013",
+  "task_type": "policy_data_comparison",
+  "question": "结合制度和业务数据,核查以R004223为线索的超标准异常,返回异常ID和记录ID集合。",
+  "scope": {
+    "clue_record": "R004223",
+    "expense_type": "training_fee",
+    "audit_period": "2025-01-01 to 2025-12-31",
+    "organization_scope": "全公司 (all departments)",
+    "employee_scope": "clue-driven expansion from R004223"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "培训课程费标准是多少？",
+      "policy_doc": "05_training_expense.md",
+      "clause": "第二条",
+      "rule": "培训课程费按人次控制,每人每期不超过3500元"
+    },
+    {
+      "id": "PQ-02",
+      "question": "超标准报销的判定条件是什么？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十二条",
+      "rule": "无专项审批时,报销金额不得超过对应制度标准的1.0倍"
+    },
+    {
+      "id": "PQ-03",
+      "question": "R004223是否属于超标准报销？",
+      "policy_doc": "05_training_expense.md",
+      "clause": "第二条",
+      "rule": "培训课程费上限3500元, R004223金额3700元 > 3500元, 且special_approval=0"
+    },
+    {
+      "id": "PQ-04",
+      "question": "是否存在与R004223关联或同类模式的其他超标准培训费记录？",
+      "policy_doc": "05_training_expense.md",
+      "clause": "第二条",
+      "rule": "所有培训课程费金额超过3500元且无专项审批的记录"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-01",
+      "question": "R004223的详细信息（金额、员工、部门、审批状态、专项审批标识）",
+      "source": "expense_query.get_expense_detail",
+      "fields": ["record_id", "amount", "employee_id", "department_id", "expense_type", "special_approval", "status"]
+    },
+    {
+      "id": "DQ-02",
+      "question": "E0009的所有培训费记录",
+      "source": "expense_query.list_expenses",
+      "filters": {"employee_id": "E0009", "expense_type": "training_fee"}
+    },
+    {
+      "id": "DQ-03",
+      "question": "全公司所有培训费金额超过3500元的记录",
+      "source": "expense_query.list_expenses + 批处理分析",
+      "filters": {"expense_type": "training_fee", "amount > 3500"}
+    },
+    {
+      "id": "DQ-04",
+      "question": "发票INV004217是否被重复使用",
+      "source": "expense_query.find_reused_invoices",
+      "fields": ["invoice_id"]
+    }
+  ],
+  "required_fields": ["record_id", "amount", "employee_id", "employee_name", "department_name", "expense_type", "expense_date", "special_approval", "reason", "status"],
+  "evidence_requirements": [
+    "R004223的完整记录和审批信息",
+    "所有金额超过3500元的培训费记录及金额对比",
+    "每条异常记录对应的政策条款引用",
+    "专项审批标识核实"
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "audit-query-planner", "description": "规划审计范围和方法", "artifact": "work/audit_plan.json", "status": "completed"},
+    {"step": 2, "action": "policy-version-check", "description": "确认适用的政策版本和条款", "trigger": "training_fee涉及培训费管理办法,需确认2025版有效", "artifact": "work/policy_check.json"},
+    {"step": 3, "action": "batch-expense-analysis", "description": "批量分析培训费数据,检测所有超标准记录", "trigger": "需要聚合筛选培训费 > 3500", "artifact": "work/batch_analysis.json"},
+    {"step": 4, "action": "check R004223 detail and approvals", "description": "核实R004223的详细信息、审批层级和专项审批状态", "artifact": "work/R004223_detail.json"},
+    {"step": 5, "action": "evidence-coverage-check", "description": "检查证据覆盖度和一致性", "artifact": "work/evidence_matrix.json"},
+    {"step": 6, "action": "false-positive-review", "description": "独立复核是否有豁免或例外", "trigger": "有异常发现时", "artifact": "work/false_positive_review.json"},
+    {"step": 7, "action": "audit-report", "description": "生成审计报告", "artifact": "work/audit_report.json"},
+    {"step": 8, "action": "result-validator", "description": "验证结果格式和一致性", "artifact": "work/validation_report.json"},
+    {"step": 9, "action": "validate + submit", "description": "调用validate_audit_result和submit_audit_result", "artifact": "work/final_result.json"}
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "涉及阈值判断（3500元标准线）",
+      "需要批处理聚合筛选（所有培训费 > 3500）",
+      "单条规则单条政策",
+      "无政策版本冲突"
+    ]
+  },
+  "subagent_plan": {
+    "required": false,
+    "reason": "complexity=2但任务范围明确、规则单一、数据可通过直接查询获取,无需专业子智能体"
+  },
+  "stopping_conditions": [
+    "所有培训费超过3500元的记录已被识别并核实",
+    "每条异常记录有对应的政策条款引用",
+    "evidence_matrix覆盖率达到100%",
+    "validation_report状态为pass"
+  ],
+  "unresolved_items": ["需确认是否存在其他与R004223共享特征的超标准记录（如同一供应商、同一发票、同一部门D009的其他培训费）"]
+}

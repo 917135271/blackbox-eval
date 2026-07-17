@@ -1,0 +1,82 @@
+{
+  "task_id": "DEV-010",
+  "task_type": "clean_trap",
+  "complexity": 1,
+  "complexity_reasons": [
+    "Single rule: Article 11 split reimbursement",
+    "Two known records: R900010, R900011",
+    "Date boundary check is the primary analytical task",
+    "No aggregation, no multi-policy conflict, no subagent needed"
+  ],
+  "scope": {
+    "audit_object": "Split reimbursement check for R900010 and R900011",
+    "expense_types": ["travel_transport"],
+    "business_period": "2025-06-01 to 2025-06-09",
+    "employee_ids": ["E9001"],
+    "department_ids": ["D901"]
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-1",
+      "question": "Does Article 11 of the 2025 Expense Reimbursement policy apply to these records?",
+      "boundaries": "Effective date 2025-01-01; expense dates June 2025 → applies"
+    },
+    {
+      "id": "PQ-2",
+      "question": "What constitutes 'within 7 days' for split reimbursement?",
+      "boundaries": "Expense date difference: 2025-06-09 - 2025-06-01 = 8 days"
+    },
+    {
+      "id": "PQ-3",
+      "question": "What is the 'higher approval line' from Authorization Management Appendix II?",
+      "boundaries": "AR-02 (3000-10000, individual) vs AR-03 (10000-50000, combined)"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-1",
+      "question": "Are R900010 and R900011 from the same employee and same expense type?",
+      "finding": "Yes: both E9001, both travel_transport"
+    },
+    {
+      "id": "DQ-2",
+      "question": "What is the date difference between the two expense dates?",
+      "finding": "2025-06-01 to 2025-06-09 = 8 calendar days"
+    },
+    {
+      "id": "DQ-3",
+      "question": "Does the combined amount (10600) reach the higher approval line?",
+      "finding": "Individual: 5300 (AR-02), Combined: 10600 (AR-03 threshold ≥10000)"
+    }
+  ],
+  "required_fields": [
+    "record_id", "employee_id", "expense_type", "expense_date", "amount",
+    "invoice_id", "vendor_name", "reason", "status", "department_id"
+  ],
+  "evidence_requirements": [
+    "Expense detail for R900010 and R900011",
+    "Policy: 01_expense_reimbursement_2025.md Article 11",
+    "Policy: 03_authorization_management.md Appendix II thresholds"
+  ],
+  "execution_steps": [
+    "Write audit plan → work/audit_plan.json",
+    "Record planning_completed checkpoint",
+    "Run policy-version-check (2025 policy applies, 2022 deprecated)",
+    "Calculate date boundary: 8 days > 7 days threshold",
+    "Run evidence-coverage-check",
+    "Produce final_result.json with no-anomaly conclusion",
+    "Run result-validator",
+    "Call validate_audit_result → submit_audit_result"
+  ],
+  "subagent_plan": {
+    "subagent_requested": false,
+    "reason": "Complexity=1, compact main-context review sufficient"
+  },
+  "stopping_conditions": [
+    "Date difference conclusively determined",
+    "Policy version applicability confirmed",
+    "All evidence rows covered in matrix"
+  ],
+  "preliminary_finding": "R900010 (2025-06-01) and R900011 (2025-06-09) are 8 days apart, exceeding the 7-day threshold in Article 11. The split reimbursement rule does NOT apply because the date condition is not met. Result: 无异常 (no anomaly).",
+  "unresolved_items": []
+}

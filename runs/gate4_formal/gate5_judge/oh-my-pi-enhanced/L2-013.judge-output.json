@@ -1,0 +1,34 @@
+{
+  "criteria": [
+    {
+      "id": "audit-conclusion",
+      "score": 20,
+      "reason": "结论明确判定为超标准异常，与预期一致，异常ID不同但不影响类型正确。",
+      "answer_evidence": "确认存在超标准异常。",
+      "trace_evidence": "get_expense_detail 返回 R004223 金额 3700，培训费管理办法第二条标准 3500，比较后判断超标。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 15,
+      "reason": "引用了费用报销管理办法第十二条（对应6.3）并说明无专项审批不得超标准，条款直接支持结论。",
+      "answer_evidence": "违反报销管理办法(2025修订版)第十二条无专项审批不得超标准的规定。",
+      "trace_evidence": "调用 get_policy_doc 获取 01_expense_reimbursement_2025.md，其中第十二条对应费用报销管理办法-6.3。"
+    },
+    {
+      "id": "case-reasoning",
+      "score": 20,
+      "reason": "完整给出了费用类型、金额、标准、差额，推理清晰且与数据一致。",
+      "answer_evidence": "R004223 费用类型为培训费，金额 ¥3,700.00，超过培训费管理办法第二条规定标准 ¥3,500.00，超出 ¥200.00。",
+      "trace_evidence": "get_expense_detail 返回 amount:3700，培训费管理办法第二条标准 3500，计算差额 200。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的 record_id R004223 存在于数据库，且为相关记录。"
+    }
+  ],
+  "overall_comment": "候选正确识别了超标准异常，引用了对应的制度条款，推理事实清晰，无关键错误。",
+  "confidence": 1.0
+}

@@ -1,0 +1,146 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 15.0,
+  "case_score_raw": 15.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "候选回答声称核查了R000002等12条记录，未提及本题记录。",
+      "id": "clean-conclusion",
+      "reason": "结论虽为无异常，但基于错误记录集，未针对本题记录(R004239,R004240)，实质未完成本题要求。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用痕迹，无法确认核查过程。"
+    },
+    {
+      "answer_evidence": "提交的record_ids为[R000002, R000005, R000020, R000028, R000037, R000055, R004201, R004202, R004203, R004204, R004205, R004206]。",
+      "id": "record-scope",
+      "reason": "提交记录集完全错误，未包含期望记录R004239和R004240，反而包含12条无关记录。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用，记录集完全偏离。"
+    },
+    {
+      "answer_evidence": "回答仅提及'重复发票注入样本'及第十条，未提及unique invoices、娱乐标准等。",
+      "id": "case-specific-reason",
+      "reason": "所述合规原因与本题不符，未涉及娱乐标准、总计低于审批线等专属原因。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用，缺乏数据支撑。"
+    },
+    {
+      "answer_evidence": "无相关证据。",
+      "id": "reverse-check",
+      "reason": "没有任何工具调用痕迹，未进行任何阈值、日期、发票等核查。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用计数为0。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": true,
+      "reason": "候选提交的record_ids虽可能存在，但与本题无关，完全未核查本题记录R004239和R004240，以无关记录支撑结论。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "未将合规记录判为异常。",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R000002",
+      "R000005",
+      "R000020",
+      "R000028",
+      "R000037",
+      "R000055",
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 114.438,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004239",
+      "R004240"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 12,
+      "f1": 0.0,
+      "missing_count": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:27:06+08:00",
+  "group": "opencode-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选提交核查了错误的记录集，结论虽为无异常但未针对本题记录，且无任何工具核查，完全不符合题目要求。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2395,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1843
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 1093,
+      "prompt_tokens": 2117,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 4512
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/opencode-baseline/TRAP-005",
+  "task_id": "TRAP-005"
+}

@@ -1,0 +1,101 @@
+{
+  "task_id": "DEV-012",
+  "task_type": "audit_report",
+  "complexity": 4,
+  "complexity_reasons": [
+    "Two or more policies: 01_expense_reimbursement, 04_travel, 05_training, 06_business_entertainment, 07_office_communication, 08_budget",
+    "Aggregation/grouping/joins: monthly communication totals, department budget aggregation",
+    "Two or more business rules: duplicate, split, over-standard, overdue, over-budget (5 rules)",
+    "Thresholds/dates/exemptions: 60-day window, 7-day split window, per-capita entertainment, year-end extension"
+  ],
+  "scope": {
+    "audit_period": "2025-01-01 to 2025-12-31",
+    "departments": ["D901", "D902"],
+    "expense_types": "all",
+    "rules_to_check": [
+      "duplicate_reimbursement",
+      "split_reimbursement",
+      "over_standard",
+      "overdue",
+      "over_budget"
+    ]
+  },
+  "policy_questions": [
+    {
+      "rule": "duplicate_reimbursement",
+      "policy_ref": "01_expense_reimbursement_2025.md Art.10",
+      "condition": "Same invoice reimbursed more than once",
+      "fields_needed": ["invoice_no", "employee_id", "amount", "record_id"]
+    },
+    {
+      "rule": "split_reimbursement",
+      "policy_ref": "01_expense_reimbursement_2025.md Art.11",
+      "condition": "Same employee, same expense_type, within 7 days, combined amount reaches higher approval level per 03_authorization_management.md",
+      "fields_needed": ["employee_id", "expense_type", "expense_date", "amount", "record_id"]
+    },
+    {
+      "rule": "over_standard",
+      "policy_ref": "01_expense_reimbursement_2025.md Art.12; 04_travel_expense.md Art.4; 05_training_expense.md Art.2-5; 06_business_entertainment.md Art.2-3; 07_office_communication.md Art.2-3",
+      "condition": "Amount exceeds applicable standard",
+      "standards": {
+        "office_supplies": "600/month/person",
+        "communication": "300/month/person",
+        "travel_lodging_manager_tier1": "650/night",
+        "travel_lodging_staff_tier1": "450/night",
+        "training_fee_internal": "800/day",
+        "training_lodging_tier1": "500/night",
+        "business_entertainment": "5000/event, 300/person"
+      },
+      "fields_needed": ["employee_id", "expense_type", "amount", "reason", "expense_date", "record_id"]
+    },
+    {
+      "rule": "overdue",
+      "policy_ref": "01_expense_reimbursement_2025.md Art.7, Art.9",
+      "condition": "Reimburse_date - expense_date > 60 days; year-end expenses (Dec) get 15-day extension from Dec 31",
+      "fields_needed": ["expense_date", "reimburse_date", "record_id"]
+    },
+    {
+      "rule": "over_budget",
+      "policy_ref": "08_budget_management.md Art.3",
+      "condition": "Department used_amount > annual_budget × 1.0",
+      "fields_needed": ["department_id", "amount", "record_id"]
+    }
+  ],
+  "data_questions": [
+    "Identify all records sharing same invoice_no",
+    "For each employee+expense_type, find records within 7-day windows and check combined approval levels",
+    "Check each record against its applicable standard by expense_type",
+    "Compute reimburse_delay = reimburse_date - expense_date for each record",
+    "Sum department totals and compare to annual budgets",
+    "Check monthly communication totals per employee"
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "Create audit plan", "artifact": "work/audit_plan.json", "status": "done"},
+    {"step": 2, "action": "Record planning_completed checkpoint", "artifact": "work/context_checkpoint.json", "status": "pending"},
+    {"step": 3, "action": "Authorize data_analyst subagent", "reason_code": "MULTI_RECORD_SCOPE", "status": "pending"},
+    {"step": 4, "action": "Launch data_analyst for comprehensive batch analysis", "status": "pending"},
+    {"step": 5, "action": "Policy-version-check in main context (compact)", "status": "pending"},
+    {"step": 6, "action": "Complete data_analyst and integrate findings", "status": "pending"},
+    {"step": 7, "action": "Evidence-coverage-check", "status": "pending"},
+    {"step": 8, "action": "False-positive-review", "status": "pending"},
+    {"step": 9, "action": "Audit-report", "status": "pending"},
+    {"step": 10, "action": "Result-validator", "status": "pending"},
+    {"step": 11, "action": "Validate and submit via audit_control", "status": "pending"}
+  ],
+  "subagent_plan": {
+    "role": "data_analyst",
+    "reason_code": "MULTI_RECORD_SCOPE",
+    "complexity": 4,
+    "task": "Perform comprehensive batch expense analysis across all 21 records for 5 rules: duplicate (same invoice), split (same employee+type within 7 days, combined reaching higher AR level), over-standard (by expense type against policy standards), overdue (>60 days, with year-end extension), over-budget (department total vs annual budget). Use SQLite and Python for aggregation, date computation, and threshold checks. Save detailed analysis to work/subagents/data_analyst/.",
+    "allowed_tools": ["Bash", "Read", "Write", "Glob", "Grep"],
+    "output_fields": ["decision", "key_findings", "record_ids", "citations", "unresolved_items", "artifact_paths"]
+  },
+  "stopping_conditions": [
+    "All 5 rules fully checked against all 21 records",
+    "Evidence matrix reaches 100% coverage",
+    "False-positive review completed",
+    "Validation passes with valid=true",
+    "Submission accepted"
+  ],
+  "unresolved_items": []
+}

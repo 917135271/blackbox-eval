@@ -1,0 +1,135 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 75.0,
+  "case_score_raw": 75.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "answer字段为“无异常”，anomaly_ids为[]。",
+      "id": "clean-conclusion",
+      "reason": "明确给出无异常结论，anomaly_ids为空，与预期一致。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "最终提交中未发现矛盾表述。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "record-scope",
+      "reason": "record_ids集合F1=1.000",
+      "score": 15.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "answer仅给出“无异常”，未解释原因。",
+      "id": "case-specific-reason",
+      "reason": "未在答案或轨迹中说明“outside aggregation window”这一专属合规原因，仅提供结论和引用。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹未提及聚合窗口或相关边界。"
+    },
+    {
+      "answer_evidence": "最终答案为无异常。",
+      "id": "reverse-check",
+      "reason": "轨迹中执行了多项核查，包括查询拆分政策、员工、预算，并获取R004236和R004237详情，其日期差8天，可支持无异常结论。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_expense_detail  R004236（expense_date 2025-10-01）和 R004237（expense_date 2025-10-09），间隔8天，不触发7天拆分规则；同时搜索了拆分、重复报销等政策。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的record_ids均为有效记录。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "未将合规记录判为异常，anomaly_ids为空。",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 292.501,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:25:47+08:00",
+  "group": "codex-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.9,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "整体判断正确，但未说明关键合规原因（outside aggregation window），仅给出结论。建议在回答中明确说明记录不触发异常的具体理由。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1467,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1059
+      },
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 9218,
+      "prompt_tokens": 10114,
+      "prompt_tokens_details": {
+        "cached_tokens": 896
+      },
+      "total_tokens": 11581
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/codex-baseline/TRAP-003",
+  "task_id": "TRAP-003"
+}

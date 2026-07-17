@@ -1,0 +1,57 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANO-L2-008-SPLIT-001",
+      "record_ids": [
+        "R004212",
+        "R004213"
+      ],
+      "citations": [
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第十一条"
+        },
+        {
+          "doc_id": "03_authorization_management.md",
+          "clause_no": "附件二"
+        }
+      ],
+      "facts": [
+        "R004212：员工E0009(张婷)，差旅住宿，2025-04-10，金额5100元，发票FP2025X0004206，审批档位AR-02",
+        "R004213：同一员工E0009(张婷)，差旅住宿，2025-04-15，金额5100元，发票FP2025X0004207，审批档位AR-02",
+        "两笔报销间隔5天（在7天内），同一费用类型travel_lodging，合计金额10200元",
+        "AR-02档位覆盖3000-9999元（部门经理审批），AR-03档位覆盖10000-49999元（部门总经理审批）",
+        "合并金额10200元达到AR-03档位，但拆分后每笔5100元仅需AR-02审批",
+        "两笔报销原因均标注'拆分报销注入样本3'，明确为拆分报销测试样本"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": [
+    "R004212",
+    "R004213"
+  ],
+  "submitted_record_ids": [
+    "R004212",
+    "R004213"
+  ],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true
+  },
+  "reconciled_figures": {
+    "R004212_amount": 5100.0,
+    "R004213_amount": 5100.0,
+    "combined_amount": 10200.0,
+    "AR-02_upper_bound": 10000,
+    "AR-03_lower_bound": 10000
+  },
+  "unresolved_items": []
+}

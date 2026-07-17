@@ -1,0 +1,205 @@
+{
+  "case_family": "retrieval_and_report",
+  "case_score": 57.5,
+  "case_score_raw": 57.5,
+  "category": "audit_report",
+  "criteria": [
+    {
+      "answer_evidence": "答案及提交的异常ID列表仅列出26个异常，未提及30或5",
+      "id": "overall-count",
+      "reason": "报告中未说明异常总数30和陷阱位5个",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中未见任何关于异常总数或陷阱位的陈述"
+    },
+    {
+      "answer_evidence": "答案中列出：重复报销、部门预算超支、超期报销、拆分报销，以及缺少财务复核审批（非超标准）",
+      "id": "five-rule-coverage",
+      "reason": "覆盖了重复、拆分、超预算、超期四类规则，缺失'超标准'",
+      "score": 10.0,
+      "source": "llm_judge",
+      "trace_evidence": "find_reused_invoices（重复）、list_records_by_reimburse_delay（超期）、summarize_department_budgets（预算）、分组查询拆分，无标准对比工具调用"
+    },
+    {
+      "answer_evidence": "重复：ANOM-REUSE-001等；拆分：ANOM-SPLIT-001等；超预算：ANOM-BUDGET-001等；超期：ANOM-DELAY-001等；无超标准ID",
+      "id": "representative-ids",
+      "reason": "四类规则（重复、拆分、超预算、超期）有异常ID和记录证据，缺失'超标准'类别",
+      "score": 12.5,
+      "source": "llm_judge",
+      "trace_evidence": "find_reused_invoices返回FP202500000002等；拆分检查R004207等；budget来自summarize_department_budgets；delay来自list_records_by_reimburse_delay返回R004231等"
+    },
+    {
+      "answer_evidence": "重复引用第十条，拆分引用第十一条，超期引用第七条，预算引用第十三条及预算管理办法第三条",
+      "id": "policy-coverage",
+      "reason": "费用类规则引用费用报销制度，预算规则引用预算制度，对应准确",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc获取01_expense_reimbursement_2025.md和08_budget_management.md，条款存在"
+    },
+    {
+      "answer_evidence": "",
+      "id": "trap-control",
+      "reason": "未将TRAP记录计为异常",
+      "score": 15.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "答案包含'审计范围'、'异常发现摘要'（事实与判断）、'总体评估'（影响与建议）",
+      "id": "report-shape",
+      "reason": "报告包含事实、规则、判断、影响和建议，与结构化结果一致",
+      "score": 5.0,
+      "source": "llm_judge",
+      "trace_evidence": "提交的anomaly_ids列表与报告中列出的异常ID完全一致"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有record_id均通过工具调用返回，无捏造记录",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": false,
+      "reason": "工具调用覆盖全年数据（如find_reused_invoices返回全部重复发票，list_records_missing_approval返回4240条记录），无部分扫描冒充",
+      "score_cap": 50,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-included-as-anomaly",
+      "triggered": false,
+      "reason": "未将任何TRAP开头的记录计入异常",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "ANOM-APPR-001",
+      "ANOM-BUDGET-001",
+      "ANOM-BUDGET-002",
+      "ANOM-BUDGET-003",
+      "ANOM-BUDGET-004",
+      "ANOM-BUDGET-005",
+      "ANOM-BUDGET-006",
+      "ANOM-DELAY-001",
+      "ANOM-DELAY-002",
+      "ANOM-DELAY-003",
+      "ANOM-DELAY-004",
+      "ANOM-DELAY-005",
+      "ANOM-DELAY-006",
+      "ANOM-REUSE-001",
+      "ANOM-REUSE-002",
+      "ANOM-REUSE-003",
+      "ANOM-REUSE-004",
+      "ANOM-REUSE-005",
+      "ANOM-REUSE-006",
+      "ANOM-SPLIT-001",
+      "ANOM-SPLIT-002",
+      "ANOM-SPLIT-003",
+      "ANOM-SPLIT-004",
+      "ANOM-SPLIT-005",
+      "ANOM-SPLIT-006",
+      "ANOM-SPLIT-007"
+    ],
+    "actual_record_ids": [
+      "R000002",
+      "R000003",
+      "R000005",
+      "R000020",
+      "R000028",
+      "R000037",
+      "R000055",
+      "R001201",
+      "R001255",
+      "R001990",
+      "R003516",
+      "R003850",
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206",
+      "R004207",
+      "R004208",
+      "R004209",
+      "R004210",
+      "R004211",
+      "R004212",
+      "R004213",
+      "R004214",
+      "R004215",
+      "R004216",
+      "R004217",
+      "R004218",
+      "R004219",
+      "R004220",
+      "R004223",
+      "R004227",
+      "R004228",
+      "R004229",
+      "R004230",
+      "R004231",
+      "R004232",
+      "R004233",
+      "R004236",
+      "R004237"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "BUDGET": 6,
+        "DUP": 6,
+        "OVERDUE": 6,
+        "SPLIT": 7
+      },
+      "count_exact": false,
+      "expected_types": {},
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "citation_count": 8,
+    "elapsed_seconds": 246.205,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:22:43+08:00",
+  "group": "openclaude-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.9,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "报告覆盖了除'超标准'以外的四类规则，但未按要求说明异常总数和陷阱位数量，整体证据较完整，制度引用基本准确。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 3816,
+      "completion_tokens_details": {
+        "reasoning_tokens": 3004
+      },
+      "prompt_cache_hit_tokens": 14976,
+      "prompt_cache_miss_tokens": 65,
+      "prompt_tokens": 15041,
+      "prompt_tokens_details": {
+        "cached_tokens": 14976
+      },
+      "total_tokens": 18857
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/openclaude-baseline/L3-009",
+  "task_id": "L3-009"
+}

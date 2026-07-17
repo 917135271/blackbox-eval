@@ -1,0 +1,88 @@
+{
+  "task_id": "L2-008",
+  "task_type": "policy_data_comparison",
+  "audit_object": "以R004212为线索的拆分报销异常",
+  "clue_record": "R004212",
+  "audit_period": {
+    "start": "2025-04-03",
+    "end": "2025-04-17",
+    "reason": "R004212 expense_date ± 7 days per Article 11 split reimbursement window"
+  },
+  "scope": {
+    "rule": "拆分报销",
+    "policy_clause": "01_expense_reimbursement_2025.md 第十一条",
+    "employee_id": "E0009",
+    "expense_type": "travel_lodging"
+  },
+  "policy_questions": [
+    {
+      "question": "Which policy version applies to the 2025-04-10/04-15 expense events?",
+      "answer": "01_expense_reimbursement_2025.md, effective 2025-01-01; 2022 version is deprecated"
+    },
+    {
+      "question": "What is the split reimbursement rule?",
+      "clause": "第十一条: 同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到《授权管理办法》附件二较高审批线的,应重点核查拆分规避审批"
+    },
+    {
+      "question": "What are the authorization approval thresholds?",
+      "source": "03_authorization_management.md 附件二",
+      "relevant_lines": [
+        "AR-02: 3000-10000 → 部门经理+财务复核",
+        "AR-03: 10000-50000 → 部门总经理"
+      ]
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "What records exist for E0009 with travel_lodging within ±7 days of 2025-04-10?",
+      "result": "R004212 (2025-04-10, ¥5100) and R004213 (2025-04-15, ¥5100)"
+    },
+    {
+      "question": "Do R004212 and R004213 share the same employee, expense type, and fall within 7 days?",
+      "result": "Yes: both E0009, travel_lodging, 5 days apart"
+    },
+    {
+      "question": "Does the combined amount reach a higher approval line?",
+      "result": "Combined ¥10,200 ≥ AR-03 threshold ¥10,000; individual ¥5,100 each in AR-02 range"
+    }
+  ],
+  "required_fields": [
+    "record_id", "employee_id", "expense_type", "expense_date", "amount",
+    "status", "special_approval", "nights", "city_tier", "employee_level",
+    "invoice_no", "approval tier"
+  ],
+  "evidence_needed": [
+    "R004212 full detail and approvals",
+    "R004213 full detail and approvals",
+    "Policy 01_expense_reimbursement_2025.md Article 11",
+    "Policy 03_authorization_management.md Annex 2",
+    "Complete search proof for E0009 travel_lodging in the 7-day window"
+  ],
+  "execution_steps": [
+    "1. Policy-version-check: 2025 policy applies; 2022 deprecated",
+    "2. Batch-expense-analysis: search E0009 travel_lodging in 7-day window",
+    "3. Verify combined amount crosses AR-03 threshold",
+    "4. Evidence-coverage-check",
+    "5. Audit-report",
+    "6. Result-validator",
+    "7. Submit"
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "aggregation/grouping: finding same-employee same-type records within date window (+1)",
+      "threshold/date boundary: 7-day window and ¥10,000 approval threshold (+1)"
+    ]
+  },
+  "subagent_plan": {
+    "required": false,
+    "reason": "Compact mode sufficient: only two records in scope, single rule, no policy ambiguity, data already retrieved"
+  },
+  "stopping_conditions": [
+    "All E0009 travel_lodging records in 2025-04-03 to 2025-04-17 window identified",
+    "Each record's approval tier confirmed",
+    "Combined amount vs authorization threshold verified",
+    "Evidence matrix passes at 100%"
+  ],
+  "unresolved_items": []
+}

@@ -1,0 +1,70 @@
+{
+  "task_id": "DEV-010",
+  "audit_scope": {
+    "object": "拆分报销核查：R900010、R900011",
+    "period": "2025-06-01 至 2025-06-09",
+    "organization": "开发审计一部 (D901)",
+    "employee": "开发员工甲 (E9001)",
+    "data_scope": "两笔指定报销记录"
+  },
+  "verified_facts": [
+    "R900010: 员工E9001, 费用类型travel_transport, 金额5300元, 费用日期2025-06-01, 发票INV900010, 供应商开发供应商10, 状态approved",
+    "R900011: 员工E9001, 费用类型travel_transport, 金额5300元, 费用日期2025-06-09, 发票INV900011, 供应商开发供应商11, 状态approved",
+    "两笔费用合计: 10600元",
+    "费用日期间隔: 2025-06-01至2025-06-09, 共8个自然日"
+  ],
+  "applicable_policies": [
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "clause": "第十一条",
+      "effective_date": "2025-01-01",
+      "rule_text": "同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到《授权管理办法》附件二较高审批线的,应重点核查拆分规避审批。"
+    },
+    {
+      "doc_id": "03_authorization_management.md",
+      "title": "XX证券授权管理办法",
+      "clause": "附件二",
+      "effective_date": "2025-01-01",
+      "thresholds": {
+        "AR-02": "3000至10000元(部门经理+财务复核)",
+        "AR-03": "10000至50000元(部门总经理)"
+      }
+    }
+  ],
+  "findings": [
+    {
+      "condition": "同一员工",
+      "observed": "E9001 (R900010) == E9001 (R900011)",
+      "result": "满足"
+    },
+    {
+      "condition": "同一费用类型",
+      "observed": "travel_transport (R900010) == travel_transport (R900011)",
+      "result": "满足"
+    },
+    {
+      "condition": "7天内",
+      "threshold": "≤7个自然日",
+      "observed": "8个自然日 (2025-06-01 至 2025-06-09)",
+      "result": "不满足 — 超出阈值1天"
+    },
+    {
+      "condition": "合计达到较高审批线",
+      "threshold": "≥10000元 (AR-03)",
+      "observed": "10600元",
+      "result": "满足 (但7天条件已不满足, 不适用)"
+    }
+  ],
+  "conclusion": "无异常",
+  "conclusion_reason": "R900010与R900011虽为同一员工同一费用类型且合计金额达到较高审批线,但费用日期间隔8天超过第十一条规定的7天阈值,不构成拆分报销。",
+  "anomaly_ids": [],
+  "record_ids": ["R900010", "R900011"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+  ],
+  "impact": "无",
+  "recommendations": "无需处理",
+  "limitations": "无"
+}

@@ -1,0 +1,210 @@
+{
+  "case_family": "full_year_audit",
+  "case_score": 11.0,
+  "case_score_raw": 11.0,
+  "category": "full_year_rule_audit",
+  "criteria": [
+    {
+      "answer_evidence": "提交的anomaly_ids包含ANOM-LATE-001, ANOM-REUSE-*, ANOM-SPLIT-*, ANOM-STD-*等共19个，预期仅为OVERSTD-001~006。",
+      "id": "all-anomaly-ids",
+      "reason": "提交的异常ID集合与预期完全不一致，包含大量其他规则异常，未满足完全一致要求。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用，无法验证扫描是否只针对超标准。"
+    },
+    {
+      "answer_evidence": "record_ids包含R004221-R004226，但也包含R000002等大量重复、拆分、超期记录。",
+      "id": "all-record-ids",
+      "reason": "返回了38个记录ID，包含预期6个超标准记录，但同时包含32个无关记录，不符合完整且无多余的要求。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用，无法验证这些记录是否经查询确认。"
+    },
+    {
+      "answer_evidence": "答案仅陈述结果，无SQL、数据提取或计算步骤。",
+      "id": "full-scan-method",
+      "reason": "无任何工具调用，未展示全年数据查询或计算过程，无法证明执行了全量扫描。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "tool_trace_summary显示call_count为0，无样本。"
+    },
+    {
+      "answer_evidence": "citations包含01_expense_reimbursement_2025.md的第十二条及04~07等文件条款；evidence_matrix中每个超标准异常列出了标准对照。",
+      "id": "policy-basis",
+      "reason": "正确引用了费用报销管理办法第十二条（即6.3）及各类别标准，每个超标准异常有明确数额对比，但未展示查询条件。",
+      "score": 6.0,
+      "source": "llm_judge",
+      "trace_evidence": "无查询条件展示。"
+    },
+    {
+      "answer_evidence": "anomaly_ids包含ANOM-REUSE-*, ANOM-SPLIT-*, ANOM-LATE-*等非超标准异常。",
+      "id": "false-positive-control",
+      "reason": "提交了19个异常ID和38个记录ID，其中13个异常属于重复、拆分、超期等其他规则，构成严重误报。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "无。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的record_id在数据库中均存在，无虚构。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": true,
+      "reason": "工具调用为零，无任何查询证据，却声称完成全年超标准专项扫描，存在虚假表述。",
+      "score_cap": 50,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "ANOM-LATE-001",
+      "ANOM-REUSE-001",
+      "ANOM-REUSE-002",
+      "ANOM-REUSE-003",
+      "ANOM-REUSE-004",
+      "ANOM-REUSE-005",
+      "ANOM-REUSE-006",
+      "ANOM-SPLIT-001",
+      "ANOM-SPLIT-002",
+      "ANOM-SPLIT-003",
+      "ANOM-SPLIT-004",
+      "ANOM-SPLIT-005",
+      "ANOM-SPLIT-006",
+      "ANOM-STD-COMM",
+      "ANOM-STD-ENTERTAIN",
+      "ANOM-STD-LODGING",
+      "ANOM-STD-OFFICE",
+      "ANOM-STD-TRAINING",
+      "ANOM-STD-TRANSPORT"
+    ],
+    "actual_record_ids": [
+      "R000002",
+      "R000005",
+      "R000020",
+      "R000028",
+      "R000037",
+      "R000055",
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206",
+      "R004207",
+      "R004208",
+      "R004209",
+      "R004210",
+      "R004211",
+      "R004212",
+      "R004213",
+      "R004214",
+      "R004215",
+      "R004216",
+      "R004217",
+      "R004218",
+      "R004219",
+      "R004220",
+      "R004221",
+      "R004222",
+      "R004223",
+      "R004224",
+      "R004225",
+      "R004226",
+      "R004227",
+      "R004228",
+      "R004229",
+      "R004230",
+      "R004231",
+      "R004232"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "DUP": 6,
+        "OVERDUE": 1,
+        "OVERSTD": 6,
+        "SPLIT": 6
+      },
+      "count_exact": false,
+      "expected_types": {
+        "OVERSTD": 6
+      },
+      "f1": 0.48,
+      "precision": 0.315789,
+      "recall": 1.0
+    },
+    "citation_count": 10,
+    "elapsed_seconds": 433.981,
+    "expected_anomaly_ids": [
+      "OVERSTD-001",
+      "OVERSTD-002",
+      "OVERSTD-003",
+      "OVERSTD-004",
+      "OVERSTD-005",
+      "OVERSTD-006"
+    ],
+    "expected_record_ids": [
+      "R004221",
+      "R004222",
+      "R004223",
+      "R004224",
+      "R004225",
+      "R004226"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 32,
+      "f1": 0.272727,
+      "missing_count": 0,
+      "precision": 0.157895,
+      "recall": 1.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:27:09+08:00",
+  "group": "opencode-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.95,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "未按题目要求仅返回超标准异常，而是输出全部异常类型，导致大量误报；且缺乏全年扫描的方法证据，制度引用正确但未体现查询执行。整体未有效完成专项任务。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 3935,
+      "completion_tokens_details": {
+        "reasoning_tokens": 3203
+      },
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 6692,
+      "prompt_tokens": 8100,
+      "prompt_tokens_details": {
+        "cached_tokens": 1408
+      },
+      "total_tokens": 12035
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/opencode-baseline/L3-003",
+  "task_id": "L3-003"
+}

@@ -1,0 +1,136 @@
+{
+  "case_family": "record_audit",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "policy_data_comparison",
+  "criteria": [
+    {
+      "answer_evidence": "候选答案：“发现1项超标准异常：R004223培训费报销金额3700.00元超出制度标准...违反费用报销管理办法第十二条。”",
+      "id": "audit-conclusion",
+      "reason": "结论正确判定超标准，异常类型匹配OVERSTD，记录ID正确。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用轨迹，但候选提交中证据矩阵显示事实核查一致。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "anomaly-id",
+      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
+      "score": 15.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "record-set",
+      "reason": "record_ids集合F1=1.000",
+      "score": 25.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "引用：“费用报销管理办法第十二条”和“培训费管理办法第二条”。",
+      "id": "policy-basis",
+      "reason": "引用了费用报销管理办法第十二条（对应6.3），且引用了培训费标准，条款有效支持结论。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用轨迹。"
+    },
+    {
+      "answer_evidence": "候选答案：“R004223培训费报销金额3700.00元...培训费管理办法第二条规定...3500元...R004223金额3700元超出标准200元...special_approval=0”。",
+      "id": "case-reasoning",
+      "reason": "明确给出培训费金额3700元，标准3500元，超额200元，且无专项审批，推理完整一致。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用轨迹，但证据矩阵扫描了578条记录。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的记录ID R004223在数据库中存在，与线索一致，无虚构或无关记录。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "ANOMALY-L2-013-001"
+    ],
+    "actual_record_ids": [
+      "R004223"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "OVERSTD": 1
+      },
+      "count_exact": true,
+      "expected_types": {
+        "OVERSTD": 1
+      },
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 2,
+    "elapsed_seconds": 275.82,
+    "expected_anomaly_ids": [
+      "OVERSTD-003"
+    ],
+    "expected_record_ids": [
+      "R004223"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [
+      "clause:费用报销管理办法-6.3"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:30:15+08:00",
+  "group": "opencode-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选准确识别超标准异常，制度依据和推理完整，无关键失败。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1514,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1085
+      },
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 1371,
+      "prompt_tokens": 2267,
+      "prompt_tokens_details": {
+        "cached_tokens": 896
+      },
+      "total_tokens": 3781
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/opencode-enhanced/L2-013",
+  "task_id": "L2-013"
+}

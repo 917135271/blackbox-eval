@@ -1,0 +1,169 @@
+{
+  "case_family": "policy_and_version",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "near_clause_disambiguation",
+  "criteria": [
+    {
+      "answer_evidence": "差旅住宿标准（《XX证券差旅费管理办法》第四条）：按员工职级和城市档位双重维度确定...",
+      "id": "travel-policy",
+      "reason": "明确指出差旅住宿适用《XX证券差旅费管理办法》，并给出第四条具体标准，制度和场景均正确。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "获取04_travel_expense.md，其中第四条详细列出住宿标准。"
+    },
+    {
+      "answer_evidence": "培训住宿标准（《XX证券培训费管理办法》第五条）：仅按城市档位单一维度确定...",
+      "id": "training-policy",
+      "reason": "明确指出培训住宿适用《XX证券培训费管理办法》，并给出第五条标准，制度和场景均正确。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "获取05_training_expense.md，其中第五条列出培训住宿标准。"
+    },
+    {
+      "answer_evidence": "不能混用的原因：1. 标准结构根本不同... 2. 制度明确禁止混用... 3. 审计发现...",
+      "id": "no-mixing",
+      "reason": "从标准结构根本不同、制度明确禁止、数值差异实例和审计发现等多角度解释了不同场景和数值差异，说明不能混用。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "无"
+    },
+    {
+      "answer_evidence": "citations: [04_travel_expense.md 第四条、第七条；05_training_expense.md 第五条、第六条]",
+      "id": "comparison-evidence",
+      "reason": "引用了《XX证券差旅费管理办法》和《XX证券培训费管理办法》两份制度，并给出具体条款，证据完整可核查。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用获取了两份制度文档全文，包含所需条款。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "未发现数据库不存在的record_id，所有引用的记录均通过工具调用获取详情且有效。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未使用已废止制度，仅引用了现行有效的差旅费和培训费管理办法。",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "AN-L3-008-STANDARD-MIX"
+    ],
+    "actual_record_ids": [
+      "R000347",
+      "R003992",
+      "R002457",
+      "R000442",
+      "R001870",
+      "R002003",
+      "R000328",
+      "R002576",
+      "R001150",
+      "R000661",
+      "R000634",
+      "R000751",
+      "R003346",
+      "R001481",
+      "R000132",
+      "R001663",
+      "R004182",
+      "R004180",
+      "R000392",
+      "R003382",
+      "R001395",
+      "R003618",
+      "R003509",
+      "R000481",
+      "R001600",
+      "R002897",
+      "R001239",
+      "R003306",
+      "R002688",
+      "R002180",
+      "R004138",
+      "R000166",
+      "R000245",
+      "R001247",
+      "R001664",
+      "R002602",
+      "R002303",
+      "R004094",
+      "R003389",
+      "R003771",
+      "R003507",
+      "R000620",
+      "R000214",
+      "R000797",
+      "R002877",
+      "R001652",
+      "R001829"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": false,
+      "expected_types": {},
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "citation_count": 4,
+    "elapsed_seconds": 251.601,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:expense_standards.travel_lodging",
+      "policy:expense_standards.training.training_lodging",
+      "document:04_travel_expense.md",
+      "document:05_training_expense.md"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:28:08+08:00",
+  "group": "openclaude-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "正确比较了差旅住宿与培训住宿标准，清晰解释了两套标准适用不同场景、数值差异及禁止混用的制度依据，引证充分，推理完整。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1594,
+      "completion_tokens_details": {
+        "reasoning_tokens": 999
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 8718,
+      "prompt_tokens": 9742,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 11336
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/openclaude-enhanced/L3-008",
+  "task_id": "L3-008"
+}

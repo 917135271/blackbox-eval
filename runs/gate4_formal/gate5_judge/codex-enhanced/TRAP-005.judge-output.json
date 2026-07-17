@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "clean-conclusion",
+      "score": 30,
+      "reason": "候选明确给出无异常结论，答案中表述无矛盾。",
+      "answer_evidence": "答案声明“TRAP-005涉及的记录不构成异常”。",
+      "trace_evidence": "核查轨迹最终结论为无异常。"
+    },
+    {
+      "id": "record-scope",
+      "score": 0,
+      "reason": "核查记录完全偏离预期，未覆盖核心记录R004239、R004240，而是关注了无关的R000005和R004202。",
+      "answer_evidence": "提交的record_ids为[\"R000005\", \"R004202\"]。",
+      "trace_evidence": "轨迹仅对R000005、R004202、R000002、R004201等记录调用get_expense_detail，未提及R004239或R004240。"
+    },
+    {
+      "id": "case-specific-reason",
+      "score": 0,
+      "reason": "未说明本题专属合规原因（unique invoices, within entertainment standards, total below approval line），给出的理由（发票重复、时序不可行）与预期不符，且未核查正确记录。",
+      "answer_evidence": "答案解释为“R004202发票日期晚于报销日期，reason标注‘重复发票注入样本’”。",
+      "trace_evidence": "轨迹未查询R004239或R004240的详情、娱乐标准或审批线。"
+    },
+    {
+      "id": "reverse-check",
+      "score": 0,
+      "reason": "未针对本题边界条件（娱乐标准、审批线、发票唯一性）进行核查，轨迹中的工具调用均围绕错误的记录展开。",
+      "answer_evidence": "答案无相关核查说明。",
+      "trace_evidence": "轨迹使用了find_reused_invoices、get_expense_detail等，但所有核查均指向非预期记录。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的记录ID均存在于数据库，未虚构记录。"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "候选未将合规记录判为异常，结论为无异常。"
+    }
+  ],
+  "overall_comment": "候选虽给出无异常结论，但完全核查了错误记录，导致记录范围、合规原因和反向验证均未得分，整体审计失效。",
+  "confidence": 1.0
+}

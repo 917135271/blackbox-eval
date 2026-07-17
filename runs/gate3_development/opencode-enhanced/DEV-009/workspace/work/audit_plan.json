@@ -1,0 +1,48 @@
+{
+  "task_scope": "核查R900008与R900009是否属于重复报销",
+  "audit_period": "2025-05-05",
+  "policy_questions": [
+    "重复报销规则：同一发票最多报销1次（第十条）"
+  ],
+  "data_questions": [
+    "R900008和R900009的发票是否相同？",
+    "每张发票是否被多条报销记录使用？"
+  ],
+  "required_fields": ["record_id", "invoice_no", "invoice_id", "amount", "expense_type", "expense_date", "employee_id", "status", "vendor_name"],
+  "evidence_requirements": [
+    "R900008和R900009的详情及审批信息",
+    "FPDEV900008和FPDEV900009的发票使用情况",
+    "政策第十条原文"
+  ],
+  "execution_steps": [
+    {"step": 1, "name": "planner", "action": "规划审计范围与规则"},
+    {"step": 2, "name": "data_query", "action": "查询R900008、R900009详情及发票使用"},
+    {"step": 3, "name": "policy_check", "action": "检索并确认适用政策条款"},
+    {"step": 4, "name": "false_positive_review", "action": "复核：不同发票不得误报为重复报销"},
+    {"step": 5, "name": "evidence_coverage", "action": "证据覆盖检查"},
+    {"step": 6, "name": "report", "action": "生成审计报告并写入final_result.json"},
+    {"step": 7, "name": "validation", "action": "结果验证"},
+    {"step": 8, "name": "submit", "action": "提交审计结果"}
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "单一规则（第十条 重复报销）",
+      "已知两条记录直接核查",
+      "无政策版本争议",
+      "无聚合或批处理",
+      "无阈值或豁免边界"
+    ]
+  },
+  "subagent_plan": {
+    "policy_researcher": false,
+    "data_analyst": false,
+    "independent_reviewer": false,
+    "reason": "复杂度为1，紧凑步骤在主上下文中即可完成"
+  },
+  "stopping_conditions": [
+    "发票相同 → 确认为重复报销异常",
+    "发票不同 → 无异常，不得误报"
+  ],
+  "unresolved_items": []
+}

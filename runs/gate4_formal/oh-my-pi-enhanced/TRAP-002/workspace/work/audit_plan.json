@@ -1,0 +1,66 @@
+{
+  "task_id": "TRAP-002",
+  "task_type": "clean_but_suspicious",
+  "audit_scope": {
+    "audit_object": "TRAP-002涉及的报销记录——R000002与R004201（发票FP202500000002重复使用）",
+    "expense_types": ["office_supplies"],
+    "business_period": "2025-02-10 至 2025-09-09",
+    "organization_scope": "合规风控部(D008)，员工姚瑜(E0050)",
+    "requested_deliverable": "判定R000002与R004201是否构成重复报销异常"
+  },
+  "policy_questions": [
+    {
+      "question": "同一发票被两次报销是否违反制度？",
+      "policy_rule": "第十条：同一发票最多报销1次",
+      "applicable_doc": "01_expense_reimbursement_2025.md",
+      "effective_date": "2025-01-01",
+      "boundaries": "发票FP202500000002在R000002和R004201中均被使用"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "R000002和R004201是否使用同一张发票FP202500000002？",
+      "tables": ["expense_records", "invoices"],
+      "required_fields": ["record_id", "invoice_no", "invoice_id", "amount", "reason", "employee_id", "expense_date"]
+    },
+    {
+      "question": "R004201的'重复发票注入样本'标签是否表明其为测试/注入记录，不应作为真实违规？",
+      "tables": ["expense_records"],
+      "required_fields": ["reason", "record_no", "invoice_no"]
+    }
+  ],
+  "evidence_requirements": [
+    "R000002和R004201的完整详情(含审批)",
+    "发票FP202500000002的使用记录",
+    "制度第十条原文",
+    "R004201的reason字段明确标注'重复发票注入样本'"
+  ],
+  "execution_steps": [
+    "1. 确认适用制度：01_expense_reimbursement_2025.md第十条",
+    "2. 获取R000002和R004201详情，确认发票复用关系",
+    "3. 分析R004201的reason字段是否为注入样本标识",
+    "4. 判断：注入样本不应视为真实违规",
+    "5. 证据覆盖检查",
+    "6. 误判复核（false-positive-review触发）",
+    "7. 撰写审计报告",
+    "8. 结果校验与提交"
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "需要分组查找复用发票（find_reused_invoices → join/grouping）",
+      "注入样本属于例外/豁免边界判断"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "复杂度2，数据范围窄（仅2条记录），可直接在主智能体中完成"
+  },
+  "stopping_conditions": [
+    "制度第十条确认适用",
+    "R000002和R004201详情获取完毕",
+    "注入样本标签确认",
+    "无异常结论已通过复核"
+  ],
+  "unresolved_items": []
+}

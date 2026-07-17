@@ -1,0 +1,54 @@
+{
+  "task_id": "L3-010",
+  "database": "/benchmark/data/expense.db",
+  "queries_file": "work/sql/query.sql",
+  "population": {
+    "total_2025_records": 4240,
+    "ar02_zone_3000_10000": 95,
+    "ar03_zone_10000_50000": 0,
+    "fp_zone_8000_10000": 1,
+    "fn_zone_3000_8000": 94,
+    "fp_zone_30000_50000": 0
+  },
+  "matched_record_ids": ["R004233"],
+  "candidate_record_ids": ["R004233"],
+  "completed_checks": [
+    {
+      "check": "population_count",
+      "status": "complete",
+      "result": "4240 total 2025 records"
+    },
+    {
+      "check": "ar02_zone_scan",
+      "status": "complete",
+      "result": "95 records in [3000, 10000); 1 record in [8000, 10000) false positive zone (R004233 at 9990.00)"
+    },
+    {
+      "check": "ar03_zone_scan",
+      "status": "complete",
+      "result": "0 records in [10000, 50000); 0 records in [30000, 50000) false positive zone"
+    },
+    {
+      "check": "approval_verification",
+      "status": "complete",
+      "result": "R004233 has AR-02 approval with 部门经理 role, consistent with current 2025 rules"
+    },
+    {
+      "check": "3000_8000_zone",
+      "status": "complete",
+      "result": "94 records in [3000, 8000) with AR-02 tier; all require 部门经理+财务复核 under 2025 rules"
+    }
+  ],
+  "rule_by_population_coverage": {
+    "version_trap_analysis": {
+      "target_population": 4240,
+      "scanned": 4240,
+      "coverage_percent": 100
+    }
+  },
+  "data_quality": {
+    "issues": [],
+    "notes": "Records in 3000-8000 range include labeled injection samples for other audit tasks; these are not anomalies for this version trap task"
+  },
+  "unresolved_items": []
+}

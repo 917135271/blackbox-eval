@@ -1,0 +1,53 @@
+{
+  "task_id": "DEV-004",
+  "task_type": "single_anomaly",
+  "question": "以R900003为线索核查是否存在拆分报销，返回构成同一异常的全部记录。",
+  "scope": {
+    "clue_record": "R900003",
+    "rule": "拆分报销 (split reimbursement)",
+    "employee_id": "E9001",
+    "expense_type": "travel_transport",
+    "date_window": "2025-01-27 to 2025-02-10 (7 days around 2025-02-03)"
+  },
+  "audit_period": {
+    "start": "2025-01-27",
+    "end": "2025-02-10"
+  },
+  "policy_questions": [
+    "拆分报销的定义和判定标准是什么？",
+    "拆分报销适用的阈值或金额条件？",
+    "拆分报销是否有豁免条件（特殊审批等）？"
+  ],
+  "data_questions": [
+    "R900003的employee_id、expense_type和expense_date",
+    "同一员工、同一费用类型、7天内是否有其他travel_transport记录",
+    "这些记录的金额、发票、审批信息"
+  ],
+  "required_fields": ["record_id", "employee_id", "expense_type", "expense_date", "amount", "invoice_id", "reason", "special_approval", "status"],
+  "evidence_requirements": [
+    "R900003的完整记录和审批详情",
+    "同一员工E9001、travel_transport类型、7天窗口内的所有记录",
+    "拆分报销相关制度条款"
+  ],
+  "execution_steps": [
+    "查询拆分报销相关制度条款",
+    "查询E9001在2025-01-27至2025-02-10期间所有travel_transport记录",
+    "分析记录间关系判断是否构成拆分报销",
+    "形成证据矩阵",
+    "生成审计报告",
+    "校验并提交"
+  ],
+  "complexity": 1,
+  "complexity_reasons": [
+    "单规则单线索记录任务",
+    "仅需限定范围的直接关联查询",
+    "无多政策、多规则、版本争议"
+  ],
+  "subagent_plan": null,
+  "stopping_conditions": [
+    "查找到所有同一员工、同一类型、7天内相关记录",
+    "确认是否构成拆分报销",
+    "完成证据覆盖和校验"
+  ],
+  "unresolved_items": []
+}

@@ -1,0 +1,146 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 20,
+  "case_score_raw": 45.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "答案文本‘无异常。’及anomaly_ids为空列表",
+      "id": "clean-conclusion",
+      "reason": "明确判断无异常，无矛盾表述",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "最终提交中anomaly_ids为空"
+    },
+    {
+      "answer_evidence": "记录列表仅含R000002, R004201-R004206等12条记录",
+      "id": "record-scope",
+      "reason": "提交记录列表不包含要求的R004236和R004237，完全偏离预期",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用均为R000002, R004201等重复发票记录，无任何R004236或R004237的get_expense_detail调用"
+    },
+    {
+      "answer_evidence": "答案仅解释重复发票为测试注入数据",
+      "id": "case-specific-reason",
+      "reason": "未说明本题专属合规原因（outside aggregation window）",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中无聚合窗口关键字的搜索或引用"
+    },
+    {
+      "answer_evidence": "答案未提及阈值、日期、聚合窗口等核查内容",
+      "id": "reverse-check",
+      "reason": "未针对本题边界条件（聚合窗口）进行核查",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用仅聚焦重复发票规则，无针对R004236/ R004237的核查，也无聚合窗口相关检查"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": true,
+      "reason": "提交了未经要求的重复发票记录作为核心结论支撑，未核查目标记录R004236、R004237",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "未将合规记录判为异常",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R000002",
+      "R004201",
+      "R000005",
+      "R004202",
+      "R000020",
+      "R004203",
+      "R000028",
+      "R004204",
+      "R000037",
+      "R004205",
+      "R000055",
+      "R004206"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 6,
+    "elapsed_seconds": 207.397,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 12,
+      "f1": 0.0,
+      "missing_count": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:24:31+08:00",
+  "group": "ccb-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.95,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "结论形式为无异常，但实际核查了无关的重复发票记录，未涉及本题专属的R004236、R004237和聚合窗口原因，因此核心内容偏离要求，受关键失败限制总分。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2699,
+      "completion_tokens_details": {
+        "reasoning_tokens": 2247
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 7550,
+      "prompt_tokens": 7550,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 10249
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/ccb-baseline/TRAP-003",
+  "task_id": "TRAP-003"
+}

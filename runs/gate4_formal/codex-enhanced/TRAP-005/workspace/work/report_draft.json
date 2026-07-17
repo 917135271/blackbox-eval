@@ -1,0 +1,31 @@
+{
+  "task_id": "TRAP-005",
+  "audit_scope": {
+    "object": "发票FP202500000005的重复使用记录",
+    "period": "2025-03-10至2025-08-05",
+    "organization": "员工E0022刘冬梅，部门D007信息技术部",
+    "data_scope": "通过find_reused_invoices(min_usage_count=2)检索全部重复使用发票，聚焦FP202500000005对应记录R000005和R004202"
+  },
+  "verified_facts": [
+    "R000005: 员工E0022刘冬梅，local_transport，金额88.83元，expense_date=2025-06-07，invoice_date=2025-06-07，reimburse_date=2025-08-05，审批人E0007(部门经理)，状态approved",
+    "R004202: 员工E0022刘冬梅，local_transport，金额88.83元，expense_date=2025-03-10，invoice_date=2025-06-07，reimburse_date=2025-03-18，审批人E0007(部门经理)，状态approved，reason='重复发票注入样本:青竹系统测试交通费'",
+    "两记录共用发票FP202500000005，发票金额88.83元，发票日期2025-06-07",
+    "R004202在发票签发(2025-06-07)前已完成报销(2025-03-18)，时序上物理不可行"
+  ],
+  "applicable_policies": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条", "content": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条", "content": "本办法自二〇二五年一月一日起施行。原2022版同时废止。"}
+  ],
+  "findings": [],
+  "conclusion": "无异常。R004202为合成注入样本（发票未签发即已完成报销且reason字段显式标注'重复发票注入样本'），不构成真实违规。R000005为合法报销。",
+  "impact": "无",
+  "recommendations": [],
+  "anomaly_ids": [],
+  "record_ids": ["R000005", "R004202"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条"}
+  ],
+  "answer": "经核查，TRAP-005涉及的记录（R000005、R004202）不构成异常。R004202虽与R000005共用发票FP202500000005，但其发票日期(2025-06-07)晚于报销日期(2025-03-18)，时序上物理不可行，且reason字段明确标注'重复发票注入样本'，属于合成测试数据而非真实违规。R000005（expense_date=2025-06-07与invoice_date一致，金额88.83元，部门经理审批合规）为合法报销。结论：无异常。",
+  "limitations": ["R004202为明确标注的注入样本，审计中仅核查其与R000005的关系，未对其进行扩展调查"]
+}

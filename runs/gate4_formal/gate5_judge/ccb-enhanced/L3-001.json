@@ -1,0 +1,173 @@
+{
+  "case_family": "full_year_audit",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "full_year_rule_audit",
+  "criteria": [
+    {
+      "answer_evidence": "",
+      "id": "all-anomaly-ids",
+      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
+      "score": 25.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "all-record-ids",
+      "reason": "record_ids集合F1=1.000",
+      "score": 30.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "“经对2025年全年4240条费用报销记录进行重复报销专项扫描”",
+      "id": "full-scan-method",
+      "reason": "候选明确声明对全年4240条记录执行重复报销专项扫描，工具调用使用find_reused_invoices返回全部重复发票，并逐条获取详情，范围、查询和统计均体现全量扫描。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "list_expenses获取全部记录（预览显示has_next:true，后续调用覆盖全部），find_reused_invoices返回所有重复发票及其关联记录ID。"
+    },
+    {
+      "answer_evidence": "“依据《XX证券费用报销管理办法(2025修订版)》第十条‘同一发票最多报销1次’”",
+      "id": "policy-basis",
+      "reason": "候选取证费用报销管理办法(2025修订版)第十条，该条款与规则费用报销管理办法-6.1对应，且查询条件（同一发票计数>1）直接落实条款要求。",
+      "score": 10.0,
+      "source": "llm_judge",
+      "trace_evidence": "search_policy查询‘重复报销 重复 报销 重复提交’，结果包含第十条；get_policy_doc获取全文；find_reused_invoices基于该规则找出记录。"
+    },
+    {
+      "answer_evidence": "“共发现6起重复报销异常……涉及12条报销记录”，且与预期记录ID精确匹配。",
+      "id": "false-positive-control",
+      "reason": "候选报告6个异常、12条记录，与预期完全一致，未混入任何其他规则异常或TRAP记录，误报率为零。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "find_reused_invoices返回的重复发票仅含预期6组，未出现拆分、超标准等其他违规类型；rule_diagnostics显示precision=1.0, recall=1.0, trap_false_positive=false。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": false,
+      "reason": "",
+      "score_cap": 50,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "ANOM-001",
+      "ANOM-002",
+      "ANOM-003",
+      "ANOM-004",
+      "ANOM-005",
+      "ANOM-006"
+    ],
+    "actual_record_ids": [
+      "R000002",
+      "R004201",
+      "R000005",
+      "R004202",
+      "R000020",
+      "R004203",
+      "R000028",
+      "R004204",
+      "R000037",
+      "R004205",
+      "R000055",
+      "R004206"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "DUP": 6
+      },
+      "count_exact": true,
+      "expected_types": {
+        "DUP": 6
+      },
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 761.063,
+    "expected_anomaly_ids": [
+      "DUP-001",
+      "DUP-002",
+      "DUP-003",
+      "DUP-004",
+      "DUP-005",
+      "DUP-006"
+    ],
+    "expected_record_ids": [
+      "R000002",
+      "R000005",
+      "R000020",
+      "R000028",
+      "R000037",
+      "R000055",
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:24:42+08:00",
+  "group": "ccb-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选完成全年全量重复报销扫描，制度依据准确，误报控制完美，异常ID和记录ID完全覆盖预期，任务执行质量优秀。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1447,
+      "completion_tokens_details": {
+        "reasoning_tokens": 944
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 9670,
+      "prompt_tokens": 9670,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 11117
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/ccb-enhanced/L3-001",
+  "task_id": "L3-001"
+}

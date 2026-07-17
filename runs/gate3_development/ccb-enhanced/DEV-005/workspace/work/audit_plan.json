@@ -1,0 +1,67 @@
+{
+  "task_id": "DEV-005",
+  "task_scope": {
+    "audit_object": "R900005",
+    "expense_type": "business_entertainment",
+    "rules": [
+      "单次活动费用不得超过5000元",
+      "人均不得超过300元",
+      "不得拆分为多个报销事项"
+    ],
+    "audit_period": "2025-03-12",
+    "department_scope": "D901"
+  },
+  "policy_questions": [
+    {
+      "question": "业务招待费单次活动和人均金额的标准是什么？",
+      "policy_doc": "06_business_entertainment.md",
+      "clauses": ["第二条", "第三条", "第四条"]
+    },
+    {
+      "question": "超标是否有豁免或特殊审批通道？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clauses": ["第十二条"]
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "R900005的金额、人数、单次活动标识是什么？",
+      "table": "expense_records",
+      "fields": ["amount", "participants", "expense_date", "employee_id", "department_id", "special_approval"]
+    }
+  ],
+  "required_fields": ["amount", "participants", "expense_date", "employee_id", "status", "special_approval"],
+  "evidence_requirements": [
+    "R900005 expense detail showing amount=3600, participants=10",
+    "Policy 06 clauses 2 and 3 showing 5000 yuan and 300 yuan limits"
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "Query policy 06_business_entertainment.md for standards", "status": "done"},
+    {"step": 2, "action": "Query R900005 expense detail", "status": "done"},
+    {"step": 3, "action": "Calculate single-event total and per-person amounts", "status": "pending"},
+    {"step": 4, "action": "Run evidence-coverage-check", "status": "pending"},
+    {"step": 5, "action": "Run audit-report", "status": "pending"},
+    {"step": 6, "action": "Run result-validator", "status": "pending"},
+    {"step": 7, "action": "Submit via validate_audit_result and submit_audit_result", "status": "pending"}
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "Single known record R900005",
+      "Single policy (06_business_entertainment.md)",
+      "Simple threshold comparison (two arithmetic calculations)",
+      "No policy version ambiguity",
+      "No subagent needed"
+    ]
+  },
+  "subagent_plan": {
+    "subagents": [],
+    "reason": "Complexity 1 — compact threshold calculation, no subagent required"
+  },
+  "stopping_conditions": [
+    "Per-person amount calculated and compared against 300 yuan threshold",
+    "Single-event total compared against 5000 yuan threshold",
+    "All evidence linked to policy clauses"
+  ],
+  "unresolved_items": []
+}

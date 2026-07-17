@@ -1,0 +1,60 @@
+{
+  "task_id": "DEV-003",
+  "question": "以R900001为线索核查重复报销，返回全部相关记录及异常结论。",
+  "scope": {
+    "rule": "重复报销（同一发票多次报销）",
+    "policy_doc": "01_expense_reimbursement_2025.md",
+    "clause": "第十条",
+    "clue_record": "R900001",
+    "audit_period": "不限",
+    "expense_types": ["office_supplies"],
+    "organization": "不限"
+  },
+  "policy_questions": [
+    "同一发票重复报销的认定标准",
+    "是否存在豁免或例外条款"
+  ],
+  "data_questions": [
+    "R900001关联的发票编号",
+    "该发票被哪些报销记录使用",
+    "各使用记录的详细信息（状态、金额、日期、特殊审批）"
+  ],
+  "required_fields": [
+    "record_id", "invoice_no", "invoice_id", "amount", "expense_date",
+    "reimburse_date", "status", "special_approval", "employee_id", "expense_type"
+  ],
+  "evidence_requirements": [
+    "R900001详情及发票编号",
+    "同一发票FPDEV900001的全部使用记录",
+    "制度第十条原文"
+  ],
+  "execution_steps": [
+    "查询R900001获取发票信息",
+    "查询发票FPDEV900001的关联记录",
+    "获取制度第十条确认规则",
+    "核对各记录是否构成重复报销",
+    "证据覆盖检查",
+    "审计报告",
+    "结果校验与提交"
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "单一规则（第十条重复报销）",
+      "单一发票线索",
+      "无需聚合或分组",
+      "无日期/金额阈值边界",
+      "无例外或豁免条款"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "复杂度为1，单一发票、单一规则，无需子智能体"
+  },
+  "stopping_conditions": [
+    "所有使用FPDEV900001的记录已核实",
+    "规则第十条已确认",
+    "证据覆盖100%"
+  ],
+  "unresolved_items": []
+}

@@ -1,0 +1,116 @@
+{
+  "case_family": "policy_and_version",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "policy_qa",
+  "criteria": [
+    {
+      "answer_evidence": "“单笔费用报销金额达到10,000元(含)以上需要部门总经理审批”",
+      "id": "current-threshold",
+      "reason": "明确给出金额为10,000元（含）以上，与附件二AR-03的“大于等于10,000元”一致，金额和边界均正确。",
+      "score": 45.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_excerpt 返回：“| AR-03 | 大于等于10000元且小于50000元 | 部门总经理 |”"
+    },
+    {
+      "answer_evidence": "“依据《XX证券费用报销管理办法(2025修订版)》第五条”",
+      "id": "current-version",
+      "reason": "答案明确基于《XX证券费用报销管理办法(2025修订版)》，且轨迹中获取了其施行日期及废止旧版的信息。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_excerpt 返回：“第十四条 本办法自二〇二五年一月一日起施行。原《XX证券费用报销管理办法(2022版)》同时废止。”"
+    },
+    {
+      "answer_evidence": "“《XX证券费用报销管理办法(2025修订版)》第五条…附件二AR-03规定:单笔报销金额大于等于10,000元且小于50,000元的,审批角色为部门总经理。”",
+      "id": "policy-citation",
+      "reason": "引用了费用报销管理办法第五条和授权管理办法附件二，附件二中直接列出了AR-03包含的10000元门槛，制度有效且支持结论。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_excerpt 返回：“第五条 单笔费用报销的审批权限…统一按《XX证券授权管理办法》附件二执行。”，“| AR-03 | 大于等于10000元且小于50000元 | 部门总经理 |”"
+    },
+    {
+      "answer_evidence": "在答案中仅出现10,000元，未出现8,000元。",
+      "id": "old-value-control",
+      "reason": "未提及旧值8000元，当前审批线10000元正确，无将旧值当作当前标准的错误。",
+      "score": 10.0,
+      "source": "llm_judge",
+      "trace_evidence": "search_policy 虽返回旧版8000元，但候选最终并未采纳旧值，且明确依据2025版。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "候选提交的record_ids为空，未提供任何记录ID，因此不涉及伪造记录。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "全程使用2025修订版和授权管理办法，未将已废止的2022版作为现行依据。",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 2,
+    "elapsed_seconds": 145.188,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:31:41+08:00",
+  "group": "oh-my-pi-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "答案准确引用了现行制度并给出正确的审批金额阈值10000元（含），版本识别清晰，制度引用有效，未误用旧值，无关键失败项。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1805,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1095
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 2305,
+      "prompt_tokens": 3329,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 5134
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/oh-my-pi-enhanced/L1-001",
+  "task_id": "L1-001"
+}

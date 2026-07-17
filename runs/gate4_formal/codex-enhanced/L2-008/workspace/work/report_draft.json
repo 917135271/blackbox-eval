@@ -1,0 +1,45 @@
+{
+  "audit_scope": {
+    "task_id": "L2-008",
+    "audit_object": "拆分报销异常",
+    "clue_record": "R004212",
+    "employee_id": "E0009",
+    "employee_name": "张婷",
+    "department_id": "D009",
+    "department_name": "财务管理部",
+    "expense_type": "travel_lodging",
+    "date_range": "2025-04-03 to 2025-04-17 (7-day window centered on 2025-04-10)"
+  },
+  "verified_facts": [
+    "R004212: E0009张婷, travel_lodging, 5100元, 2025-04-10, 7晚, city_tier A, AR-02审批, 发票FP2025X0004206",
+    "R004213: E0009张婷, travel_lodging, 5100元, 2025-04-15, 7晚, city_tier A, AR-02审批, 发票FP2025X0004207",
+    "两笔记录间隔5天，在7天窗口内",
+    "两笔合计10200元，达到AR-03档位（>=10000元，部门总经理审批）",
+    "两笔记录均仅获得AR-02审批（部门经理E0009自批），未获得AR-03审批",
+    "两笔记录事由均为'拆分报销注入样本3'",
+    "发票各使用1次，无重复报销"
+  ],
+  "applicable_policies": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条", "rule": "不得将同一事项或同类事项拆分为多笔报销以规避审批权限。同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到《授权管理办法》附件二较高审批线的,应重点核查拆分规避审批。"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条", "rule": "单笔费用报销的审批权限按《XX证券授权管理办法》附件二执行"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二", "rule": "AR-02: >=3000且<10000→部门经理+财务复核; AR-03: >=10000且<50000→部门总经理"}
+  ],
+  "findings": [
+    {
+      "anomaly_id": "SPLIT-001",
+      "description": "员工张婷(E0009)将同一类差旅住宿费拆分为两笔(各5100元)分别报销，规避了AR-03部门总经理审批权限",
+      "record_ids": ["R004212", "R004213"],
+      "impact": "两笔合计10200元应触发AR-03部门总经理审批但实际仅获得AR-02审批，审批权限被规避",
+      "recommendation": "追回两笔报销款项并重新走AR-03审批流程，对相关人员进行合规教育"
+    }
+  ],
+  "anomaly_ids": ["SPLIT-001"],
+  "record_ids": ["R004212", "R004213"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+  ],
+  "answer": "经核查，员工张婷(E0009)在2025年4月10日和4月15日（间隔5天，在7天窗口内）分别提交R004212和R004213两笔差旅住宿报销，每笔5100元，合计10200元。根据《XX证券费用报销管理办法(2025修订版)》第十一条，同一员工同一费用类型在7天内出现2笔及以上报销且合计金额达到较高审批线（AR-03:>=10000元，附件二）的，应认定为拆分报销规避审批。两笔记录单独在AR-02档位（部门经理审批），合计达AR-03档位（部门总经理审批），但实际仅获得AR-02审批，构成拆分报销异常。异常ID：SPLIT-001，涉及记录：R004212、R004213。",
+  "limitations": []
+}

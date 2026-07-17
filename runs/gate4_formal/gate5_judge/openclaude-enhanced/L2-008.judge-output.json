@@ -1,0 +1,34 @@
+{
+  "criteria": [
+    {
+      "id": "audit-conclusion",
+      "score": 20,
+      "reason": "结论明确为拆分报销异常，异常类型正确",
+      "answer_evidence": "异常ID为ANO-L2-008-SPLIT-001，判定为拆分报销异常",
+      "trace_evidence": "工具调用确认了R004212和R004213两笔记录，均为张婷同一费用类型，间隔5天"
+    },
+    {
+      "id": "policy-basis",
+      "score": 15,
+      "reason": "引用了费用报销管理办法第十一条（对应规则6.2），条款有效且直接支持拆分规避审批的结论",
+      "answer_evidence": "引用01_expense_reimbursement_2025.md第十一条“不得将同一事项或同类事项拆分为多笔报销以规避审批权限”",
+      "trace_evidence": "search_policy和get_policy_excerpt返回了第十一条完整条文"
+    },
+    {
+      "id": "case-reasoning",
+      "score": 20,
+      "reason": "完整给出了7天内合计10200元、超10000元审批线的关键事实，数值准确，逻辑自洽",
+      "answer_evidence": "两笔各5100元，合计10200元，间隔5天；合并后达AR-03档（≥10000元），拆分后仅需AR-02审批",
+      "trace_evidence": "get_expense_detail确认金额5100；list_expenses确认日期2025-04-10和2025-04-15；get_policy_doc确认审批档位"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的record_id（R004212、R004213）均真实存在，无无关记录"
+    }
+  ],
+  "overall_comment": "候选正确识别了拆分报销异常，制度引用准确，推理基于数据且计算一致，记录ID完整匹配预期。",
+  "confidence": 1.0
+}

@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "SPLIT-001",
+      "record_ids": ["R004212", "R004213"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "R004212: 员工E0009张婷,费用类型travel_lodging,金额5100元,费用日期2025-04-10,审批档位AR-02",
+        "R004213: 员工E0009张婷,费用类型travel_lodging,金额5100元,费用日期2025-04-15,审批档位AR-02",
+        "两笔记录间隔5天,在7天窗口内,同一员工E0009、同一费用类型travel_lodging,合计金额10200元",
+        "授权管理办法附件二AR-02:3000~10000元需部门经理审批;AR-03:10000~50000元需部门总经理审批",
+        "单笔5100元属于AR-02,合计10200元达到AR-03较高审批线,拆分后规避了部门总经理审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004212", "R004213"],
+  "submitted_record_ids": ["R004212", "R004213"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {},
+  "unresolved_items": []
+}

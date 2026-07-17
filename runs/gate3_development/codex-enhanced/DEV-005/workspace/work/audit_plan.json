@@ -1,0 +1,59 @@
+{
+  "task_id": "DEV-005",
+  "task_scope": {
+    "audit_object": "R900005",
+    "expense_type": "业务招待费",
+    "rules": ["业务招待费总额上限", "业务招待费人均上限"],
+    "period": "determined from R900005 expense_date",
+    "organization": "determined from R900005 department and employee"
+  },
+  "policy_questions": [
+    "What is the current policy for 业务招待费 (business entertainment)?",
+    "What is the total amount limit per activity?",
+    "What is the per capita limit for 业务招待费?",
+    "What city tier adjustment applies (if any)?"
+  ],
+  "data_questions": [
+    "What is R900005's amount, expense type, date, employee, department, and city tier?",
+    "What is the number of attendees for R900005?",
+    "What is the per capita amount (= total / attendees)?",
+    "Does R900005 have special approval?"
+  ],
+  "required_fields": [
+    "record_id", "amount", "expense_type", "expense_date", "employee_id",
+    "department_id", "city_tier", "special_approval", "attendees_count"
+  ],
+  "evidence_requirements": [
+    "Policy doc with 业务招待费 thresholds (total and per capita)",
+    "R900005 full expense detail including attendees",
+    "Employee and department info for R900005"
+  ],
+  "execution_steps": [
+    {"step": "query_policy", "action": "Search policy for 业务招待费 thresholds"},
+    {"step": "query_expense", "action": "Get R900005 expense detail"},
+    {"step": "calculate", "action": "Compute total and per capita; compare to policy thresholds"},
+    {"step": "evidence_coverage", "action": "Run evidence-coverage-check"},
+    {"step": "audit_report", "action": "Run audit-report"},
+    {"step": "result_validation", "action": "Run result-validator"},
+    {"step": "submit", "action": "Validate and submit"}
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "Single rule (业务招待费) with compact threshold calculation",
+      "Single known record R900005",
+      "No policy version ambiguity",
+      "No subagent needed per routing hint"
+    ]
+  },
+  "subagent_plan": {
+    "enabled": false,
+    "reason": "complexity=1; compact mode; no native subagent"
+  },
+  "stopping_conditions": [
+    "All thresholds compared and documented",
+    "Evidence coverage 100%",
+    "Validation passes",
+    "Submission accepted"
+  ]
+}

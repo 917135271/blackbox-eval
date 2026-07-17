@@ -1,0 +1,60 @@
+{
+  "task_id": "TRAP-005",
+  "task_type": "clean_but_suspicious",
+  "question": "核查TRAP-005涉及的记录是否构成异常，正确时应说明无异常",
+  "scope": {
+    "audit_object": "TRAP-005 映射到的发票 FP202500000005 对应记录 R000005 和 R004202",
+    "expense_types": ["local_transport"],
+    "business_period": "2025-03-10 至 2025-08-05",
+    "organization_scope": "员工 E0022 刘冬梅，部门 D007 信息技术部",
+    "deliverable": "判定是否存在异常；无异常则明确声明无异常"
+  },
+  "policy_questions": [
+    {
+      "id": "Q1",
+      "question": "2025版费用报销管理办法第十条：同一发票 FP202500000005 被 R000005 和 R004202 两次使用，是否构成重复报销违规？",
+      "boundary": "2025版政策自2025-01-01生效，两条记录均在此后。发票日期2025-06-07，R004202在2025-03-18已报销（早于发票日期3个月），存在物理时序不可能性。",
+      "applicable_clauses": ["01_expense_reimbursement_2025.md 第10条", "01_expense_reimbursement_2025.md 第14条"]
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "D1",
+      "question": "R000005 和 R004202 的详细信息：报销金额、日期、审批链、发票信息、特殊标记",
+      "tables": ["reimbursement_records", "invoices", "approvals"]
+    }
+  ],
+  "required_fields": ["record_id", "record_no", "employee_id", "expense_date", "reimburse_date", "expense_type", "amount", "reason", "invoice_no", "invoice_date", "status", "special_approval", "approvals"],
+  "evidence_needed": [
+    "R000005 完整记录及审批",
+    "R004202 完整记录及审批",
+    "FP202500000005 发票信息",
+    "2025版政策第十条全文"
+  ],
+  "execution_steps": [
+    {"step": "收集 TRAP-005 相关记录证据", "status": "completed"},
+    {"step": "确认适用政策版本及条款", "status": "completed"},
+    {"step": "核查 R004202 注入样本性质", "status": "in_progress"},
+    {"step": "形成初步结论并更新证据矩阵", "status": "pending"},
+    {"step": "执行 evidence-coverage-check", "status": "pending"},
+    {"step": "执行 audit-report", "status": "pending"},
+    {"step": "执行 result-validator", "status": "pending"},
+    {"step": "验证并提交最终结果", "status": "pending"}
+  ],
+  "complexity_score": 2,
+  "complexity_reasons": [
+    "单规则（第十条）任务",
+    "含日期边界和例外判断（注入样本识别）",
+    "直接相关记录仅2条"
+  ],
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "复杂度2，但任务仅涉及2条直接记录和1条规则，可在主代理中完成。R004202的注入样本标签可直接判断，无需分析师深度计算。"
+  },
+  "stopping_conditions": [
+    "确认R004202为合成注入样本",
+    "确认R000005是合法报销",
+    "证据矩阵覆盖100%"
+  ],
+  "unresolved_items": []
+}

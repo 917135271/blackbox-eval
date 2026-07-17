@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "current-threshold",
+      "score": 45,
+      "reason": "金额和边界表达正确，明确10000元（含）需部门总经理审批",
+      "answer_evidence": "答案中：单笔费用报销金额达到10,000元（含）时，需要部门总经理审批。",
+      "trace_evidence": "get_policy_excerpt返回授权管理办法附件二明确AR-03为大于等于10000元且小于50000元，必要审批角色为部门总经理。"
+    },
+    {
+      "id": "current-version",
+      "score": 20,
+      "reason": "引用了2025修订版费用报销管理办法和授权管理办法，明确基于现行制度",
+      "answer_evidence": "citations中包含doc_id: 01_expense_reimbursement_2025.md，表明使用2025版",
+      "trace_evidence": "get_policy_excerpt和get_policy_doc均调用01_expense_reimbursement_2025.md和03_authorization_management.md，确认现行版本。"
+    },
+    {
+      "id": "policy-citation",
+      "score": 20,
+      "reason": "引用授权管理办法附件二AR-03档位，费用报销管理办法第五条指向附件二，直接支持10000元审批线",
+      "answer_evidence": "citations中附件二和第五条的引用，以及答案中明确提及AR-03档位。",
+      "trace_evidence": "get_policy_excerpt查询授权管理办法返回附件二表格，明确AR-03金额区间和必要审批角色。"
+    },
+    {
+      "id": "old-value-control",
+      "score": 5,
+      "reason": "未提及旧版8000元旧值，但当前值10000元正确，未明确排除旧值",
+      "answer_evidence": "答案中仅提及10000元，无旧值信息。",
+      "trace_evidence": "轨迹中未使用2022版文档，未出现8000元。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的record_ids在工具调用中均被查询且返回有效详情，未使用无关记录支撑核心结论"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "仅使用2025版和授权管理办法，未使用2022版废止制度"
+    }
+  ],
+  "overall_comment": "回答正确给出10000元（含）审批线，基于现行制度；但未明确排除旧版8000元，故old-value-control部分得分5。综合评分90分。",
+  "confidence": 0.95
+}

@@ -1,0 +1,55 @@
+{
+  "task_scope": "GATE2 领域增强集成 Canary — 验证 policy_researcher 子智能体授权、调用、完成链路，以及 expense_query 只读验证、提交链路端到端集成。",
+  "audit_period": "2025-01-01 to 2025-12-31",
+  "policy_questions": [
+    "确认 01_expense_reimbursement_2025.md 第十条为当前适用政策条款",
+    "确认无历史版本冲突、废止或替换关系"
+  ],
+  "data_questions": [
+    "验证 R000001 报销记录存在于只读业务库"
+  ],
+  "required_fields": [
+    "record_id", "employee_id", "department_id", "amount", "expense_date",
+    "expense_type", "status", "invoice_no", "approval_chain"
+  ],
+  "evidence_requirements": [
+    "policy_query 读取 01_expense_reimbursement_2025.md 第十条全文",
+    "expense_query.get_expense_detail 验证 R000001",
+    "子智能体 summary.json 和 policy_applicability.json"
+  ],
+  "execution_steps": [
+    "1. audit-query-planner 写入计划（本文件）",
+    "2. checkpoint_audit_context → planning_completed",
+    "3. authorize_audit_subagent → policy_researcher / MULTI_POLICY_VERSION_CHECK",
+    "4. 原生 task 子智能体 policy-researcher 读取第十条，保存产物",
+    "5. complete_audit_subagent 注册结果",
+    "6. expense_query.get_expense_detail 验证 R000001",
+    "7. 创建 evidence_matrix.json, validation_report.json, final_result.json",
+    "8. checkpoint_audit_context → validation_ready",
+    "9. result-validator 复核 → submit_audit_result"
+  ],
+  "complexity": 3,
+  "complexity_reasons": [
+    "多制度版本核查：需确认 01_expense_reimbursement_2025.md 的适用性和无冲突",
+    "需 policy_researcher 子智能体独立完成政策查询与摘要",
+    "阈值/日期边界、豁免与例外均在设计范围内"
+  ],
+  "subagent_plan": {
+    "role": "policy_researcher",
+    "reason_code": "MULTI_POLICY_VERSION_CHECK",
+    "complexity": 3,
+    "task": "使用 policy_query 读取 01_expense_reimbursement_2025.md 第十条，保存详细结果至 work/subagents/policy_researcher/policy_applicability.json，六字段摘要至 work/subagents/policy_researcher/summary.json",
+    "artifact_paths": [
+      "work/subagents/policy_researcher/policy_applicability.json",
+      "work/subagents/policy_researcher/summary.json"
+    ]
+  },
+  "stopping_conditions": [
+    "子智能体 policy-researcher 完成并返回结构化摘要",
+    "complete_audit_subagent 返回 completed=true",
+    "expense_query.get_expense_detail 返回 R000001 数据",
+    "validate_audit_result 返回 valid=true",
+    "submit_audit_result 返回 status=accepted"
+  ],
+  "unresolved_items": []
+}

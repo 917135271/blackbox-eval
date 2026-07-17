@@ -1,0 +1,42 @@
+{
+  "audit_scope": {
+    "department": "D902",
+    "department_name": "开发审计二部",
+    "budget_year": 2025,
+    "annual_budget": 50000.00,
+    "period": "2025-01-01 至 2025-03-15"
+  },
+  "verified_facts": [
+    "D902部门(开发审计二部)2025年度预算额度为50,000元",
+    "截至2025-03-15，部门共发生3笔报销，累计56,000元(预算1.12倍)",
+    "按时间顺序计算累计：R900018(2025-01-15,45,000元)→累计45,000元(0.90倍)，未超预算",
+    "R900019(2025-02-15,6,000元)→累计51,000元(1.02倍)，首次超过年度预算50,000元",
+    "R900019的special_approval=0，在预算达1.0倍阈值后未取得专项审批",
+    "R900020(2025-03-15,5,000元,special_approval=1)已取得专项审批，不构成违规"
+  ],
+  "applicable_policies": [
+    {"doc_id": "08_budget_management.md", "clauses": ["第二条","第三条","第四条"]},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clauses": ["第十三条"]}
+  ],
+  "findings": [
+    {
+      "anomaly_id": "DEV-011-BUDGET-OVERRUN-001",
+      "record_ids": ["R900019"],
+      "description": "R900019于2025-02-15报销6,000元，使部门累计达51,000元(预算阈值50,000元的1.02倍)，首次导致预算超限且未取得专项审批(special_approval=0)，违反08_budget_management.md第三条和01_expense_reimbursement_2025.md第十三条",
+      "threshold": "年度预算额度50,000元(1.0倍)",
+      "observed": "累计51,000元(1.02倍)"
+    }
+  ],
+  "impact": "R900019未经专项审批即产生超预算支出6,000元(其中超预算部分1,000元)",
+  "recommendations": ["R900019应补办专项审批或追回超预算部分"],
+  "anomaly_ids": ["DEV-011-BUDGET-OVERRUN-001"],
+  "record_ids": ["R900019"],
+  "citations": [
+    {"doc_id": "08_budget_management.md", "clause_no": "第二条"},
+    {"doc_id": "08_budget_management.md", "clause_no": "第三条"},
+    {"doc_id": "08_budget_management.md", "clause_no": "第四条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"}
+  ],
+  "answer": "D902部门(开发审计二部)2025年度预算50,000元。按时间排序：R900018(45,000元)后累计45,000元(0.90倍)未超预算；R900019(6,000元)后累计51,000元(1.02倍)首次超过年度预算额度，且special_approval=0未取得专项审批，违反08_budget_management.md第三条和01_expense_reimbursement_2025.md第十三条；R900020(5,000元)虽累计56,000元但special_approval=1已取得专项审批，不构成违规。异常记录：R900019。",
+  "limitations": []
+}

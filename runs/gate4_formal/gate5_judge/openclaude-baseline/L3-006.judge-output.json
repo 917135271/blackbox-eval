@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "current-value",
+      "score": 30,
+      "reason": "现行审批线10000元准确，引用授权管理办法附件二AR-03档位。",
+      "answer_evidence": "“部门总经理审批线为单笔金额10000元（含）以上且不足50000元（AR-03档位）”",
+      "trace_evidence": "get_policy_excerpt返回附件二“AR-03 | 大于等于10000元且小于50000元 | 部门总经理”"
+    },
+    {
+      "id": "deprecated-value",
+      "score": 25,
+      "reason": "明确2022版8000元已废止，金额和状态均正确。",
+      "answer_evidence": "“2022版第一条自述仅为制度沿革留档...第四条明确其审批金额已被后续制度替代不得作为现行审批依据”",
+      "trace_evidence": "get_policy_doc(02_expense_reimbursement_2022_deprecated.md) 返回文本含“第二条...达到8000元的...提交部门总经理审批”及“第四条...不得作为现行审批依据”"
+    },
+    {
+      "id": "applicable-version",
+      "score": 20,
+      "reason": "选择2025修订版，以第十四条施行日期和2022版废止说明为据，理由充分。",
+      "answer_evidence": "“应采用2025修订版...第十四条明确自2025年1月1日起施行，2022版同时废止”",
+      "trace_evidence": "get_policy_doc(01_expense_reimbursement_2025.md) 返回文本含第十四条“自2025年1月1日起施行，原2022版同时废止”"
+    },
+    {
+      "id": "two-version-evidence",
+      "score": 20,
+      "reason": "提供了两份制度文档的可核查出处，证据完整。",
+      "answer_evidence": "citations包含01_expense_reimbursement_2025.md和02_expense_reimbursement_2022_deprecated.md",
+      "trace_evidence": "工具调用get_policy_doc获取了01和02文档，内容均可用"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "使用的R004233在数据库中存在，非虚构记录。"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未以废止制度作为现行依据。"
+    }
+  ],
+  "overall_comment": "候选准确判定应采用2025修订版，正确指出部门总经理审批线为10000元，明确2022版8000元已废止，证据多源且可核查，无关键失败。",
+  "confidence": 1.0
+}

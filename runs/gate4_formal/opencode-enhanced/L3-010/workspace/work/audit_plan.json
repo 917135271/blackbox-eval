@@ -1,0 +1,62 @@
+{
+  "task_id": "L3-010",
+  "task_type": "audit_report",
+  "question": "请专门写一段版本陷阱审计说明,解释旧版审批线可能导致的误判。",
+  "scope": {
+    "audit_object": "版本陷阱——旧版审批线与现行审批线差异导致的审计误判",
+    "policy_versions": {
+      "deprecated": {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "effective": "before 2025-01-01"},
+      "current": {"doc_id": "01_expense_reimbursement_2025.md", "effective": "2025-01-01 onwards"},
+      "authorization": {"doc_id": "03_authorization_management.md", "effective": "2025-01-01 onwards"}
+    },
+    "business_period": "2025-01-01 onwards (current policy period)",
+    "organization_scope": "all departments"
+  },
+  "policy_questions": [
+    "旧版2022政策规定的审批线金额是多少？",
+    "现行2025授权管理办法附件二规定的审批线金额是多少？",
+    "新旧审批线之间是否存在数值差异，导致同一金额在不同版本下需要不同级别的审批角色？",
+    "如果审计人员误用旧版审批线评判现行报销记录，会产生哪些误判类型？"
+  ],
+  "data_questions": [
+    "查找金额落在旧版审批线触发区间但现行标准已调整的记录，作为误判示例",
+    "查找金额在8000~10000元区间的报销记录（旧版需部门总经理，现行仅需部门经理+财务复核）",
+    "查找金额在30000~50000元区间的报销记录（旧版需分管副总，现行仅需部门总经理）"
+  ],
+  "required_fields": ["record_id", "amount", "expense_date", "employee_id", "department_id", "status", "approvals"],
+  "evidence_requirements": {
+    "policy": ["02_expense_reimbursement_2022_deprecated.md 第二条、第三条", "03_authorization_management.md 附件二", "01_expense_reimbursement_2025.md 第五条、第十四条"],
+    "records": "金额在版本陷阱区间的报销记录样例",
+    "analysis": "版本对比表、误判类型分析"
+  },
+  "execution_steps": [
+    {"step": 1, "action": "policy_version_check", "description": "对比2022旧版与2025现行审批线，明确差异区间"},
+    {"step": 2, "action": "batch_expense_analysis", "description": "检索金额落在版本陷阱区间的记录作为示例"},
+    {"step": 3, "action": "evidence_coverage_check", "description": "确认证据覆盖所有版本陷阱区间和误判类型"},
+    {"step": 4, "action": "false_positive_review", "description": "复核排除已正确审批的记录"},
+    {"step": 5, "action": "audit_report", "description": "撰写版本陷阱审计说明"},
+    {"step": 6, "action": "result_validation", "description": "校验结果完整性"},
+    {"step": 7, "action": "submission", "description": "验证并提交最终结果"}
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "涉及政策版本有效期和废止关系",
+      "涉及两个以上政策文档（2022报销、2025报销、2025授权）",
+      "涉及审批阈值边界和日期边界",
+      "需撰写专题审计说明报告"
+    ]
+  },
+  "subagent_plan": {
+    "authorized": false,
+    "reason": "任务聚焦单一主题（版本陷阱解释），复杂度3但主要工作为政策对比分析和专题撰写，可在主智能体内通过policy-version-check和batch-expense-analysis技能完成，无需委托专业角色"
+  },
+  "stopping_conditions": [
+    "已识别所有新旧审批线差异区间",
+    "已找到至少一个版本陷阱区间的具体记录示例",
+    "已撰写完整的版本陷阱审计说明",
+    "证据覆盖率100%",
+    "结果通过preflight校验"
+  ],
+  "unresolved_items": []
+}

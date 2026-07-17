@@ -1,0 +1,175 @@
+{
+  "metadata": {
+    "invocation_id": "43ff5975-5ace-4af7-9d1f-b31037116e3e",
+    "total_records_analyzed": 21,
+    "record_range": "R900001-R900021",
+    "analysis_date": "2026-07-16"
+  },
+  "findings": [
+    {
+      "rule_id": "Rule-1",
+      "rule_description": "重复报销 — 同一发票最多报销1次 (Art.10)",
+      "citation": {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"},
+      "finding": "INV900001/FPDEV900001 被 R900001 和 R900002 两次使用,构成重复报销。",
+      "record_ids": ["R900001", "R900002"],
+      "amounts": [480.0, 480.0],
+      "details": {
+        "invoice_no": "FPDEV900001",
+        "invoice_id": "INV900001",
+        "usage_count": 2,
+        "records": [
+          {"record_id": "R900001", "employee": "E9001", "expense_date": "2025-01-05", "amount": 480.0},
+          {"record_id": "R900002", "employee": "E9001", "expense_date": "2025-01-06", "amount": 480.0}
+        ]
+      }
+    },
+    {
+      "rule_id": "Rule-2",
+      "rule_description": "拆分报销 — 同一员工同一费用类型7天内2笔及以上,合计≥10000 (Art.11)",
+      "citation": {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+      "finding": "E9001 在 travel_transport 类型,2025-02-03 和 2025-02-06(间隔3天)报销两笔5200元,合计10400元(AR-03线≥10000),构成拆分规避审批。",
+      "record_ids": ["R900003", "R900004"],
+      "amounts": [5200.0, 5200.0],
+      "details": {
+        "employee_id": "E9001",
+        "expense_type": "travel_transport",
+        "gap_days": 3,
+        "total_amount": 10400.0,
+        "ar_threshold": "AR-03 (≥10000)",
+        "records": [
+          {"record_id": "R900003", "expense_date": "2025-02-03", "amount": 5200.0, "approval_tier": "AR-02"},
+          {"record_id": "R900004", "expense_date": "2025-02-06", "amount": 5200.0, "approval_tier": "AR-02"}
+        ]
+      }
+    },
+    {
+      "rule_id": "Rule-3a",
+      "rule_description": "超标 — 办公用品每人每月≤600元 (07_office_communication.md Art.2)",
+      "citation": {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+      "finding": "E9001 2025年4月办公用品报销650元,超出月标准600元。",
+      "record_ids": ["R900007"],
+      "amounts": [650.0],
+      "details": {
+        "employee_id": "E9001",
+        "month": "2025-04",
+        "total_amount": 650.0,
+        "standard": 600.0,
+        "excess": 50.0,
+        "note": "R900001+R900002 January total 960 also exceeds 600, but these are duplicate invoices covered by Rule-1 and not separately flagged here."
+      }
+    },
+    {
+      "rule_id": "Rule-3b",
+      "rule_description": "超标 — 通讯费每人每月≤300元 (07_office_communication.md Art.3)",
+      "citation": {"doc_id": "07_office_communication.md", "clause_no": "第三条"},
+      "finding": "E9001 2025年9月通讯费报销两笔合计340元(R900014=180, R900015=160),超出月标准300元。",
+      "record_ids": ["R900014", "R900015"],
+      "amounts": [180.0, 160.0],
+      "details": {
+        "employee_id": "E9001",
+        "month": "2025-09",
+        "total_amount": 340.0,
+        "standard": 300.0,
+        "excess": 40.0,
+        "records": [
+          {"record_id": "R900014", "expense_date": "2025-09-03", "amount": 180.0},
+          {"record_id": "R900015", "expense_date": "2025-09-20", "amount": 160.0}
+        ]
+      }
+    },
+    {
+      "rule_id": "Rule-3c",
+      "rule_description": "超标 — 差旅住宿(经理级一类城市650元/晚) (04_travel_expense.md Art.4)",
+      "citation": {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+      "finding": "R900013: E9002(经理级)一类城市住宿2晚共1400元,折合700元/晚,超出标准650元/晚×1.0倍。",
+      "record_ids": ["R900013"],
+      "amounts": [1400.0],
+      "details": {
+        "employee_id": "E9002",
+        "employee_level": "经理级",
+        "city_tier": "A (一类城市)",
+        "nights": 2,
+        "total_amount": 1400.0,
+        "per_night": 700.0,
+        "standard": 650.0,
+        "excess_per_night": 50.0,
+        "special_approval": 0
+      }
+    },
+    {
+      "rule_id": "Rule-3d",
+      "rule_description": "超标 — 内部培训综合费用≤800元/日 (05_training_expense.md Art.3)",
+      "citation": {"doc_id": "05_training_expense.md", "clause_no": "第三条"},
+      "finding": "R900016: 内部培训1天共850元,超出标准800元/日。",
+      "record_ids": ["R900016"],
+      "amounts": [850.0],
+      "details": {
+        "employee_id": "E9001",
+        "days": 1,
+        "total_amount": 850.0,
+        "per_day": 850.0,
+        "standard": 800.0,
+        "excess": 50.0,
+        "special_approval": 0
+      }
+    },
+    {
+      "rule_id": "Rule-3e",
+      "rule_description": "超标 — 业务招待单次≤5000元,人均≤300元 (06_business_entertainment.md Art.2, Art.3)",
+      "citation": {"doc_id": "06_business_entertainment.md", "clause_no": "第二条,第三条"},
+      "finding": "R900005: 3600元/10人=360元/人,超出人均300元标准。R900017: 5200元,超出单次5000元上限。",
+      "record_ids": ["R900005", "R900017"],
+      "amounts": [3600.0, 5200.0],
+      "details": {
+        "records": [
+          {"record_id": "R900005", "amount": 3600.0, "participants": 10, "per_person": 360.0, "violates": "人均>300", "event_ok": true},
+          {"record_id": "R900017", "amount": 5200.0, "participants": 20, "per_person": 260.0, "violates": "单次>5000", "person_ok": true}
+        ]
+      }
+    },
+    {
+      "rule_id": "Rule-4",
+      "rule_description": "超期报销 — 60天内提交,年末可延至次年1月15日 (Art.7, Art.9)",
+      "citation": {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第七条,第九条"},
+      "finding": "R900006: 费用日期2025-03-01,报销日期2025-05-05,间隔65天,超过60天期限。年末记录R900012(21天)在Art.9豁免范围内,不违规。",
+      "record_ids": ["R900006"],
+      "amounts": [200.0],
+      "details": {
+        "expense_date": "2025-03-01",
+        "reimburse_date": "2025-05-05",
+        "delay_days": 65,
+        "limit_days": 60,
+        "excess_days": 5,
+        "year_end_exception_checked": false,
+        "special_approval": 0
+      }
+    },
+    {
+      "rule_id": "Rule-5",
+      "rule_description": "超预算 — 部门年度预算不足时不得继续报销,达1.0倍后需专项审批 (Art.13, 08_budget_management.md Art.3)",
+      "citation": {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"},
+      "citation2": {"doc_id": "08_budget_management.md", "clause_no": "第三条"},
+      "finding": "D902(开发审计二部)年度预算50000元。R900018(45000)累计45000未超;R900019(6000)累计51000超过预算且无专项审批;R900020(5000)累计56000虽有专项审批故豁免。",
+      "record_ids": ["R900019"],
+      "amounts": [6000.0],
+      "details": {
+        "department_id": "D902",
+        "department_name": "开发审计二部",
+        "annual_budget": 50000.0,
+        "records": [
+          {"record_id": "R900018", "amount": 45000.0, "cumulative": 45000.0, "rate": 0.90, "breach": false, "special_approval": 0, "status": "under"},
+          {"record_id": "R900019", "amount": 6000.0, "cumulative": 51000.0, "rate": 1.02, "breach": true, "special_approval": 0, "status": "ANOMALY"},
+          {"record_id": "R900020", "amount": 5000.0, "cumulative": 56000.0, "rate": 1.12, "breach": true, "special_approval": 1, "status": "CLEARED"}
+        ]
+      }
+    }
+  ],
+  "all_anomalous_record_ids": ["R900001","R900002","R900003","R900004","R900005","R900006","R900007","R900013","R900014","R900015","R900016","R900017","R900019"],
+  "validated_non_anomalous": ["R900008","R900009","R900010","R900011","R900012","R900018","R900020","R900021"],
+  "summary_stats": {
+    "total_records": 21,
+    "anomalous_records": 13,
+    "rules_with_findings": 5,
+    "rules_checked": 5
+  }
+}

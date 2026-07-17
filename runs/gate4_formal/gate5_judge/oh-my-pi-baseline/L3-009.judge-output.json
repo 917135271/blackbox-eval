@@ -1,0 +1,58 @@
+{
+  "criteria": [
+    {
+      "id": "overall-count",
+      "score": 0,
+      "reason": "候选答案报告25个异常，未说明全年应识别30个异常及5个TRAP陷阱不计入异常，异常总量明显错误。",
+      "answer_evidence": "答案中写“共发现25项异常”，未提及30个异常和5个陷阱位。",
+      "trace_evidence": "候选anomaly_ids仅25条，工具未发现其引用陷阱记录。"
+    },
+    {
+      "id": "five-rule-coverage",
+      "score": 10,
+      "reason": "报告覆盖了重复、拆分、超标准、超期报销四类规则，但未将超预算作为正式异常规则识别，缺少一类。",
+      "answer_evidence": "答案列出重复、拆分、超标准、超期报销和审批缺失，超预算仅在补充发现中提及但未列为异常。",
+      "trace_evidence": "候选anomaly_ids前缀包含DUP、SPLIT、STD、DELAY、APPR，无BUDGET相关前缀。"
+    },
+    {
+      "id": "representative-ids",
+      "score": 12.5,
+      "reason": "重复、拆分、超标准、超期报销四类均有正确ID和记录证据，但缺超预算类，仅四类有完整证据。",
+      "answer_evidence": "ANOM-DUP-001~006、ANOM-SPLIT-001~006等列出相应记录号，evidence_matrix包含对应事实。",
+      "trace_evidence": "工具调用获取了R004201等记录详情，evidence_matrix确认四类证据完整，但无超预算类证据。"
+    },
+    {
+      "id": "policy-coverage",
+      "score": 7.5,
+      "reason": "费用类规则引用了费用报销管理办法相关条款，但超预算规则既未识别也未引用预算管理办法，仅有一类制度完整。",
+      "answer_evidence": "citations列出费用报销管理办法第十、十一、十二、七条等，但无预算管理办法。",
+      "trace_evidence": "工具调用了get_policy_doc('08_budget_management.md')，但未在citations中引用。"
+    },
+    {
+      "id": "report-shape",
+      "score": 5,
+      "reason": "报告包含事实、规则、判断，补充发现含建议，整体结构基本完整且与提交结果一致。",
+      "answer_evidence": "答案按异常类别描述事实、规则、判断，补充发现提出专项审计建议。",
+      "trace_evidence": "answer文本结构清晰，各要素均可定位。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的记录ID均在工具调用中成功获取到详情，无虚构ID。"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": false,
+      "reason": "使用了summarize_expenses、find_reused_invoices等全局工具，扫描全年数据，未局限部分月份。"
+    },
+    {
+      "id": "trap-included-as-anomaly",
+      "triggered": false,
+      "reason": "候选anomaly_ids中无任何以TRAP开头的ID。"
+    }
+  ],
+  "overall_comment": "报告未覆盖全部五类规则，缺少超预算异常，异常总数不符且未提及5个陷阱位，制度依据不全。",
+  "confidence": 0.7
+}

@@ -1,0 +1,121 @@
+{
+  "case_family": "retrieval_and_report",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "audit_report",
+  "criteria": [
+    {
+      "answer_evidence": "答案中“现行附件二：AR-03 [10000, 50000) → 部门总经理”以及“旧版8000元门槛在现行制度中已被AR-03的10000元门槛取代”。",
+      "id": "current-threshold",
+      "reason": "明确指出现行值为10000元，版本清晰。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "调用 get_policy_doc 获取 03_authorization_management.md 返回附件二表格，显示 AR-03 区间 [10000,50000)。"
+    },
+    {
+      "answer_evidence": "答案中“旧版(2022)第二条：单笔≥8000元 → 部门总经理”并说明已被10000元取代，以及第十四条明确废止旧版。",
+      "id": "old-threshold-status",
+      "reason": "准确指出2022版8000元审批线已废止，旧值和状态均正确。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "调用 get_policy_doc 获取 02_expense_reimbursement_2022_deprecated.md 返回第二条内容“单笔报销金额达到8000元的，应提交部门总经理审批”，且第一条指明仅留档，第四条明确不得作为现行依据。"
+    },
+    {
+      "answer_evidence": "答案中引述“第五条 单笔费用报销的审批权限，不在本办法正文列示具体金额，统一按《XX证券授权管理办法》附件二执行”。",
+      "id": "cross-reference",
+      "reason": "完整说明报销办法通过授权管理办法附件二取得现行金额，制度关系清晰。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "调用 get_policy_doc 获取 01_expense_reimbursement_2025.md 返回第五条内容；调用 get_policy_doc 获取 03_authorization_management.md 返回第二条和附件二表格。"
+    },
+    {
+      "answer_evidence": "答案中定义陷阱区间一、二，说明若按旧版审计会错误标记合规记录；审计建议部分提出以附件二为唯一依据、注明制度版本、重点核查陷阱区间、增加AR展示等措施。",
+      "id": "risk-explanation",
+      "reason": "具体解释了陷阱区间误判风险，并给出了版本校验等审计建议。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "调用 list_records_missing_approval 以“部门总经理”和“分管副总”筛选，返回记录 R004233 等落入陷阱区间，证实风险存在。"
+    },
+    {
+      "answer_evidence": "答案包含制度沿革、差异对比、案例验证、审计建议四部分，与提交的 anomaly_id、record_ids、citations 一致。",
+      "id": "report-shape",
+      "reason": "以审计说明形式提交，结构完整，字段与提交一致。",
+      "score": 5.0,
+      "source": "llm_judge",
+      "trace_evidence": "提交的 evidence_matrix 和 validation_report 均显示字段一致，无矛盾。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的 record_id R004233 在工具返回中出现，非虚构。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "答案明确区分新旧制度，未将2022版作为现行审批依据。",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "L3-010-VT-001"
+    ],
+    "actual_record_ids": [
+      "R004233"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": false,
+      "expected_types": {},
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "citation_count": 8,
+    "elapsed_seconds": 266.143,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:24:05+08:00",
+  "group": "ccb-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.98,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选提交准确解析了版本陷阱，现行阈值、旧版废止、制度关系、风险与建议均表述完整，符合审计说明要求，无关键错误。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2061,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1222
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 7011,
+      "prompt_tokens": 7011,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 9072
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/ccb-baseline/L3-010",
+  "task_id": "L3-010"
+}

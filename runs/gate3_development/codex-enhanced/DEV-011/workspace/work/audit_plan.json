@@ -1,0 +1,63 @@
+{
+  "task_id": "DEV-011",
+  "task_type": "aggregate_budget",
+  "question": "核查D902部门年度预算执行，识别首次导致预算超限且没有专项审批的报销记录；专项审批记录不得误报。",
+  "scope": {
+    "department": "D902",
+    "department_name": "开发审计二部",
+    "budget_year": 2025,
+    "annual_budget": 50000.0,
+    "rule": "预算超限且无专项审批",
+    "exclusions": ["专项审批记录(special_approval=1)不得误报"]
+  },
+  "policy_questions": [
+    "预算管理办法第二条/第三条/第四条：部门预算额度与超预算专项审批要求",
+    "费用报销管理办法第十三条：预算不足时专项审批要求"
+  ],
+  "data_questions": [
+    "D902部门2025年所有报销记录按时间排序",
+    "累计预算计算：哪条记录首次使累计金额超过50,000",
+    "该记录是否有special_approval标志",
+    "后续记录中special_approval=1的不应误报为异常"
+  ],
+  "required_fields": ["record_id", "amount", "expense_date", "special_approval", "approvals"],
+  "evidence_requirements": [
+    "08_budget_management.md 第二条-第四条",
+    "01_expense_reimbursement_2025.md 第十三条",
+    "R900018, R900019, R900020 详情与审批链"
+  ],
+  "execution_steps": [
+    "1. audit-query-planner 生成计划",
+    "2. authorize data_analyst 执行批量分析",
+    "3. policy-version-check 确认适用制度版本",
+    "4. batch-expense-analysis 计算累计预算",
+    "5. evidence-coverage-check 覆盖检查",
+    "6. false-positive-review 复核R900020不误报",
+    "7. audit-report + result-validator",
+    "8. validate + submit"
+  ],
+  "complexity": 3,
+  "complexity_reasons": [
+    "聚合计算(累计预算)",
+    "预算阈值(1.0倍)",
+    "专项审批豁免判断"
+  ],
+  "subagent_plan": {
+    "role": "data_analyst",
+    "reason_code": "AGGREGATION_REQUIRED",
+    "context": {
+      "task": "对D902部门2025年报销记录按时间排序计算累计预算，识别首次使累计金额超过50,000(年度预算额度)的记录，检查该记录的special_approval字段。同时确认所有special_approval=1的记录不应被标记为异常。",
+      "question": "D902部门年度预算50,000元，现有3条记录，按时间排序计算累计金额：R900018(45,000)→R900019(6,000)→R900020(5,000)。确认哪条记录首次导致累计超过50,000，以及该记录是否有专项审批(special_approval)。"
+    },
+    "artifact_paths": ["work/audit_plan.json"],
+    "requested_token_budget": 4000
+  },
+  "stopping_conditions": [
+    "确认首次超限记录",
+    "确认该记录无专项审批",
+    "确认special_approval=1记录不误报",
+    "evidence_matrix pass且coverage 100%",
+    "validation_report pass"
+  ],
+  "unresolved_items": []
+}

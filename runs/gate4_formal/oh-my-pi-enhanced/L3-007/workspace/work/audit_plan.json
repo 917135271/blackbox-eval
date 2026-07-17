@@ -1,0 +1,88 @@
+{
+  "task_id": "L3-007",
+  "task_type": "two_hop_retrieval",
+  "question": "报销办法没有直接列审批金额时,请通过交叉引用找到单笔费用审批档位。",
+  "audit_object": "单笔费用审批档位（通过政策交叉引用检索）",
+  "audit_period": "2025年度",
+  "organization_scope": "XX证券全部门",
+  "policy_questions": [
+    {
+      "id": "Q1",
+      "question": "2025年费用报销办法中审批金额是否直接列示？如未列示，引用了哪个制度的哪个部分？",
+      "policy_docs": ["01_expense_reimbursement_2025.md"],
+      "target_clauses": ["第五条"]
+    },
+    {
+      "id": "Q2",
+      "question": "被引用的《XX证券授权管理办法》附件二中单笔费用审批档位（含金额区间和审批角色）是什么？",
+      "policy_docs": ["03_authorization_management.md"],
+      "target_clauses": ["附件二"]
+    }
+  ],
+  "data_questions": [],
+  "required_fields": [],
+  "evidence_requirements": [
+    "01_expense_reimbursement_2025.md 第五条原文",
+    "03_authorization_management.md 附件二原文",
+    "交叉引用路径完整性验证"
+  ],
+  "execution_steps": [
+    {
+      "step": 1,
+      "name": "policy_version_check",
+      "description": "确认2025版报销办法为现行有效制度，2022版已废止；确认授权管理办法现行有效",
+      "output": "work/policy_applicability.json"
+    },
+    {
+      "step": 2,
+      "name": "cross_reference_verification",
+      "description": "验证报销办法第五条→授权管理办法附件二的交叉引用路径",
+      "output": "引用路径确认"
+    },
+    {
+      "step": 3,
+      "name": "evidence_coverage_check",
+      "description": "构建无异常证据矩阵，验证政策引用完整性",
+      "output": "work/evidence_matrix.json"
+    },
+    {
+      "step": 4,
+      "name": "audit_report",
+      "description": "撰写审计报告，给出交叉引用得到的审批档位",
+      "output": "work/report_draft.json"
+    },
+    {
+      "step": 5,
+      "name": "result_validation",
+      "description": "校验最终结果格式和内容",
+      "output": "work/validation_report.json"
+    },
+    {
+      "step": 6,
+      "name": "submission",
+      "description": "提交最终审计结果",
+      "output": "work/final_result.json"
+    }
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "纯政策事实检索，无数据分析需求",
+      "仅涉及两条制度的直接交叉引用",
+      "无聚合、分组、批处理或异常检测"
+    ]
+  },
+  "subagent_plan": {
+    "policy_researcher": false,
+    "data_analyst": false,
+    "independent_reviewer": false,
+    "reason": "复杂度1，保持主智能体紧凑模式执行"
+  },
+  "stopping_conditions": [
+    "交叉引用路径验证完成",
+    "审批档位信息完整获取",
+    "证据矩阵覆盖率100%",
+    "结果校验通过"
+  ],
+  "unresolved_items": []
+}

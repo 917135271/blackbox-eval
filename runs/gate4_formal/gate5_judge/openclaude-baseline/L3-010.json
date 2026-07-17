@@ -1,0 +1,119 @@
+{
+  "case_family": "retrieval_and_report",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "audit_report",
+  "criteria": [
+    {
+      "answer_evidence": "现行附件二费用报销审批权限表（AR-01至AR-05）……部门总经理审批线：旧版≥8,000元 → 现行≥10,000元（AR-03档：[10,000, 50,000)区间）",
+      "id": "current-threshold",
+      "reason": "答案明确指出现行2025修订版部门总经理审批线为10,000元（AR-03档），金额和版本均准确。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具get_policy_doc(03_authorization_management.md)返回附件二包含AR-03: 大于等于10000元且小于50000元，部门总经理审批。"
+    },
+    {
+      "answer_evidence": "旧版制度曾规定，单笔报销金额达到8000元的，应提交部门总经理审批……2022版第四条明确声明其审批金额已被后续制度替代，不得作为现行审批依据。",
+      "id": "old-threshold-status",
+      "reason": "答案准确指出旧版2022版8000元审批线，并明确说明该版本已废止，且引用其第四条声明。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具get_policy_doc(02_expense_reimbursement_2022_deprecated.md)返回第二条为8000元，第四条为废止声明。"
+    },
+    {
+      "answer_evidence": "现行审批权限统一按照《XX证券授权管理办法》（XX证综规〔2025〕丙号）附件二执行。2025修订版第五条规定：‘单笔费用报销的审批权限，不在本办法正文列示具体金额，统一按《XX证券授权管理办法》附件二执行。’",
+      "id": "cross-reference",
+      "reason": "答案完整说明了费用报销管理办法（2025修订版）通过授权管理办法附件二取得现行审批金额的制度关系。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具get_policy_doc(01_expense_reimbursement_2025.md)返回第五条引用附件二；get_policy_doc(03_authorization_management.md)返回附件二具体金额。"
+    },
+    {
+      "answer_evidence": "【误判类型一】8,000元≤金额<10,000元区间……若按旧线审计，该区间内所有记录将被错误标记为“缺失部门总经理审批”。……【误判类型二】30,000元≤金额<50,000元区间……将被错误标记为“缺失分管副总审批”。……审计建议（1）（2）（3）。",
+      "id": "risk-explanation",
+      "reason": "答案详细解释了旧线会导致两个金额区间误判的具体风险，并提出了强制绑定版本、标记废止制度等具体校验措施。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "无特定工具调用需引用。"
+    },
+    {
+      "answer_evidence": "全文为“版本陷阱审计说明”标题及分节内容，且答案文本与 citations、record_ids 对应。",
+      "id": "report-shape",
+      "reason": "答案以完整的审计说明形式提交，结构包含背景、差异、风险、建议、结论，与 submitted_json 字段一致，无冲突。",
+      "score": 5.0,
+      "source": "llm_judge",
+      "trace_evidence": "submitted_json 中 answer 和 record_ids 等字段一致，无冲突。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "使用的 record_id R004233 在数据集中存在，工具 get_expense_detail 和 list_approvals 均返回有效记录，未虚构。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "答案明确指出2022版已废止，所有结论均基于现行2025版和授权管理办法附件二，未将旧版作为当前审批依据。",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R004233"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 6,
+    "elapsed_seconds": 136.674,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:27:49+08:00",
+  "group": "openclaude-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.95,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "审计说明完整准确地指出了现行审批线10000元与已废止的旧线8000元，清晰阐述制度引用关系，具体说明误判风险并提出可行建议，格式规范，无关键失败。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2010,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1055
+      },
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 5306,
+      "prompt_tokens": 6458,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152
+      },
+      "total_tokens": 8468
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/openclaude-baseline/L3-010",
+  "task_id": "L3-010"
+}

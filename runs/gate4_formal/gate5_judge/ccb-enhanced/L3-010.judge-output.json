@@ -1,0 +1,53 @@
+{
+  "criteria": [
+    {
+      "id": "current-threshold",
+      "score": 30,
+      "reason": "明确指出现行部门总经理审批线为10000元，来自附件二AR-03。",
+      "answer_evidence": "现行附件二审批线为：AR-01 [0,3000)部门经理；... AR-03 [10000,50000)部门总经理。",
+      "trace_evidence": "get_policy_doc(\"03_authorization_management.md\")返回附件二审批表，AR-03区间为[10000,50000)。"
+    },
+    {
+      "id": "old-threshold-status",
+      "score": 25,
+      "reason": "明确指出2022版8000元审批线已废止。",
+      "answer_evidence": "2022版第二条触发线为8000元（部门总经理）...2022版于2025年1月1日被2025修订版废止。",
+      "trace_evidence": "get_policy_doc(\"02_expense_reimbursement_2022_deprecated.md\")返回旧版文本，明确旧值8000元且第四条不得作为现行依据。"
+    },
+    {
+      "id": "cross-reference",
+      "score": 20,
+      "reason": "正确说明报销办法第五条委托授权管理办法附件二规定审批金额。",
+      "answer_evidence": "2025修订版改变了审批线的定义方式，其第五条明确不再在本办法中列示具体金额，统一按《授权管理办法》附件二执行。",
+      "trace_evidence": "get_policy_doc(\"01_expense_reimbursement_2025.md\")返回第五条内容，get_policy_doc(\"03_authorization_management.md\")返回附件二。"
+    },
+    {
+      "id": "risk-explanation",
+      "score": 20,
+      "reason": "详细分析了三个版本陷阱区间，并提出了具体的防范措施。",
+      "answer_evidence": "（一）[8000,10000)假阳性陷阱...（二）[30000,50000)假阳性陷阱...（三）[3000,8000)假阴性陷阱...防范措施包括：每次审计前核实所引用制度的发文编号和生效日期...",
+      "trace_evidence": "无直接工具调用，为分析性内容。"
+    },
+    {
+      "id": "report-shape",
+      "score": 5,
+      "reason": "以审计说明形式提交，字段一致且无冲突。",
+      "answer_evidence": "答案完整，anomaly_ids、citations、record_ids匹配。",
+      "trace_evidence": "结构化字段与答案一致，无冲突。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的记录ID R004233存在于数据库中，无伪造。"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未将废止制度作为现行依据，明确区分版本并指出废止状态。"
+    }
+  ],
+  "overall_comment": "答案完整覆盖所有评分点，准确指出现行审批线、旧版废止状态、制度关系，并详细分析版本陷阱风险及防范措施，报告形式规范。",
+  "confidence": 1.0
+}

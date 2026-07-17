@@ -1,0 +1,78 @@
+{
+  "task_id": "L3-004",
+  "task_type": "full_year_rule_audit",
+  "audit_object": "全部门年度超预算",
+  "business_period": "2025-01-01 至 2025-12-31",
+  "scope": "全部门(department budget)年度累计费用 vs 年度预算额度",
+  "policy_questions": [
+    {
+      "question": "部门累计费用达到年度预算额度1.0倍后是否允许继续报销？",
+      "clauses": ["08_budget_management/第3条", "01_expense_reimbursement_2025/第13条"],
+      "answer": "原则上不得继续报销；确需发生须履行专项审批。"
+    },
+    {
+      "question": "超预算支出需要何种审批？",
+      "clauses": ["08_budget_management/第4条", "01_expense_reimbursement_2025/第13条"],
+      "answer": "因监管要求、客户服务或经营连续性确需超预算支出的，应履行专项审批(special_approval)。"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "哪些部门的年度累计报销金额超过年度预算额度？",
+      "method": "summarize_department_budgets + 逐部门核对 cumulative vs budget"
+    },
+    {
+      "question": "对于超预算部门，哪些报销记录位于预算耗尽点之后？",
+      "method": "按部门列出全部已批准报销记录，按日期排序，计算累计金额，标识预算耗尽点前后的记录"
+    },
+    {
+      "question": "超预算的记录是否有专项审批(special_approval)？",
+      "method": "检查每条记录的special_approval字段"
+    }
+  ],
+  "required_fields": [
+    "record_id", "department_id", "amount", "expense_date", "status",
+    "special_approval", "annual_budget", "cumulative_amount"
+  ],
+  "evidence_requirements": [
+    "各部门年度预算额度和累计使用金额",
+    "超预算部门全部已批准报销记录明细",
+    "超预算记录的审批状态(special_approval)",
+    "政策引用: 08_budget_management/第3条+第4条, 01_expense_reimbursement_2025/第13条"
+  ],
+  "execution_steps": [
+    "1. 获取全部部门预算汇总，识别超预算部门",
+    "2. 对每个超预算部门，列出全部已批准(approved)报销记录(按日期排序)",
+    "3. 计算每个部门的累计使用额，标识预算耗尽分界点",
+    "4. 检查预算耗尽点之后记录的special_approval状态",
+    "5. 无special_approval的记录构成超预算异常",
+    "6. 形成证据矩阵",
+    "7. 独立复核",
+    "8. 生成报告与校验",
+    "9. 提交"
+  ],
+  "complexity_score": 5,
+  "complexity_reasons": [
+    "多政策协同: 01_expense_reimbursement_2025 + 08_budget_management (+1)",
+    "聚合计算: 按部门累计求和，识别预算耗尽分界点 (+1)",
+    "多业务规则: 预算上限 + 专项审批豁免 (+1)",
+    "阈值判定: 1.0倍预算额度边界 (+1)",
+    "全部门全年综合审计报告 (+1)"
+  ],
+  "subagent_plan": {
+    "data_analyst": {
+      "role": "data_analyst",
+      "reason_code": "AGGREGATION_REQUIRED",
+      "task": "Execute batch analysis: for each over-budget department (D001,D002,D003,D004,D005,D006), list all approved expenses, compute cumulative sums, identify records beyond budget threshold, and note special_approval status.",
+      "artifact_paths": ["work/audit_plan.json"]
+    }
+  },
+  "stopping_conditions": [
+    "全部6个超预算部门的报销记录已完整检索",
+    "每家超预算部门的累计金额已精确计算并核实",
+    "每条超预算记录special_approval状态已确认",
+    "异常发现与政策条款均有明确对应",
+    "无异常部门已确认排除"
+  ],
+  "unresolved_items": []
+}

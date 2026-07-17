@@ -1,0 +1,28 @@
+{
+  "criteria": [
+    {
+      "id": "audit-conclusion",
+      "score": 20,
+      "reason": "结论为重复报销，异常ID准确对应DUP类型",
+      "answer_evidence": "提交anomaly_ids包含L2-003-001，答案称'重复报销异常'",
+      "trace_evidence": "find_invoice_usage确认FP202500000020关联R000020和R004203，记录金额均为669.5"
+    },
+    {
+      "id": "policy-basis",
+      "score": 15,
+      "reason": "引用现行制度第十条，且与重复报销管控要求一致",
+      "answer_evidence": "citations中列出'第十条'，答案称'违反2025修订版费用报销管理办法第十条'",
+      "trace_evidence": "search_policy和get_policy_excerpt返回第十条全文：'同一发票最多报销1次...'"
+    },
+    {
+      "id": "case-reasoning",
+      "score": 20,
+      "reason": "完整列出两笔记录和发票号、金额669.5元，证据闭环",
+      "answer_evidence": "答案写明'FP202500000020...R000020...669.50元'和'R004203...669.50元'",
+      "trace_evidence": "get_expense_detail(R000020)和(R004203)均返回amount:669.5，find_invoice_usage核实发票关联"
+    }
+  ],
+  "critical_failures": [],
+  "overall_comment": "候选完全识别了重复报销异常，制度引用和事实推理准确，无虚构记录。",
+  "confidence": 1.0
+}

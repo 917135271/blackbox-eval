@@ -1,0 +1,37 @@
+{
+  "audit_scope": {
+    "task_id": "L2-008",
+    "rule": "拆分报销 (费用报销管理办法第十一条)",
+    "period": "2025年4月3日至2025年4月17日 (R004212费用日期前后7天窗口)",
+    "employee": "E0009 (张婷, 财务管理部 部门经理)",
+    "expense_type": "travel_lodging",
+    "clue_record": "R004212"
+  },
+  "verified_facts": [
+    "R004212: 员工E0009, travel_lodging, 金额5100元, 费用日期2025-04-10, 审批AR-02(部门经理), 状态approved",
+    "R004213: 员工E0009, travel_lodging, 金额5100元, 费用日期2025-04-15, 审批AR-02(部门经理), 状态approved",
+    "两笔记录间隔5天, 在7天窗口内, 合计金额10200元",
+    "两笔记录均无特殊审批(special_approval=0)"
+  ],
+  "applicable_policies": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "title": "XX证券费用报销管理办法(2025修订版)", "clause": "第十一条"},
+    {"doc_id": "03_authorization_management.md", "title": "XX证券授权管理办法", "clause": "附件二"}
+  ],
+  "findings": [
+    {
+      "anomaly_id": "SPLIT-001",
+      "type": "拆分报销规避审批权限",
+      "description": "员工E0009将合计10200元的travel_lodging拆分为两笔5100元,间隔5天提交,规避了部门总经理审批(AR-03)。单笔5100元仅需部门经理AR-02审批,但合计10200元已达到AR-03档位(>=10000元)。"
+    }
+  ],
+  "impact": "拆分报销导致10200元费用规避了部门总经理(AR-03)审批,违反费用报销管理办法第十一条禁止拆分的规定",
+  "recommendations": ["将R004212和R004213合并审批,补办部门总经理级AR-03审批"],
+  "anomaly_ids": ["SPLIT-001"],
+  "record_ids": ["R004212", "R004213"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+  ],
+  "answer": "发现拆分报销异常SPLIT-001:员工E0009(张婷)于2025年4月10日(R004212,5100元)和2025年4月15日(R004213,5100元)分两笔提交travel_lodging费用,间隔5天(7天窗口内),合计10200元达到授权管理办法附件二AR-03档位(>=10000元需部门总经理审批),但两笔均仅经过AR-02(部门经理)审批,构成拆分报销规避审批权限,违反XX证券费用报销管理办法(2025修订版)第十一条。",
+  "limitations": []
+}

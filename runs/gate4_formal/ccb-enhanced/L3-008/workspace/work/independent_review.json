@@ -1,0 +1,27 @@
+{
+  "decision": "pass",
+  "challenged_findings": [
+    {
+      "anomaly_id": "L3-008-A01",
+      "challenge": "5 near-boundary records checked for special approval exemptions",
+      "result": "All 15 records have special_approval=0. No exemptions apply.",
+      "close_boundary_cases": [
+        {"record_id": "R001829", "excess": 27.40, "resolution": "M1/A/1n, exceeded training std 500 by 5.5%, no special approval"},
+        {"record_id": "R004138", "excess": 25.39, "resolution": "D1/C/3n, exceeded training std 350 by 7.3%, no special approval"},
+        {"record_id": "R003507", "excess": 34.06, "resolution": "M1/C/3n, exceeded training std 350 by 9.7%, no special approval"},
+        {"record_id": "R003618", "excess": 40.86, "resolution": "M1/A/2n, exceeded training std 500 by 8.2%, no special approval"},
+        {"record_id": "R002576", "excess": 46.30, "resolution": "M1/B/3n, exceeded training std 420 by 11.0%, no special approval"}
+      ]
+    }
+  ],
+  "supporting_evidence": [
+    "All 15 records: special_approval=0, status=approved (部门经理 level), expense_type=travel_lodging, reason contains '培训'",
+    "No record has 专项审批 (special approval) that would allow exceeding the standard per 01_expense_reimbursement_2025.md Art 12",
+    "All per-night amounts computed as amount/nights and compared against training standard from 05_training_expense.md Art 5"
+  ],
+  "opposing_evidence": [],
+  "exceptions_or_boundaries": "5 records near boundary (<¥50 excess) reviewed. No special approvals found. The fundamental issue is classification: training stays must use training lodging standard regardless of amount.",
+  "required_changes": [],
+  "rationale": "All 15 records are valid violations. Training stays classified as travel_lodging violate both 04_travel_expense.md Art 7 and 05_training_expense.md Art 6. Per-night amounts exceed the correct training lodging standard (05 Art 5), and no special approvals exist to exempt any. The 33 other records with training stays under travel_lodging that don't exceed the training standard are still classification errors but not financially material — they are properly recorded as unused_candidate_record_ids.",
+  "unresolved_conflicts": []
+}

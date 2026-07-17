@@ -1,0 +1,136 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 15.0,
+  "case_score_raw": 15.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "answer: '经核查，TRAP-002涉及的记录R000002和R004201不构成异常。'",
+      "id": "clean-conclusion",
+      "reason": "候选结论基于R000002和R004201得出无异常，但本题应核查的记录是R004234和R004235，候选未针对本题记录进行判断，结论实质无效。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "trace中仅对FP202500000002的使用记录(R000002, R004201)进行了核查，未涉及R004234,R004235。"
+    },
+    {
+      "answer_evidence": "submitted_json record_ids: ['R000002', 'R004201']",
+      "id": "record-scope",
+      "reason": "预期核查记录为R004234和R004235，候选提交的记录为R000002和R004201，完全错误。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "trace中调用了find_reused_invoices和find_invoice_usage，针对的是FP202500000002，未调用获取R004234或R004235详情的工具。"
+    },
+    {
+      "answer_evidence": "answer: 'R004201明确标注为重复发票注入样本... R000002为正常业务报销。'",
+      "id": "case-specific-reason",
+      "reason": "期望原因为'发票不同且合计低于审批线'，候选给出的原因是测试注入样本和正常报销，与期望原因完全不符。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "trace中没有核查发票差异或合计金额是否低于审批线的内容。"
+    },
+    {
+      "answer_evidence": "无",
+      "id": "reverse-check",
+      "reason": "轨迹中没有针对本题边界条件（如核对R004234与R004235的发票号是否相同、合计金额、日期跨度等）的核查。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "trace中主要围绕FP202500000002的重复使用，以及查询政策第十条，未涉及本题记录的发票比较或金额汇总。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": true,
+      "reason": "候选使用R000002和R004201这些与本题无关的记录来支撑核心结论，而非核查预期的R004234和R004235。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R000002",
+      "R004201"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 279.444,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004234",
+      "R004235"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 2,
+      "f1": 0.0,
+      "missing_count": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:28:04+08:00",
+  "group": "oh-my-pi-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.95,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选完全未核查本题指定的记录(R004234, R004235)，而是错误地聚焦于另一张发票(FP202500000002)的重复使用，导致所有评判维度均不得分。触发critical failure，得分上限为20，最终得分0。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2990,
+      "completion_tokens_details": {
+        "reasoning_tokens": 2366
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 6596,
+      "prompt_tokens": 7620,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 10610
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/oh-my-pi-enhanced/TRAP-002",
+  "task_id": "TRAP-002"
+}

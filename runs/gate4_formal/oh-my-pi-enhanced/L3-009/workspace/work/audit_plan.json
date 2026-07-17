@@ -1,0 +1,132 @@
+{
+  "task_id": "L3-009",
+  "task_type": "audit_report",
+  "audit_object": "XX证券全年费用报销",
+  "audit_period": "2025-01-01 至 2025-12-31",
+  "organization_scope": "全公司所有部门及员工",
+  "expense_types": ["差旅费", "培训费", "业务招待费", "办公用品", "通讯费"],
+  "deliverable": "基于全年数据的异常审计摘要报告，覆盖五类规则并列出关键异常ID",
+
+  "policy_questions": [
+    {
+      "rule_category": "重复报销",
+      "rule_id": "R01",
+      "question": "同一发票是否在不同报销记录中重复出现？",
+      "policy_basis": "01_expense_reimbursement_2025.md 第十条",
+      "threshold": "同一发票最多报销1次",
+      "fields_needed": ["invoice_no", "record_id", "amount", "expense_date", "employee_id"]
+    },
+    {
+      "rule_category": "拆分报销规避审批",
+      "rule_id": "R02",
+      "question": "同一员工、同一费用类型在7天内是否有2笔及以上报销，且合计金额达到AR-03（10000元）及以上审批线？",
+      "policy_basis": "01_expense_reimbursement_2025.md 第十一条; 03_authorization_management.md 附件二",
+      "threshold": "7天内≥2笔，合计≥10000元",
+      "fields_needed": ["employee_id", "expense_type", "expense_date", "amount", "record_id"]
+    },
+    {
+      "rule_category": "超标准报销",
+      "rule_id": "R03",
+      "question": "报销金额是否超过对应制度标准的1.0倍且无专项审批？",
+      "policy_basis": "01_expense_reimbursement_2025.md 第十二条; 04-07各费用管理办法",
+      "sub_rules": [
+        {"type": "差旅住宿", "standard": "按职级+城市档位：员工级300-450元/晚，经理级450-650元/晚，部门负责人级600-850元/晚，高管级750-1100元/晚"},
+        {"type": "培训课程", "standard": "每人每期≤3500元"},
+        {"type": "培训综合", "standard": "内部≤800元/日，外部≤1200元/日"},
+        {"type": "培训住宿", "standard": "按城市档位：350-500元/晚"},
+        {"type": "业务招待", "standard": "单次≤5000元，人均≤300元"},
+        {"type": "办公用品", "standard": "每人每月≤600元"},
+        {"type": "通讯费", "standard": "每人每月≤300元"}
+      ],
+      "fields_needed": ["record_id", "expense_type", "amount", "employee_id", "city_tier", "employee_level", "participants", "days", "nights", "special_approval"]
+    },
+    {
+      "rule_category": "预算超支",
+      "rule_id": "R04",
+      "question": "部门年度预算是否超支（已使用≥预算额度），且后续报销无专项审批？",
+      "policy_basis": "01_expense_reimbursement_2025.md 第十三条; 08_budget_management.md 第三条",
+      "threshold": "已使用≥预算额度1.0倍",
+      "fields_needed": ["department_id", "record_id", "amount", "expense_date", "special_approval", "budget_amount", "budget_used"]
+    },
+    {
+      "rule_category": "超期报销",
+      "rule_id": "R05",
+      "question": "费用发生后是否超过60天才提交报销？",
+      "policy_basis": "01_expense_reimbursement_2025.md 第七条",
+      "threshold": "费用发生后60天内提交",
+      "fields_needed": ["record_id", "expense_date", "reimburse_date", "employee_id"]
+    }
+  ],
+
+  "data_questions": [
+    "列出全年所有报销记录",
+    "按发票号分组，找出使用次数≥2的发票",
+    "按(员工, 费用类型, 7天窗口)分组，找出合计金额≥10000元的组",
+    "按费用类型和对应标准，逐条检查超标情况",
+    "按部门计算预算累计使用，找出超预算节点",
+    "计算每条记录的提交延迟天数（reimburse_date - expense_date）"
+  ],
+
+  "required_fields": [
+    "record_id", "employee_id", "department_id", "expense_type", "amount",
+    "expense_date", "reimburse_date", "invoice_no", "city_tier", "employee_level",
+    "participants", "days", "nights", "special_approval", "status",
+    "budget_amount", "budget_used"
+  ],
+
+  "evidence_requirements": [
+    "每条异常必须有对应的数据库记录ID",
+    "每条异常必须有对应的政策条款引用",
+    "证据矩阵覆盖率100%"
+  ],
+
+  "execution_steps": [
+    {"step": 1, "name": "审计规划", "action": "制定审计计划，确定五类规则和数据范围"},
+    {"step": 2, "name": "政策研究（子智能体）", "action": "确定适用政策版本、条款、标准和豁免条件"},
+    {"step": 3, "name": "数据分析（子智能体）", "action": "全年数据批量分析，按五类规则筛选候选异常"},
+    {"step": 4, "name": "初步发现汇总", "action": "汇总政策研究和数据分析结果，形成初步发现"},
+    {"step": 5, "name": "证据覆盖检查", "action": "逐条核查证据覆盖率和关联性"},
+    {"step": 6, "name": "独立复核（子智能体）", "action": "对初步发现进行假阳性复核"},
+    {"step": 7, "name": "审计报告", "action": "编写异常审计摘要报告"},
+    {"step": 8, "name": "结果校验与提交", "action": "通过result-validator校验后提交"}
+  ],
+
+  "complexity_score": 6,
+  "complexity_reasons": [
+    "政策版本关系（2022 vs 2025）",
+    "多项政策（8个以上政策文档）",
+    "聚合、分组、连接、批量过滤",
+    "五个业务规则",
+    "多阈值、日期边界、豁免条件",
+    "综合审计报告"
+  ],
+
+  "subagent_plan": {
+    "policy_researcher": {
+      "role": "policy_researcher",
+      "reason_code": "MULTI_POLICY_VERSION_CHECK",
+      "trigger": "存在2022版和2025版报销制度，需要确认适用版本；多项费用标准制度需要交叉引用",
+      "task": "确定2025全年适用的制度版本、五类规则的具体条款、各项费用标准、豁免条件和审批权限"
+    },
+    "data_analyst": {
+      "role": "data_analyst",
+      "reason_code": "AGGREGATION_REQUIRED",
+      "trigger": "全年数据需要聚合分析、多表连接、分组统计",
+      "task": "对全年报销数据进行五类规则的批量分析：重复发票检测、7天拆分窗口检测、超标检测、预算超支检测、超期检测"
+    },
+    "independent_reviewer": {
+      "role": "independent_reviewer",
+      "reason_code": "COMPREHENSIVE_AUDIT",
+      "trigger": "综合审计需独立复核",
+      "task": "对初步发现进行假阳性复核，特别关注审批豁免、阈值边界、日期窗口、数据完整性"
+    }
+  },
+
+  "stopping_conditions": [
+    "所有五类规则的证据覆盖率达到100%",
+    "预检valid=true且提交成功",
+    "所有子智能体结果已登记"
+  ],
+
+  "unresolved_items": []
+}

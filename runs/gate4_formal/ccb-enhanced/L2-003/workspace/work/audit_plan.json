@@ -1,0 +1,62 @@
+{
+  "task_id": "L2-003",
+  "task_question": "结合制度和业务数据,核查以R000020为线索的重复报销异常,返回异常ID和记录ID集合。",
+  "scope": {
+    "clue_record": "R000020",
+    "rule": "Article 10 - 同一发票最多报销1次",
+    "expense_types": ["travel_lodging"],
+    "period": "2025-01-01 to 2025-12-31",
+    "organization": "财务管理部 (D009)"
+  },
+  "audit_period": "2025-01-01 to 2025-12-31",
+  "policy_questions": [
+    {
+      "question": "Which policy version applies to R000020 (expense_date 2025-01-05) and R004203 (expense_date 2025-04-10)?",
+      "applicable_policy": "01_expense_reimbursement_2025.md",
+      "clause": "第十条 (Article 10)",
+      "clause_text": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "Is invoice FP202500000020 used in multiple expense records?",
+      "findings": "INV000020 appears in R000020 and R004203, usage_count=2",
+      "evidence_source": "find_reused_invoices + get_expense_detail"
+    }
+  ],
+  "required_fields": ["record_id", "invoice_no", "invoice_id", "expense_date", "amount", "status", "employee_id", "department_id"],
+  "evidence_requirements": [
+    "Policy document: 01_expense_reimbursement_2025.md, Article 10",
+    "Record R000020 detail from get_expense_detail",
+    "Record R004203 detail from get_expense_detail",
+    "Reused invoice list from find_reused_invoices confirming INV000020 usage_count=2"
+  ],
+  "execution_steps": [
+    {"step": "planning", "status": "completed", "artifact": "work/audit_plan.json"},
+    {"step": "policy_version_check", "status": "pending", "trigger": "policy_version_applicability"},
+    {"step": "data_analysis", "status": "completed", "findings": "Same invoice FP202500000020 in R000020 and R004203"},
+    {"step": "evidence_coverage_check", "status": "pending"},
+    {"step": "false_positive_review", "status": "pending", "trigger": "duplicate_invoice_exception_check"},
+    {"step": "audit_report", "status": "pending"},
+    {"step": "result_validation", "status": "pending"},
+    {"step": "submission", "status": "pending"}
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "Single rule (Article 10 - duplicate invoice)",
+      "Involves reused invoice batch lookup across records",
+      "Requires date-boundary check for policy applicability"
+    ]
+  },
+  "subagent_plan": {
+    "required": false,
+    "reason": "Direct evidence available; complexity 2 with single-rule, single-policy scope. Both records already retrieved. No professional subagent needed."
+  },
+  "stopping_conditions": [
+    "All records using invoice INV000020 identified and verified",
+    "Policy applicability confirmed for both records",
+    "No valid exemptions or exceptions found for the duplicate usage"
+  ],
+  "unresolved_items": []
+}

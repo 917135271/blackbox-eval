@@ -1,0 +1,142 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 60.0,
+  "case_score_raw": 60.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "经逐条核查...全部记录均在各项适用政策标准的合规范围内，无异常。",
+      "id": "clean-conclusion",
+      "reason": "明确无异常且无矛盾表述",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "无直接工具调用，但候选answer明确结论。"
+    },
+    {
+      "answer_evidence": "提交的record_ids字段包含8条记录，远超预期的2条。",
+      "id": "record-scope",
+      "reason": "核心记录已覆盖，但提交中包含了额外6条无关记录（R004233-R004238），属于加入无关记录。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用，但从提交的record_ids可知。"
+    },
+    {
+      "answer_evidence": "R004239/R004240招待费合计1085元（未达拆分审批线且符合人均标准）。",
+      "id": "case-specific-reason",
+      "reason": "只说明了符合招待标准和总额未达审批线，未提及发票唯一性，缺少关键原因。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用，未核查发票唯一性。"
+    },
+    {
+      "answer_evidence": "无。",
+      "id": "reverse-check",
+      "reason": "轨迹中无任何工具调用证据，无法验证是否对阈值、日期、发票等进行了反向核查。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "tool_trace_summary显示call_count为0，无任何工具调用。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的record_id均在数据库中存在。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "没有将合规记录判为异常。",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R004233",
+      "R004234",
+      "R004235",
+      "R004236",
+      "R004237",
+      "R004238",
+      "R004239",
+      "R004240"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 9,
+    "elapsed_seconds": 464.9,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004239",
+      "R004240"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 6,
+      "f1": 0.4,
+      "missing_count": 0,
+      "precision": 0.25,
+      "recall": 1.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:27:22+08:00",
+  "group": "opencode-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.95,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "结论正确，但核查范围过大包含了无关记录，合规原因遗漏发票唯一性，且无工具调用证据支持反向核查。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2266,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1776
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 1972,
+      "prompt_tokens": 2996,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 5262
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/opencode-enhanced/TRAP-005",
+  "task_id": "TRAP-005"
+}

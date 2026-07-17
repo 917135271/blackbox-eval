@@ -1,0 +1,124 @@
+{
+  "task_id": "DEV-011",
+  "task_type": "aggregate_budget",
+  "audit_object": "D902部门年度预算执行",
+  "audit_period": "2025年度",
+  "organization_scope": {
+    "department_id": "D902",
+    "department_name": "开发审计二部",
+    "annual_budget": 50000.0
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-1",
+      "question": "部门年度预算超限后是否允许继续报销？",
+      "applicable_docs": ["08_budget_management.md"],
+      "relevant_clauses": ["第三条", "第四条"]
+    },
+    {
+      "id": "PQ-2",
+      "question": "超预算支出需要什么审批程序？",
+      "applicable_docs": ["08_budget_management.md", "01_expense_reimbursement_2025.md"],
+      "relevant_clauses": ["第四条", "第十三条"]
+    },
+    {
+      "id": "PQ-3",
+      "question": "专项审批在数据中如何体现？",
+      "applicable_docs": ["01_expense_reimbursement_2025.md"],
+      "relevant_clauses": ["第十三条"]
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-1",
+      "question": "D902部门2025年度所有报销记录及预算累计情况",
+      "required_tables": ["expenses", "departments"],
+      "required_fields": ["record_id", "amount", "expense_date", "special_approval", "department_id", "annual_budget"]
+    },
+    {
+      "id": "DQ-2",
+      "question": "识别首次导致累计金额超过年度预算的记录",
+      "method": "running_total_comparison"
+    },
+    {
+      "id": "DQ-3",
+      "question": "核实超限记录的专项审批状态",
+      "required_fields": ["special_approval"]
+    }
+  ],
+  "evidence_requirements": [
+    "D902部门年度预算额度证明",
+    "所有报销记录按时间排序的累计金额计算",
+    "首次超限记录的特殊审批字段值",
+    "后续记录的special_approval确认"
+  ],
+  "execution_steps": [
+    {
+      "step": 1,
+      "name": "policy_research",
+      "description": "查询预算管理办法和费用报销制度中关于预算超限和专项审批的条款",
+      "artifacts": ["policy_excerpts"],
+      "stopping_condition": "已获取全部相关条款"
+    },
+    {
+      "step": 2,
+      "name": "data_analysis",
+      "description": "委托data_analyst子智能体：获取D902部门所有报销记录、计算累计、识别首次超限、核查专项审批",
+      "artifacts": ["work/subagents/data_analyst/detail_analysis.json", "work/subagents/data_analyst/summary.json"],
+      "stopping_condition": "子智能体返回结构化摘要和分析产物"
+    },
+    {
+      "step": 3,
+      "name": "evidence_review",
+      "description": "复核数据分析和制度条款的对应关系",
+      "artifacts": ["work/evidence_matrix.json"],
+      "stopping_condition": "evidence_matrix status为pass且coverage_percent=100"
+    },
+    {
+      "step": 4,
+      "name": "false_positive_review",
+      "description": "检查专项审批记录是否被误报，确认R900020不应被标记",
+      "artifacts": ["false_positive_review_result"],
+      "stopping_condition": "确认无误报"
+    },
+    {
+      "step": 5,
+      "name": "report_and_validate",
+      "description": "生成审计报告并通过结果校验",
+      "artifacts": ["work/final_result.json", "work/validation_report.json"],
+      "stopping_condition": "validation_report status为pass且submission_allowed=true"
+    },
+    {
+      "step": 6,
+      "name": "submit",
+      "description": "调用validate_audit_result和submit_audit_result提交",
+      "artifacts": [],
+      "stopping_condition": "提交成功"
+    }
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "aggregation/grouping: 需要计算累计金额并识别首次超限",
+      "two_or_more_business_rules: 预算超限规则 + 专项审批豁免规则",
+      "thresholds_exemptions: 预算1.0倍阈值 + 专项审批豁免"
+    ]
+  },
+  "subagent_plan": {
+    "requested": true,
+    "roles": [
+      {
+        "role": "data_analyst",
+        "reason_code": "AGGREGATION_REQUIRED",
+        "task": "获取D902部门2025年度全部报销记录，按日期排序计算累计金额，识别首次导致累计超过年度预算(¥50,000)的记录，检查该记录和后续记录的special_approval字段。R900020标注为专项批准的连续性支出且special_approval=1，不得误报。",
+        "artifact_paths": ["work/subagents/data_analyst/"],
+        "expected_outputs": ["detail_analysis.json", "summary.json"]
+      }
+    ]
+  },
+  "stopping_conditions": {
+    "global": "所有步骤完成且提交成功",
+    "per_step": "见各步骤stopping_condition"
+  },
+  "unresolved_items": []
+}

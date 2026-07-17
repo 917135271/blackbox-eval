@@ -1,0 +1,34 @@
+{
+  "criteria": [
+    {
+      "id": "audit-conclusion",
+      "score": 20,
+      "reason": "明确判定为重复报销异常，异常类型正确。",
+      "answer_evidence": "认定为重复报销异常。",
+      "trace_evidence": "list_invoices发现FP202500000020被使用2次；find_invoice_usage返回R000020和R004203两笔记录。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 15,
+      "reason": "准确引用现行《费用报销管理办法》第十条，条款有效且直接支持重复报销结论。",
+      "answer_evidence": "违反《XX证券费用报销管理办法(2025修订版)》第十条'同一发票最多报销1次'。",
+      "trace_evidence": "get_policy_excerpt返回“第十条 同一发票最多报销1次……应认定为重复报销风险”。"
+    },
+    {
+      "id": "case-reasoning",
+      "score": 20,
+      "reason": "完整说明发票FP202500000020被同一员工在R000020和R004203重复使用，金额均为669.5元，事实清晰。",
+      "answer_evidence": "发票FP202500000020(INV000020)被同一员工E0028(杜丹)在R000020和R004203两笔报销中重复使用,金额均为669.5元。",
+      "trace_evidence": "get_expense_detail(R000020)和get_expense_detail(R004203)均显示amount=669.5, invoice_no=FP202500000020。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的R000020和R004203均存在于数据库中，无虚构记录。"
+    }
+  ],
+  "overall_comment": "候选提交正确识别重复报销异常，制度依据和推理完整，结论可靠。异常ID虽与期望ID不同但异常类型一致，不影响结论准确性。",
+  "confidence": 1.0
+}

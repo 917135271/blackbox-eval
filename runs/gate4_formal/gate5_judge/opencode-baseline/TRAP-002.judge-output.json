@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "clean-conclusion",
+      "score": 30,
+      "reason": "明确给出无异常结论，无矛盾表述",
+      "answer_evidence": "answer: 无异常",
+      "trace_evidence": "无工具调用，结论表述清晰"
+    },
+    {
+      "id": "record-scope",
+      "score": 0,
+      "reason": "未核查核心记录R004234, R004235，提交的全部是与题目无关的记录",
+      "answer_evidence": "record_ids: [R000002, R004201, R000005, R004202, R000020, R004203, R000028, R004204, R000037, R004205, R000055, R004206]，不含预期记录",
+      "trace_evidence": "无工具调用，未触及预期记录"
+    },
+    {
+      "id": "case-specific-reason",
+      "score": 0,
+      "reason": "未说明专属合规原因（如不同发票、总额低于审批线）",
+      "answer_evidence": "answer: 无异常，未提及原因",
+      "trace_evidence": "无工具调用，无推理证据"
+    },
+    {
+      "id": "reverse-check",
+      "score": 0,
+      "reason": "未进行任何反向核查（阈值、日期、发票等关键条件）",
+      "answer_evidence": "无",
+      "trace_evidence": "call_count: 0"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": true,
+      "reason": "提交的12条记录均为无关记录，未使用预期记录R004234、R004235作为核心支撑"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "未将合规记录误判为异常"
+    }
+  ],
+  "overall_comment": "结论正确但核查记录完全错误，且未提供任何推理依据或验证证据，触发关键失败，总分限制为20。",
+  "confidence": 1.0
+}

@@ -1,0 +1,39 @@
+{
+  "criteria": [
+    {
+      "id": "full-scan-method",
+      "score": 15,
+      "reason": "使用find_reused_invoices(min_usage_count=2)对全年重复发票进行全量扫描，并逐条获取详情复核，范围完整。",
+      "answer_evidence": "候选提交列出6个异常和12条记录，与find_reused_invoices返回结果一致。",
+      "trace_evidence": "find_reused_invoices(page=1, page_size=100)返回所有重复发票，has_next=false说明全覆盖。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 10,
+      "reason": "明确引用《XX证券费用报销管理办法(2025修订版)》第十条“同一发票最多报销1次”，查询条件与规则对应。",
+      "answer_evidence": "answer中写明“违反《XX证券费用报销管理办法(2025修订版)》第十条”并附citations。",
+      "trace_evidence": "get_policy_excerpt查询重复报销条款，返回第十条内容。"
+    },
+    {
+      "id": "false-positive-control",
+      "score": 15,
+      "reason": "提交的anomaly_ids和record_ids与期望集合完全一致，无混入其他规则异常或TRAP记录。",
+      "answer_evidence": "anomaly_ids与record_ids集合精确匹配期望集合。",
+      "trace_evidence": "rule_diagnostics显示precision=1.0, recall=1.0, 无unknown_record_ids。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的record_id均在预期集合中，无虚构ID。"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": false,
+      "reason": "工具调用覆盖全年数据，且提交结果完整，未仅检查部分月份。"
+    }
+  ],
+  "overall_comment": "候选提交准确完成全年重复报销扫描，制度引用正确，无任何误报或遗漏。",
+  "confidence": 1.0
+}

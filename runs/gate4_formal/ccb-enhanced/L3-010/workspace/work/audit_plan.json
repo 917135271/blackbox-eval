@@ -1,0 +1,109 @@
+{
+  "task_id": "L3-010",
+  "task_type": "audit_report",
+  "question": "请专门写一段版本陷阱审计说明,解释旧版审批线可能导致的误判。",
+  "scope": {
+    "audit_object": "证券费用报销审批线版本陷阱",
+    "expense_types": "all",
+    "business_period": "2025-01-01 onwards",
+    "organization_scope": "XX证券全部门",
+    "deliverable": "版本陷阱审计说明（audit_report格式）"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-1",
+      "question": "2022版与2025版费用报销审批线有何差异？",
+      "policies": ["01_expense_reimbursement_2025.md", "02_expense_reimbursement_2022_deprecated.md", "03_authorization_management.md"],
+      "boundaries": {
+        "old_thresholds": {"dept_gm": 8000, "deputy_gm": 30000},
+        "new_thresholds": {"AR01_upper": 3000, "AR02_upper": 10000, "AR03_upper": 50000, "AR04_upper": 200000},
+        "effective_date": "2025-01-01",
+        "repeal_date": "2025-01-01"
+      }
+    },
+    {
+      "id": "PQ-2",
+      "question": "使用旧版审批线会在哪些金额区间造成误判？",
+      "policies": ["02_expense_reimbursement_2022_deprecated.md", "03_authorization_management.md"],
+      "boundaries": {
+        "false_positive_zones": ["8000-10000 (旧线触发部门总经理,现行AR-02仅需部门经理+财务复核)", "30000-50000 (旧线触发分管副总,现行AR-03仅需部门总经理)"],
+        "false_negative_zones": ["3000-8000 (旧线无特殊要求,现行AR-02需财务复核)", "10000+ (旧线8000起触发,现行10000起触发部门总经理)"]
+      }
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-1",
+      "question": "哪些报销记录落入版本陷阱金额区间？",
+      "tables": ["expenses"],
+      "fields": ["record_id", "amount", "expense_type", "expense_date", "reimburse_date", "employee_name", "department_name", "status"],
+      "filters": "amount在3000-10000或10000-50000区间,且expense_date>=2025-01-01"
+    }
+  ],
+  "evidence_requirements": [
+    {
+      "type": "policy",
+      "description": "2022版废止的审批线（8000/30000）",
+      "source": "02_expense_reimbursement_2022_deprecated.md, 第二条/第三条"
+    },
+    {
+      "type": "policy",
+      "description": "2025版现行审批线（附件二AR-01至AR-05）",
+      "source": "03_authorization_management.md, 附件二"
+    },
+    {
+      "type": "policy",
+      "description": "2025版第五条：审批权限不在本办法列示,统一按授权管理办法附件二执行",
+      "source": "01_expense_reimbursement_2025.md, 第五条"
+    },
+    {
+      "type": "policy",
+      "description": "2025版第十四条：2022版同时废止",
+      "source": "01_expense_reimbursement_2025.md, 第十四条"
+    },
+    {
+      "type": "policy",
+      "description": "2022版第四条：审批金额已被后续制度替代,不得作为现行审批依据",
+      "source": "02_expense_reimbursement_2022_deprecated.md, 第四条"
+    },
+    {
+      "type": "data",
+      "description": "落入版本陷阱区间的报销记录样本",
+      "source": "expense_query"
+    }
+  ],
+  "execution_steps": [
+    {"step": 1, "name": "planning", "action": "audit-query-planner", "output": "work/audit_plan.json"},
+    {"step": 2, "name": "checkpoint_planning", "action": "记录planning_completed checkpoint"},
+    {"step": 3, "name": "policy_version_check", "action": "policy-version-check skill", "trigger": "policy version comparison needed", "output": "政策版本对比结论"},
+    {"step": 4, "name": "batch_expense_analysis", "action": "batch-expense-analysis skill", "trigger": "need boundary-zone record retrieval", "output": "落入陷阱区间的记录"},
+    {"step": 5, "name": "checkpoint_investigation", "action": "记录investigation_completed checkpoint"},
+    {"step": 6, "name": "evidence_coverage", "action": "evidence-coverage-check skill", "output": "work/evidence_matrix.json"},
+    {"step": 7, "name": "checkpoint_review_ready", "action": "记录review_ready checkpoint"},
+    {"step": 8, "name": "false_positive_review", "action": "false-positive-review skill", "trigger": "explanatory report with boundary cases"},
+    {"step": 9, "name": "audit_report", "action": "audit-report skill", "output": "work/final_result.json"},
+    {"step": 10, "name": "result_validation", "action": "result-validator skill", "output": "work/validation_report.json"},
+    {"step": 11, "name": "checkpoint_validation", "action": "记录validation_ready checkpoint"},
+    {"step": 12, "name": "validate_and_submit", "action": "validate_audit_result then submit_audit_result"}
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "policy_version_ambiguity: 2022版vs2025版审批线差异",
+      "threshold_date: 8000/30000旧线与3000/10000/50000/200000新线的对比",
+      "report_deliverable: 需要撰写审计说明"
+    ]
+  },
+  "subagent_plan": {
+    "required": false,
+    "reason": "complexity 2, 版本对比和政策分析可由主智能体直接完成,无需原生子智能体"
+  },
+  "stopping_conditions": [
+    "政策版本差异已完整梳理",
+    "版本陷阱区间已明确识别",
+    "审计说明已撰写并覆盖所有误判场景",
+    "evidence_matrix通过,validation_report通过",
+    "validate_audit_result返回valid=true"
+  ],
+  "unresolved_items": []
+}

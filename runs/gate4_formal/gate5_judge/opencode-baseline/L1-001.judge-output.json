@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "current-threshold",
+      "score": 45,
+      "reason": "金额和包含边界均正确",
+      "answer_evidence": "单笔费用报销金额达到10000元（含）时，需要部门总经理审批；单笔金额区间大于等于10000元且小于50000元的。",
+      "trace_evidence": "无工具调用，答案自行给出完整结论。"
+    },
+    {
+      "id": "current-version",
+      "score": 20,
+      "reason": "明确识别现行版本",
+      "answer_evidence": "依据《XX证券授权管理办法》（XX证综规〔2025〕丙号）。",
+      "trace_evidence": "无工具调用，答案直接引用2025年版制度。"
+    },
+    {
+      "id": "policy-citation",
+      "score": 20,
+      "reason": "引用有效且能支持10000元",
+      "answer_evidence": "引用03_authorization_management.md附件二和01_expense_reimbursement_2025.md。",
+      "trace_evidence": "未使用工具，citations字段提供了制度依据。"
+    },
+    {
+      "id": "old-value-control",
+      "score": 5,
+      "reason": "未提旧值但当前值正确",
+      "answer_evidence": "单笔费用报销金额达到10000元（含）。",
+      "trace_evidence": "答案未涉及8000元。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "未提交任何record_id，无伪造行为。"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "引用的《XX证券授权管理办法》为2025年版，非废止制度。"
+    }
+  ],
+  "overall_comment": "答案准确给出10000元（含）的门槛，并基于2025年授权管理办法附件二，引用有效，未使用旧值，但未明确排除旧值。",
+  "confidence": 1.0
+}

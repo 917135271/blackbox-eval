@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "current-threshold",
+      "score": 45,
+      "reason": "答案正确指出部门总经理审批线为10,000元，且表达清晰包含边界。",
+      "answer_evidence": "大于等于10,000元（含）且小于50,000元时，需要部门总经理审批",
+      "trace_evidence": "工具调用get_policy_doc返回授权管理办法附件二，档位AR-03明确该金额区间。"
+    },
+    {
+      "id": "current-version",
+      "score": 20,
+      "reason": "明确提及现行2025修订版制度，并区分旧版。",
+      "answer_evidence": "现行《XX证券费用报销管理办法(2025修订版)》",
+      "trace_evidence": "list_policy_docs列出2025版文件名，get_policy_doc获取了现行制度内容。"
+    },
+    {
+      "id": "policy-citation",
+      "score": 20,
+      "reason": "引用了授权管理办法附件二和2025版费用报销管理办法第五条，两者有效且支持金额结论。",
+      "answer_evidence": "依据《XX证券授权管理办法》附件二「费用报销审批权限表」档位AR-03执行，第五条明确规定...",
+      "trace_evidence": "get_policy_doc调用获取01_expense_reimbursement_2025.md和03_authorization_management.md，其中第五条和附件二内容与答案一致。"
+    },
+    {
+      "id": "old-value-control",
+      "score": 10,
+      "reason": "明确排除旧版8000元，使其不被作为当前标准。",
+      "answer_evidence": "旧版2022制度中部门总经理审批线为8,000元，已废止。",
+      "trace_evidence": "search_policy结果中显示2022版相关条款，但答案未采信。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "答案未提交任何record_id，未用无关记录支撑核心结论。"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "答案明确区分现行与废止制度，结论基于2025修订版。"
+    }
+  ],
+  "overall_comment": "候选答案准确引用现行制度，正确识别审批金额与版本，无关键错误，得分95。",
+  "confidence": 1.0
+}

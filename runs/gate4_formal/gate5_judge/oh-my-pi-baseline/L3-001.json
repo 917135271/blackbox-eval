@@ -1,0 +1,173 @@
+{
+  "case_family": "full_year_audit",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "full_year_rule_audit",
+  "criteria": [
+    {
+      "answer_evidence": "",
+      "id": "all-anomaly-ids",
+      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
+      "score": 25.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "all-record-ids",
+      "reason": "record_ids集合F1=1.000",
+      "score": 30.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "提交的异常ID和记录ID集合完整覆盖了所有重复报销案例，共6项异常，12条记录。",
+      "id": "full-scan-method",
+      "reason": "对全年数据执行了完整的重复发票查询，范围覆盖全部记录，工具调用和结果统计均证明全量扫描。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "调用find_reused_invoices(min_usage_count=2)获取所有重复使用的发票列表，返回6张发票及其关联记录；随后逐一调用get_expense_detail验证每条记录，确认全部合规。"
+    },
+    {
+      "answer_evidence": "答案中写明‘违反《XX证券费用报销管理办法(2025修订版)》第十条“同一发票最多报销1次”的规定’，并在证据矩阵中为每项异常提供第十条引用。",
+      "id": "policy-basis",
+      "reason": "明确引用了《XX证券费用报销管理办法(2025修订版)》第十条，并将规则落实到查询条件中。",
+      "score": 10.0,
+      "source": "llm_judge",
+      "trace_evidence": "search_policy搜索“重复报销 重复提交 同一发票 多次报销”获取第十条原文；find_reused_invoices使用min_usage_count=2精确对应同一发票被报销超过一次的条件。"
+    },
+    {
+      "answer_evidence": "候选提交的record_ids集合与预期record_ids完全匹配，无多余或缺失项；anomaly_ids虽采用自定义命名但一对一对应。",
+      "id": "false-positive-control",
+      "reason": "提交结果无任何误报，所有记录ID与预期完全一致，未混入其他规则异常或TRAP记录。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "find_reused_invoices返回的发票及其record_ids经后续逐条核实，仅输出重复报销记录，未引入无关数据。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": false,
+      "reason": "",
+      "score_cap": 50,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "ANOM-DUP-001",
+      "ANOM-DUP-002",
+      "ANOM-DUP-003",
+      "ANOM-DUP-004",
+      "ANOM-DUP-005",
+      "ANOM-DUP-006"
+    ],
+    "actual_record_ids": [
+      "R000002",
+      "R000005",
+      "R000020",
+      "R000028",
+      "R000037",
+      "R000055",
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "DUP": 6
+      },
+      "count_exact": true,
+      "expected_types": {
+        "DUP": 6
+      },
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 125.425,
+    "expected_anomaly_ids": [
+      "DUP-001",
+      "DUP-002",
+      "DUP-003",
+      "DUP-004",
+      "DUP-005",
+      "DUP-006"
+    ],
+    "expected_record_ids": [
+      "R000002",
+      "R000005",
+      "R000020",
+      "R000028",
+      "R000037",
+      "R000055",
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:31:04+08:00",
+  "group": "oh-my-pi-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选准确完成了全年重复报销专项扫描，方法、制度依据和误报控制均符合要求，结果无误。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 897,
+      "completion_tokens_details": {
+        "reasoning_tokens": 418
+      },
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 6892,
+      "prompt_tokens": 8044,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152
+      },
+      "total_tokens": 8941
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/oh-my-pi-baseline/L3-001",
+  "task_id": "L3-001"
+}

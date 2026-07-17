@@ -1,0 +1,136 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 45.0,
+  "case_score_raw": 45.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "答案声明“TRAP-005涉及的记录不构成异常”。",
+      "id": "clean-conclusion",
+      "reason": "候选明确给出无异常结论，答案中表述无矛盾。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "核查轨迹最终结论为无异常。"
+    },
+    {
+      "answer_evidence": "提交的record_ids为[\"R000005\", \"R004202\"]。",
+      "id": "record-scope",
+      "reason": "核查记录完全偏离预期，未覆盖核心记录R004239、R004240，而是关注了无关的R000005和R004202。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹仅对R000005、R004202、R000002、R004201等记录调用get_expense_detail，未提及R004239或R004240。"
+    },
+    {
+      "answer_evidence": "答案解释为“R004202发票日期晚于报销日期，reason标注‘重复发票注入样本’”。",
+      "id": "case-specific-reason",
+      "reason": "未说明本题专属合规原因（unique invoices, within entertainment standards, total below approval line），给出的理由（发票重复、时序不可行）与预期不符，且未核查正确记录。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹未查询R004239或R004240的详情、娱乐标准或审批线。"
+    },
+    {
+      "answer_evidence": "答案无相关核查说明。",
+      "id": "reverse-check",
+      "reason": "未针对本题边界条件（娱乐标准、审批线、发票唯一性）进行核查，轨迹中的工具调用均围绕错误的记录展开。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹使用了find_reused_invoices、get_expense_detail等，但所有核查均指向非预期记录。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的记录ID均存在于数据库，未虚构记录。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "候选未将合规记录判为异常，结论为无异常。",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R000005",
+      "R004202"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 2,
+    "elapsed_seconds": 417.334,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004239",
+      "R004240"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 2,
+      "f1": 0.0,
+      "missing_count": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:25:42+08:00",
+  "group": "codex-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选虽给出无异常结论，但完全核查了错误记录，导致记录范围、合规原因和反向验证均未得分，整体审计失效。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2240,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1663
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 6939,
+      "prompt_tokens": 7963,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 10203
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/codex-enhanced/TRAP-005",
+  "task_id": "TRAP-005"
+}

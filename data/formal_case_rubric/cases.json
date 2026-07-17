@@ -1,0 +1,2464 @@
+{
+  "dataset_id": "securities-expense-audit-formal-15-v1",
+  "case_count": 15,
+  "source": {
+    "evals": "data/evals.json",
+    "ground_truth": "data/ground_truth.yaml"
+  },
+  "case_family_counts": {
+    "clean_trap": 3,
+    "full_year_audit": 3,
+    "policy_and_version": 3,
+    "record_audit": 3,
+    "retrieval_and_report": 3
+  },
+  "cases": [
+    {
+      "id": "L1-001",
+      "source_task_id": "L1-001",
+      "level": "L1",
+      "category": "policy_qa",
+      "case_family": "policy_and_version",
+      "prompt": "现行制度下,单笔费用报销达到多少金额需要部门总经理审批?",
+      "selection_reason": "现行审批线基础题，验证制度事实与版本意识",
+      "ground_truth_refs": [
+        "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive"
+      ],
+      "expected_output": {
+        "scoring_kind": "expected_facts",
+        "expected_facts": [
+          "现行部门总经理审批线为10000元"
+        ],
+        "required_citations": [
+          "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive"
+        ]
+      },
+      "rubric": {
+        "max_score": 100,
+        "pass_score": 70,
+        "criteria": [
+          {
+            "id": "current-threshold",
+            "title": "现行金额",
+            "description": "指出现行部门总经理审批线",
+            "weight": 45,
+            "metric": "conclusion",
+            "evaluation_mode": "hybrid",
+            "expected": "10000元，达到该金额即进入该审批档位",
+            "evidence_sources": [
+              "final_answer",
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "金额和包含边界均正确",
+              "partial": "金额正确但边界表达不清",
+              "zero": "金额错误或未回答"
+            }
+          },
+          {
+            "id": "current-version",
+            "title": "现行版本",
+            "description": "明确结论基于2025修订版或现行制度",
+            "weight": 20,
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "2025修订版为现行制度",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "明确识别现行版本",
+              "partial": "只写现行但无版本依据",
+              "zero": "使用旧版作为当前依据"
+            }
+          },
+          {
+            "id": "policy-citation",
+            "title": "制度依据",
+            "description": "引用审批档位的有效制度或授权附件",
+            "weight": 20,
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": [
+              "费用报销管理办法",
+              "授权管理办法附件二"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "引用有效且能支持10000元",
+              "partial": "只引用制度名称未定位审批档位",
+              "zero": "无引用或引用无关制度"
+            }
+          },
+          {
+            "id": "old-value-control",
+            "title": "旧值排除",
+            "description": "不把2022版8000元旧值当作当前标准",
+            "weight": 10,
+            "metric": "false_positive",
+            "evaluation_mode": "llm",
+            "expected": "8000元不得作为当前审批线",
+            "evidence_sources": [
+              "final_answer"
+            ],
+            "anchors": {
+              "full": "明确排除旧值",
+              "partial": "未提旧值但当前值正确",
+              "zero": "把8000元作为当前值"
+            }
+          },
+          {
+            "id": "submission",
+            "title": "结果提交",
+            "description": "最终字段完整且结论一致",
+            "weight": 5,
+            "metric": "format",
+            "evaluation_mode": "deterministic",
+            "expected": "统一Schema可解析",
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "字段完整且一致",
+              "partial": "可修复的非核心缺陷",
+              "zero": "无法解析或字段冲突"
+            }
+          }
+        ],
+        "critical_failures": [
+          {
+            "id": "fabricated-record-id",
+            "condition": "提交数据库中不存在的record_id，或用无关记录支撑核心结论",
+            "score_cap": 20
+          },
+          {
+            "id": "deprecated-policy-as-current",
+            "condition": "使用已废止制度形成当前适用结论",
+            "score_cap": 40
+          }
+        ]
+      }
+    },
+    {
+      "id": "L3-006",
+      "source_task_id": "L3-006",
+      "level": "L3",
+      "category": "version_trap",
+      "case_family": "policy_and_version",
+      "prompt": "请判断费用报销审批线应采用2022版还是2025修订版,并指出部门总经理审批线。",
+      "selection_reason": "新旧制度冲突题，验证适用版本选择",
+      "ground_truth_refs": [
+        "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+        "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount",
+        "document:01_expense_reimbursement_2025.md",
+        "document:02_expense_reimbursement_2022_deprecated.md"
+      ],
+      "expected_output": {
+        "scoring_kind": "expected_facts",
+        "expected_facts": [
+          "现行值为10000元",
+          "2022旧值8000元已废止",
+          "应采用2025修订版"
+        ],
+        "required_citations": [
+          "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+          "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount",
+          "document:01_expense_reimbursement_2025.md",
+          "document:02_expense_reimbursement_2022_deprecated.md"
+        ]
+      },
+      "rubric": {
+        "max_score": 100,
+        "pass_score": 70,
+        "criteria": [
+          {
+            "id": "current-value",
+            "title": "现行审批线",
+            "description": "指出2025修订版现行值",
+            "weight": 30,
+            "metric": "conclusion",
+            "evaluation_mode": "hybrid",
+            "expected": "10000元",
+            "evidence_sources": [
+              "final_answer",
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "现行值准确",
+              "partial": "值正确但版本表达不清",
+              "zero": "现行值错误"
+            }
+          },
+          {
+            "id": "deprecated-value",
+            "title": "旧版状态",
+            "description": "指出2022版8000元已经废止",
+            "weight": 25,
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "8000元已废止",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "金额和废止状态均正确",
+              "partial": "仅正确一项",
+              "zero": "称旧值仍有效"
+            }
+          },
+          {
+            "id": "applicable-version",
+            "title": "适用版本",
+            "description": "明确当前应采用2025修订版",
+            "weight": 20,
+            "metric": "reasoning",
+            "evaluation_mode": "llm",
+            "expected": "采用2025修订版，不采用2022版",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "选择正确并说明时间适用关系",
+              "partial": "选择正确但理由薄弱",
+              "zero": "选择旧版"
+            }
+          },
+          {
+            "id": "two-version-evidence",
+            "title": "双版本证据",
+            "description": "提供新旧制度的可核查出处",
+            "weight": 20,
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": [
+              "01_expense_reimbursement_2025.md",
+              "02_expense_reimbursement_2022_deprecated.md"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "两份制度证据均完整",
+              "partial": "只有一份有效证据",
+              "zero": "无有效证据"
+            }
+          },
+          {
+            "id": "submission",
+            "title": "结果提交",
+            "description": "最终字段完整且结论一致",
+            "weight": 5,
+            "metric": "format",
+            "evaluation_mode": "deterministic",
+            "expected": "统一Schema可解析",
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "字段完整且一致",
+              "partial": "可修复的非核心缺陷",
+              "zero": "无法解析或字段冲突"
+            }
+          }
+        ],
+        "critical_failures": [
+          {
+            "id": "fabricated-record-id",
+            "condition": "提交数据库中不存在的record_id，或用无关记录支撑核心结论",
+            "score_cap": 20
+          },
+          {
+            "id": "deprecated-policy-as-current",
+            "condition": "使用已废止制度形成当前适用结论",
+            "score_cap": 40
+          }
+        ]
+      }
+    },
+    {
+      "id": "L3-008",
+      "source_task_id": "L3-008",
+      "level": "L3",
+      "category": "near_clause_disambiguation",
+      "case_family": "policy_and_version",
+      "prompt": "比较差旅住宿和培训住宿标准,说明为什么不能混用。",
+      "selection_reason": "近似条款区分题，验证适用场景判断",
+      "ground_truth_refs": [
+        "policy:expense_standards.travel_lodging",
+        "policy:expense_standards.training.training_lodging",
+        "document:04_travel_expense.md",
+        "document:05_training_expense.md"
+      ],
+      "expected_output": {
+        "scoring_kind": "expected_facts",
+        "expected_facts": [
+          "差旅住宿适用差旅费管理办法",
+          "培训住宿适用培训费管理办法",
+          "两组数值不同不得混用"
+        ],
+        "required_citations": [
+          "policy:expense_standards.travel_lodging",
+          "policy:expense_standards.training.training_lodging",
+          "document:04_travel_expense.md",
+          "document:05_training_expense.md"
+        ]
+      },
+      "rubric": {
+        "max_score": 100,
+        "pass_score": 70,
+        "criteria": [
+          {
+            "id": "travel-policy",
+            "title": "差旅住宿适用制度",
+            "description": "指出差旅住宿适用差旅费管理办法",
+            "weight": 25,
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "差旅费管理办法",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "制度和场景均正确",
+              "partial": "制度正确但场景不清",
+              "zero": "制度错误"
+            }
+          },
+          {
+            "id": "training-policy",
+            "title": "培训住宿适用制度",
+            "description": "指出培训期间住宿适用培训费管理办法",
+            "weight": 25,
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "培训费管理办法",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "制度和场景均正确",
+              "partial": "制度正确但场景不清",
+              "zero": "制度错误"
+            }
+          },
+          {
+            "id": "no-mixing",
+            "title": "不得混用",
+            "description": "解释两套标准因适用事项和数值不同不能混用",
+            "weight": 25,
+            "metric": "reasoning",
+            "evaluation_mode": "llm",
+            "expected": "差旅与培训是不同业务场景，标准表和数值不同",
+            "evidence_sources": [
+              "final_answer"
+            ],
+            "anchors": {
+              "full": "场景与数值差异均说明",
+              "partial": "只说明其中一个差异",
+              "zero": "认为可以混用"
+            }
+          },
+          {
+            "id": "comparison-evidence",
+            "title": "比较证据",
+            "description": "引用两份制度并给出可核查的比较依据",
+            "weight": 20,
+            "metric": "evidence",
+            "evaluation_mode": "hybrid",
+            "expected": [
+              "04_travel_expense.md",
+              "05_training_expense.md"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "两份制度证据完整",
+              "partial": "只有一份有效证据",
+              "zero": "无有效证据"
+            }
+          },
+          {
+            "id": "submission",
+            "title": "结果提交",
+            "description": "最终字段完整且结论一致",
+            "weight": 5,
+            "metric": "format",
+            "evaluation_mode": "deterministic",
+            "expected": "统一Schema可解析",
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "字段完整且一致",
+              "partial": "可修复的非核心缺陷",
+              "zero": "无法解析或字段冲突"
+            }
+          }
+        ],
+        "critical_failures": [
+          {
+            "id": "fabricated-record-id",
+            "condition": "提交数据库中不存在的record_id，或用无关记录支撑核心结论",
+            "score_cap": 20
+          },
+          {
+            "id": "deprecated-policy-as-current",
+            "condition": "使用已废止制度形成当前适用结论",
+            "score_cap": 40
+          }
+        ]
+      }
+    },
+    {
+      "id": "L2-003",
+      "source_task_id": "L2-003",
+      "level": "L2",
+      "category": "policy_data_comparison",
+      "case_family": "record_audit",
+      "prompt": "结合制度和业务数据,核查以R000020为线索的重复报销异常,返回异常ID和记录ID集合。",
+      "selection_reason": "重复报销单案，验证跨记录证据关联",
+      "ground_truth_refs": [
+        "ground_truth:DUP-003",
+        "record:R000020",
+        "record:R004203",
+        "clause:费用报销管理办法-6.1"
+      ],
+      "expected_output": {
+        "scoring_kind": "anomaly_id_set",
+        "expected_anomaly_ids": [
+          "DUP-003"
+        ],
+        "expected_record_ids": [
+          "R000020",
+          "R004203"
+        ],
+        "required_citations": [
+          "clause:费用报销管理办法-6.1"
+        ]
+      },
+      "rubric": {
+        "max_score": 100,
+        "pass_score": 70,
+        "criteria": [
+          {
+            "id": "audit-conclusion",
+            "title": "异常结论",
+            "description": "正确判断本案构成重复报销",
+            "weight": 20,
+            "metric": "conclusion",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "rule": "重复报销",
+              "anomaly_ids": [
+                "DUP-003"
+              ]
+            },
+            "evidence_sources": [
+              "final_answer",
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "结论和异常类型均正确",
+              "partial": "识别可疑但结论不明确",
+              "zero": "判为无异常或类型错误"
+            }
+          },
+          {
+            "id": "anomaly-id",
+            "title": "异常标识",
+            "description": "准确返回本案异常ID DUP-003",
+            "weight": 15,
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "DUP-003"
+            ],
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "集合完全一致",
+              "partial": "核心结论正确但异常ID缺失",
+              "zero": "返回错误异常ID"
+            }
+          },
+          {
+            "id": "record-set",
+            "title": "记录证据集合",
+            "description": "完整返回关联记录 R000020, R004203",
+            "weight": 25,
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "R000020",
+              "R004203"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "集合准确且无多余记录",
+              "partial": "只遗漏一个关联记录且无错误记录",
+              "zero": "核心记录缺失或含无关记录"
+            }
+          },
+          {
+            "id": "policy-basis",
+            "title": "制度依据",
+            "description": "引用费用报销管理办法-6.1并说明其适用性",
+            "weight": 15,
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "费用报销管理办法-6.1",
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "条款有效且直接支持结论",
+              "partial": "制度正确但条款定位不完整",
+              "zero": "无依据或使用错误制度"
+            }
+          },
+          {
+            "id": "case-reasoning",
+            "title": "案件推理",
+            "description": "用业务数据说明：同一发票被重复使用，源金额为669.5元",
+            "weight": 20,
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": "同一发票被重复使用，源金额为669.5元",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "anchors": {
+              "full": "关键数值或关联事实完整且计算一致",
+              "partial": "结论正确但只给部分事实",
+              "zero": "推理与数据矛盾"
+            }
+          },
+          {
+            "id": "submission",
+            "title": "结果提交",
+            "description": "最终字段完整且中间证据一致",
+            "weight": 5,
+            "metric": "format",
+            "evaluation_mode": "deterministic",
+            "expected": "统一Schema可解析",
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "字段完整且一致",
+              "partial": "可修复的非核心缺陷",
+              "zero": "无法解析或字段冲突"
+            }
+          }
+        ],
+        "critical_failures": [
+          {
+            "id": "fabricated-record-id",
+            "condition": "提交数据库中不存在的record_id，或用无关记录支撑核心结论",
+            "score_cap": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "L2-008",
+      "source_task_id": "L2-008",
+      "level": "L2",
+      "category": "policy_data_comparison",
+      "case_family": "record_audit",
+      "prompt": "结合制度和业务数据,核查以R004212为线索的拆分报销异常,返回异常ID和记录ID集合。",
+      "selection_reason": "拆分报销双记录案例，验证窗口和合计金额",
+      "ground_truth_refs": [
+        "ground_truth:SPLIT-003",
+        "record:R004212",
+        "record:R004213",
+        "clause:费用报销管理办法-6.2"
+      ],
+      "expected_output": {
+        "scoring_kind": "anomaly_id_set",
+        "expected_anomaly_ids": [
+          "SPLIT-003"
+        ],
+        "expected_record_ids": [
+          "R004212",
+          "R004213"
+        ],
+        "required_citations": [
+          "clause:费用报销管理办法-6.2"
+        ]
+      },
+      "rubric": {
+        "max_score": 100,
+        "pass_score": 70,
+        "criteria": [
+          {
+            "id": "audit-conclusion",
+            "title": "异常结论",
+            "description": "正确判断本案构成拆分报销",
+            "weight": 20,
+            "metric": "conclusion",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "rule": "拆分报销",
+              "anomaly_ids": [
+                "SPLIT-003"
+              ]
+            },
+            "evidence_sources": [
+              "final_answer",
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "结论和异常类型均正确",
+              "partial": "识别可疑但结论不明确",
+              "zero": "判为无异常或类型错误"
+            }
+          },
+          {
+            "id": "anomaly-id",
+            "title": "异常标识",
+            "description": "准确返回本案异常ID SPLIT-003",
+            "weight": 15,
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "SPLIT-003"
+            ],
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "集合完全一致",
+              "partial": "核心结论正确但异常ID缺失",
+              "zero": "返回错误异常ID"
+            }
+          },
+          {
+            "id": "record-set",
+            "title": "记录证据集合",
+            "description": "完整返回关联记录 R004212, R004213",
+            "weight": 25,
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "R004212",
+              "R004213"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "集合准确且无多余记录",
+              "partial": "只遗漏一个关联记录且无错误记录",
+              "zero": "核心记录缺失或含无关记录"
+            }
+          },
+          {
+            "id": "policy-basis",
+            "title": "制度依据",
+            "description": "引用费用报销管理办法-6.2并说明其适用性",
+            "weight": 15,
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "费用报销管理办法-6.2",
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "条款有效且直接支持结论",
+              "partial": "制度正确但条款定位不完整",
+              "zero": "无依据或使用错误制度"
+            }
+          },
+          {
+            "id": "case-reasoning",
+            "title": "案件推理",
+            "description": "用业务数据说明：7天窗口内合计10200.0元，超过10000元审批线",
+            "weight": 20,
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": "7天窗口内合计10200.0元，超过10000元审批线",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "anchors": {
+              "full": "关键数值或关联事实完整且计算一致",
+              "partial": "结论正确但只给部分事实",
+              "zero": "推理与数据矛盾"
+            }
+          },
+          {
+            "id": "submission",
+            "title": "结果提交",
+            "description": "最终字段完整且中间证据一致",
+            "weight": 5,
+            "metric": "format",
+            "evaluation_mode": "deterministic",
+            "expected": "统一Schema可解析",
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "字段完整且一致",
+              "partial": "可修复的非核心缺陷",
+              "zero": "无法解析或字段冲突"
+            }
+          }
+        ],
+        "critical_failures": [
+          {
+            "id": "fabricated-record-id",
+            "condition": "提交数据库中不存在的record_id，或用无关记录支撑核心结论",
+            "score_cap": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "L2-013",
+      "source_task_id": "L2-013",
+      "level": "L2",
+      "category": "policy_data_comparison",
+      "case_family": "record_audit",
+      "prompt": "结合制度和业务数据,核查以R004223为线索的超标准异常,返回异常ID和记录ID集合。",
+      "selection_reason": "培训费超标准案例，验证金额与费用类型标准",
+      "ground_truth_refs": [
+        "ground_truth:OVERSTD-003",
+        "record:R004223",
+        "clause:费用报销管理办法-6.3"
+      ],
+      "expected_output": {
+        "scoring_kind": "anomaly_id_set",
+        "expected_anomaly_ids": [
+          "OVERSTD-003"
+        ],
+        "expected_record_ids": [
+          "R004223"
+        ],
+        "required_citations": [
+          "clause:费用报销管理办法-6.3"
+        ]
+      },
+      "rubric": {
+        "max_score": 100,
+        "pass_score": 70,
+        "criteria": [
+          {
+            "id": "audit-conclusion",
+            "title": "异常结论",
+            "description": "正确判断本案构成超标准",
+            "weight": 20,
+            "metric": "conclusion",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "rule": "超标准",
+              "anomaly_ids": [
+                "OVERSTD-003"
+              ]
+            },
+            "evidence_sources": [
+              "final_answer",
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "结论和异常类型均正确",
+              "partial": "识别可疑但结论不明确",
+              "zero": "判为无异常或类型错误"
+            }
+          },
+          {
+            "id": "anomaly-id",
+            "title": "异常标识",
+            "description": "准确返回本案异常ID OVERSTD-003",
+            "weight": 15,
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "OVERSTD-003"
+            ],
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "集合完全一致",
+              "partial": "核心结论正确但异常ID缺失",
+              "zero": "返回错误异常ID"
+            }
+          },
+          {
+            "id": "record-set",
+            "title": "记录证据集合",
+            "description": "完整返回关联记录 R004223",
+            "weight": 25,
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "R004223"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "集合准确且无多余记录",
+              "partial": "只遗漏一个关联记录且无错误记录",
+              "zero": "核心记录缺失或含无关记录"
+            }
+          },
+          {
+            "id": "policy-basis",
+            "title": "制度依据",
+            "description": "引用费用报销管理办法-6.3并说明其适用性",
+            "weight": 15,
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "费用报销管理办法-6.3",
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "条款有效且直接支持结论",
+              "partial": "制度正确但条款定位不完整",
+              "zero": "无依据或使用错误制度"
+            }
+          },
+          {
+            "id": "case-reasoning",
+            "title": "案件推理",
+            "description": "用业务数据说明：费用类型training_fee金额3700元，超过3500元标准",
+            "weight": 20,
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": "费用类型training_fee金额3700元，超过3500元标准",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "anchors": {
+              "full": "关键数值或关联事实完整且计算一致",
+              "partial": "结论正确但只给部分事实",
+              "zero": "推理与数据矛盾"
+            }
+          },
+          {
+            "id": "submission",
+            "title": "结果提交",
+            "description": "最终字段完整且中间证据一致",
+            "weight": 5,
+            "metric": "format",
+            "evaluation_mode": "deterministic",
+            "expected": "统一Schema可解析",
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "字段完整且一致",
+              "partial": "可修复的非核心缺陷",
+              "zero": "无法解析或字段冲突"
+            }
+          }
+        ],
+        "critical_failures": [
+          {
+            "id": "fabricated-record-id",
+            "condition": "提交数据库中不存在的record_id，或用无关记录支撑核心结论",
+            "score_cap": 20
+          }
+        ]
+      }
+    },
+    {
+      "id": "L3-001",
+      "source_task_id": "L3-001",
+      "level": "L3",
+      "category": "full_year_rule_audit",
+      "case_family": "full_year_audit",
+      "prompt": "请对全年数据做重复报销专项扫描,返回全部异常ID和记录ID集合。",
+      "selection_reason": "全年重复报销扫描，验证完整召回",
+      "ground_truth_refs": [
+        "ground_truth:DUP-001",
+        "ground_truth:DUP-002",
+        "ground_truth:DUP-003",
+        "ground_truth:DUP-004",
+        "ground_truth:DUP-005",
+        "ground_truth:DUP-006"
+      ],
+      "expected_output": {
+        "scoring_kind": "anomaly_id_set",
+        "expected_anomaly_ids": [
+          "DUP-001",
+          "DUP-002",
+          "DUP-003",
+          "DUP-004",
+          "DUP-005",
+          "DUP-006"
+        ],
+        "expected_record_ids": [
+          "R000002",
+          "R000005",
+          "R000020",
+          "R000028",
+          "R000037",
+          "R000055",
+          "R004201",
+          "R004202",
+          "R004203",
+          "R004204",
+          "R004205",
+          "R004206"
+        ]
+      },
+      "rubric": {
+        "max_score": 100,
+        "pass_score": 70,
+        "criteria": [
+          {
+            "id": "all-anomaly-ids",
+            "title": "异常完整召回",
+            "description": "返回全年重复报销的全部6个异常ID",
+            "weight": 25,
+            "metric": "conclusion",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "DUP-001",
+              "DUP-002",
+              "DUP-003",
+              "DUP-004",
+              "DUP-005",
+              "DUP-006"
+            ],
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "异常ID集合完全一致",
+              "partial": "召回多数且无错误类型",
+              "zero": "遗漏一半以上或类型错误"
+            }
+          },
+          {
+            "id": "all-record-ids",
+            "title": "记录完整召回",
+            "description": "返回全部12个关联record_id",
+            "weight": 30,
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "R000002",
+              "R000005",
+              "R000020",
+              "R000028",
+              "R000037",
+              "R000055",
+              "R004201",
+              "R004202",
+              "R004203",
+              "R004204",
+              "R004205",
+              "R004206"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "记录集合完全一致",
+              "partial": "召回率不低于80%且错误记录很少",
+              "zero": "召回率低于50%或含大量无关记录"
+            }
+          },
+          {
+            "id": "full-scan-method",
+            "title": "全年扫描方法",
+            "description": "对全年数据执行可复核的重复报销查询或计算",
+            "weight": 15,
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "rule": "重复报销",
+              "expected_count": 6
+            },
+            "evidence_sources": [
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "anchors": {
+              "full": "范围、查询和统计均能证明全量扫描",
+              "partial": "执行批量查询但范围或复核不完整",
+              "zero": "只查看样例记录"
+            }
+          },
+          {
+            "id": "policy-basis",
+            "title": "制度依据",
+            "description": "引用费用报销管理办法-6.1并将规则落实到查询条件",
+            "weight": 10,
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "费用报销管理办法-6.1",
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "条款和查询条件对应",
+              "partial": "有制度引用但未对应计算",
+              "zero": "无有效制度依据"
+            }
+          },
+          {
+            "id": "false-positive-control",
+            "title": "误报控制",
+            "description": "不混入其他规则异常、TRAP记录或无关业务记录",
+            "weight": 15,
+            "metric": "false_positive",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "allowed_anomaly_ids": [
+                "DUP-001",
+                "DUP-002",
+                "DUP-003",
+                "DUP-004",
+                "DUP-005",
+                "DUP-006"
+              ],
+              "allowed_record_ids": [
+                "R000002",
+                "R000005",
+                "R000020",
+                "R000028",
+                "R000037",
+                "R000055",
+                "R004201",
+                "R004202",
+                "R004203",
+                "R004204",
+                "R004205",
+                "R004206"
+              ]
+            },
+            "evidence_sources": [
+              "submitted_json",
+              "final_answer"
+            ],
+            "anchors": {
+              "full": "无任何实质误报",
+              "partial": "仅有一个可解释的边界争议",
+              "zero": "混入其他规则或TRAP记录"
+            }
+          },
+          {
+            "id": "submission",
+            "title": "结果提交",
+            "description": "最终字段完整且集合去重",
+            "weight": 5,
+            "metric": "format",
+            "evaluation_mode": "deterministic",
+            "expected": "统一Schema可解析",
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "字段完整、去重且一致",
+              "partial": "可修复的非核心缺陷",
+              "zero": "无法解析或字段冲突"
+            }
+          }
+        ],
+        "critical_failures": [
+          {
+            "id": "fabricated-record-id",
+            "condition": "提交数据库中不存在的record_id，或用无关记录支撑核心结论",
+            "score_cap": 20
+          },
+          {
+            "id": "partial-scan-presented-as-complete",
+            "condition": "只检查部分月份或样例记录，却将结果表述为全年完整扫描",
+            "score_cap": 50
+          }
+        ]
+      }
+    },
+    {
+      "id": "L3-003",
+      "source_task_id": "L3-003",
+      "level": "L3",
+      "category": "full_year_rule_audit",
+      "case_family": "full_year_audit",
+      "prompt": "请对全年数据做超标准专项扫描,返回全部异常ID和记录ID集合。",
+      "selection_reason": "全年超标准扫描，验证多费用类型标准",
+      "ground_truth_refs": [
+        "ground_truth:OVERSTD-001",
+        "ground_truth:OVERSTD-002",
+        "ground_truth:OVERSTD-003",
+        "ground_truth:OVERSTD-004",
+        "ground_truth:OVERSTD-005",
+        "ground_truth:OVERSTD-006"
+      ],
+      "expected_output": {
+        "scoring_kind": "anomaly_id_set",
+        "expected_anomaly_ids": [
+          "OVERSTD-001",
+          "OVERSTD-002",
+          "OVERSTD-003",
+          "OVERSTD-004",
+          "OVERSTD-005",
+          "OVERSTD-006"
+        ],
+        "expected_record_ids": [
+          "R004221",
+          "R004222",
+          "R004223",
+          "R004224",
+          "R004225",
+          "R004226"
+        ]
+      },
+      "rubric": {
+        "max_score": 100,
+        "pass_score": 70,
+        "criteria": [
+          {
+            "id": "all-anomaly-ids",
+            "title": "异常完整召回",
+            "description": "返回全年超标准的全部6个异常ID",
+            "weight": 25,
+            "metric": "conclusion",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "OVERSTD-001",
+              "OVERSTD-002",
+              "OVERSTD-003",
+              "OVERSTD-004",
+              "OVERSTD-005",
+              "OVERSTD-006"
+            ],
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "异常ID集合完全一致",
+              "partial": "召回多数且无错误类型",
+              "zero": "遗漏一半以上或类型错误"
+            }
+          },
+          {
+            "id": "all-record-ids",
+            "title": "记录完整召回",
+            "description": "返回全部6个关联record_id",
+            "weight": 30,
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "R004221",
+              "R004222",
+              "R004223",
+              "R004224",
+              "R004225",
+              "R004226"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "记录集合完全一致",
+              "partial": "召回率不低于80%且错误记录很少",
+              "zero": "召回率低于50%或含大量无关记录"
+            }
+          },
+          {
+            "id": "full-scan-method",
+            "title": "全年扫描方法",
+            "description": "对全年数据执行可复核的超标准查询或计算",
+            "weight": 15,
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "rule": "超标准",
+              "expected_count": 6
+            },
+            "evidence_sources": [
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "anchors": {
+              "full": "范围、查询和统计均能证明全量扫描",
+              "partial": "执行批量查询但范围或复核不完整",
+              "zero": "只查看样例记录"
+            }
+          },
+          {
+            "id": "policy-basis",
+            "title": "制度依据",
+            "description": "引用费用报销管理办法-6.3并将规则落实到查询条件",
+            "weight": 10,
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "费用报销管理办法-6.3",
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "条款和查询条件对应",
+              "partial": "有制度引用但未对应计算",
+              "zero": "无有效制度依据"
+            }
+          },
+          {
+            "id": "false-positive-control",
+            "title": "误报控制",
+            "description": "不混入其他规则异常、TRAP记录或无关业务记录",
+            "weight": 15,
+            "metric": "false_positive",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "allowed_anomaly_ids": [
+                "OVERSTD-001",
+                "OVERSTD-002",
+                "OVERSTD-003",
+                "OVERSTD-004",
+                "OVERSTD-005",
+                "OVERSTD-006"
+              ],
+              "allowed_record_ids": [
+                "R004221",
+                "R004222",
+                "R004223",
+                "R004224",
+                "R004225",
+                "R004226"
+              ]
+            },
+            "evidence_sources": [
+              "submitted_json",
+              "final_answer"
+            ],
+            "anchors": {
+              "full": "无任何实质误报",
+              "partial": "仅有一个可解释的边界争议",
+              "zero": "混入其他规则或TRAP记录"
+            }
+          },
+          {
+            "id": "submission",
+            "title": "结果提交",
+            "description": "最终字段完整且集合去重",
+            "weight": 5,
+            "metric": "format",
+            "evaluation_mode": "deterministic",
+            "expected": "统一Schema可解析",
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "字段完整、去重且一致",
+              "partial": "可修复的非核心缺陷",
+              "zero": "无法解析或字段冲突"
+            }
+          }
+        ],
+        "critical_failures": [
+          {
+            "id": "fabricated-record-id",
+            "condition": "提交数据库中不存在的record_id，或用无关记录支撑核心结论",
+            "score_cap": 20
+          },
+          {
+            "id": "partial-scan-presented-as-complete",
+            "condition": "只检查部分月份或样例记录，却将结果表述为全年完整扫描",
+            "score_cap": 50
+          }
+        ]
+      }
+    },
+    {
+      "id": "L3-004",
+      "source_task_id": "L3-004",
+      "level": "L3",
+      "category": "full_year_rule_audit",
+      "case_family": "full_year_audit",
+      "prompt": "请对全年数据做超预算专项扫描,返回全部异常ID和记录ID集合。",
+      "selection_reason": "全年超预算扫描，验证部门聚合",
+      "ground_truth_refs": [
+        "ground_truth:BUDGET-001",
+        "ground_truth:BUDGET-002",
+        "ground_truth:BUDGET-003",
+        "ground_truth:BUDGET-004",
+        "ground_truth:BUDGET-005",
+        "ground_truth:BUDGET-006"
+      ],
+      "expected_output": {
+        "scoring_kind": "anomaly_id_set",
+        "expected_anomaly_ids": [
+          "BUDGET-001",
+          "BUDGET-002",
+          "BUDGET-003",
+          "BUDGET-004",
+          "BUDGET-005",
+          "BUDGET-006"
+        ],
+        "expected_record_ids": [
+          "R000079",
+          "R000312",
+          "R000894",
+          "R002009",
+          "R003479",
+          "R003968"
+        ]
+      },
+      "rubric": {
+        "max_score": 100,
+        "pass_score": 70,
+        "criteria": [
+          {
+            "id": "all-anomaly-ids",
+            "title": "异常完整召回",
+            "description": "返回全年超预算的全部6个异常ID",
+            "weight": 25,
+            "metric": "conclusion",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "BUDGET-001",
+              "BUDGET-002",
+              "BUDGET-003",
+              "BUDGET-004",
+              "BUDGET-005",
+              "BUDGET-006"
+            ],
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "异常ID集合完全一致",
+              "partial": "召回多数且无错误类型",
+              "zero": "遗漏一半以上或类型错误"
+            }
+          },
+          {
+            "id": "all-record-ids",
+            "title": "记录完整召回",
+            "description": "返回全部6个关联record_id",
+            "weight": 30,
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "R000079",
+              "R000312",
+              "R000894",
+              "R002009",
+              "R003479",
+              "R003968"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "记录集合完全一致",
+              "partial": "召回率不低于80%且错误记录很少",
+              "zero": "召回率低于50%或含大量无关记录"
+            }
+          },
+          {
+            "id": "full-scan-method",
+            "title": "全年扫描方法",
+            "description": "对全年数据执行可复核的超预算查询或计算",
+            "weight": 15,
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "rule": "超预算",
+              "expected_count": 6
+            },
+            "evidence_sources": [
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "anchors": {
+              "full": "范围、查询和统计均能证明全量扫描",
+              "partial": "执行批量查询但范围或复核不完整",
+              "zero": "只查看样例记录"
+            }
+          },
+          {
+            "id": "policy-basis",
+            "title": "制度依据",
+            "description": "引用预算管理办法-4.1并将规则落实到查询条件",
+            "weight": 10,
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "预算管理办法-4.1",
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "条款和查询条件对应",
+              "partial": "有制度引用但未对应计算",
+              "zero": "无有效制度依据"
+            }
+          },
+          {
+            "id": "false-positive-control",
+            "title": "误报控制",
+            "description": "不混入其他规则异常、TRAP记录或无关业务记录",
+            "weight": 15,
+            "metric": "false_positive",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "allowed_anomaly_ids": [
+                "BUDGET-001",
+                "BUDGET-002",
+                "BUDGET-003",
+                "BUDGET-004",
+                "BUDGET-005",
+                "BUDGET-006"
+              ],
+              "allowed_record_ids": [
+                "R000079",
+                "R000312",
+                "R000894",
+                "R002009",
+                "R003479",
+                "R003968"
+              ]
+            },
+            "evidence_sources": [
+              "submitted_json",
+              "final_answer"
+            ],
+            "anchors": {
+              "full": "无任何实质误报",
+              "partial": "仅有一个可解释的边界争议",
+              "zero": "混入其他规则或TRAP记录"
+            }
+          },
+          {
+            "id": "submission",
+            "title": "结果提交",
+            "description": "最终字段完整且集合去重",
+            "weight": 5,
+            "metric": "format",
+            "evaluation_mode": "deterministic",
+            "expected": "统一Schema可解析",
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "字段完整、去重且一致",
+              "partial": "可修复的非核心缺陷",
+              "zero": "无法解析或字段冲突"
+            }
+          }
+        ],
+        "critical_failures": [
+          {
+            "id": "fabricated-record-id",
+            "condition": "提交数据库中不存在的record_id，或用无关记录支撑核心结论",
+            "score_cap": 20
+          },
+          {
+            "id": "partial-scan-presented-as-complete",
+            "condition": "只检查部分月份或样例记录，却将结果表述为全年完整扫描",
+            "score_cap": 50
+          }
+        ]
+      }
+    },
+    {
+      "id": "TRAP-002",
+      "source_task_id": "TRAP-002",
+      "level": "trap",
+      "category": "clean_but_suspicious",
+      "case_family": "clean_trap",
+      "prompt": "请核查TRAP-002涉及的记录是否构成异常,正确时应说明无异常。",
+      "selection_reason": "同组记录但发票不同且合计未越线",
+      "ground_truth_refs": [
+        "ground_truth:TRAP-002",
+        "record:R004234",
+        "record:R004235"
+      ],
+      "expected_output": {
+        "scoring_kind": "no_anomaly",
+        "expected_anomaly_ids": [],
+        "expected_record_ids": [
+          "R004234",
+          "R004235"
+        ],
+        "expected_reason": "different invoices and total below approval line"
+      },
+      "rubric": {
+        "max_score": 100,
+        "pass_score": 70,
+        "criteria": [
+          {
+            "id": "clean-conclusion",
+            "title": "无异常结论",
+            "description": "明确判断本题记录不构成异常",
+            "weight": 30,
+            "metric": "conclusion",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "anomaly_ids": [],
+              "conclusion": "无异常"
+            },
+            "evidence_sources": [
+              "final_answer",
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "明确无异常且无矛盾表述",
+              "partial": "倾向合规但表述保留",
+              "zero": "报告实质异常"
+            }
+          },
+          {
+            "id": "record-scope",
+            "title": "核查记录范围",
+            "description": "核查并准确保留记录范围 R004234, R004235",
+            "weight": 15,
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "R004234",
+              "R004235"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "记录集合准确",
+              "partial": "记录已核查但最终少列一条",
+              "zero": "未核查核心记录或加入无关记录"
+            }
+          },
+          {
+            "id": "case-specific-reason",
+            "title": "本题合规原因",
+            "description": "说明本题专属合规原因：different invoices and total below approval line",
+            "weight": 25,
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": "different invoices and total below approval line",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "完整说明专属边界或例外",
+              "partial": "只说明部分原因",
+              "zero": "原因错误或与数据矛盾"
+            }
+          },
+          {
+            "id": "reverse-check",
+            "title": "反向验证",
+            "description": "轨迹中核对阈值、日期、发票或聚合窗口，而非凭题目暗示直接答无异常",
+            "weight": 15,
+            "metric": "false_positive",
+            "evaluation_mode": "hybrid",
+            "expected": "存在针对本题边界条件的工具证据",
+            "evidence_sources": [
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "anchors": {
+              "full": "完成与本题匹配的反向核查",
+              "partial": "只核查一部分关键条件",
+              "zero": "没有核查证据"
+            }
+          },
+          {
+            "id": "no-unsupported-output",
+            "title": "无多余异常",
+            "description": "不返回任何异常ID或无关record_id",
+            "weight": 10,
+            "metric": "false_positive",
+            "evaluation_mode": "deterministic",
+            "expected": {
+              "anomaly_ids": [],
+              "record_ids": [
+                "R004234",
+                "R004235"
+              ]
+            },
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "无任何多余项",
+              "partial": "仅有不影响结论的文字疑虑",
+              "zero": "含实质异常或无关记录"
+            }
+          },
+          {
+            "id": "submission",
+            "title": "结果提交",
+            "description": "最终字段完整且结论一致",
+            "weight": 5,
+            "metric": "format",
+            "evaluation_mode": "deterministic",
+            "expected": "统一Schema可解析",
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "字段完整且一致",
+              "partial": "可修复的非核心缺陷",
+              "zero": "无法解析或字段冲突"
+            }
+          }
+        ],
+        "critical_failures": [
+          {
+            "id": "fabricated-record-id",
+            "condition": "提交数据库中不存在的record_id，或用无关记录支撑核心结论",
+            "score_cap": 20
+          },
+          {
+            "id": "trap-false-positive",
+            "condition": "把本题合规记录判为实质异常",
+            "score_cap": 30
+          }
+        ]
+      }
+    },
+    {
+      "id": "TRAP-003",
+      "source_task_id": "TRAP-003",
+      "level": "trap",
+      "category": "clean_but_suspicious",
+      "case_family": "clean_trap",
+      "prompt": "请核查TRAP-003涉及的记录是否构成异常,正确时应说明无异常。",
+      "selection_reason": "超过聚合时间窗，验证窗口边界",
+      "ground_truth_refs": [
+        "ground_truth:TRAP-003",
+        "record:R004236",
+        "record:R004237"
+      ],
+      "expected_output": {
+        "scoring_kind": "no_anomaly",
+        "expected_anomaly_ids": [],
+        "expected_record_ids": [
+          "R004236",
+          "R004237"
+        ],
+        "expected_reason": "outside aggregation window"
+      },
+      "rubric": {
+        "max_score": 100,
+        "pass_score": 70,
+        "criteria": [
+          {
+            "id": "clean-conclusion",
+            "title": "无异常结论",
+            "description": "明确判断本题记录不构成异常",
+            "weight": 30,
+            "metric": "conclusion",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "anomaly_ids": [],
+              "conclusion": "无异常"
+            },
+            "evidence_sources": [
+              "final_answer",
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "明确无异常且无矛盾表述",
+              "partial": "倾向合规但表述保留",
+              "zero": "报告实质异常"
+            }
+          },
+          {
+            "id": "record-scope",
+            "title": "核查记录范围",
+            "description": "核查并准确保留记录范围 R004236, R004237",
+            "weight": 15,
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "R004236",
+              "R004237"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "记录集合准确",
+              "partial": "记录已核查但最终少列一条",
+              "zero": "未核查核心记录或加入无关记录"
+            }
+          },
+          {
+            "id": "case-specific-reason",
+            "title": "本题合规原因",
+            "description": "说明本题专属合规原因：outside aggregation window",
+            "weight": 25,
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": "outside aggregation window",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "完整说明专属边界或例外",
+              "partial": "只说明部分原因",
+              "zero": "原因错误或与数据矛盾"
+            }
+          },
+          {
+            "id": "reverse-check",
+            "title": "反向验证",
+            "description": "轨迹中核对阈值、日期、发票或聚合窗口，而非凭题目暗示直接答无异常",
+            "weight": 15,
+            "metric": "false_positive",
+            "evaluation_mode": "hybrid",
+            "expected": "存在针对本题边界条件的工具证据",
+            "evidence_sources": [
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "anchors": {
+              "full": "完成与本题匹配的反向核查",
+              "partial": "只核查一部分关键条件",
+              "zero": "没有核查证据"
+            }
+          },
+          {
+            "id": "no-unsupported-output",
+            "title": "无多余异常",
+            "description": "不返回任何异常ID或无关record_id",
+            "weight": 10,
+            "metric": "false_positive",
+            "evaluation_mode": "deterministic",
+            "expected": {
+              "anomaly_ids": [],
+              "record_ids": [
+                "R004236",
+                "R004237"
+              ]
+            },
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "无任何多余项",
+              "partial": "仅有不影响结论的文字疑虑",
+              "zero": "含实质异常或无关记录"
+            }
+          },
+          {
+            "id": "submission",
+            "title": "结果提交",
+            "description": "最终字段完整且结论一致",
+            "weight": 5,
+            "metric": "format",
+            "evaluation_mode": "deterministic",
+            "expected": "统一Schema可解析",
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "字段完整且一致",
+              "partial": "可修复的非核心缺陷",
+              "zero": "无法解析或字段冲突"
+            }
+          }
+        ],
+        "critical_failures": [
+          {
+            "id": "fabricated-record-id",
+            "condition": "提交数据库中不存在的record_id，或用无关记录支撑核心结论",
+            "score_cap": 20
+          },
+          {
+            "id": "trap-false-positive",
+            "condition": "把本题合规记录判为实质异常",
+            "score_cap": 30
+          }
+        ]
+      }
+    },
+    {
+      "id": "TRAP-005",
+      "source_task_id": "TRAP-005",
+      "level": "trap",
+      "category": "clean_but_suspicious",
+      "case_family": "clean_trap",
+      "prompt": "请核查TRAP-005涉及的记录是否构成异常,正确时应说明无异常。",
+      "selection_reason": "多条件均合规，验证综合反向复核",
+      "ground_truth_refs": [
+        "ground_truth:TRAP-005",
+        "record:R004239",
+        "record:R004240"
+      ],
+      "expected_output": {
+        "scoring_kind": "no_anomaly",
+        "expected_anomaly_ids": [],
+        "expected_record_ids": [
+          "R004239",
+          "R004240"
+        ],
+        "expected_reason": "unique invoices, within entertainment standards, and total below approval line"
+      },
+      "rubric": {
+        "max_score": 100,
+        "pass_score": 70,
+        "criteria": [
+          {
+            "id": "clean-conclusion",
+            "title": "无异常结论",
+            "description": "明确判断本题记录不构成异常",
+            "weight": 30,
+            "metric": "conclusion",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "anomaly_ids": [],
+              "conclusion": "无异常"
+            },
+            "evidence_sources": [
+              "final_answer",
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "明确无异常且无矛盾表述",
+              "partial": "倾向合规但表述保留",
+              "zero": "报告实质异常"
+            }
+          },
+          {
+            "id": "record-scope",
+            "title": "核查记录范围",
+            "description": "核查并准确保留记录范围 R004239, R004240",
+            "weight": 15,
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "R004239",
+              "R004240"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "记录集合准确",
+              "partial": "记录已核查但最终少列一条",
+              "zero": "未核查核心记录或加入无关记录"
+            }
+          },
+          {
+            "id": "case-specific-reason",
+            "title": "本题合规原因",
+            "description": "说明本题专属合规原因：unique invoices, within entertainment standards, and total below approval line",
+            "weight": 25,
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": "unique invoices, within entertainment standards, and total below approval line",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "完整说明专属边界或例外",
+              "partial": "只说明部分原因",
+              "zero": "原因错误或与数据矛盾"
+            }
+          },
+          {
+            "id": "reverse-check",
+            "title": "反向验证",
+            "description": "轨迹中核对阈值、日期、发票或聚合窗口，而非凭题目暗示直接答无异常",
+            "weight": 15,
+            "metric": "false_positive",
+            "evaluation_mode": "hybrid",
+            "expected": "存在针对本题边界条件的工具证据",
+            "evidence_sources": [
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "anchors": {
+              "full": "完成与本题匹配的反向核查",
+              "partial": "只核查一部分关键条件",
+              "zero": "没有核查证据"
+            }
+          },
+          {
+            "id": "no-unsupported-output",
+            "title": "无多余异常",
+            "description": "不返回任何异常ID或无关record_id",
+            "weight": 10,
+            "metric": "false_positive",
+            "evaluation_mode": "deterministic",
+            "expected": {
+              "anomaly_ids": [],
+              "record_ids": [
+                "R004239",
+                "R004240"
+              ]
+            },
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "无任何多余项",
+              "partial": "仅有不影响结论的文字疑虑",
+              "zero": "含实质异常或无关记录"
+            }
+          },
+          {
+            "id": "submission",
+            "title": "结果提交",
+            "description": "最终字段完整且结论一致",
+            "weight": 5,
+            "metric": "format",
+            "evaluation_mode": "deterministic",
+            "expected": "统一Schema可解析",
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "字段完整且一致",
+              "partial": "可修复的非核心缺陷",
+              "zero": "无法解析或字段冲突"
+            }
+          }
+        ],
+        "critical_failures": [
+          {
+            "id": "fabricated-record-id",
+            "condition": "提交数据库中不存在的record_id，或用无关记录支撑核心结论",
+            "score_cap": 20
+          },
+          {
+            "id": "trap-false-positive",
+            "condition": "把本题合规记录判为实质异常",
+            "score_cap": 30
+          }
+        ]
+      }
+    },
+    {
+      "id": "L3-007",
+      "source_task_id": "L3-007",
+      "level": "L3",
+      "category": "two_hop_retrieval",
+      "case_family": "retrieval_and_report",
+      "prompt": "报销办法没有直接列审批金额时,请通过交叉引用找到单笔费用审批档位。",
+      "selection_reason": "二跳制度检索，验证交叉引用",
+      "ground_truth_refs": [
+        "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+        "document:01_expense_reimbursement_2025.md",
+        "document:03_authorization_management.md"
+      ],
+      "expected_output": {
+        "scoring_kind": "expected_facts",
+        "expected_facts": [
+          "部门总经理审批线为10000元",
+          "金额出现在授权管理办法附件二"
+        ],
+        "required_citations": [
+          "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+          "document:01_expense_reimbursement_2025.md",
+          "document:03_authorization_management.md"
+        ]
+      },
+      "rubric": {
+        "max_score": 100,
+        "pass_score": 70,
+        "criteria": [
+          {
+            "id": "threshold",
+            "title": "审批金额",
+            "description": "给出部门总经理审批线10000元",
+            "weight": 35,
+            "metric": "conclusion",
+            "evaluation_mode": "hybrid",
+            "expected": "10000元",
+            "evidence_sources": [
+              "final_answer",
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "金额和边界正确",
+              "partial": "金额正确但边界不清",
+              "zero": "金额错误"
+            }
+          },
+          {
+            "id": "two-hop-path",
+            "title": "二跳检索路径",
+            "description": "说明从费用报销办法交叉引用到授权管理办法附件二",
+            "weight": 30,
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": [
+              "费用报销管理办法",
+              "授权管理办法附件二"
+            ],
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "两跳路径完整可复核",
+              "partial": "找到附件但未说明交叉引用",
+              "zero": "停在第一份制度或路径错误"
+            }
+          },
+          {
+            "id": "citations",
+            "title": "双文档证据",
+            "description": "引用两份制度中的相关内容",
+            "weight": 20,
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": [
+              "01_expense_reimbursement_2025.md",
+              "03_authorization_management.md"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "两份证据均有效",
+              "partial": "只有一份有效证据",
+              "zero": "无有效证据"
+            }
+          },
+          {
+            "id": "no-premature-stop",
+            "title": "检索完整性",
+            "description": "不因首份制度未列金额而提前结束",
+            "weight": 10,
+            "metric": "false_positive",
+            "evaluation_mode": "llm",
+            "expected": "继续追踪交叉引用",
+            "evidence_sources": [
+              "tool_trace",
+              "final_answer"
+            ],
+            "anchors": {
+              "full": "轨迹证明继续检索",
+              "partial": "最终正确但轨迹不完整",
+              "zero": "提前停止并猜测"
+            }
+          },
+          {
+            "id": "submission",
+            "title": "结果提交",
+            "description": "最终字段完整且结论一致",
+            "weight": 5,
+            "metric": "format",
+            "evaluation_mode": "deterministic",
+            "expected": "统一Schema可解析",
+            "evidence_sources": [
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "字段完整且一致",
+              "partial": "可修复的非核心缺陷",
+              "zero": "无法解析或字段冲突"
+            }
+          }
+        ],
+        "critical_failures": [
+          {
+            "id": "fabricated-record-id",
+            "condition": "提交数据库中不存在的record_id，或用无关记录支撑核心结论",
+            "score_cap": 20
+          },
+          {
+            "id": "deprecated-policy-as-current",
+            "condition": "使用已废止制度形成当前适用结论",
+            "score_cap": 40
+          }
+        ]
+      }
+    },
+    {
+      "id": "L3-009",
+      "source_task_id": "L3-009",
+      "level": "L3",
+      "category": "audit_report",
+      "case_family": "retrieval_and_report",
+      "prompt": "请基于全年数据出一份异常审计摘要报告,覆盖五类规则并列出关键异常ID。",
+      "selection_reason": "全年综合报告，验证五类规则汇总",
+      "ground_truth_refs": [
+        "ground_truth:DUP-001",
+        "ground_truth:DUP-002",
+        "ground_truth:DUP-003",
+        "ground_truth:DUP-004",
+        "ground_truth:DUP-005",
+        "ground_truth:DUP-006",
+        "ground_truth:SPLIT-001",
+        "ground_truth:SPLIT-002",
+        "ground_truth:SPLIT-003",
+        "ground_truth:SPLIT-004",
+        "ground_truth:SPLIT-005",
+        "ground_truth:SPLIT-006",
+        "ground_truth:OVERSTD-001",
+        "ground_truth:OVERSTD-002",
+        "ground_truth:OVERSTD-003",
+        "ground_truth:OVERSTD-004",
+        "ground_truth:OVERSTD-005",
+        "ground_truth:OVERSTD-006",
+        "ground_truth:BUDGET-001",
+        "ground_truth:BUDGET-002",
+        "ground_truth:BUDGET-003",
+        "ground_truth:BUDGET-004",
+        "ground_truth:BUDGET-005",
+        "ground_truth:BUDGET-006",
+        "ground_truth:OVERDUE-001",
+        "ground_truth:OVERDUE-002",
+        "ground_truth:OVERDUE-003",
+        "ground_truth:OVERDUE-004",
+        "ground_truth:OVERDUE-005",
+        "ground_truth:OVERDUE-006"
+      ],
+      "expected_output": {
+        "scoring_kind": "llm_rubric",
+        "rubric_assertions": [
+          "报告必须说明共识别30个异常和5个陷阱位不应计入异常。",
+          "报告必须覆盖重复报销、拆分报销、超标准、超预算、超期报销五类规则。",
+          "报告必须至少列出每类规则的一个异常ID。",
+          "报告必须引用费用报销管理办法或预算管理办法的对应条款出处。",
+          "报告不得把TRAP开头的陷阱位计为异常。"
+        ]
+      },
+      "rubric": {
+        "max_score": 100,
+        "pass_score": 70,
+        "criteria": [
+          {
+            "id": "overall-count",
+            "title": "总体数量",
+            "description": "说明全年共30个异常，5个TRAP不计异常",
+            "weight": 20,
+            "metric": "conclusion",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "anomaly_count": 30,
+              "trap_count": 5
+            },
+            "evidence_sources": [
+              "final_answer",
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "两个数量均正确",
+              "partial": "只给出一个正确数量",
+              "zero": "异常总量明显错误"
+            }
+          },
+          {
+            "id": "five-rule-coverage",
+            "title": "五类规则覆盖",
+            "description": "覆盖重复、拆分、超标准、超预算和超期五类规则",
+            "weight": 20,
+            "metric": "conclusion",
+            "evaluation_mode": "hybrid",
+            "expected": [
+              "重复报销",
+              "拆分报销",
+              "超标准",
+              "超预算",
+              "超期报销"
+            ],
+            "evidence_sources": [
+              "final_answer"
+            ],
+            "anchors": {
+              "full": "五类均有结论",
+              "partial": "覆盖三至四类",
+              "zero": "覆盖少于三类"
+            }
+          },
+          {
+            "id": "representative-ids",
+            "title": "关键异常证据",
+            "description": "每类至少列出一个正确异常ID并给出对应记录证据",
+            "weight": 25,
+            "metric": "evidence",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "prefixes": [
+                "DUP",
+                "SPLIT",
+                "OVERSTD",
+                "BUDGET",
+                "OVERDUE"
+              ],
+              "minimum_per_prefix": 1
+            },
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "五类均有正确ID和记录",
+              "partial": "四类有完整证据",
+              "zero": "少于三类有完整证据"
+            }
+          },
+          {
+            "id": "policy-coverage",
+            "title": "制度依据",
+            "description": "费用类规则引用费用报销制度，预算规则引用预算制度",
+            "weight": 15,
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": [
+              "费用报销管理办法-6.1至6.4",
+              "预算管理办法-4.1"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "两类制度与规则准确对应",
+              "partial": "只有一类制度完整",
+              "zero": "无有效制度依据"
+            }
+          },
+          {
+            "id": "trap-control",
+            "title": "陷阱误报控制",
+            "description": "不得把TRAP-001至TRAP-005计入异常",
+            "weight": 15,
+            "metric": "false_positive",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "TRAP-001",
+              "TRAP-002",
+              "TRAP-003",
+              "TRAP-004",
+              "TRAP-005"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "final_answer"
+            ],
+            "anchors": {
+              "full": "无TRAP误报",
+              "partial": "只出现非结论性的风险提示",
+              "zero": "把任一TRAP计为异常"
+            }
+          },
+          {
+            "id": "report-shape",
+            "title": "报告表达",
+            "description": "报告包含事实、规则、判断、影响和建议，且与结构化结果一致",
+            "weight": 5,
+            "metric": "format",
+            "evaluation_mode": "llm",
+            "expected": [
+              "事实",
+              "规则",
+              "判断",
+              "影响",
+              "建议"
+            ],
+            "evidence_sources": [
+              "final_answer",
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "结构完整且一致",
+              "partial": "缺一个非核心部分",
+              "zero": "报告与结果冲突"
+            }
+          }
+        ],
+        "critical_failures": [
+          {
+            "id": "fabricated-record-id",
+            "condition": "提交数据库中不存在的record_id，或用无关记录支撑核心结论",
+            "score_cap": 20
+          },
+          {
+            "id": "partial-scan-presented-as-complete",
+            "condition": "只检查部分月份或样例记录，却将结果表述为全年完整扫描",
+            "score_cap": 50
+          },
+          {
+            "id": "trap-included-as-anomaly",
+            "condition": "把任一TRAP记录计入正式异常",
+            "score_cap": 30
+          }
+        ]
+      }
+    },
+    {
+      "id": "L3-010",
+      "source_task_id": "L3-010",
+      "level": "L3",
+      "category": "audit_report",
+      "case_family": "retrieval_and_report",
+      "prompt": "请专门写一段版本陷阱审计说明,解释旧版审批线可能导致的误判。",
+      "selection_reason": "制度版本风险报告，验证审计表达",
+      "ground_truth_refs": [
+        "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+        "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount"
+      ],
+      "expected_output": {
+        "scoring_kind": "llm_rubric",
+        "rubric_assertions": [
+          "必须指出2025修订版现行部门总经理审批线为10000元。",
+          "必须指出2022版8000元审批线已废止。",
+          "必须说明报销办法通过授权管理办法附件二取得现行审批金额。",
+          "不得把旧版条款作为当前审批依据。"
+        ],
+        "required_citations": [
+          "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+          "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount"
+        ]
+      },
+      "rubric": {
+        "max_score": 100,
+        "pass_score": 70,
+        "criteria": [
+          {
+            "id": "current-threshold",
+            "title": "现行审批线",
+            "description": "指出2025修订版现行值为10000元",
+            "weight": 30,
+            "metric": "conclusion",
+            "evaluation_mode": "hybrid",
+            "expected": "10000元",
+            "evidence_sources": [
+              "final_answer",
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "现行值准确",
+              "partial": "金额正确但版本不清",
+              "zero": "金额错误"
+            }
+          },
+          {
+            "id": "old-threshold-status",
+            "title": "旧版状态",
+            "description": "指出2022版8000元审批线已废止",
+            "weight": 25,
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "8000元已废止",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "旧值和状态均正确",
+              "partial": "只说明其中一项",
+              "zero": "把旧值当作现行"
+            }
+          },
+          {
+            "id": "cross-reference",
+            "title": "制度关系",
+            "description": "说明报销办法通过授权管理办法附件二取得现行金额",
+            "weight": 20,
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": [
+              "费用报销管理办法",
+              "授权管理办法附件二"
+            ],
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "anchors": {
+              "full": "制度关系完整",
+              "partial": "提到两份制度但关系不清",
+              "zero": "制度关系错误"
+            }
+          },
+          {
+            "id": "risk-explanation",
+            "title": "误判风险",
+            "description": "解释使用旧线会错误扩大需升级审批的记录范围，并提出版本校验措施",
+            "weight": 20,
+            "metric": "reasoning",
+            "evaluation_mode": "llm",
+            "expected": [
+              "误报风险",
+              "版本校验建议"
+            ],
+            "evidence_sources": [
+              "final_answer"
+            ],
+            "anchors": {
+              "full": "风险与建议均具体",
+              "partial": "只有风险或建议",
+              "zero": "未解释误判影响"
+            }
+          },
+          {
+            "id": "report-shape",
+            "title": "报告表达",
+            "description": "以审计说明形式提交并保持字段一致",
+            "weight": 5,
+            "metric": "format",
+            "evaluation_mode": "hybrid",
+            "expected": "事实、规则、判断和建议一致",
+            "evidence_sources": [
+              "final_answer",
+              "submitted_json"
+            ],
+            "anchors": {
+              "full": "表达完整且一致",
+              "partial": "轻微缺项",
+              "zero": "报告与结构化结果冲突"
+            }
+          }
+        ],
+        "critical_failures": [
+          {
+            "id": "fabricated-record-id",
+            "condition": "提交数据库中不存在的record_id，或用无关记录支撑核心结论",
+            "score_cap": 20
+          },
+          {
+            "id": "deprecated-policy-as-current",
+            "condition": "使用已废止制度形成当前适用结论",
+            "score_cap": 40
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "case_family": "record_audit",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "policy_data_comparison",
+  "criteria": [
+    {
+      "answer_evidence": "认定为重复报销异常。",
+      "id": "audit-conclusion",
+      "reason": "明确判定为重复报销异常，异常类型正确。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "list_invoices发现FP202500000020被使用2次；find_invoice_usage返回R000020和R004203两笔记录。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "anomaly-id",
+      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
+      "score": 15.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "record-set",
+      "reason": "record_ids集合F1=1.000",
+      "score": 25.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "违反《XX证券费用报销管理办法(2025修订版)》第十条'同一发票最多报销1次'。",
+      "id": "policy-basis",
+      "reason": "准确引用现行《费用报销管理办法》第十条，条款有效且直接支持重复报销结论。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_excerpt返回“第十条 同一发票最多报销1次……应认定为重复报销风险”。"
+    },
+    {
+      "answer_evidence": "发票FP202500000020(INV000020)被同一员工E0028(杜丹)在R000020和R004203两笔报销中重复使用,金额均为669.5元。",
+      "id": "case-reasoning",
+      "reason": "完整说明发票FP202500000020被同一员工在R000020和R004203重复使用，金额均为669.5元，事实清晰。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_expense_detail(R000020)和get_expense_detail(R004203)均显示amount=669.5, invoice_no=FP202500000020。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的R000020和R004203均存在于数据库中，无虚构记录。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "DUP-R000020"
+    ],
+    "actual_record_ids": [
+      "R000020",
+      "R004203"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "DUP": 1
+      },
+      "count_exact": true,
+      "expected_types": {
+        "DUP": 1
+      },
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 174.179,
+    "expected_anomaly_ids": [
+      "DUP-003"
+    ],
+    "expected_record_ids": [
+      "R000020",
+      "R004203"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [
+      "clause:费用报销管理办法-6.1"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:26:29+08:00",
+  "group": "codex-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选提交正确识别重复报销异常，制度依据和推理完整，结论可靠。异常ID虽与期望ID不同但异常类型一致，不影响结论准确性。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1932,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1463
+      },
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 3227,
+      "prompt_tokens": 4123,
+      "prompt_tokens_details": {
+        "cached_tokens": 896
+      },
+      "total_tokens": 6055
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/codex-enhanced/L2-003",
+  "task_id": "L2-003"
+}

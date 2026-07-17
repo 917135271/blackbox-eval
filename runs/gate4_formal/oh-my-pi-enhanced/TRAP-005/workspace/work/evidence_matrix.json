@@ -1,0 +1,67 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [],
+  "candidate_record_ids": ["R004233", "R004234", "R004235", "R004236", "R004237", "R004238", "R004239", "R004240"],
+  "submitted_record_ids": ["R004233", "R004234", "R004235", "R004236", "R004237", "R004238", "R004239", "R004240"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "scope": "TRAP-005陷阱样本R004233-R004240共8条记录",
+    "rules_checked": [
+      "01_expense_reimbursement_2025.md:第七条(时限管理)",
+      "01_expense_reimbursement_2025.md:第十条(禁止重复报销)",
+      "01_expense_reimbursement_2025.md:第十一条(禁止拆分报销)",
+      "01_expense_reimbursement_2025.md:第十二条(标准限制)",
+      "03_authorization_management.md:附件二(审批权限表)",
+      "04_travel_expense.md:第四条(住宿标准)",
+      "06_business_entertainment.md:第二条(单次上限)",
+      "06_business_entertainment.md:第三条(人均上限)",
+      "07_office_communication.md:第二条(办公用品月度上限)",
+      "07_office_communication.md:第三条(通讯费月度上限)"
+    ],
+    "search_proof": {
+      "duplicate_invoice_check": {
+        "method": "find_reused_invoices+list_invoices",
+        "scope": "全部8条记录的发票号",
+        "result": "FP2025X0004227-FP2025X0004234均为单次使用,无重复",
+        "artifacts": ["work/analysis/data_findings.json"]
+      },
+      "split_reimbursement_check": {
+        "method": "按员工+类型分组,计算7日窗口内合计",
+        "result": "R004234/R004235:同日合计¥500未触发AR-01以上; R004236/R004237:相隔8天不在7天窗口内; R004239/R004240:相邻日合计¥1,085未触发AR-01以上。均无拆分违规。"
+      },
+      "standard_limit_check": {
+        "method": "逐条对照费用标准和职级映射",
+        "result": "R004233:¥999/晚<¥1,100; R004236:¥743/晚<¥850; R004237:¥743/晚<¥850; R004234/R004235:月度¥500<¥600; R004238:¥220<¥300; R004239:¥180/人<¥300; R004240:¥182/人<¥300",
+        "level_mapping": "D1→部门负责人级(¥850/晚); X1→高管级(¥1,100/晚)",
+        "level_mapping_justification": "D1为部门级代号,涵盖部门经理及部门总经理,对应差旅标准'部门负责人级'"
+      },
+      "delay_check": {
+        "method": "计算expense_date到reimburse_date天数",
+        "verdict": "R004238:2025-07-01至2025-08-30=60天,恰好等于60天界限,未超过('60天内'含边界)"
+      },
+      "approval_check": {
+        "method": "逐条核对approvals表",
+        "result": "全部8条记录均有部门经理审批,审批档位AR-01/AR-02与金额匹配"
+      },
+      "policy_version_check": {
+        "method": "list_policy_docs+get_policy_doc",
+        "result": "适用2025修订版,2022版已废止。所有记录日期均在2025年,无版本冲突",
+        "artifacts": ["work/policy_applicability.json"]
+      }
+    },
+    "exhaustive_search_completed": true,
+    "dismissed_anomalies": [],
+    "completeness_attestation": "全部8条记录在所有10项适用政策规则下逐一核实,未发现异常。搜索覆盖重复报销(发票比对)、拆分报销(7日窗口)、标准限制(职级×城市×天数)、时限管理(天数计算)、审批档位(金额×审批级)五个维度。"
+  },
+  "reconciled_figures": {
+    "records_in_scope": 8,
+    "records_evidence_covered": 8,
+    "anomalies_identified": 0,
+    "anomalies_evidenced": 0
+  },
+  "unresolved_items": []
+}

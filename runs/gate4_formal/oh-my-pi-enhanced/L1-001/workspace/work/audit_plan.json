@@ -1,0 +1,49 @@
+{
+  "task_id": "L1-001",
+  "task_type": "policy_qa",
+  "question": "现行制度下,单笔费用报销达到多少金额需要部门总经理审批?",
+  "scope": {
+    "audit_object": "policy threshold lookup",
+    "rule": "expense reimbursement approval threshold for department general manager",
+    "period": "current (现行制度)",
+    "deliverable": "threshold amount and policy citation"
+  },
+  "policy_questions": [
+    "What is the current expense reimbursement amount threshold requiring department general manager (部门总经理) approval?"
+  ],
+  "data_questions": [],
+  "required_fields": [],
+  "evidence_requirements": [
+    "Policy document specifying the approval threshold",
+    "Exact threshold amount in RMB"
+  ],
+  "execution_steps": [
+    "1. Search/query policy for department general manager approval threshold",
+    "2. Run policy-version-check if multiple versions or date boundaries are found",
+    "3. Record evidence and construct answer",
+    "4. Run evidence-coverage-check",
+    "5. Run audit-report",
+    "6. Run result-validator",
+    "7. Submit via audit_control.submit_audit_result"
+  ],
+  "complexity": {
+    "score": 0,
+    "reasons": [
+      "Single policy fact lookup",
+      "No aggregation, joins, or batch filtering",
+      "No multi-rule or multi-policy"
+    ]
+  },
+  "subagent_plan": {
+    "policy_researcher": false,
+    "data_analyst": false,
+    "independent_reviewer": false,
+    "note": "Complexity 0-1, all work in main agent"
+  },
+  "stopping_conditions": [
+    "Policy threshold found and cited",
+    "Evidence coverage passes",
+    "Validation passes",
+    "Submission accepted"
+  ]
+}

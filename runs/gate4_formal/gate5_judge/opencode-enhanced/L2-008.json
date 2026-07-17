@@ -1,0 +1,138 @@
+{
+  "case_family": "record_audit",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "policy_data_comparison",
+  "criteria": [
+    {
+      "answer_evidence": "anomaly_ids: SPLIT-001, answer描述：员工E0009分两笔提交费用，间隔5天在7天窗口内，合计10200元，构成拆分报销规避审批权限。",
+      "id": "audit-conclusion",
+      "reason": "正确识别拆分报销异常，异常类型SPLIT正确。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "",
+      "id": "anomaly-id",
+      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
+      "score": 15.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "record-set",
+      "reason": "record_ids集合F1=1.000",
+      "score": 25.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "citations: 01_expense_reimbursement_2025.md 第十一条。",
+      "id": "policy-basis",
+      "reason": "引用了费用报销管理办法第十一条，即规则中的6.2，有效支持结论。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "answer: 'R004212,5100元...R004213,5100元...间隔5天在7天窗口内,合计10200元达到AR-03档位...构成拆分报销'",
+      "id": "case-reasoning",
+      "reason": "明确说明R004212和R004213两笔记录合计10200元，在7天窗口内，超过10000元审批线，构成拆分。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的record_ids R004212和R004213均存在于数据库中，无虚构记录。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "SPLIT-001"
+    ],
+    "actual_record_ids": [
+      "R004212",
+      "R004213"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "SPLIT": 1
+      },
+      "count_exact": true,
+      "expected_types": {
+        "SPLIT": 1
+      },
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 2,
+    "elapsed_seconds": 197.852,
+    "expected_anomaly_ids": [
+      "SPLIT-003"
+    ],
+    "expected_record_ids": [
+      "R004212",
+      "R004213"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [
+      "clause:费用报销管理办法-6.2"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:30:16+08:00",
+  "group": "opencode-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选提交准确识别了拆分报销异常，引用了正确的制度条款，推理充分。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1823,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1456
+      },
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 1368,
+      "prompt_tokens": 2264,
+      "prompt_tokens_details": {
+        "cached_tokens": 896
+      },
+      "total_tokens": 4087
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/opencode-enhanced/L2-008",
+  "task_id": "L2-008"
+}

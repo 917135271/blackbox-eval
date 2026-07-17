@@ -1,0 +1,51 @@
+{
+  "task_id": "DEV-005",
+  "question": "核查R900005的业务招待费是否超标，需要同时计算单次活动总额和人均金额",
+  "complexity": 1,
+  "complexity_reasons": [
+    "单一记录核查 (R900005)",
+    "单一规则 (业务招待费标准)",
+    "单一制度文档 (06_business_entertainment.md)",
+    "无需聚合、分组或批量过滤",
+    "无需子智能体"
+  ],
+  "scope": {
+    "record_ids": ["R900005"],
+    "expense_type": "business_entertainment",
+    "policy_docs": ["06_business_entertainment.md"],
+    "audit_period": "2025-03-12",
+    "department": "D901"
+  },
+  "policy_questions": [
+    "业务招待费单次活动总额上限是多少？",
+    "业务招待费人均金额上限是多少？"
+  ],
+  "data_questions": [
+    "R900005的报销金额是多少？",
+    "R900005的参与人数是多少？",
+    "人均金额是否超标？总金额是否超标？"
+  ],
+  "required_fields": ["amount", "participants", "expense_type", "status"],
+  "evidence_requirements": [
+    "R900005完整报销记录",
+    "06_business_entertainment.md章程第二条(总限额)和第三条(人均限额)"
+  ],
+  "execution_steps": [
+    "查询R900005报销详情",
+    "获取业务招待费管理办法全文",
+    "计算总金额和人均金额",
+    "与制度阈值对比判断",
+    "证据覆盖检查",
+    "审计报告",
+    "结果校验与提交"
+  ],
+  "subagent_plan": {
+    "selected": false,
+    "reason": "complexity=1，单一记录单一规则核查，compact模式足够"
+  },
+  "stopping_conditions": [
+    "完成R900005两条限额对比后即可出结论",
+    "如人均或总金额超标则标记异常"
+  ],
+  "unresolved_items": []
+}

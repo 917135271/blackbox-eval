@@ -1,0 +1,46 @@
+{
+  "audit_scope": {
+    "audit_object": "R900005",
+    "expense_type": "business_entertainment",
+    "expense_date": "2025-03-12",
+    "department": "D901 开发审计一部",
+    "employee": "E9001 开发员工甲"
+  },
+  "verified_facts": {
+    "total_amount": 3600.0,
+    "participants": 10,
+    "per_person_amount": 360.0,
+    "reason": "客户交流餐叙",
+    "status": "approved",
+    "special_approval": false
+  },
+  "applicable_policies": [
+    {
+      "doc_id": "06_business_entertainment.md",
+      "title": "XX证券业务招待费管理办法",
+      "clauses": [
+        {"clause_no": "第二条", "rule": "单次活动费用不得超过5000元"},
+        {"clause_no": "第三条", "rule": "人均不得超过300元"}
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "anomaly_id": "DEV-005-001",
+      "rule": "业务招待费人均金额超标",
+      "clause": "06_business_entertainment.md 第三条",
+      "record_ids": ["R900005"],
+      "detail": "总额3600元未超5000元上限（通过），但10人参与，人均360元超过300元上限（超标60元/人）",
+      "impact": "人均超标60元，超幅20%"
+    }
+  ],
+  "recommendations": ["要求经办人补充说明参与人数合理性，或按300元/人标准核减至3000元"],
+  "anomaly_ids": ["DEV-005-001"],
+  "record_ids": ["R900005"],
+  "citations": [
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第二条"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第三条"}
+  ],
+  "answer": "R900005业务招待费超标。单次活动总额3600元，未超过5000元上限；但参与人数10人，人均360元，超过《XX证券业务招待费管理办法》第三条规定的300元上限，超标60元/人。",
+  "limitations": []
+}

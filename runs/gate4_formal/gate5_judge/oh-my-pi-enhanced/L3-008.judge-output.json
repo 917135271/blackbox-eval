@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "travel-policy",
+      "score": 25,
+      "reason": "制度和场景均正确，明确指出差旅住宿适用差旅费管理办法。",
+      "answer_evidence": "差旅住宿标准（04_travel_expense.md第四条）按职级×城市档位二维分类。",
+      "trace_evidence": "工具调用 get_policy_doc 获取 04_travel_expense.md 全文，第四条为差旅住宿标准表。"
+    },
+    {
+      "id": "training-policy",
+      "score": 25,
+      "reason": "制度和场景均正确，明确指出培训住宿适用培训费管理办法。",
+      "answer_evidence": "培训住宿标准（05_training_expense.md第五条）仅按城市档位一维分类。",
+      "trace_evidence": "工具调用 get_policy_doc 获取 05_training_expense.md 全文，第五条为培训住宿标准表。"
+    },
+    {
+      "id": "no-mixing",
+      "score": 25,
+      "reason": "场景差异（分类维度、场景不可互换）与数值差异（金额体系不同）均详细说明。",
+      "answer_evidence": "不能混用的理由：1. 分类维度不同；2. 金额体系不同；3. 互引条款明确禁止；4. 场景不可互换。",
+      "trace_evidence": "无"
+    },
+    {
+      "id": "comparison-evidence",
+      "score": 20,
+      "reason": "两份制度证据完整，明确引用04_travel_expense.md和05_training_expense.md具体条款。",
+      "answer_evidence": "citations 中列出04_travel_expense.md（第四、七条）和05_training_expense.md（第五、六条）。",
+      "trace_evidence": "工具调用 get_policy_doc 分别获取04和05全文，get_policy_excerpt 提取相关条款。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "未提交任何record_id，无虚假记录。"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "仅使用04_travel_expense.md和05_training_expense.md，均为现行有效制度，未使用废止制度。"
+    }
+  ],
+  "overall_comment": "候选答案正确指出差旅住宿适用差旅费管理办法、培训住宿适用培训费管理办法，并从分类维度、金额体系、互引条款和场景不可互换等方面解释不能混用，提供两份制度原文作为证据，结论合理。",
+  "confidence": 1.0
+}

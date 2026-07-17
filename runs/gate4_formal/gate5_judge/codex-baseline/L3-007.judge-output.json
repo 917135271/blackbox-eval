@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "threshold",
+      "score": 35,
+      "reason": "金额和边界正确，给出部门总经理审批线10000元，区间为[10000,50000)。",
+      "answer_evidence": "答案明确列出“AR-03([10000,50000)部门总经理)”。",
+      "trace_evidence": "get_policy_doc('03_authorization_management.md') 返回附件二表格：AR-03 >=10000且<50000，必要审批角色部门总经理。"
+    },
+    {
+      "id": "two-hop-path",
+      "score": 30,
+      "reason": "两跳路径完整可复核，从费用报销管理办法第五条交叉引用到授权管理办法附件二。",
+      "answer_evidence": "答案写道：“XX证券费用报销管理办法(2025修订版)第五条明确规定...统一按《XX证券授权管理办法》附件二执行。”",
+      "trace_evidence": "get_policy_doc('01_expense_reimbursement_2025.md') 返回第五条文字；get_policy_doc('03_authorization_management.md') 显示附件二。"
+    },
+    {
+      "id": "citations",
+      "score": 20,
+      "reason": "两份证据均有效，引用了01_expense_reimbursement_2025.md和03_authorization_management.md。",
+      "answer_evidence": "citations中包含{\"doc_id\":\"01_expense_reimbursement_2025.md\",\"clause_no\":\"第五条\"}，{\"doc_id\":\"03_authorization_management.md\",\"clause_no\":\"第二条\"}，{\"doc_id\":\"03_authorization_management.md\",\"clause_no\":\"附件二\"}。",
+      "trace_evidence": "工具调用获取了01_expense_reimbursement_2025.md和03_authorization_management.md，并显示相关条款。"
+    },
+    {
+      "id": "no-premature-stop",
+      "score": 10,
+      "reason": "轨迹证明继续检索，未因首份制度未列金额而停止。",
+      "answer_evidence": "答案中引用了两份文档并进行了交叉引用，表明未提前停止。",
+      "trace_evidence": "轨迹中先搜索政策，获取03_authorization_management.md和01_expense_reimbursement_2025.md，随后继续列出费用、获取详情，未提前结束。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有record_ids均存在于数据库，无捏造痕迹。"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未使用废止制度作为现行依据，全部引用现行有效版本。"
+    }
+  ],
+  "overall_comment": "候选正确识别并通过交叉引用给出了审批阈值，路径和证据完整，无关键错误。",
+  "confidence": 1.0
+}

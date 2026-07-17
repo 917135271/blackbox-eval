@@ -1,0 +1,32 @@
+{
+  "audit_scope": {
+    "task_id": "DEV-010",
+    "audit_object": "拆分报销核查",
+    "records": ["R900010", "R900011"],
+    "period": "2025-06-01 至 2025-06-09",
+    "employee": "E9001（开发员工甲）",
+    "department": "D901（开发审计一部）"
+  },
+  "verified_facts": [
+    "R900010：员工E9001，差旅交通费，expense_date=2025-06-01，金额5,300元，发票FPDEV900010",
+    "R900011：员工E9001，差旅交通费，expense_date=2025-06-09，金额5,300元，发票FPDEV900011",
+    "同一员工（E9001）、同一费用类型（travel_transport），发票不重复",
+    "合计金额10,600元，达到AR-03审批线（≥10,000元）",
+    "两笔expense_date间隔为8天（2025-06-01至2025-06-09）"
+  ],
+  "applicable_policies": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条", "content": "同一员工、同一费用类型在7天内出现2笔及以上报销，且合计金额达到较高审批线的，应重点核查拆分规避审批"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二", "content": "AR-03：≥10,000元且<50,000元，部门总经理审批"}
+  ],
+  "findings": [],
+  "impact": "无",
+  "recommendations": "无——不构成违规",
+  "anomaly_ids": [],
+  "record_ids": ["R900010", "R900011"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+  ],
+  "answer": "R900010（2025-06-01，5,300元）与R900011（2025-06-09，5,300元）同一员工E9001、同一费用类型travel_transport，合计10,600元，达到AR-03审批线（≥10,000元），满足拆分报销'较高审批线'条件。但两笔expense_date间隔8天，超出《费用报销管理办法》第十一条规定的7天窗口（阈值7天，观测值8天），日期边界条件不满足，不构成拆分报销。结论：无异常。",
+  "limitations": []
+}

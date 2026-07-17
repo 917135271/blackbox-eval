@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "travel-policy",
+      "score": 25,
+      "reason": "制度和场景均正确，明确指出差旅住宿适用差旅费管理办法。",
+      "answer_evidence": "差旅住宿标准（04_travel_expense.md 第四条）按「职级×城市档位」双重维度设定...",
+      "trace_evidence": "调用 get_policy_doc 获取 04_travel_expense.md，内容包含差旅住宿标准表。"
+    },
+    {
+      "id": "training-policy",
+      "score": 25,
+      "reason": "制度和场景均正确，明确指出培训住宿适用培训费管理办法。",
+      "answer_evidence": "培训住宿标准（05_training_expense.md 第五条）仅按「城市档位」单维度设定...",
+      "trace_evidence": "调用 get_policy_doc 获取 05_training_expense.md，内容包含培训住宿标准表。"
+    },
+    {
+      "id": "no-mixing",
+      "score": 25,
+      "reason": "说明了场景互斥（差旅出差 vs 培训期间）和数值差异（如经理级一类城市650 vs 500），两个差异均明确。",
+      "answer_evidence": "差旅住宿标准适用于公务出差期间的住宿...培训住宿标准适用于培训期间住宿...两者适用场景互斥。数值差异显著：以经理级为例，差旅一类城市650元高于培训500元30%。",
+      "trace_evidence": ""
+    },
+    {
+      "id": "comparison-evidence",
+      "score": 20,
+      "reason": "两份制度证据完整，答案引用了04_travel_expense.md和05_training_expense.md的具体条款。",
+      "answer_evidence": "citations 包含 doc_id: 04_travel_expense.md (第四条、第七条) 和 05_training_expense.md (第五条、第六条)。",
+      "trace_evidence": "轨迹中成功调用 get_policy_doc 获取 04_travel_expense.md 和 05_training_expense.md 全文。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "未使用不存在记录或无关记录支撑核心结论。"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未使用已废止制度形成当前适用结论。"
+    }
+  ],
+  "overall_comment": "回答完整比较了差旅住宿与培训住宿标准的结构和数值差异，并依据制度条款说明了两者的适用场景互斥和不得混用的规定，证据充分。",
+  "confidence": 1.0
+}

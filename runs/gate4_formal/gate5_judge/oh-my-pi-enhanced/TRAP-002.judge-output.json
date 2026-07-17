@@ -1,0 +1,41 @@
+{
+  "criteria": [
+    {
+      "id": "clean-conclusion",
+      "score": 0,
+      "reason": "候选结论基于R000002和R004201得出无异常，但本题应核查的记录是R004234和R004235，候选未针对本题记录进行判断，结论实质无效。",
+      "answer_evidence": "answer: '经核查，TRAP-002涉及的记录R000002和R004201不构成异常。'",
+      "trace_evidence": "trace中仅对FP202500000002的使用记录(R000002, R004201)进行了核查，未涉及R004234,R004235。"
+    },
+    {
+      "id": "record-scope",
+      "score": 0,
+      "reason": "预期核查记录为R004234和R004235，候选提交的记录为R000002和R004201，完全错误。",
+      "answer_evidence": "submitted_json record_ids: ['R000002', 'R004201']",
+      "trace_evidence": "trace中调用了find_reused_invoices和find_invoice_usage，针对的是FP202500000002，未调用获取R004234或R004235详情的工具。"
+    },
+    {
+      "id": "case-specific-reason",
+      "score": 0,
+      "reason": "期望原因为'发票不同且合计低于审批线'，候选给出的原因是测试注入样本和正常报销，与期望原因完全不符。",
+      "answer_evidence": "answer: 'R004201明确标注为重复发票注入样本... R000002为正常业务报销。'",
+      "trace_evidence": "trace中没有核查发票差异或合计金额是否低于审批线的内容。"
+    },
+    {
+      "id": "reverse-check",
+      "score": 0,
+      "reason": "轨迹中没有针对本题边界条件（如核对R004234与R004235的发票号是否相同、合计金额、日期跨度等）的核查。",
+      "answer_evidence": "无",
+      "trace_evidence": "trace中主要围绕FP202500000002的重复使用，以及查询政策第十条，未涉及本题记录的发票比较或金额汇总。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": true,
+      "reason": "候选使用R000002和R004201这些与本题无关的记录来支撑核心结论，而非核查预期的R004234和R004235。"
+    }
+  ],
+  "overall_comment": "候选完全未核查本题指定的记录(R004234, R004235)，而是错误地聚焦于另一张发票(FP202500000002)的重复使用，导致所有评判维度均不得分。触发critical failure，得分上限为20，最终得分0。",
+  "confidence": 0.95
+}

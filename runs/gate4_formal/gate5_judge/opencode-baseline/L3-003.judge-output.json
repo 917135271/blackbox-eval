@@ -1,0 +1,53 @@
+{
+  "criteria": [
+    {
+      "id": "all-anomaly-ids",
+      "score": 0,
+      "reason": "提交的异常ID集合与预期完全不一致，包含大量其他规则异常，未满足完全一致要求。",
+      "answer_evidence": "提交的anomaly_ids包含ANOM-LATE-001, ANOM-REUSE-*, ANOM-SPLIT-*, ANOM-STD-*等共19个，预期仅为OVERSTD-001~006。",
+      "trace_evidence": "无工具调用，无法验证扫描是否只针对超标准。"
+    },
+    {
+      "id": "all-record-ids",
+      "score": 0,
+      "reason": "返回了38个记录ID，包含预期6个超标准记录，但同时包含32个无关记录，不符合完整且无多余的要求。",
+      "answer_evidence": "record_ids包含R004221-R004226，但也包含R000002等大量重复、拆分、超期记录。",
+      "trace_evidence": "无工具调用，无法验证这些记录是否经查询确认。"
+    },
+    {
+      "id": "full-scan-method",
+      "score": 0,
+      "reason": "无任何工具调用，未展示全年数据查询或计算过程，无法证明执行了全量扫描。",
+      "answer_evidence": "答案仅陈述结果，无SQL、数据提取或计算步骤。",
+      "trace_evidence": "tool_trace_summary显示call_count为0，无样本。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 6,
+      "reason": "正确引用了费用报销管理办法第十二条（即6.3）及各类别标准，每个超标准异常有明确数额对比，但未展示查询条件。",
+      "answer_evidence": "citations包含01_expense_reimbursement_2025.md的第十二条及04~07等文件条款；evidence_matrix中每个超标准异常列出了标准对照。",
+      "trace_evidence": "无查询条件展示。"
+    },
+    {
+      "id": "false-positive-control",
+      "score": 0,
+      "reason": "提交了19个异常ID和38个记录ID，其中13个异常属于重复、拆分、超期等其他规则，构成严重误报。",
+      "answer_evidence": "anomaly_ids包含ANOM-REUSE-*, ANOM-SPLIT-*, ANOM-LATE-*等非超标准异常。",
+      "trace_evidence": "无。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的record_id在数据库中均存在，无虚构。"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": true,
+      "reason": "工具调用为零，无任何查询证据，却声称完成全年超标准专项扫描，存在虚假表述。"
+    }
+  ],
+  "overall_comment": "未按题目要求仅返回超标准异常，而是输出全部异常类型，导致大量误报；且缺乏全年扫描的方法证据，制度引用正确但未体现查询执行。整体未有效完成专项任务。",
+  "confidence": 0.95
+}

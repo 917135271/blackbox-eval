@@ -1,0 +1,39 @@
+{
+  "task_id": "L2-013",
+  "task_question": "结合制度和业务数据,核查以R004223为线索的超标准异常,返回异常ID和记录ID集合。",
+  "task_scope": {
+    "audit_object": "R004223及其关联超标准记录",
+    "expense_types": ["training_fee"],
+    "business_period": "2025",
+    "organization_scope": "以R004223所属部门(E0009/D009)及相关范围",
+    "deliverable": "anomaly_ids和record_ids"
+  },
+  "policy_questions": [
+    "培训课程费每人每期标准是多少? (05_training_expense.md 第2条: ≤3500元)",
+    "内部培训综合费用每日标准是多少? (第3条: ≤800元)",
+    "外部培训综合费用每日标准是多少? (第4条: ≤1200元)",
+    "超标准报销的条件? (01_expense_reimbursement_2025.md 第12条: 无专项审批时不超过制度标准1.0倍)"
+  ],
+  "data_questions": [
+    "R004223的金额是否超过培训课程费标准3500元?",
+    "R004223是否有专项审批(special_approval)?",
+    "是否存在与R004223相关的其他培训费超标准记录?",
+    "部门预算是否充足?"
+  ],
+  "required_fields": ["record_id", "employee_id", "department_id", "expense_type", "amount", "expense_date", "special_approval", "status", "reason"],
+  "execution_steps": [
+    {"step": "查询R004223详情", "status": "completed"},
+    {"step": "查询培训费制度标准", "status": "completed"},
+    {"step": "核查R004223是否超标准并确认异常", "status": "pending"},
+    {"step": "检索关联培训费超标准记录", "status": "pending"},
+    {"step": "证据覆盖检查和复核", "status": "pending"},
+    {"step": "生成报告并校验提交", "status": "pending"}
+  ],
+  "complexity": 2,
+  "complexity_reasons": [
+    "单一规则(培训费标准)+金额阈值边界",
+    "可能需要关联记录检索"
+  ],
+  "subagent_plan": "compact_mode — 复杂度2，主代理直接处理",
+  "stopping_conditions": "所有发现的异常均已证据覆盖，无未解决项"
+}

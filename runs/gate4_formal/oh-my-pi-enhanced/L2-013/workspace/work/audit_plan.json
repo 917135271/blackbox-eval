@@ -1,0 +1,85 @@
+{
+  "task_id": "L2-013",
+  "task_type": "policy_data_comparison",
+  "question": "结合制度和业务数据,核查以R004223为线索的超标准异常,返回异常ID和记录ID集合",
+  "clue_record_id": "R004223",
+  "scope": {
+    "audit_object": "以R004223为线索的超标准异常",
+    "expense_types": ["training_fee"],
+    "business_period": "2025-05-18",
+    "organization_scope": "E0009 (张婷), D009 (财务管理部)",
+    "requested_deliverable": "异常ID和记录ID集合"
+  },
+  "policy_questions": [
+    {
+      "question": "培训课程费标准是多少？",
+      "policy_doc": "05_training_expense.md",
+      "clause": "第二条",
+      "expected_value": "每人每期不超过3500元"
+    },
+    {
+      "question": "无专项审批时超标准报销如何处理？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十二条",
+      "expected_value": "无专项审批时不得超过对应制度标准的1.0倍"
+    },
+    {
+      "question": "2025版和2022版制度哪个适用？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十四条",
+      "expected_value": "2025版自2025-01-01施行,2022版废止"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "R004223的金额是否超过培训课程费标准¥3,500？",
+      "record_id": "R004223",
+      "amount": 3700.0,
+      "standard": 3500.0,
+      "exceeds": true
+    },
+    {
+      "question": "R004223是否有特殊审批？",
+      "record_id": "R004223",
+      "special_approval": 0,
+      "has_exemption": false
+    }
+  ],
+  "required_tables": ["reimbursement_records", "invoices", "employees", "departments", "approvals"],
+  "required_fields": ["record_id", "amount", "expense_type", "expense_date", "special_approval", "employee_id", "department_id"],
+  "evidence_needed": [
+    "R004223 expense detail (amount, type, date, special_approval)",
+    "Training fee policy Article 2 standard",
+    "General reimbursement policy Article 12",
+    "Policy applicability (2025 vs 2022)"
+  ],
+  "execution_steps": [
+    "1. Read training fee policy and general reimbursement policy",
+    "2. Verify 2025 policy applies (effective 2025-01-01, expense 2025-05-18)",
+    "3. Compare R004223 amount (¥3,700) against training course fee standard (¥3,500)",
+    "4. Check special_approval status (0 = no exemption)",
+    "5. Run evidence-coverage-check",
+    "6. Run audit-report",
+    "7. Validate and submit"
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "Known-record clue task with directly related records",
+      "Straightforward policy comparison (¥3,700 vs ¥3,500)",
+      "Single applicable policy version (2025, no ambiguity)",
+      "Two business rules (training standard + no-special-approval rule)"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "Complexity 0-1, compact mode sufficient"
+  },
+  "stopping_conditions": [
+    "R004223 verified against training fee standard",
+    "Policy applicability confirmed",
+    "Evidence matrix complete at 100%",
+    "Validation passes"
+  ],
+  "unresolved_items": []
+}

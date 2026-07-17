@@ -1,0 +1,96 @@
+{
+  "audit_scope": {
+    "object": "XX证券费用报销",
+    "period": "2025-01-01至2025-12-31（全年）",
+    "organization": "全部门（D001-D010），全体员工",
+    "data_scope": "expense_records共4240条，涵盖差旅住宿、市内交通、办公用品、业务招待、通讯费、培训费6类费用",
+    "applicable_policy": "XX证券费用报销管理办法(2025修订版)(XX证财规〔2025〕甲号)及配套专项管理办法"
+  },
+  "verified_facts": {
+    "R1_重复报销": "发现6组重复发票，同一invoice_id在两条不同报销记录中出现，涉及6张发票12条记录",
+    "R2_拆分报销": "发现112组拆分报销规避审批，同一员工同一费用类型在7天内提交≥2笔且合计金额≥3000元（AR-02线），涉及222条记录",
+    "R3_超标准报销_done": "差旅住宿超标1条(R004225:部门负责人级一类城市900元/晚vs标准850); 招待费人均超标1条(R004224:700元/2人/人均350vs标准300); 办公用品月度超标115组287条(每人每月>600元); 通讯费月度超标132组307条(每人每月>300元)",
+    "R3_超标准报销_unresolved": "培训综合费无法判定：578条培训费记录days字段全部NULL，无法计算每日标准(内部800元/日、外部1200元/日)",
+    "R4_超预算报销": "6个部门(D001-D006)年度累计费用超出预算1.0倍后继续报销，涉及1196条无专项审批记录；0条记录有special_approval豁免",
+    "R5_超期报销": "发现6条超期记录，费用发生到报销间隔65-120天(>60天限额)，不适用年末例外条款(第九条)"},
+  "applicable_policies": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "title": "费用报销管理办法(2025修订版)", "effective": "2025-01-01"},
+    {"doc_id": "03_authorization_management.md", "title": "授权管理办法", "effective": "2025-01-01", "note": "附件二审批权限表AR-02线=3000元"},
+    {"doc_id": "04_travel_expense.md", "title": "差旅费管理办法", "effective": "2025-01-01"},
+    {"doc_id": "05_training_expense.md", "title": "培训费管理办法", "effective": "2025-01-01"},
+    {"doc_id": "06_business_entertainment.md", "title": "业务招待费管理办法", "effective": "2025-01-01"},
+    {"doc_id": "07_office_communication.md", "title": "办公与通讯费用管理办法", "effective": "2025-01-01"},
+    {"doc_id": "08_budget_management.md", "title": "预算管理办法", "effective": "2025-01-01"}
+  ],
+  "findings": [
+    {
+      "rule": "R1-重复报销",
+      "policy": "01_expense_reimbursement_2025.md 第十条",
+      "threshold": "同一发票最多报销1次",
+      "observed": "6张发票各在2条记录中出现",
+      "anomaly_ids": ["R1-DUP-FP202500000002","R1-DUP-FP202500000005","R1-DUP-FP202500000020","R1-DUP-FP202500000028","R1-DUP-FP202500000037","R1-DUP-FP202500000055"],
+      "record_ids_count": 12,
+      "impact": "涉及金额较小(84.72-999.76元)，但性质为明确的重复报销违规",
+      "recommendation": "追回重复报销款项，完善发票查重机制"
+    },
+    {
+      "rule": "R2-拆分报销",
+      "policy": "01_expense_reimbursement_2025.md 第十一条 + 03_authorization_management.md 附件二",
+      "threshold": "7天内≥2笔且合计≥3000元(AR-02线)",
+      "observed": "112组拆分，最高组达10500元(3笔差旅住宿)",
+      "anomaly_ids_count": 112,
+      "record_ids_count": 222,
+      "impact": "多组差旅住宿拆分金额高达10200-10500元，系统性规避审批",
+      "recommendation": "对7天内同类型报销实施系统自动聚合审批"
+    },
+    {
+      "rule": "R3-超标准报销",
+      "policy": "01_expense_reimbursement_2025.md 第十二条 + 各专项政策",
+      "thresholds": "差旅住宿按职级/城市(300-1100元/晚); 招待费人均300元; 办公用品600元/月; 通讯费300元/月",
+      "observed": "差旅住宿超标1条(900vs850); 招待费超标1条(人均350vs300); 办公超标115组; 通讯超标132组",
+      "anomaly_ids_count": 249,
+      "record_ids_count": 596,
+      "impact": "办公用品和通讯费月度超标分布广泛，存在制度执行不严问题",
+      "recommendation": "加强月度费用额度的系统控制"
+    },
+    {
+      "rule": "R4-超预算报销",
+      "policy": "01_expense_reimbursement_2025.md 第十三条 + 08_budget_management.md 第二、三条",
+      "threshold": "部门年度预算1.0倍",
+      "observed": "D001(投资银行部)超预算133,219元、D002(固定收益部)超57,143元、D003(财富管理部)超64,379元、D004(研究所)超143,943元、D005(机构业务部)超154,902元、D006(运营管理部)超189,280元",
+      "anomaly_ids_count": 6,
+      "record_ids_count": 1196,
+      "impact": "6个部门严重超预算，合计超支743,366元，占总费用比例重大",
+      "recommendation": "建立预算实时预警机制，超预算后自动锁定报销功能"
+    },
+    {
+      "rule": "R5-超期报销",
+      "policy": "01_expense_reimbursement_2025.md 第七条",
+      "threshold": "费用发生后60天内提交",
+      "observed": "6条记录间隔65-120天(65/72/88/95/110/120天)",
+      "anomaly_ids": ["R5-LATE-R004227","R5-LATE-R004228","R5-LATE-R004229","R5-LATE-R004230","R5-LATE-R004231","R5-LATE-R004232"],
+      "record_ids_count": 6,
+      "impact": "均为通讯费，金额较小(181-186元)，但违反时限规定",
+      "recommendation": "系统设置60天提交截止提醒"
+    }
+  ],
+  "impact_summary": "2025年度审计发现379项异常，涉及1797条报销记录。其中超预算问题最为突出（6个部门、1196条记录），拆分报销规避审批（112组）和办公通讯超标（247组）也需重点关注。",
+  "recommendations": [
+    "1. 紧急约谈D001-D006六部门负责人，核查超预算原因并制定整改方案",
+    "2. 部署发票查重和7天同类型聚合审批的系统控制",
+    "3. 办公用品和通讯费实施月度额度硬限制",
+    "4. 补充培训费记录的days字段数据，完成培训综合费超标审计"
+  ],
+  "anomaly_ids": "见evidence_matrix.json的anomaly_id汇总",
+  "record_ids": "见evidence_matrix.json的submitted_record_ids汇总",
+  "citations": "见evidence_matrix.json的evidence_rows[*].citations汇总",
+  "answer_text": "2025年度XX证券费用审计共发现379项异常，覆盖重复报销、拆分报销规避审批、超标准报销、超预算报销和超期报销五类规则，涉及1797条报销记录。六部门超预算合计超支743,366元；112组拆分报销规避审批；办公通讯月度超标247组；6条超期报销间隔65-120天；6组重复发票违规。培训费因缺少days字段无法完成综合费超标判定。",
+  "limitations": [
+    "培训费578条记录days字段全部为NULL，无法计算内部培训综合费(800元/日)和外部培训综合费(1200元/日)的每日标准，该部分留为未决议项"
+  ],
+  "reconciled_with": {
+    "evidence_matrix": "work/evidence_matrix.json",
+    "data_findings": "work/analysis/data_findings.json",
+    "policy_applicability": "work/policy_applicability.json"
+  }
+}

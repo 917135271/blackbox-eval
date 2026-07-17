@@ -1,0 +1,139 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 70.0,
+  "case_score_raw": 70.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "“无异常。经核查，TRAP-003涉及的5条陷阱样本记录均符合相关制度规定…”",
+      "id": "clean-conclusion",
+      "reason": "候选明确输出“无异常”，且 anomaly_ids 为空，与预期一致，无矛盾表述。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "无需工具调用佐证，仅根据最终答案判断。"
+    },
+    {
+      "answer_evidence": "submitted_record_ids: [\"R004233\", \"R004236\", \"R004237\", \"R004239\", \"R004240\"]",
+      "id": "record-scope",
+      "reason": "预期应仅核查 R004236 和 R004237，但提交的 record_ids 包含额外无关记录 R004233、R004239、R004240，符合“加入无关记录”锚点。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用，未能体现只针对核心记录的范围限定。"
+    },
+    {
+      "answer_evidence": "“R004236与R004237相隔8日，不触发7日内拆分核查规则”",
+      "id": "case-specific-reason",
+      "reason": "准确指出 R004236 与 R004237 相隔 8 日，不触发 7 日内拆分核查规则，即“outside aggregation window”。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "无需工具调用，答案可直接作为证据。"
+    },
+    {
+      "answer_evidence": "候选答案中无工具输出引用。",
+      "id": "reverse-check",
+      "reason": "轨迹中无任何工具调用，未能针对本题边界条件（如日期间隔、金额阈值等）提供核查证据。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "tool_trace_summary 显示 call_count:0，无任何工具交互。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的 record_id 均存在于数据库中（rule_diagnostics 无 unknown_record_ids），且未用作虚假支撑。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "候选结论为无异常，未将合规记录判为异常。",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R004233",
+      "R004236",
+      "R004237",
+      "R004239",
+      "R004240"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 5,
+    "elapsed_seconds": 255.884,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 3,
+      "f1": 0.571429,
+      "missing_count": 0,
+      "precision": 0.4,
+      "recall": 1.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:26:51+08:00",
+  "group": "opencode-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.95,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "无异常结论正确，合规原因解释充分，但提交了无关记录导致记录范围评分为零，且因无工具调用，反向验证缺失。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1956,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1364
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 972,
+      "prompt_tokens": 1996,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 3952
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/opencode-baseline/TRAP-003",
+  "task_id": "TRAP-003"
+}

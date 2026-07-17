@@ -1,0 +1,140 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 20,
+  "case_score_raw": 45.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "答案为“无异常”，anomaly_ids为空",
+      "id": "clean-conclusion",
+      "reason": "明确判断无异常，无矛盾表述",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "不需要"
+    },
+    {
+      "answer_evidence": "answer中record_ids为[R004227, R004228, R004229, R004230, R004231, R004232]",
+      "id": "record-scope",
+      "reason": "提交的记录集合R004227-R004232与预期R004234、R004235完全不同，且未核查核心记录",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中get_expense_detail调用针对R004227等无关记录，未触及R004234、R004235"
+    },
+    {
+      "answer_evidence": "答案强调“原则上”非绝对禁止，讨论通讯费上限和审批层级，未提及发票不同或金额合计",
+      "id": "case-specific-reason",
+      "reason": "未说明合规原因是发票不同且合计金额低于审批线，而是用条款弹性解释超期，完全偏离",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中未对R004234、R004235的发票号进行比较，也未计算合计金额与审批线对比"
+    },
+    {
+      "answer_evidence": "不需要",
+      "id": "reverse-check",
+      "reason": "没有针对正确记录的边界条件（发票唯一性、合计金额阈值）进行任何工具核查",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用全部围绕无关记录，未发现针对R004234、R004235的发票使用或聚合金额检查"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": true,
+      "reason": "候选提交的record_ids全为与本案例无关的记录，用无关记录支撑核心结论",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "结论为无异常，未判为实质异常",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R004227",
+      "R004228",
+      "R004229",
+      "R004230",
+      "R004231",
+      "R004232"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 3,
+    "elapsed_seconds": 448.899,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004234",
+      "R004235"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 6,
+      "f1": 0.0,
+      "missing_count": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:25:06+08:00",
+  "group": "codex-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选答案方向错误，核查了完全无关的记录集，合规原因严重偏离，无有效核查证据；受critical failure影响，得分上限20。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1304,
+      "completion_tokens_details": {
+        "reasoning_tokens": 770
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 10266,
+      "prompt_tokens": 10266,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 11570
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/codex-enhanced/TRAP-002",
+  "task_id": "TRAP-002"
+}

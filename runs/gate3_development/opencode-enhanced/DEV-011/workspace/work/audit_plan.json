@@ -1,0 +1,90 @@
+{
+  "task_id": "DEV-011",
+  "task_type": "aggregate_budget",
+  "question": "核查D902部门年度预算执行，识别首次导致预算超限且没有专项审批的报销记录；专项审批记录不得误报。",
+  "scope": {
+    "department_id": "D902",
+    "department_name": "开发审计二部",
+    "annual_budget": 50000.0,
+    "period": "annual",
+    "budget_year": "current year"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-1",
+      "question": "部门年度预算执行的合规要求是什么？",
+      "relevant_docs": ["08_budget_management.md", "01_expense_reimbursement_2025.md"],
+      "key_clauses": [
+        "08_budget_management.md 第二条：各部门应在年度预算额度内发生费用",
+        "08_budget_management.md 第三条：部门费用累计使用达到年度预算额度的1.0倍后,原则上不得继续报销",
+        "08_budget_management.md 第四条：因监管要求、客户服务或经营连续性确需超预算支出的,应履行专项审批",
+        "01_expense_reimbursement_2025.md 第十三条：部门年度预算不足时不得继续报销。预算使用达到预算额度的1.0倍后,确需发生的费用应履行专项审批"
+      ]
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-1",
+      "question": "D902部门年度预算额度和累计已批准报销金额是多少？",
+      "data_obtained": {
+        "annual_budget": 50000.0,
+        "cumulative_amount": 56000.0,
+        "record_count": 3
+      }
+    },
+    {
+      "id": "DQ-2",
+      "question": "D902部门所有已批准报销记录按时间排序后，哪一笔首次使累计金额超过预算5万元？",
+      "needs": "list_expenses for D902 with status=approved, sort by expense_date"
+    },
+    {
+      "id": "DQ-3",
+      "question": "首次超限记录是否具有专项审批？",
+      "needs": "check special_approval field; if true, continue to next record"
+    }
+  ],
+  "required_fields": ["record_id", "expense_date", "amount", "special_approval", "status", "expense_type", "department_id", "employee_id"],
+  "required_policy_docs": ["08_budget_management.md", "01_expense_reimbursement_2025.md", "03_authorization_management.md"],
+  "evidence_requirements": [
+    "D902 department budget amount",
+    "All D902 approved expense records sorted by date",
+    "Cumulative spending calculation",
+    "Special approval status of the first overrun record",
+    "Approval chain of identified record",
+    "Policy clauses on budget overrun and special approval"
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "Plan and record checkpoint", "artifact": "work/audit_plan.json"},
+    {"step": 2, "action": "Authorize data_analyst subagent for aggregation", "reason_code": "AGGREGATION_REQUIRED"},
+    {"step": 3, "action": "Main agent: run policy-version-check for budget policy applicability"},
+    {"step": 4, "action": "Data analyst: get all D902 records, compute cumulative, identify first overrun"},
+    {"step": 5, "action": "Complete subagent and register summary"},
+    {"step": 6, "action": "Run batch-expense-analysis if needed for approval verification"},
+    {"step": 7, "action": "Evidence coverage check"},
+    {"step": 8, "action": "False positive review (special approval boundary)"},
+    {"step": 9, "action": "Audit report and result-validator"},
+    {"step": 10, "action": "Validate and submit"}
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "aggregation and grouping required (cumulative spending)",
+      "threshold boundary (1.0x budget)",
+      "exemption condition (special_approval=true)",
+      "batch filtering of department records"
+    ]
+  },
+  "subagent_plan": {
+    "role": "data_analyst",
+    "reason_code": "AGGREGATION_REQUIRED",
+    "authorized": false,
+    "task": "Retrieve all D902 approved expense records, sort by expense_date, compute cumulative spending, identify the first record where cumulative exceeds 50000, check special_approval status, and return detailed findings."
+  },
+  "stopping_conditions": [
+    "All D902 approved records retrieved and analyzed",
+    "Cumulative budget threshold crossing identified",
+    "Special approval status verified for first overrun record",
+    "Evidence matrix shows 100% coverage"
+  ],
+  "unresolved_items": []
+}

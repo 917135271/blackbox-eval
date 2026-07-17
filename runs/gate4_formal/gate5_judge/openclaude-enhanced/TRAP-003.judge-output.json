@@ -1,0 +1,39 @@
+{
+  "criteria": [
+    {
+      "id": "clean-conclusion",
+      "score": 30,
+      "reason": "明确判断无异常，anomaly_ids为空，答案无矛盾",
+      "answer_evidence": "candidate_submission.answer: '无异常'，anomaly_ids: []",
+      "trace_evidence": "evidence_matrix中no_anomaly_coverage.reason: '两笔间隔8天>7天窗口,不触发拆分核查'"
+    },
+    {
+      "id": "case-specific-reason",
+      "score": 25,
+      "reason": "完整说明outside aggregation window：日期间隔8天>7天，不触发拆分",
+      "answer_evidence": "evidence_matrix中no_anomaly_coverage.reason明确提及'两笔间隔8天>7天窗口,不触发拆分核查'",
+      "trace_evidence": "get_expense_detail(R004236/R004237)获取日期，结合search_policy查得的第十一条拆分窗口（7天）计算间隔8天"
+    },
+    {
+      "id": "reverse-check",
+      "score": 15,
+      "reason": "轨迹中核对日期间隔、拆分窗口、差旅标准，完成反向核查",
+      "answer_evidence": "evidence_matrix记载'date_gap_days:8, policy_split_window_days:7'，并核查标准、审批等",
+      "trace_evidence": "list_expenses, get_expense_detail(R004236,R004237)获取日期；search_policy确认第十一条；计算间隔8天"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "record_ids均为预期数据库记录，无伪造"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "未将合规记录判为异常，结论正确"
+    }
+  ],
+  "overall_comment": "候选正确识别无异常，充分核查拆分窗口并给出合理合规原因，无关键错误。",
+  "confidence": 1.0
+}

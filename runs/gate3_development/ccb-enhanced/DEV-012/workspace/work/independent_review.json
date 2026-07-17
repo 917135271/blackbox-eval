@@ -1,0 +1,47 @@
+{
+  "decision": "pass",
+  "challenged_findings": [
+    {
+      "anomaly_id": "ANOM-BUD-001",
+      "original_record_ids": ["R900019", "R900020"],
+      "challenge": "R900020 reason contains '专项批准的连续性支出' and detail record confirms special_approval=1, qualifying as valid special approval under 08_budget_management.md Art.4 and 01_expense_reimbursement_2025.md Art.13",
+      "resolution": "accepted",
+      "updated_record_ids": ["R900019"]
+    }
+  ],
+  "supporting_evidence": [
+    {"record_id": "R900020", "field": "special_approval", "value": 1, "source": "expense_query.get_expense_detail"},
+    {"record_id": "R900019", "field": "special_approval", "value": 0, "source": "expense_query.get_expense_detail"},
+    {"record_id": "R900018", "field": "special_approval", "value": 0, "source": "expense_query.get_expense_detail"}
+  ],
+  "opposing_evidence": [],
+  "exceptions_and_boundaries": [
+    {
+      "type": "special_approval_exemption",
+      "record_id": "R900020",
+      "explanation": "R900020 has special_approval=1 confirmed via detail record. The reason '专项批准的连续性支出' and the field value establish valid exemption under 08_budget_management.md Art.4. Excluded from over-budget violation records."
+    },
+    {
+      "type": "pre_crossing_exclusion",
+      "record_id": "R900018",
+      "explanation": "R900018 (45000) was processed when budget was at 0/50000, resulting in remaining budget of 5000. It did not cross the 1.0x threshold. Excluded as calculation background per evidence-coverage-check rules."
+    },
+    {
+      "type": "boundary_check",
+      "anomaly_ids": ["ANOM-STD-003","ANOM-STD-005","ANOM-STD-006","ANOM-STD-007"],
+      "explanation": "All over-standard amounts are 4-8.3% above limits, well beyond any rounding tolerance. No policy provision for de minimis exceptions."
+    }
+  ],
+  "required_changes": [
+    {
+      "action": "update_evidence_matrix",
+      "detail": "Remove R900020 from ANOM-BUD-001 record_ids, keep only R900019. Update submitted_record_ids to remove R900020 and add to unused_candidate_record_ids with clearance explanation."
+    },
+    {
+      "action": "update_final_result",
+      "detail": "Adjust record_ids to match: R900020 no longer in violation records."
+    }
+  ],
+  "rationale": "All 9 anomalies withstand adversarial review. The only material change is R900020's exclusion from over-budget (ANOM-BUD-001) due to confirmed special_approval=1. The crossing record R900019 (special_approval=0, pushed department total from 45000 to 51000, exceeding 50000 budget) remains as the sole over-budget violation record. All other findings have clear evidence, no exemptions, and no boundary ambiguities.",
+  "unresolved_conflicts": []
+}

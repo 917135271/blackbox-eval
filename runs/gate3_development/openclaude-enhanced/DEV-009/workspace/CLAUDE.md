@@ -1,0 +1,17 @@
+# Enhanced Audit Workflow
+
+Use the following order for every enhanced audit task.
+
+First run `audit-query-planner` and save `work/audit_plan.json`. Record a `planning_completed` checkpoint. If the plan selects a subagent, immediately call `authorize_audit_subagent` and launch the authorized native role before the main agent starts the delegated investigation. While it runs, the main agent may perform only non-overlapping work and must consume the subagent artifact instead of repeating the same queries. The native role must save its detailed work and compact summary, after which the main agent must call `complete_audit_subagent` with the returned `invocation_id`. An authorized subagent that is not registered as completed blocks final submission. Next run `policy-version-check` and `batch-expense-analysis` when their trigger conditions apply; independent policy and data investigations may run in parallel.
+
+Freeze the requested rule and scope from the task. A single-rule clue task may retrieve directly related records but must not report unrelated anomalies. Complexity 0-1 uses compact Skill steps and no subagent; complexity 2-3 may use one professional role; complexity 4-6 is reserved for genuine multi-rule or comprehensive work.
+
+Treat `record_ids` as audited evidence, not as a dump of every row read. Positive results include only records participating in an in-scope violation; running-balance history and valid exemptions remain context. No-anomaly results keep the records directly named or covered by the conclusion and state `无异常` explicitly.
+
+After investigation, record an `investigation_completed` checkpoint, form preliminary findings, and run `evidence-coverage-check`. Do not proceed unless `work/evidence_matrix.json` has status `pass` and coverage of 100 percent. Before independent review, record a `review_ready` checkpoint. Run `false-positive-review` when its trigger conditions apply and resolve its decision. Then run `audit-report`, followed by `result-validator`, and record a `validation_ready` checkpoint.
+
+Only after `work/validation_report.json` passes may the agent call `validate_audit_result`. Repair all correlated artifacts until the allowed preflight returns `valid=true`, then call `submit_audit_result`. On `repair_required`, repair all reported fields and correlated files before the single resubmission. Never retry after rejection. Do not print direct final JSON as a substitute for the submission tool.
+
+Use the native subagent mechanism only after authorization. A subagent receives the question, its role task, necessary artifact paths, allowed tools, output fields, and budget. It must save detailed work under `work/subagents/<role>/` and return a compact summary containing decision, key findings, record IDs, citations, unresolved items, and artifact paths. It cannot create another subagent. The main agent receives only the summary returned by `complete_audit_subagent`; full analysis remains in files.
+
+Maintain `work/task_state.json`, `work/evidence_index.json`, `work/decision_log.jsonl`, `work/context_checkpoint.json`, and `work/artifact_index.json`. At estimated context use of 60 percent, write a checkpoint; at 75 percent, compact completed tool conversations and long source text into the checkpoint; at 85 percent, stop broad discovery and perform only targeted evidence completion, validation, and submission. Never delete source artifacts or audit traces during compaction.

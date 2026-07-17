@@ -1,0 +1,35 @@
+{
+  "criteria": [
+    {
+      "id": "threshold",
+      "score": 35,
+      "reason": "明确给出部门总经理审批线10000元，边界清晰（≥10000元且<50000元）",
+      "answer_evidence": "AR-03：≥10000元且<50000元 → 部门总经理",
+      "trace_evidence": "无"
+    },
+    {
+      "id": "two-hop-path",
+      "score": 30,
+      "reason": "完整说明第一跳从费用报销管理办法第五条交叉引用，第二跳到授权管理办法附件二",
+      "answer_evidence": "第一跳：《XX证券费用报销管理办法(2025修订版)》第五条...第二跳：《XX证券授权管理办法》附件二...",
+      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md → get_policy_doc 03_authorization_management.md"
+    },
+    {
+      "id": "citations",
+      "score": 20,
+      "reason": "正确引用两份制度（01_expense_reimbursement_2025.md 和 03_authorization_management.md）中的相关条款",
+      "answer_evidence": "citations字段包含01_expense_reimbursement_2025.md和03_authorization_management.md",
+      "trace_evidence": "调用了get_policy_doc 01和get_policy_doc 03"
+    },
+    {
+      "id": "no-premature-stop",
+      "score": 10,
+      "reason": "未因第一份制度中金额缺失而停止，继续检索授权管理办法并查询了异常记录",
+      "answer_evidence": "无",
+      "trace_evidence": "get_policy_doc 01后继续get_policy_doc 03，并进一步执行list_records_missing_approval"
+    }
+  ],
+  "critical_failures": [],
+  "overall_comment": "候选提交准确找出了审批金额10000元，完整展示了交叉引用路径，提供了双文档证据，且检索过程未提前终止，所有评分点均满分。",
+  "confidence": 1.0
+}

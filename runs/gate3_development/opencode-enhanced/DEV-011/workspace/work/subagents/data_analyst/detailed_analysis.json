@@ -1,0 +1,117 @@
+{
+  "department": {
+    "department_id": "D902",
+    "department_name": "开发审计二部",
+    "annual_budget": 50000.00,
+    "cumulative_approved_amount": 56000.00,
+    "record_count": 3
+  },
+  "all_records_sorted_by_date": [
+    {
+      "record_id": "R900018",
+      "record_no": "BXDEV900018",
+      "employee_id": "E9003",
+      "employee_name": "开发员工丙",
+      "expense_date": "2025-01-15",
+      "reimburse_date": "2025-01-20",
+      "expense_type": "other",
+      "amount": 45000.00,
+      "reason": "年度基础服务采购",
+      "invoice_no": "FPDEV900018",
+      "vendor_name": "开发供应商18",
+      "special_approval": false,
+      "cumulative_total": 45000.00,
+      "cumulative_to_budget_ratio": 0.90,
+      "approvals": [
+        {
+          "approval_id": "AP000018",
+          "tier_id": "AR-03",
+          "approver_employee_id": "E9004",
+          "approver_role": "部门总经理",
+          "approved_at": "2025-01-20",
+          "approval_status": "approved"
+        }
+      ]
+    },
+    {
+      "record_id": "R900019",
+      "record_no": "BXDEV900019",
+      "employee_id": "E9003",
+      "employee_name": "开发员工丙",
+      "expense_date": "2025-02-15",
+      "reimburse_date": "2025-02-20",
+      "expense_type": "other",
+      "amount": 6000.00,
+      "reason": "新增业务服务采购",
+      "invoice_no": "FPDEV900019",
+      "vendor_name": "开发供应商19",
+      "special_approval": false,
+      "cumulative_total": 51000.00,
+      "cumulative_to_budget_ratio": 1.02,
+      "is_first_overrun": true,
+      "approvals": [
+        {
+          "approval_id": "AP000019",
+          "tier_id": "AR-02",
+          "approver_employee_id": "E9004",
+          "approver_role": "部门经理",
+          "approved_at": "2025-02-20",
+          "approval_status": "approved"
+        }
+      ]
+    },
+    {
+      "record_id": "R900020",
+      "record_no": "BXDEV900020",
+      "employee_id": "E9003",
+      "employee_name": "开发员工丙",
+      "expense_date": "2025-03-15",
+      "reimburse_date": "2025-03-20",
+      "expense_type": "other",
+      "amount": 5000.00,
+      "reason": "专项批准的连续性支出",
+      "invoice_no": "FPDEV900020",
+      "vendor_name": "开发供应商20",
+      "special_approval": true,
+      "cumulative_total": 56000.00,
+      "cumulative_to_budget_ratio": 1.12,
+      "is_first_overrun": false,
+      "approvals": [
+        {
+          "approval_id": "AP000020",
+          "tier_id": "AR-02",
+          "approver_employee_id": "E9004",
+          "approver_role": "部门经理",
+          "approved_at": "2025-03-20",
+          "approval_status": "approved"
+        }
+      ]
+    }
+  ],
+  "first_overrun_record": {
+    "record_id": "R900019",
+    "expense_date": "2025-02-15",
+    "amount": 6000.00,
+    "cumulative_before": 45000.00,
+    "cumulative_after": 51000.00,
+    "budget": 50000.00,
+    "special_approval": false,
+    "is_anomaly": true
+  },
+  "invoice_analysis": {
+    "FPDEV900018": { "usage_count": 1, "no_reuse": true },
+    "FPDEV900019": { "usage_count": 1, "no_reuse": true },
+    "FPDEV900020": { "usage_count": 1, "no_reuse": true },
+    "any_reused": false,
+    "split_claim_pattern": false
+  },
+  "anomaly_determination": {
+    "anomalous_record_id": "R900019",
+    "reason": "First record causing cumulative (51,000.00) to exceed annual budget (50,000.00), without special approval (special_approval=false). Record R900020 was also over-budget but has special_approval=true and is therefore exempt.",
+    "policy_clauses": [
+      "08_budget_management.md Article 2: Departments must incur expenses within annual budget",
+      "08_budget_management.md Article 3: When cumulative reaches 1.0x budget, expenses shall not be reimbursed in principle",
+      "01_expense_reimbursement_2025.md Article 13: When department budget is insufficient, no further reimbursement. After reaching 1.0x budget, necessary expenses must undergo special approval"
+    ]
+  }
+}

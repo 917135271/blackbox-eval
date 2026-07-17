@@ -1,0 +1,52 @@
+{
+  "audit_scope": {
+    "task_id": "DEV-004",
+    "audit_object": "拆分报销（split reimbursement）",
+    "clue_record": "R900003",
+    "audit_period": "2025-01-27至2025-02-10（线索日期前后7天窗口）",
+    "organization": "D901开发审计一部",
+    "data_scope": "E9001员工travel_transport类型全部记录"
+  },
+  "verified_facts": [
+    "R900003：员工E9001开发员工甲，2025-02-03，travel_transport，金额5,200元，事由'同一客户路演交通费第一笔'，发票FPDEV900003，审批AR-02（部门经理）",
+    "R900004：同一员工E9001，2025-02-06，travel_transport，金额5,200元，事由'同一客户路演交通费第二笔'，发票FPDEV900004，审批AR-02（部门经理）",
+    "两笔记录间隔3天（在制度第十一条规定的7天窗口内）",
+    "两笔记录事由均为'同一客户路演交通费'，属同一事项",
+    "合计金额5,200+5,200=10,400元，达到附件二AR-03档位（≥10,000元且<50,000元）",
+    "实际审批均仅经过AR-02（部门经理），未经AR-03要求的部门总经理"
+  ],
+  "applicable_policies": [
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第十一条",
+      "rule": "不得将同一事项或同类事项拆分为多笔报销以规避审批权限。同一员工、同一费用类型在7天内出现2笔及以上报销，且合计金额达到附件二较高审批线的，应重点核查拆分规避审批。"
+    },
+    {
+      "doc_id": "03_authorization_management.md",
+      "clause_no": "附件二",
+      "rule": "AR-02：≥3,000元且<10,000元→部门经理；AR-03：≥10,000元且<50,000元→部门总经理"
+    }
+  ],
+  "findings": [
+    {
+      "anomaly_id": "DEV004-SPLIT-001",
+      "record_ids": ["R900003", "R900004"],
+      "type": "拆分报销",
+      "description": "同一员工将同一事项（客户路演交通费）拆分为两笔各5,200元报销，单笔控制在AR-02区间以规避AR-03部门总经理审批。合计10,400元实际达到AR-03档位，应经部门总经理审批。",
+      "combined_amount": 10400,
+      "threshold_triggered": "AR-03 (≥10,000)",
+      "actual_approval": "AR-02 (部门经理)",
+      "days_between": 3
+    }
+  ],
+  "impact": "规避了AR-03部门总经理审批环节，削弱了费用审批的层级控制有效性。",
+  "recommendation": "将R900003和R900004合并追溯至部门总经理审批，并对员工进行拆分报销制度教育。",
+  "anomaly_ids": ["DEV004-SPLIT-001"],
+  "record_ids": ["R900003", "R900004"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+  ],
+  "answer": "存在拆分报销违规。R900003（2025-02-03，5200元，同一客户路演交通费第一笔）与R900004（2025-02-06，5200元，同一客户路演交通费第二笔）为同一员工E9001、同一费用类型travel_transport、同一事项（同一客户路演交通费）在7天内拆分为两笔报销。单笔均以AR-02（部门经理）审批通过，但合计金额10,400元已达到附件二AR-03档位（≥10,000元），应经部门总经理审批而实际未经过，构成拆分报销以规避更高审批权限。",
+  "limitations": []
+}

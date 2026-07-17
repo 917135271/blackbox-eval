@@ -1,0 +1,66 @@
+{
+  "audit_scope": {
+    "task": "DEV-009",
+    "object": "R900008 and R900009 — same-day same-amount same-type duplicate reimbursement check",
+    "period": "2025-05-05",
+    "department": "D901 (开发审计一部)",
+    "data_scope": "Records R900008 and R900009 with their linked invoices and approvals"
+  },
+  "verified_facts": {
+    "R900008": {
+      "employee": "E9001 (开发员工甲)",
+      "invoice": "FPDEV900008",
+      "vendor": "开发供应商08",
+      "amount": 590.00,
+      "date": "2025-05-05",
+      "type": "office_supplies",
+      "reason": "五月办公用品甲",
+      "status": "approved"
+    },
+    "R900009": {
+      "employee": "E9002 (开发经理乙)",
+      "invoice": "FPDEV900009",
+      "vendor": "开发供应商09",
+      "amount": 590.00,
+      "date": "2025-05-05",
+      "type": "office_supplies",
+      "reason": "五月办公用品乙",
+      "status": "approved"
+    },
+    "comparison": {
+      "same_date": true,
+      "same_amount": true,
+      "same_type": true,
+      "same_invoice": false,
+      "same_employee": false,
+      "same_vendor": false,
+      "same_reason": false
+    }
+  },
+  "applicable_policies": [
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "clause": "第十条",
+      "rule": "同一发票最多报销1次",
+      "applicability": "不适用 — FPDEV900008 ≠ FPDEV900009"
+    },
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "clause": "第十一条",
+      "rule": "同一员工、同一费用类型7天内2笔及以上",
+      "applicability": "不适用 — E9001 ≠ E9002"
+    }
+  ],
+  "findings": [],
+  "conclusion": "无异常",
+  "answer": "经核查，R900008与R900009虽为同日（2025-05-05）、同额（590.00元）、同费用类型（office_supplies），但使用不同发票（FPDEV900008 vs FPDEV900009），由不同员工提交（E9001开发员工甲 vs E9002开发经理乙），分属不同供应商（开发供应商08 vs 开发供应商09），报销事项不同（五月办公用品甲 vs 五月办公用品乙）。依据《XX证券费用报销管理办法(2025修订版)》第十条（同一发票重复报销）要求同一发票，第十一条（拆分规避审批）要求同一员工，两笔报销均不满足任一规则的适用条件，属于独立合规报销，无异常。",
+  "anomaly_ids": [],
+  "record_ids": ["R900008", "R900009"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"}
+  ],
+  "limitations": []
+}

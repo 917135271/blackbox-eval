@@ -1,0 +1,43 @@
+{
+  "audit_scope": {
+    "task_id": "DEV-010",
+    "task_type": "clean_trap",
+    "audit_object": "R900010与R900011拆分报销核查",
+    "audit_period": "2025-06-01至2025-06-09",
+    "organization": "E9001 (开发员工甲) / D901 (开发审计一部)",
+    "data_scope": ["R900010", "R900011"]
+  },
+  "verified_facts": [
+    "R900010: 员工E9001, 费用类型travel_transport, 金额5300元, 费用日期2025-06-01, 发票FPDEV900010, 状态approved",
+    "R900011: 员工E9001, 费用类型travel_transport, 金额5300元, 费用日期2025-06-09, 发票FPDEV900011, 状态approved",
+    "两笔记录为同一员工(E9001)、同一费用类型(travel_transport)",
+    "费用日期相差8天 (2025-06-09 - 2025-06-01 = 8天)",
+    "合计金额10600元, 超过附件二较高审批线10000元(AR-03档位)",
+    "两笔记录使用不同发票(FPDEV900010 / FPDEV900011)，非重复报销"
+  ],
+  "applicable_policies": [
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "clause": "第十一条",
+      "rule": "同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到附件二较高审批线的,应重点核查拆分规避审批"
+    },
+    {
+      "doc_id": "03_authorization_management.md",
+      "title": "XX证券授权管理办法",
+      "clause": "附件二",
+      "rule": "AR-03档位: 10000元及以上、50000元以下, 须部门总经理审批"
+    }
+  ],
+  "findings": [],
+  "impact": "无",
+  "recommendations": "不构成拆分报销, 无需进一步处理",
+  "anomaly_ids": [],
+  "record_ids": ["R900010", "R900011"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+  ],
+  "answer": "无异常。R900010与R900011费用日期相差8天,超过第十一条规定的7天边界,不构成拆分报销。",
+  "limitations": "无"
+}

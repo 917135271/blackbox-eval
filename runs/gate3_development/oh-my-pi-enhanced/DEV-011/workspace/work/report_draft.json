@@ -1,0 +1,39 @@
+{
+  "audit_scope": {
+    "object": "D902部门2025年度预算执行",
+    "department": "D902（开发审计二部）",
+    "period": "2025年度",
+    "budget": 50000.0,
+    "records_reviewed": 3
+  },
+  "verified_facts": [
+    "D902部门2025年度预算为50000元",
+    "已审批报销记录3条，按日期排序：R900018（2025-01-15，45000元）、R900019（2025-02-15，6000元）、R900020（2025-03-15，5000元）",
+    "R900018报销后累计45000元，未超过年度预算",
+    "R900019报销后累计51000元，首次超过50000元年度预算额度，special_approval=0，无专项审批",
+    "R900020报销后累计56000元，special_approval=1，已履行专项审批"
+  ],
+  "applicable_policies": [
+    {"doc_id": "08_budget_management.md", "clause_no": "第三条", "rule": "部门费用累计使用达到年度预算额度的1.0倍后，原则上不得继续报销"},
+    {"doc_id": "08_budget_management.md", "clause_no": "第四条", "rule": "因监管要求、客户服务或经营连续性确需超预算支出的，应履行专项审批"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条", "rule": "部门年度预算不足时不得继续报销。预算使用达到预算额度的1.0倍后，确需发生的费用应履行专项审批"}
+  ],
+  "findings": [
+    {
+      "anomaly_id": "DEV-011-001",
+      "record_id": "R900019",
+      "description": "R900019（2025-02-15，6000元，新增业务服务采购）是D902部门首个导致年度预算超限的报销记录。此前累计45000元，加此笔后累计51000元，超过50000元年度预算。该记录无专项审批（special_approval=0），违反预算管理办法第三条、第四条及费用报销管理办法第十三条。"
+    }
+  ],
+  "impact": "单笔超额1000元，累计超预算6000元",
+  "recommendations": ["对R900019补办专项审批或追回超额部分"],
+  "anomaly_ids": ["DEV-011-001"],
+  "record_ids": ["R900019"],
+  "citations": [
+    {"doc_id": "08_budget_management.md", "clause_no": "第三条"},
+    {"doc_id": "08_budget_management.md", "clause_no": "第四条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"}
+  ],
+  "answer_text": "D902部门2025年度预算为50000元。R900019（2025-02-15，6000元）报销后累计51000元，首次超过预算且无专项审批，构成违规。R900020虽有超额但有专项审批，不构成违规。",
+  "limitations": []
+}

@@ -1,0 +1,136 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 15.0,
+  "case_score_raw": 15.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "最终答案明确输出“无异常”。",
+      "id": "clean-conclusion",
+      "reason": "候选结论虽表述为“无异常”，但核查对象完全错误（针对R000005与R004202，而非本题要求的R004239、R004240），该结论与题目无关，视为未完成题目要求的合规判断。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中全部核查围绕发票FP202500000005及记录R000005、R004202，未涉及R004239、R004240的任何操作。"
+    },
+    {
+      "answer_evidence": "submitted_json中record_ids为[\"R000005\", \"R004202\"]。",
+      "id": "record-scope",
+      "reason": "要求核查记录集合为{R004239, R004240}，候选提交的记录集合为{R000005, R004202}，完全错误，无任何预期记录。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中只调用过get_expense_detail查询R000005、R004202等，从未查询R004239或R004240。"
+    },
+    {
+      "answer_evidence": "最终答案解释为“发票FP202500000005...R004202为合成测试数据，不构成实际重复报销违规”。",
+      "id": "case-specific-reason",
+      "reason": "合规原因要求说明unique invoices、within entertainment standards、total below approval line，候选给出的原因（重复发票、合成测试数据）与本题无关，完全错误。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中仅分析重复发票规则（第十条），未涉及招待标准、审批线或发票唯一性等本题专属原因。"
+    },
+    {
+      "answer_evidence": "无任何关于本题边界条件的反向验证证据。",
+      "id": "reverse-check",
+      "reason": "反向验证要求核对与本题匹配的阈值、日期、发票或聚合窗口，候选仅围绕重复发票展开，未进行任何与招待标准、金额阈值或窗口拆分相关的核查。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹工具调用包括find_reused_invoices、get_expense_detail等，均用于重复发票分析，无与招待标准或审批额度相关的查询。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "候选使用的R000005和R004202均为数据库中真实存在的记录ID。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "候选结论为“无异常”，未将合规记录判为实质异常。",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R000005",
+      "R004202"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 520.875,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004239",
+      "R004240"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 2,
+      "f1": 0.0,
+      "missing_count": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:24:58+08:00",
+  "group": "ccb-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选完全误判题目范围，核查了错误的记录并给出无关结论，未能履行题目要求，实质未完成审计任务，因此各评分项均为0分。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1516,
+      "completion_tokens_details": {
+        "reasoning_tokens": 842
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 8133,
+      "prompt_tokens": 8133,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 9649
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/ccb-enhanced/TRAP-005",
+  "task_id": "TRAP-005"
+}

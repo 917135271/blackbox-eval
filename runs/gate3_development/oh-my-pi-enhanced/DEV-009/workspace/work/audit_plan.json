@@ -1,0 +1,55 @@
+{
+  "task_id": "DEV-009",
+  "task_type": "clean_trap",
+  "audit_object": "R900008 and R900009 — same-day same-amount same-type potential duplicate",
+  "scope": {
+    "record_ids": ["R900008", "R900009"],
+    "expense_types": ["office_supplies"],
+    "date_range": "2025-05-05",
+    "department": "D901"
+  },
+  "policy_questions": [
+    "Does Article 10 (same invoice duplicate) apply? Requires same invoice across records.",
+    "Does Article 11 (split to avoid approval) apply? Requires same employee within 7 days."
+  ],
+  "data_questions": [
+    "Are R900008 and R900009 on the same invoice?",
+    "Are they from the same employee?",
+    "Are the amounts, dates, and types the same?"
+  ],
+  "required_fields": ["record_id", "employee_id", "invoice_no", "invoice_id", "expense_date", "amount", "expense_type"],
+  "evidence_requirements": [
+    "Detail records for R900008 and R900009",
+    "Applicable policy: 01_expense_reimbursement_2025.md Articles 10 and 11"
+  ],
+  "execution_steps": [
+    "Fetch R900008 and R900009 detail",
+    "Fetch policy for duplicate reimbursement rules",
+    "Compare invoice numbers and employee IDs",
+    "Determine if any policy rule is violated",
+    "Evidence coverage check",
+    "False-positive review (compact)",
+    "Audit report",
+    "Result validation and submission"
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "One rule (duplicate reimbursement) with simple record comparison",
+      "No policy version ambiguity (2025 policy in effect)",
+      "No aggregation, grouping, or joins needed",
+      "Single policy, no conflicts",
+      "No thresholds or exemptions at boundary"
+    ]
+  },
+  "subagent_plan": {
+    "policy_researcher": false,
+    "data_analyst": false,
+    "independent_reviewer": false,
+    "reason": "Complexity 1: compact mode sufficient; two-record direct lookup, no native subagent needed"
+  },
+  "stopping_conditions": [
+    "Invoice numbers compared: same → anomaly; different → no anomaly",
+    "Employee IDs compared: same + within scope → check Article 11; different → no Article 11 concern"
+  ]
+}

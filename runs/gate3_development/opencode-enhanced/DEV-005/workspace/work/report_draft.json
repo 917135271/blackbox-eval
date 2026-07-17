@@ -1,0 +1,38 @@
+{
+  "audit_scope": {
+    "task_id": "DEV-005",
+    "object": "R900005业务招待费",
+    "period": "2025-03-12",
+    "organization": "开发审计一部 (D901)",
+    "data_scope": "单记录R900005"
+  },
+  "verified_facts": [
+    "R900005为业务招待费报销，金额3600元，参与人数10人，事由为客户交流餐叙",
+    "人均金额为3600÷10=360元/人",
+    "单次活动总额3600元，未超过5000元上限"
+  ],
+  "applicable_policies": [
+    {"doc_id": "06_business_entertainment.md", "title": "XX证券业务招待费管理办法", "clause_no": "第二条", "content": "业务招待单次活动费用不得超过5000元"},
+    {"doc_id": "06_business_entertainment.md", "title": "XX证券业务招待费管理办法", "clause_no": "第三条", "content": "业务招待费用按参与人数核算，人均不得超过300元"}
+  ],
+  "findings": [
+    {
+      "anomaly_id": "ANOM-DEV005-01",
+      "description": "R900005业务招待费人均超标",
+      "rule": "XX证券业务招待费管理办法第三条：人均不得超过300元",
+      "observed": "人均360元（3600元÷10人）",
+      "threshold": "300元/人",
+      "severity": "人均超标60元，超出比例20%"
+    }
+  ],
+  "impact": "R900005业务招待费人均金额360元超过制度上限300元，构成违规",
+  "recommendations": ["要求相关部门补充说明参与人数合理性，或追回超出部分"],
+  "anomaly_ids": ["ANOM-DEV005-01"],
+  "record_ids": ["R900005"],
+  "citations": [
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第二条"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第三条"}
+  ],
+  "answer": "R900005业务招待费存在超标：单次活动总额3600元未超过5000元上限（合规），但人均金额360元（3600元÷10人）超过300元/人的制度标准，构成人均超标违规。",
+  "limitations": []
+}

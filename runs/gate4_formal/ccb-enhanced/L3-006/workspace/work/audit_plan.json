@@ -1,0 +1,65 @@
+{
+  "task_id": "L3-006",
+  "task_type": "version_trap",
+  "question": "请判断费用报销审批线应采用2022版还是2025修订版,并指出部门总经理审批线。",
+  "scope": {
+    "audit_object": "费用报销审批权限版本适用性",
+    "policy_documents": [
+      "01_expense_reimbursement_2025.md (XX证券费用报销管理办法2025修订版)",
+      "02_expense_reimbursement_2022_deprecated.md (XX证券费用报销管理办法2022版-已废止)",
+      "03_authorization_management.md (XX证券授权管理办法)"
+    ],
+    "business_period": "2025年1月1日起",
+    "rule_focus": "费用报销审批线的版本适用性及部门总经理审批线金额区间"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ1",
+      "question": "2022版与2025修订版的生效与废止关系如何？应适用哪个版本？",
+      "boundaries": ["生效日期", "废止条款", "制度沿革声明"],
+      "relevant_docs": ["01_expense_reimbursement_2025.md", "02_expense_reimbursement_2022_deprecated.md"]
+    },
+    {
+      "id": "PQ2",
+      "question": "部门总经理审批线的具体金额区间是什么？",
+      "boundaries": ["审批权限表", "金额区间上下限"],
+      "relevant_docs": ["03_authorization_management.md", "01_expense_reimbursement_2025.md"]
+    }
+  ],
+  "data_questions": [],
+  "required_fields": [],
+  "evidence_requirements": [
+    "2025修订版第十四条(施行日期与废止条款)",
+    "2022版第一条(制度沿革留档声明)和第四条(审批金额已被替代)",
+    "授权管理办法附件二AR-03(部门总经理审批线)"
+  ],
+  "execution_steps": [
+    {"step": "planning", "action": "编写审计计划并记录planning_completed checkpoint"},
+    {"step": "policy_version_check", "action": "授权并启动policy-researcher子智能体,核查版本适用性,reason=MULTI_POLICY_VERSION_CHECK"},
+    {"step": "evidence_coverage", "action": "构建证据矩阵,验证100%覆盖率"},
+    {"step": "reporting", "action": "生成审计报告"},
+    {"step": "validation", "action": "校验并提交结果"}
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "policy version ambiguity (+1)",
+      "multiple policies involved (+1)"
+    ]
+  },
+  "subagent_plan": {
+    "role": "policy-researcher",
+    "reason_code": "MULTI_POLICY_VERSION_CHECK",
+    "task": "核查费用报销审批线的版本适用性：比对2022版与2025修订版的生效/废止关系,确认应适用哪个版本,并查找部门总经理审批线的具体金额区间",
+    "artifact_paths": ["work/subagents/policy-researcher/detailed_work.md", "work/subagents/policy-researcher/summary.json"],
+    "requested_token_budget": 8000
+  },
+  "stopping_conditions": [
+    "明确认定适用版本(2025修订版)",
+    "明确部门总经理审批线金额区间(AR-03: ≥10000且<50000)",
+    "证据矩阵覆盖率100%",
+    "校验通过且提交成功"
+  ],
+  "expected_answer_type": "no_anomaly",
+  "unresolved_items": []
+}

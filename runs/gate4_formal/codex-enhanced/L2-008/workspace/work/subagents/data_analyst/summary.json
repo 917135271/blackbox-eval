@@ -1,0 +1,25 @@
+{
+  "decision": "reject",
+  "key_findings": [
+    "Found 2 travel_lodging records for E0009 (张婷) within 2025-04-03 to 2025-04-17: R004212 (2025-04-10, 5100 yuan) and R004213 (2025-04-15, 5100 yuan)",
+    "Both records share same employee (E0009), same expense type (travel_lodging), same reason ('拆分报销注入样本3'), and fall 5 days apart within the 7-day window",
+    "Individual records each at 5100 yuan fall under AR-02 tier (部门经理,并经财务复核), requiring department manager + financial review",
+    "Combined amount of 10200 yuan reaches AR-03 tier (>=10000, 部门总经理) — the '较高审批线' — but neither record received AR-03 approval",
+    "This is a clear split-reimbursement violation of Article 11 of 01_expense_reimbursement_2025.md",
+    "Both records were approved only by E0009 (self-approval as 部门经理) without the required financial review (AR-02 requires 部门经理,并经财务复核)",
+    "Each invoice has usage_count=1, confirming no invoice reuse"
+  ],
+  "record_ids": ["R004212", "R004213"],
+  "citations": [
+    "01_expense_reimbursement_2025.md:第十一条",
+    "01_expense_reimbursement_2025.md:第五条",
+    "03_authorization_management.md:附件二"
+  ],
+  "unresolved_items": [
+    "AR-02 requires both 部门经理 and 财务复核 approval roles, but both records show only the 部门经理 approval (E0009 self-approving); this missing financial review is noted but outside the strict scope of the Article 11 split-reimbursement analysis"
+  ],
+  "artifact_paths": [
+    "work/subagents/data_analyst/analysis.json",
+    "work/subagents/data_analyst/summary.json"
+  ]
+}

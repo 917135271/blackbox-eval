@@ -1,0 +1,136 @@
+{
+  "task_id": "DEV-007",
+  "analysis_date": "2026-07-16",
+  "scope": {
+    "expense_types": ["office_supplies", "communication"],
+    "aggregation_unit": "per employee per expense_type per natural month",
+    "thresholds": {
+      "office_supplies": {"cap": 600, "unit": "yuan/person/month", "policy": "Article 2, 07_office_communication.md"},
+      "communication": {"cap": 300, "unit": "yuan/person/month", "policy": "Article 3, 07_office_communication.md"}
+    }
+  },
+  "all_groups": [
+    {
+      "employee_id": "E9001",
+      "employee_name": "开发员工甲",
+      "expense_type": "office_supplies",
+      "natural_month": "2025-01",
+      "record_ids": ["R900001", "R900002"],
+      "individual_amounts": [480.0, 480.0],
+      "monthly_sum": 960.0,
+      "threshold": 600,
+      "excess": 360.0,
+      "is_over_standard": true,
+      "notes": "Split claim: same invoice FPDEV900001 used for both records"
+    },
+    {
+      "employee_id": "E9001",
+      "employee_name": "开发员工甲",
+      "expense_type": "office_supplies",
+      "natural_month": "2025-04",
+      "record_ids": ["R900007"],
+      "individual_amounts": [650.0],
+      "monthly_sum": 650.0,
+      "threshold": 600,
+      "excess": 50.0,
+      "is_over_standard": true,
+      "notes": "Single record exceeds monthly cap"
+    },
+    {
+      "employee_id": "E9001",
+      "employee_name": "开发员工甲",
+      "expense_type": "office_supplies",
+      "natural_month": "2025-05",
+      "record_ids": ["R900008"],
+      "individual_amounts": [590.0],
+      "monthly_sum": 590.0,
+      "threshold": 600,
+      "excess": 0,
+      "is_over_standard": false,
+      "notes": "Within limit"
+    },
+    {
+      "employee_id": "E9002",
+      "employee_name": "开发经理乙",
+      "expense_type": "office_supplies",
+      "natural_month": "2025-05",
+      "record_ids": ["R900009"],
+      "individual_amounts": [590.0],
+      "monthly_sum": 590.0,
+      "threshold": 600,
+      "excess": 0,
+      "is_over_standard": false,
+      "notes": "Within limit"
+    },
+    {
+      "employee_id": "E9001",
+      "employee_name": "开发员工甲",
+      "expense_type": "communication",
+      "natural_month": "2025-03",
+      "record_ids": ["R900006"],
+      "individual_amounts": [200.0],
+      "monthly_sum": 200.0,
+      "threshold": 300,
+      "excess": 0,
+      "is_over_standard": false,
+      "notes": "Within limit"
+    },
+    {
+      "employee_id": "E9001",
+      "employee_name": "开发员工甲",
+      "expense_type": "communication",
+      "natural_month": "2025-09",
+      "record_ids": ["R900014", "R900015"],
+      "individual_amounts": [180.0, 160.0],
+      "monthly_sum": 340.0,
+      "threshold": 300,
+      "excess": 40.0,
+      "is_over_standard": true,
+      "notes": "Two communication records in same month split to appear under individual limits"
+    }
+  ],
+  "over_standard_groups": [
+    {
+      "group_key": "E9001_office_supplies_2025-01",
+      "employee_id": "E9001",
+      "expense_type": "office_supplies",
+      "natural_month": "2025-01",
+      "monthly_sum": 960.0,
+      "threshold": 600,
+      "excess": 360.0,
+      "record_ids": ["R900001", "R900002"]
+    },
+    {
+      "group_key": "E9001_office_supplies_2025-04",
+      "employee_id": "E9001",
+      "expense_type": "office_supplies",
+      "natural_month": "2025-04",
+      "monthly_sum": 650.0,
+      "threshold": 600,
+      "excess": 50.0,
+      "record_ids": ["R900007"]
+    },
+    {
+      "group_key": "E9001_communication_2025-09",
+      "employee_id": "E9001",
+      "expense_type": "communication",
+      "natural_month": "2025-09",
+      "monthly_sum": 340.0,
+      "threshold": 300,
+      "excess": 40.0,
+      "record_ids": ["R900014", "R900015"]
+    }
+  ],
+  "over_standard_record_ids": ["R900001", "R900002", "R900007", "R900014", "R900015"],
+  "summary": {
+    "total_groups": 6,
+    "over_standard_groups": 3,
+    "over_standard_records": 5,
+    "within_limit_groups": 3,
+    "employees_affected": 1,
+    "anomaly_types": {
+      "office_supplies_over": 2,
+      "communication_over": 1
+    }
+  }
+}

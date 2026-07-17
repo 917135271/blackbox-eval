@@ -1,0 +1,58 @@
+{
+  "criteria": [
+    {
+      "id": "overall-count",
+      "score": 0,
+      "reason": "报告未说明异常总量30和陷阱位5，反而声称“共涉及42条唯一记录”，数量错误。",
+      "answer_evidence": "“以上五类异常共涉及42条唯一记录”",
+      "trace_evidence": "工具调用次数为0，无法验证数据来源。"
+    },
+    {
+      "id": "five-rule-coverage",
+      "score": 10,
+      "reason": "报告覆盖了重复报销、超预算、超期报销、拆分报销四类规则，缺少“超标准”报销，且错误地将“审批缺失”作为一类。",
+      "answer_evidence": "报告列出五类：“重复报销”“审批缺失”“预算超支”“超期报销”“拆分报销”。",
+      "trace_evidence": "无工具调用记录。"
+    },
+    {
+      "id": "representative-ids",
+      "score": 20,
+      "reason": "为重复、超预算、超期、拆分四类提供了异常ID和对应记录证据，但缺少超标准类的任何ID或记录。",
+      "answer_evidence": "异常ID：ANOM-L3-009-DUP、ANOM-L3-009-BUD、ANOM-L3-009-DLY、ANOM-L3-009-SPL；evidence_matrix中各含多条记录ID。",
+      "trace_evidence": "无工具调用记录，证据矩阵由候选自报。"
+    },
+    {
+      "id": "policy-coverage",
+      "score": 15,
+      "reason": "费用报销制度被引用于重复、超期、拆分（第十条、第七条、第十一条），预算制度被引用于超预算（第十三条和预算管理办法第三条），两类制度与规则准确对应。",
+      "answer_evidence": "报告在每条规则后引用条款，如“制度第10条”“制度第13条+预算办法第3条”。",
+      "trace_evidence": "无工具调用记录。"
+    },
+    {
+      "id": "report-shape",
+      "score": 2,
+      "reason": "报告包含事实、规则和简单判断，但缺少详细的影响分析和具体整改建议，结构不完整。",
+      "answer_evidence": "报告结尾仅写“需重点整改”，未展开建议或影响。",
+      "trace_evidence": "无工具调用记录。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的 record_id 均为 R 开头格式，验证报告未标记未知 ID，且无直接证据表明数据库不存在这些记录。"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": false,
+      "reason": "虽然无工具调用记录，但报告中出现的日期分布全年，无明确迹象表明仅扫描了部分数据。"
+    },
+    {
+      "id": "trap-included-as-anomaly",
+      "triggered": false,
+      "reason": "提交的 record_ids 中无任何 TRAP 开头的记录，未将陷阱位计入异常。"
+    }
+  ],
+  "overall_comment": "报告遗漏了“超标准报销”规则，导致总异常数量错误，但其余四类的制度引用和证据部分满足要求，结构和完整性有待提升。",
+  "confidence": 0.85
+}

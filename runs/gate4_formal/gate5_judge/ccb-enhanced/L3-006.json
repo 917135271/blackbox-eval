@@ -1,0 +1,119 @@
+{
+  "case_family": "policy_and_version",
+  "case_score": 87.5,
+  "case_score_raw": 87.5,
+  "category": "version_trap",
+  "criteria": [
+    {
+      "answer_evidence": "部门总经理审批线为AR-03:单笔金额大于等于10000元且小于50000元",
+      "id": "current-value",
+      "reason": "明确指出部门总经理审批线AR-03为大于等于10000元，现行值准确。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc('03_authorization_management.md')返回附件二，AR-03区间为>=10000且<50000。"
+    },
+    {
+      "answer_evidence": "2022版(XX证财规〔2022〕乙号)已被第十四条明文废止,仅作制度沿革留档",
+      "id": "deprecated-value",
+      "reason": "指出2022版已被废止，但未明确说出旧值8000元，仅废止状态正确。",
+      "score": 12.5,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc('02_expense_reimbursement_2022_deprecated.md')内容含'单笔报销金额达到8000元的，应提交部门总经理审批'。"
+    },
+    {
+      "answer_evidence": "费用报销审批线应采用2025修订版...2022版已被第十四条明文废止",
+      "id": "applicable-version",
+      "reason": "明确应采用2025修订版，并说明2022版被废止，时间适用关系清晰。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc('01_expense_reimbursement_2025.md')第十四条提及施行日期与废止条款。"
+    },
+    {
+      "answer_evidence": "citations包含01_expense_reimbursement_2025.md和02_expense_reimbursement_2022_deprecated.md",
+      "id": "two-version-evidence",
+      "reason": "提供了2025版和2022版两份制度文档的条款引用，证据完整。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用了get_policy_doc获取01和02文档，返回完整内容。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 6,
+    "elapsed_seconds": 428.461,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount",
+      "document:01_expense_reimbursement_2025.md",
+      "document:02_expense_reimbursement_2022_deprecated.md"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:24:25+08:00",
+  "group": "ccb-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选正确判定应采用2025修订版并给出部门总经理审批线10000元，但未明确提及旧值8000元，扣分部分。证据充分。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2470,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1938
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 3981,
+      "prompt_tokens": 3981,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 6451
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/ccb-enhanced/L3-006",
+  "task_id": "L3-006"
+}

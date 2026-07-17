@@ -1,0 +1,136 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 15.0,
+  "case_score_raw": 15.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "回答中称“无异常。R004236和R004237虽涉及同一员工...不存在重复报销或拆分规避审批的违规行为。”",
+      "id": "clean-conclusion",
+      "reason": "候选的结论虽声称无异常，但其核查的记录为R004236和R004237，并非题目TRAP-005涉及的记录（预期为R004239和R004240），因此结论不适用于本题。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用中仅有对R004236、R004237等记录的详情获取，未出现R004239或R004240。"
+    },
+    {
+      "answer_evidence": "提交的record_ids列表为[\"R004236\",\"R004237\"]。",
+      "id": "record-scope",
+      "reason": "提交的record_ids为R004236和R004237，与预期的R004239、R004240完全不同，未核查核心记录。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_expense_detail调用记录ID均为R0042xx系列，未见R004239或R004240。"
+    },
+    {
+      "answer_evidence": "回答解释：“相隔8天，不满足...第十一条规定的7天内...拆分规避审批核查条件”。",
+      "id": "case-specific-reason",
+      "reason": "候选给出的合规原因（间隔8天不满足7天拆分阈值）与本题专属合规原因（发票唯一、符合娱乐标准、总额低于审批线）完全不匹配。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用仅针对拆分规避规则（第十一条），未核查娱乐标准或总额审批线。"
+    },
+    {
+      "answer_evidence": "无相关引用。",
+      "id": "reverse-check",
+      "reason": "轨迹中虽有通用风险核查（拆分、重复发票），但未针对本题边界条件（娱乐标准、发票唯一性、金额汇总与审批线比较）进行反向验证。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "find_reused_invoices搜索重复发票，search_policy查询拆分，但无娱乐标准核查或按预期记录核实。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": true,
+      "reason": "候选使用无关记录R004236和R004237支撑核心结论，这些记录并非TRAP-005涉及的记录，属于用无关记录支撑结论。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "候选未将合规记录判为异常。",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 2,
+    "elapsed_seconds": 322.427,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004239",
+      "R004240"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 2,
+      "f1": 0.0,
+      "missing_count": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:26:15+08:00",
+  "group": "openclaude-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.98,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选完全核查了错误的记录集，给出的合规原因与本题预期不符，导致所有评分项均未得分。触发fabricated-record-id关键失败，总分上限为20，实际得分为0。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 3412,
+      "completion_tokens_details": {
+        "reasoning_tokens": 2747
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 9809,
+      "prompt_tokens": 10833,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 14245
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/openclaude-baseline/TRAP-005",
+  "task_id": "TRAP-005"
+}

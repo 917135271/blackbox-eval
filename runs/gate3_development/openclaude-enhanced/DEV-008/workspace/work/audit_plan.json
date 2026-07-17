@@ -1,0 +1,24 @@
+{
+  "task_id": "DEV-008",
+  "complexity": 3,
+  "question": "扫描开发库中的超期报销，返回全部异常记录，并对年末补充提交记录进行核对。",
+  "scope": {
+    "rules": ["Article 7 - 60天报销时限", "Article 9 - 年末补充提交"],
+    "policy_doc": "01_expense_reimbursement_2025.md",
+    "date_range": "2025-01-01 to 2026-07-16",
+    "record_scope": "all reimbursement records in dev database"
+  },
+  "subagent_plan": {
+    "data_analyst": {
+      "reason_code": "MULTI_RECORD_SCOPE",
+      "role_task": "查询所有报销记录的延迟天数，识别超过60天的超期记录，核对年末（12月）费用的补充提交是否符合15天宽限期规则"
+    }
+  },
+  "plan": [
+    "1. 查询制度规则：第七条第60天时限、第九条年末15天补充提交窗口",
+    "2. 查询所有报销记录的延迟天数，筛选超60天的记录",
+    "3. 对年末费用记录（12月）逐一核对其提交日期是否在次年1月15日前",
+    "4. 形成异常结论：超期记录判定为异常，合规年末记录通过验证",
+    "5. 制作证据矩阵和最终结论"
+  ]
+}

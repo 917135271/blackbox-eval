@@ -1,0 +1,43 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "SPLIT-001",
+      "record_ids": ["R900003", "R900004"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "R900003与R900004属于同一员工E9001、同一费用类型travel_transport",
+        "R900003 expense_date=2025-02-03，R900004 expense_date=2025-02-06，间隔3天，在7天窗口内",
+        "R900003金额¥5,200，R900004金额¥5,200，合计¥10,400",
+        "合计金额¥10,400达到附件二AR-03档位（≥¥10,000且<¥50,000），需部门总经理审批",
+        "单笔¥5,200分别仅需AR-02部门经理审批，均未触发部门总经理审批",
+        "两笔报销事由明确标注为'同一客户路演交通费第一笔'和'同一客户路演交通费第二笔'，属于同一事项拆分",
+        "两笔记录均无special_approval，未获得特殊审批豁免"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900003", "R900004"],
+  "submitted_record_ids": ["R900003", "R900004"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": false
+  },
+  "reconciled_figures": {
+    "combined_amount": 10400,
+    "individual_amounts": [5200, 5200],
+    "date_gap_days": 3,
+    "approval_tier_individual": "AR-02",
+    "approval_tier_combined": "AR-03"
+  },
+  "unresolved_items": []
+}

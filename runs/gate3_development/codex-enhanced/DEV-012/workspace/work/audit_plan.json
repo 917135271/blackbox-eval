@@ -1,0 +1,67 @@
+{
+  "task_id": "DEV-012",
+  "task_scope": {
+    "audit_object": "XX证券完整开发库综合费用审计",
+    "expense_types": ["all"],
+    "business_period": "2025-01-01 to 2025-12-31",
+    "organization_scope": "D901(开发审计一部), D902(开发审计二部)",
+    "deliverable": "综合审计报告，覆盖重复报销、拆分报销、超标准、超期、超预算五类规则"
+  },
+  "policy_questions": [
+    {"rule": "重复报销", "clause": "01_expense_reimbursement_2025.md 第十条", "trigger": "同一发票在多个报销记录中出现"},
+    {"rule": "拆分报销", "clause": "01_expense_reimbursement_2025.md 第十一条", "trigger": "同一员工、同一费用类型、7天内≥2笔、合计金额达AR-03及以上"},
+    {"rule": "超标准", "clause": "01_expense_reimbursement_2025.md 第十二条 + 各专项制度标准", "trigger": "金额超过对应制度标准的1.0倍"},
+    {"rule": "超期", "clause": "01_expense_reimbursement_2025.md 第七条、第九条", "trigger": "报销日-发生日>60天(年末费用除外)"},
+    {"rule": "超预算", "clause": "01_expense_reimbursement_2025.md 第十三条 + 08_budget_management.md 第三条", "trigger": "部门累计报销超过年度预算"}
+  ],
+  "data_questions": [
+    "检索全部21条报销记录",
+    "检测重复发票: invoice_no出现≥2次的记录",
+    "检测拆分: 按(employee_id, expense_type, 7天窗口)分组，合计金额>=AR-03阈值(10000)",
+    "检测超标准: office_supplies>600, communication月合计>300, travel_lodging按职级城市标准, training_fee>800/d内部, business_entertainment>5000或人均>300",
+    "检测超期: 计算reimburse_date - expense_date > 60天",
+    "检测超预算: D902累计56,000 > 年度预算50,000"
+  ],
+  "required_fields": ["record_id", "employee_id", "department_id", "expense_date", "reimburse_date", "expense_type", "amount", "invoice_no", "city_tier", "nights", "days", "participants", "special_approval", "employee_level"],
+  "evidence_requirements": [
+    "每项异常至少一条制度条款引用",
+    "每项异常至少一条事实描述",
+    "100%覆盖率"
+  ],
+  "execution_steps": [
+    {"step": "audit_planning", "status": "pending"},
+    {"step": "policy_version_check", "status": "pending"},
+    {"step": "data_analyst_subagent", "status": "pending"},
+    {"step": "batch_expense_analysis", "status": "pending"},
+    {"step": "evidence_coverage_check", "status": "pending"},
+    {"step": "false_positive_review", "status": "pending"},
+    {"step": "audit_report", "status": "pending"},
+    {"step": "result_validation", "status": "pending"},
+    {"step": "submission", "status": "pending"}
+  ],
+  "complexity": {
+    "score": 4,
+    "reasons": [
+      "多规则(5条规则: 重复、拆分、超标准、超期、超预算)",
+      "多制度(报销管理办法+差旅+培训+招待+办公通讯+预算+授权)",
+      "需要聚合、分组、JOIN和批量过滤",
+      "涉及阈值、日期边界、豁免(专项审批)和综合报告"
+    ]
+  },
+  "subagent_plan": {
+    "data_analyst": {
+      "reason_code": "MULTI_RECORD_SCOPE",
+      "role": "data_analyst",
+      "task": "对21条报销记录执行完整SQL/Python分析: 检测重复发票、拆分报销窗口、超标准对比、超期计算、超预算累计",
+      "allowed_tools": ["expense_query.*", "exec_command"],
+      "output_fields": ["decision", "key_findings", "record_ids", "citations", "unresolved_items", "artifact_paths"]
+    }
+  },
+  "stopping_conditions": [
+    "所有5条规则完成分析",
+    "evidence_matrix status=pass且coverage_percent=100",
+    "validation_report status=pass",
+    "submit_audit_result成功"
+  ],
+  "unresolved_items": []
+}

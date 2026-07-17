@@ -1,0 +1,43 @@
+{
+  "step_1_policy": {
+    "tool": "search_policy",
+    "query": "同一发票最多报销1次 重复发票 第十条",
+    "result": "Found Article 10 in 01_expense_reimbursement_2025.md"
+  },
+  "step_2_reused_invoices": {
+    "tool": "find_reused_invoices",
+    "params": {
+      "min_usage_count": 2,
+      "page": 1,
+      "page_size": 50
+    },
+    "pagination_result": {
+      "total": 6,
+      "has_next": false,
+      "pages_requested": 1
+    }
+  },
+  "step_3_invoice_usage": {
+    "tool": "find_invoice_usage",
+    "calls": 6,
+    "all_confirmed": true
+  },
+  "step_4_full_details": {
+    "tool": "get_expense_detail",
+    "calls": 12,
+    "all_special_approval_zero": true,
+    "all_status_approved": true
+  },
+  "step_5_scope": {
+    "tool": "summarize_expenses",
+    "params": {
+      "date_from": "2025-01-01",
+      "date_to": "2025-12-31",
+      "group_by": "status"
+    },
+    "result": {
+      "total_records": 4240,
+      "total_amount": 2923724.49
+    }
+  }
+}

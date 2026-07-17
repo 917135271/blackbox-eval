@@ -1,0 +1,70 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-DEV007-001",
+      "record_ids": ["R900001", "R900002"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+        {"doc_id": "07_office_communication.md", "clause_no": "第四条"}
+      ],
+      "facts": [
+        "E9001开发员工甲2025年1月报销办公用品两笔:R900001金额480元(expense_date 2025-01-05)和R900002金额480元(expense_date 2025-01-06)，月度合计960元",
+        "两笔记录共用同一发票FPDEV900001(开发供应商01,发票日期2025-01-05,金额480元)",
+        "07_office_communication.md第二条:员工个人办公用品报销按月控制,每人每月不超过600元",
+        "07_office_communication.md第四条:办公费用和通讯费用不得以其他费用类型绕开月度控制",
+        "960元超出600元标准360元，构成超标异常"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-DEV007-002",
+      "record_ids": ["R900007"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第二条"}
+      ],
+      "facts": [
+        "E9001开发员工甲2025年4月报销办公用品R900007金额650元(expense_date 2025-04-08)",
+        "07_office_communication.md第二条:员工个人办公用品报销按月控制,每人每月不超过600元",
+        "650元超出600元标准50元，单笔即超标"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-DEV007-003",
+      "record_ids": ["R900014", "R900015"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第三条"},
+        {"doc_id": "07_office_communication.md", "clause_no": "第四条"}
+      ],
+      "facts": [
+        "E9001开发员工甲2025年9月报销通讯费两笔:R900014金额180元(expense_date 2025-09-03)和R900015金额160元(expense_date 2025-09-20)，月度合计340元",
+        "07_office_communication.md第三条:员工通讯费用报销按月控制,每人每月不超过300元",
+        "340元超出300元标准40元，构成超标异常"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900001", "R900002", "R900007", "R900014", "R900015"],
+  "submitted_record_ids": ["R900001", "R900002", "R900007", "R900014", "R900015"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": false
+  },
+  "reconciled_figures": {
+    "office_supplies_limit": 600,
+    "communication_limit": 300,
+    "anomaly_count": 3
+  },
+  "unresolved_items": []
+}

@@ -1,0 +1,63 @@
+{
+  "task_scope": {
+    "audit_object": "R900013 差旅住宿费超标核查",
+    "expense_types": ["travel_lodging"],
+    "business_period": "2025-07-10",
+    "organization_scope": "D901 开发审计一部",
+    "requested_deliverable": "核查住宿费是否超标"
+  },
+  "policy_questions": [
+    {
+      "question": "差旅住宿费标准如何按职级和城市档位确定？",
+      "doc_id": "04_travel_expense.md",
+      "relevant_clauses": ["第三条", "第四条", "第五条"]
+    }
+  ],
+  "material_boundaries": {
+    "employee_level": "经理级",
+    "city_tier": "A (一类城市)",
+    "nights": 2,
+    "applicable_standard_per_night": 650,
+    "total_standard": 1300,
+    "actual_amount": 1400
+  },
+  "data_fields": {
+    "record_id": "R900013",
+    "employee_id": "E9002",
+    "expense_type": "travel_lodging",
+    "amount": 1400.0,
+    "city_tier": "A",
+    "nights": 2,
+    "special_approval": 0
+  },
+  "execution_steps": [
+    "query expense detail for R900013",
+    "query employee info for E9002",
+    "query travel expense policy doc (04_travel_expense.md)",
+    "calculate standard: 经理级 + 一类城市 = 650元/晚 × 2晚 = 1300元",
+    "compare actual 1400 vs standard 1300",
+    "evidence coverage check",
+    "false positive review",
+    "audit report",
+    "result validation",
+    "validate and submit"
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "单一规则: 住宿标准超标",
+      "单条记录直接核查",
+      "无政策版本歧义",
+      "无多表聚合需求"
+    ]
+  },
+  "subagent_plan": {
+    "planned": false,
+    "reason": "complexity=1, compact mode sufficient"
+  },
+  "stopping_conditions": [
+    "完成R900013与住宿标准的对比计算",
+    "确认是否存在专项审批",
+    "得出超标/未超标结论"
+  ]
+}

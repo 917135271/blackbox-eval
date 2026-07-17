@@ -1,0 +1,79 @@
+{
+  "task_id": "L3-001",
+  "task_type": "full_year_rule_audit",
+  "audit_object": "全年费用报销数据的重复报销专项扫描",
+  "audit_period": {
+    "start": "2025-01-01",
+    "end": "2025-12-31",
+    "description": "2025年全年"
+  },
+  "organization_scope": "XX证券全部门及全体员工",
+  "requested_deliverable": "返回全部异常ID和记录ID集合",
+
+  "policy_questions": [
+    {
+      "id": "Q1",
+      "rule": "第十条 同一发票最多报销1次",
+      "question": "是否有同一发票在不同报销单中重复出现的情况？",
+      "boundaries": {
+        "condition": "同一发票(invoice_no)在多个record中出现",
+        "exemptions": "无",
+        "exception_conditions": "无"
+      }
+    }
+  ],
+
+  "data_questions": [
+    {
+      "id": "DQ1",
+      "table": "expense records",
+      "fields": ["record_id", "record_no", "employee_id", "employee_name", "department_id", "department_name", "expense_date", "reimburse_date", "expense_type", "amount", "reason", "invoice_no", "status"],
+      "query": "查找所有invoice_no出现次数>=2的记录，并获取每对重复记录的详细信息",
+      "evidence_required": "每对重复发票的完整记录信息"
+    }
+  ],
+
+  "evidence_requirements": [
+    "每对重复报销记录的完整字段信息",
+    "制度第十条原文引用",
+    "确认记录状态（是否为approved）",
+    "确认无豁免或例外情况"
+  ],
+
+  "execution_steps": [
+    {"step": 1, "action": "audit-query-planner", "status": "completed", "artifact": "work/audit_plan.json"},
+    {"step": 2, "action": "获取重复发票详细记录", "status": "pending"},
+    {"step": 3, "action": "policy-version-check (触发：确认2025版制度为现行有效制度)", "status": "pending"},
+    {"step": 4, "action": "batch-expense-analysis (触发：验证find_reused_invoices结果完整性)", "status": "pending"},
+    {"step": 5, "action": "evidence-coverage-check", "status": "pending"},
+    {"step": 6, "action": "false-positive-review (触发：确认是否有豁免/例外)", "status": "pending"},
+    {"step": 7, "action": "audit-report", "status": "pending"},
+    {"step": 8, "action": "result-validator", "status": "pending"},
+    {"step": 9, "action": "validate_audit_result + submit_audit_result", "status": "pending"}
+  ],
+
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "单一规则（第十条 重复发票检测）",
+      "find_reused_invoices工具已提供候选结果",
+      "无需跨制度版本判断（2025版为现行有效制度）",
+      "无金额阈值、日期边界或豁免条件",
+      "无多表JOIN或复杂聚合"
+    ]
+  },
+
+  "subagent_plan": {
+    "required": false,
+    "reason": "复杂度为1，按路由规则保留在主智能体中处理"
+  },
+
+  "stopping_conditions": [
+    "所有重复发票对已确认并获取详细记录",
+    "制度适用性已确认",
+    "证据覆盖率达到100%",
+    "验证报告通过"
+  ],
+
+  "unresolved_items": []
+}

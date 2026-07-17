@@ -1,0 +1,126 @@
+generated_at: '2026-07-16T18:00:29+08:00'
+status: gate1_oh_my_pi_passed_gate2_adapter_and_targeted_gate3_governance_rerun_required
+previous_checkpoint: gate3_submission_and_adapter_checks_passed
+next_gate: gate2_oh_my_pi_adapter_and_targeted_gate3_governance_rerun
+
+model:
+  provider: DeepSeek
+  name: deepseek-v4-pro
+  base_url: https://api.deepseek.com
+  api_key_env: LLM_API_KEY
+
+experiment:
+  framework_count: 5
+  groups_per_framework: 2
+  group_count: 10
+  development_case_count: 12
+  formal_case_count: 15
+  formal_run_count: 150
+  diagnostic_ablation_case_count: 6
+  diagnostic_ablation_run_count: 30
+  prompt_variants: [precise]
+  repeats_per_case: 1
+  task_timeout_seconds: 900
+
+groups:
+  - ccb-baseline
+  - ccb-enhanced
+  - codex-baseline
+  - codex-enhanced
+  - openclaude-baseline
+  - openclaude-enhanced
+  - opencode-baseline
+  - opencode-enhanced
+  - oh-my-pi-baseline
+  - oh-my-pi-enhanced
+
+frameworks:
+  claude-code-best:
+    repository: https://github.com/claude-code-best/claude-code.git
+    version: 2.8.3
+    commit: 7680c291ee7d8aa9cb291d518273352ad32256ec
+    gate_status: governance_gate2_passed_targeted_gate3_required
+  codex:
+    repository: https://github.com/openai/codex.git
+    version: 0.144.4
+    commit: 8c68d4c87dc54d38861f5114e920c3de2efa5876
+    gate_status: governance_gate2_passed_targeted_gate3_required
+  openclaude:
+    repository: https://github.com/Gitlawb/openclaude.git
+    version: 0.24.0
+    commit: 7b9e477519f6965b19f4c0db70ae410e3586a72c
+    source_cli_sha256: a592103de450fbe08f4de64a2bde13ff4ce832c97ba696569f66bec6b19cecdc
+    image_id: sha256:b6c658a0992c89e38a07bcf5e727cf87e991c36e0025f754382ed8c5f3f8cb8e
+    gate_status: governance_gate2_passed_targeted_gate3_required
+  opencode:
+    repository: https://github.com/anomalyco/opencode.git
+    version: 1.18.1
+    commit: 04bdf7732bae0cbb2ab3e003d65bddb8d56edacf
+    source_cli_sha256: cdf39ec3df50c7ae2517caf2238d520c9aa4dd7832117f1651d393291b90abbe
+    image_id: sha256:1b7769c4144ff4bb8b21f2f84bbd88a40c91e5375ec81ef15432a0445977a5bb
+    container_runtime_mode: locked_source_via_bun
+    gate_status: governance_gate2_passed_targeted_gate3_required
+  oh-my-pi:
+    repository: https://github.com/can1357/oh-my-pi.git
+    candidate_version: v17.0.1
+    commit: 6ae7cdbf97bbe7b608ce71ff7b3e0532955bd94a
+    source_cli_sha256: dbddca0e0650749c659a5835162c4887daa6153e667b823a8c06a3626aa81f43
+    image_id: sha256:b82b82c1f7aef629e0ed4b443e0c253b559bf21e5d2c09fe8c1d37cb0aea3b87
+    image_runtime_user: agent
+    container_runtime_mode: locked_source_via_bun
+    gate_status: gate1_source_build_version_nonroot_and_deepseek_tool_canary_passed
+paths:
+  development_evals: data/development/evals.json
+  formal_evals: data/formal_case_rubric/evals.json
+  formal_case_rubrics: data/formal_case_rubric/cases.json
+  rubric_schema: schemas/case-rubric.schema.json
+  shared_audit_core: domain-enhancement/shared-audit-core
+
+formal_dataset:
+  dataset_id: securities-expense-audit-formal-15-v1
+  case_family_counts:
+    policy_and_version: 3
+    record_audit: 3
+    full_year_audit: 3
+    clean_trap: 3
+    retrieval_and_report: 3
+  rubric_score_per_case: 100
+  rubric_pass_score: 70
+  exclude_categories: [ground_truth_lookup]
+
+governance_revision:
+  gate2_status: passed_for_existing_four_adapters
+  oh_my_pi_adapter_status: gate1_passed_gate2_packaging_required
+  outer_runner_is_authoritative: true
+  native_hooks_are_supplementary: true
+  required_event_streams:
+    - traces/events.jsonl
+    - traces/tool_calls.jsonl
+    - traces/subagents.jsonl
+    - traces/context_events.jsonl
+    - traces/artifact_manifest.json
+    - run_manifest.json
+  subagent_protocol:
+    authorize_tool: authorize_audit_subagent
+    complete_tool: complete_audit_subagent
+    main_agent_receives_structured_summary_only: true
+  task_memory:
+    scope: single_task_only
+    cross_task_memory_allowed: false
+  context_control:
+    checkpoint_threshold_percent: 60
+    compact_threshold_percent: 75
+    restricted_search_threshold_percent: 85
+    thresholds_must_be_calibrated_in_gate3: true
+  gate4_blocked_until:
+    - unified_hook_events_verified
+    - subagent_completion_protocol_verified
+    - task_state_and_checkpoint_verified
+    - targeted_gate3_rerun_passed
+
+diagnostic_ablation:
+  timing: after_formal_main_runs
+  frameworks: 5
+  cases_per_framework: 6
+  configuration: enhanced_without_subagents
+  included_in_final_ranking: false

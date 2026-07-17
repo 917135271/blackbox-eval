@@ -1,0 +1,52 @@
+{
+  "task_id": "DEV-005",
+  "task_scope": {
+    "audit_object": "R900005",
+    "expense_type": "business_entertainment",
+    "business_period": "2025-03-12",
+    "rule": "业务招待费单次活动总额和人均金额标准"
+  },
+  "policy_questions": [
+    {
+      "question": "业务招待费单次活动总额上限",
+      "policy_doc": "06_business_entertainment.md",
+      "clause": "第二条",
+      "threshold": "5000元"
+    },
+    {
+      "question": "业务招待费人均金额上限",
+      "policy_doc": "06_business_entertainment.md",
+      "clause": "第三条",
+      "threshold": "300元"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "R900005的金额和参与人数",
+      "table": "reimbursement_records",
+      "fields": ["amount", "participants"]
+    }
+  ],
+  "complexity": 1,
+  "complexity_reasons": [
+    "单一规则（业务招待费标准）",
+    "已知单记录核查",
+    "仅需简单除法和阈值比较"
+  ],
+  "subagent_plan": null,
+  "execution_steps": [
+    "查询06_business_entertainment.md获取阈值",
+    "查询R900005详情获取金额和参与人数",
+    "计算人均金额并比较两个阈值",
+    "证据覆盖检查",
+    "误报复核",
+    "审计报告",
+    "结果校验与提交"
+  ],
+  "stopping_conditions": [
+    "两个阈值比较均完成",
+    "证据矩阵覆盖100%",
+    "校验通过"
+  ],
+  "unresolved_items": []
+}

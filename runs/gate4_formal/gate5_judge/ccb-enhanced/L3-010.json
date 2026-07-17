@@ -1,0 +1,123 @@
+{
+  "case_family": "retrieval_and_report",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "audit_report",
+  "criteria": [
+    {
+      "answer_evidence": "现行附件二审批线为：AR-01 [0,3000)部门经理；... AR-03 [10000,50000)部门总经理。",
+      "id": "current-threshold",
+      "reason": "明确指出现行部门总经理审批线为10000元，来自附件二AR-03。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc(\"03_authorization_management.md\")返回附件二审批表，AR-03区间为[10000,50000)。"
+    },
+    {
+      "answer_evidence": "2022版第二条触发线为8000元（部门总经理）...2022版于2025年1月1日被2025修订版废止。",
+      "id": "old-threshold-status",
+      "reason": "明确指出2022版8000元审批线已废止。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc(\"02_expense_reimbursement_2022_deprecated.md\")返回旧版文本，明确旧值8000元且第四条不得作为现行依据。"
+    },
+    {
+      "answer_evidence": "2025修订版改变了审批线的定义方式，其第五条明确不再在本办法中列示具体金额，统一按《授权管理办法》附件二执行。",
+      "id": "cross-reference",
+      "reason": "正确说明报销办法第五条委托授权管理办法附件二规定审批金额。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc(\"01_expense_reimbursement_2025.md\")返回第五条内容，get_policy_doc(\"03_authorization_management.md\")返回附件二。"
+    },
+    {
+      "answer_evidence": "（一）[8000,10000)假阳性陷阱...（二）[30000,50000)假阳性陷阱...（三）[3000,8000)假阴性陷阱...防范措施包括：每次审计前核实所引用制度的发文编号和生效日期...",
+      "id": "risk-explanation",
+      "reason": "详细分析了三个版本陷阱区间，并提出了具体的防范措施。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "无直接工具调用，为分析性内容。"
+    },
+    {
+      "answer_evidence": "答案完整，anomaly_ids、citations、record_ids匹配。",
+      "id": "report-shape",
+      "reason": "以审计说明形式提交，字段一致且无冲突。",
+      "score": 5.0,
+      "source": "llm_judge",
+      "trace_evidence": "结构化字段与答案一致，无冲突。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的记录ID R004233存在于数据库中，无伪造。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未将废止制度作为现行依据，明确区分版本并指出废止状态。",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "VERSION_TRAP_OLD_APPROVAL_LINE"
+    ],
+    "actual_record_ids": [
+      "R004233"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": false,
+      "expected_types": {},
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "citation_count": 6,
+    "elapsed_seconds": 515.471,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [
+      "VERSION_TRAP_OLD_APPROVAL_LINE"
+    ],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:25:08+08:00",
+  "group": "ccb-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "答案完整覆盖所有评分点，准确指出现行审批线、旧版废止状态、制度关系，并详细分析版本陷阱风险及防范措施，报告形式规范。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2614,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1865
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 4967,
+      "prompt_tokens": 4967,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 7581
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/ccb-enhanced/L3-010",
+  "task_id": "L3-010"
+}

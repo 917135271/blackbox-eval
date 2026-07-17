@@ -1,0 +1,72 @@
+{
+  "task_id": "DEV-010",
+  "task_type": "clean_trap",
+  "question": "R900010与R900011合计超过10000元，请核查是否构成7天内拆分报销，并准确处理日期边界。",
+  "scope": {
+    "records": ["R900010", "R900011"],
+    "rule": "Article 11 of 01_expense_reimbursement_2025.md - 拆分报销核查",
+    "audit_period": "2025-06-01 to 2025-06-09"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "拆分报销的构成条件是什么？",
+      "clause": "Article 11: 同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到附件二较高审批线"
+    },
+    {
+      "id": "PQ-02",
+      "question": "附件二较高审批线金额是多少？",
+      "clause": "AR-03: 10000元（部门总经理审批）"
+    },
+    {
+      "id": "PQ-03",
+      "question": "7天内的日期边界如何计算？",
+      "clause": "需准确判定2025-06-01至2025-06-09是否在7天内"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-01",
+      "question": "R900010和R900011的详细信息",
+      "fields": ["record_id", "employee_id", "expense_date", "expense_type", "amount", "status", "invoice_id"]
+    },
+    {
+      "id": "DQ-02",
+      "question": "两笔记录是否同一员工同一费用类型",
+      "check": "employee_id match, expense_type match"
+    },
+    {
+      "id": "DQ-03",
+      "question": "日期差是否在7天内",
+      "calculation": "2025-06-09 - 2025-06-01 = 8天"
+    },
+    {
+      "id": "DQ-04",
+      "question": "合计金额是否达到较高审批线",
+      "calculation": "5300 + 5300 = 10600 >= 10000"
+    }
+  ],
+  "complexity": 1,
+  "complexity_reasons": [
+    "单一规则（Article 11拆分报销）",
+    "两个已知记录直接查询",
+    "日期边界判定在7天边界简单清晰",
+    "无需子智能体"
+  ],
+  "subagent_plan": null,
+  "execution_steps": [
+    "查询R900010和R900011详情",
+    "获取2025版费用报销管理办法Article 11及授权管理办法附件二",
+    "分析三个条件：同一员工同一类型 ✓、合计金额达标 ✓、7天内 ✗（8天）",
+    "日期边界准确计算：2025-06-09 - 2025-06-01 = 8天 > 7天",
+    "结论：不构成7天内拆分报销，无异常",
+    "运行证据覆盖检查",
+    "生成审计报告",
+    "运行结果校验器",
+    "提交"
+  ],
+  "stopping_conditions": [
+    "日期差明确 > 7天即停止，无需进一步调查拆分意图",
+    "确认为clean_trap无异常结论"
+  ]
+}

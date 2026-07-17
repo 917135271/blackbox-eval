@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [],
+  "candidate_record_ids": ["R004233", "R004234", "R004235", "R004236", "R004237", "R004238", "R004239", "R004240"],
+  "submitted_record_ids": ["R004233", "R004234", "R004235", "R004236", "R004237", "R004238", "R004239", "R004240"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true,
+    "searched_population": "注入记录 R004201-R004240 中标记为'陷阱样本'的记录",
+    "query_conditions": "record_id IN R004233-R004240, 提取全部字段并逐条对照政策条款核查",
+    "checked_rules": [
+      {"rule": "Article 7 报销时限60天", "policy": "01_expense_reimbursement_2025.md 第七条", "result": "R004238正好60天，属于60天内，合规"},
+      {"rule": "Article 11 拆分报销7天窗口", "policy": "01_expense_reimbursement_2025.md 第十一条", "result": "R004234/235合计500元未达AR-02线；R004236/237相隔8天超过7天窗口；R004239/240合计1085元未达AR-02线；均不构成拆分"},
+      {"rule": "Article 5/授权审批 AR-02 3000元线", "policy": "03_authorization_management.md 附件二", "result": "R004233金额9990<10000正确触发AR-02；R004236/237各5200正确触发AR-02"},
+      {"rule": "旅行住宿标准", "policy": "04_travel_expense.md 第四条", "result": "R004233: 10晚×1100=11000>9990; R004236/237: 7晚×850=5950>5200; 均在标准内"},
+      {"rule": "办公室用品月度上限600元", "policy": "07_office_communication.md 第二条", "result": "E0009 2025-10 office_supplies合计500<600"},
+      {"rule": "通讯费月度上限300元", "policy": "07_office_communication.md 第三条", "result": "E0007 2025-07 communication合计220<300"},
+      {"rule": "业务招待单次≤5000元/人均≤300元", "policy": "06_business_entertainment.md 第二、三条", "result": "R004239:540/3=180<300; R004240:545/3≈182<300; 均<5000"},
+      {"rule": "Article 12 报销金额不超过制度标准", "policy": "01_expense_reimbursement_2025.md 第十二条", "result": "全部记录均在对应制度标准的1.0倍以内"}
+    ],
+    "population_count": 8,
+    "conclusion": "8条陷阱样本记录均未违反任何适用的费用报销政策条款，无异常。"
+  },
+  "reconciled_figures": {
+    "total_records_checked": 8,
+    "total_anomalies": 0
+  },
+  "unresolved_items": []
+}

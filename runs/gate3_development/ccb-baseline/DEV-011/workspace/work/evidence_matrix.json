@@ -1,0 +1,46 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "DEV011-ANOM-001",
+      "record_ids": ["R900019"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"},
+        {"doc_id": "08_budget_management.md", "clause_no": "第三条"},
+        {"doc_id": "08_budget_management.md", "clause_no": "第四条"}
+      ],
+      "facts": [
+        "D902开发审计二部2025年度预算为50,000元",
+        "R900018（2025-01-15）金额45,000元为第一笔报销，累计45,000元，在预算额度内",
+        "R900019（2025-02-15）金额6,000元为第二笔报销，累计51,000元，首次超过年度预算50,000元（达到1.02倍）",
+        "R900019报销记录的special_approval值为0，未履行专项审批",
+        "R900020（2025-03-15）金额5,000元为第三笔报销，special_approval值为1，已履行专项审批，属于合规超预算支出",
+        "费用报销管理办法第十三条和预算管理办法第三条均规定预算达到1.0倍后不得继续报销，确需发生须履行专项审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900018", "R900019", "R900020"],
+  "submitted_record_ids": ["R900019"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": false
+  },
+  "reconciled_figures": {
+    "D902_annual_budget": 50000,
+    "D902_cumulative_amount": 56000,
+    "R900018_amount": 45000,
+    "R900019_amount": 6000,
+    "R900020_amount": 5000,
+    "budget_remaining_after_R900018": 5000,
+    "budget_exceeded_by_R900019": true,
+    "first_exceeding_record": "R900019"
+  },
+  "unresolved_items": []
+}

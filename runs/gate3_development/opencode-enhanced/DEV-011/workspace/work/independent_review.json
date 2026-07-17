@@ -1,0 +1,28 @@
+{
+  "decision": "pass",
+  "challenged_findings": [
+    {
+      "anomaly_id": "ANOM-D902-001",
+      "record_id": "R900019",
+      "challenge": "验证R900019是否为误报（专项审批豁免或边界问题）",
+      "result": "确认非误报",
+      "reason": "R900019的special_approval=0（false），无专项审批。累计金额51,000元明确超过预算50,000元。R900020的special_approval=1（true）已正确排除。"
+    }
+  ],
+  "supporting_evidence": [
+    "R900019 special_approval=false，仅有AR-02部门经理审批，未履行超预算专项审批",
+    "cumulative after R900018=45,000(90%) < 50,000; after R900019=51,000(102%) > 50,000 — 边界明确",
+    "R900018 cumulative 45,000未超预算，不构成违规",
+    "R900020 special_approval=true，reason='专项批准的连续性支出'，已正确豁免"
+  ],
+  "opposing_evidence": [],
+  "exceptions_and_boundaries": [
+    {"type": "threshold_boundary", "detail": "50,000元预算边界：R900018后累计45,000 < 50,000 ✓；R900019后累计51,000 > 50,000 ✓", "status": "verified"},
+    {"type": "special_approval_exemption", "detail": "R900020 special_approval=true，正确豁免 ✓", "status": "verified"},
+    {"type": "no_exemption_for_R900019", "detail": "R900019 special_approval=false，无豁免适用 ✓", "status": "verified"}
+  ],
+  "required_changes": [],
+  "supplemental_query": null,
+  "rationale": "首次超预算记录为R900019，该记录无专项审批（special_approval=false），明确违反预算管理办法第二、三、四条及费用报销管理办法第十三条。R900020虽也超预算但有专项审批，已正确排除。R900018虽无专项审批但未超预算，不构成违规。边界计算准确，数据一致。",
+  "unresolved_conflicts": []
+}

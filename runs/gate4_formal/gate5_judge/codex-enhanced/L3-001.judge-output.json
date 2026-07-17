@@ -1,0 +1,39 @@
+{
+  "criteria": [
+    {
+      "id": "full-scan-method",
+      "score": 15,
+      "reason": "全年全量数据扫描，使用find_reused_invoices和list_invoices交叉验证，总记录数4240，覆盖所有月份。",
+      "answer_evidence": "evidence_matrix中total_records_scanned: 4240, scan_method: find_reused_invoices + list_invoices cross-verified",
+      "trace_evidence": "list_expenses调用指定date_from=2025-01-01, date_to=2025-12-31；find_reused_invoices和list_invoices均设置min_usage_count=2并返回全部发票；summarize_expenses按月分组确认覆盖全年。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 10,
+      "reason": "正确引用费用报销管理办法第十条（同一发票最多报销1次），查询条件直接对应重复发票检测。",
+      "answer_evidence": "答案中明确引用第十条，citations包含doc_id: 01_expense_reimbursement_2025.md, clause_no: 第十条。",
+      "trace_evidence": "search_policy查询“重复报销 同一发票 多次报销”并返回第十条内容；get_policy_excerpt提取第十条；find_reused_invoices基于重复发票字段落实规则。"
+    },
+    {
+      "id": "false-positive-control",
+      "score": 15,
+      "reason": "无任何误报，anomaly_ids和record_ids与预期完全一致，未混入其他规则异常或TRAP记录。",
+      "answer_evidence": "提交的anomaly_ids对应全部6组重复，record_ids集合与预期完全相同，无额外记录。",
+      "trace_evidence": "规则诊断显示trap_false_positive: false，unknown_record_ids为空；record_metrics和anomaly_metrics均为精度1.0，召回1.0。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有record_ids均在数据库中存在，规则诊断验证record_ids_verified_against_db为true，无虚构记录。"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": false,
+      "reason": "工具调用和evidence_matrix确认对全年12个月数据进行了完整扫描，并非只检查部分月份或样例。"
+    }
+  ],
+  "overall_comment": "候选提交完美完成了专项扫描，方法科学、依据明确、结果精确，无任何误报或遗漏。",
+  "confidence": 1.0
+}

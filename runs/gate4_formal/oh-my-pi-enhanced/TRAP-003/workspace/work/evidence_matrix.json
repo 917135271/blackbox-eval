@@ -1,0 +1,27 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [],
+  "candidate_record_ids": ["R000002","R000005","R000020","R000028","R000037","R000055","R004201","R004202","R004203","R004204","R004205","R004206"],
+  "submitted_record_ids": ["R000002","R000005","R000020","R000028","R000037","R000055","R004201","R004202","R004203","R004204","R004205","R004206"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true,
+    "searched_population": "全部发票重复使用记录：通过find_reused_invoices(min_usage_count=2)发现6张发票(FP202500000002, FP202500000005, FP202500000020, FP202500000028, FP202500000037, FP202500000055)各被2条报销记录使用，共计12条记录",
+    "query_conditions": "find_reused_invoices(min_usage_count=2), get_expense_detail逐条获取全部12条记录详情",
+    "checked_rules": ["01_expense_reimbursement_2025.md 第十条：同一发票最多报销1次"],
+    "population_count": 12,
+    "conclusion": "6条R0042XX记录reason字段均标注「重复发票注入样本」，为测试注入记录，非真实业务违规。原记录R0000XX为正常业务报销，各仅使用发票一次。十二条记录均不构成真实异常。"
+  },
+  "reconciled_figures": {
+    "total_records_investigated": 12,
+    "original_records": 6,
+    "injection_sample_records": 6,
+    "reused_invoices": 6,
+    "anomalies_found": 0
+  },
+  "unresolved_items": []
+}

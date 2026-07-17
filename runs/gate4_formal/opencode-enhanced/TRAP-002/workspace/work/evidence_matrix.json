@@ -1,0 +1,29 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [],
+  "candidate_record_ids": ["R000002","R004201","R000005","R004202","R000020","R004203","R000028","R004204","R000037","R004205","R000055","R004206"],
+  "submitted_record_ids": ["R000002","R004201","R000005","R004202","R000020","R004203","R000028","R004204","R000037","R004205","R000055","R004206"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true,
+    "searched_population": "All invoices with usage_count >= 2 in the expense database. SQL: SELECT invoice_id FROM invoices JOIN expense_records GROUP BY invoice_id HAVING COUNT(record_id) >= 2. Result: 6 invoices (INV000002, INV000005, INV000020, INV000028, INV000037, INV000055) with 12 linked records.",
+    "query_conditions": "min_usage_count=2, status=approved, budget_year=2025",
+    "checked_rules": [
+      {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条", "rule": "同一发票最多报销1次"}
+    ],
+    "population_count": 12,
+    "conclusion": "R004201-R004206 are explicitly labeled as '重复发票注入样本' (duplicate invoice injection test samples) in their reason fields, with record_no prefix 'BX2025X' distinguishing them from genuine records ('BX2025'). R004201 additionally has expense_date (2025-02-10) before invoice_date (2025-08-19), confirming non-genuine data. These injection samples do not represent actual reimbursements and therefore no anomaly exists under Article 10."
+  },
+  "reconciled_figures": {
+    "total_candidates": 12,
+    "total_submitted": 12,
+    "matched_invoices": 6,
+    "original_records": 6,
+    "injection_samples": 6
+  },
+  "unresolved_items": []
+}

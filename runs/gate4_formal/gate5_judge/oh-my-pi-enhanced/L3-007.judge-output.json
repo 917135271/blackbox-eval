@@ -1,0 +1,35 @@
+{
+  "criteria": [
+    {
+      "id": "threshold",
+      "score": 35,
+      "reason": "答案明确给出部门总经理审批线为AR-03：金额≥10000且<50000元，金额和边界均正确。",
+      "answer_evidence": "经交叉引用检索：...AR-03 金额≥10000且<50000元由部门总经理审批",
+      "trace_evidence": "get_policy_doc 03_authorization_management.md 获取附件二，包含AR-03区间"
+    },
+    {
+      "id": "two-hop-path",
+      "score": 30,
+      "reason": "候选明确描述了从费用报销办法第五条交叉引用到授权管理办法附件二的完整两跳路径。",
+      "answer_evidence": "交叉引用路径：01_expense_reimbursement_2025.md第五条→03_authorization_management.md附件二",
+      "trace_evidence": "先get 01_expense_reimbursement_2025.md，再get 03_authorization_management.md，路径可复核"
+    },
+    {
+      "id": "citations",
+      "score": 20,
+      "reason": "提交的引用包含01_expense_reimbursement_2025.md和03_authorization_management.md，均为有效制度文档。",
+      "answer_evidence": "citations字段包含这两份文档，且均为现行有效版本",
+      "trace_evidence": "工具调用记录中get_policy_doc输出了这两份文档的完整内容"
+    },
+    {
+      "id": "no-premature-stop",
+      "score": 10,
+      "reason": "轨迹显示候选在读取01号文档后没有停止，而是进一步检索了03号文档，完成了交叉引用。",
+      "answer_evidence": "最终答案基于两份文档得出结论",
+      "trace_evidence": "工具调用序列：get_policy_doc 01 → get_policy_doc 03，证明继续检索"
+    }
+  ],
+  "critical_failures": [],
+  "overall_comment": "候选准确完成了二跳检索，找到了部门总经理审批线10000元，并给出了完整的交叉引用路径和双文档证据，轨迹无缺陷。",
+  "confidence": 1.0
+}

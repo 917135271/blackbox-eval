@@ -1,0 +1,34 @@
+{
+  "criteria": [
+    {
+      "id": "audit-conclusion",
+      "score": 20,
+      "reason": "结论明确为重复报销，异常类型正确，与预期一致。",
+      "answer_evidence": "answer中明确认为构成重复报销异常。",
+      "trace_evidence": "find_invoice_usage确认同一发票在两个记录中使用，search_policy找到第十条禁止同一发票重复报销。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 15,
+      "reason": "引用了费用报销管理办法第十条，即规则6.1对应条款，有效支持结论。",
+      "answer_evidence": "citations中clause_no: \"第十条\"，doc_id: \"01_expense_reimbursement_2025.md\"。",
+      "trace_evidence": "search_policy返回了包含第十条内容的片段，get_policy_doc获取了完整制度。"
+    },
+    {
+      "id": "case-reasoning",
+      "score": 20,
+      "reason": "推理完整，指出同一发票FP202500000020金额669.5元在R000020和R004203中重复使用，数值一致。",
+      "answer_evidence": "answer中详细说明了发票号、金额、两个记录ID及重复事实。",
+      "trace_evidence": "get_expense_detail for R000020和R004203都显示金额669.5元，find_invoice_usage显示两笔记录。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有record_ids均在工具返回中存在，无虚构或无关记录。"
+    }
+  ],
+  "overall_comment": "候选准确识别了重复报销异常，引用了正确的制度条款，推理事实清晰完整。",
+  "confidence": 1.0
+}

@@ -1,0 +1,195 @@
+{
+  "case_family": "full_year_audit",
+  "case_score": 15.0,
+  "case_score_raw": 15.0,
+  "category": "full_year_rule_audit",
+  "criteria": [
+    {
+      "answer_evidence": "候选提交anomaly_ids包含DUP_001等，预期为OVERSTD-001等。",
+      "id": "all-anomaly-ids",
+      "reason": "提交的异常ID全是其他类型（DUP、SPLIT），未包含任何预期的OVERSTD-xxx，完全错误。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "规则诊断显示实际异常ID无匹配，precision=0, recall=0。"
+    },
+    {
+      "answer_evidence": "提交的record_ids包含[R000002, ..., R004221, R004222, R004223]，缺少R004224等。",
+      "id": "all-record-ids",
+      "reason": "提交的记录中包含了R004221-004223，但遗漏了R004224-004226，且多出26个无关记录，召回率50%且大量错误。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "规则诊断显示missing_count=3, extra_count=26, precision=0.103, recall=0.5。"
+    },
+    {
+      "answer_evidence": "答案仅报告3项超标准，而预期6项。",
+      "id": "full-scan-method",
+      "reason": "执行了针对超标准的list_expenses查询，但仅针对部分费用类型（办公、通讯、培训），未对差旅住宿等按标准全量扫描，导致遗漏。",
+      "score": 5.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹显示list_expenses with training_fee>3500, office_supplies>600, communication>300，但未对travel_lodging按职级和城市标准进行全量扫描。"
+    },
+    {
+      "answer_evidence": "答案中提及“违反相应制度标准及《费用报销管理办法》第十二条”，但未提及差旅住宿标准。",
+      "id": "policy-basis",
+      "reason": "引用了费用报销管理办法第十二条及办公、培训标准，但未引用差旅住宿标准，制度依据不完整。",
+      "score": 5.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中获取了差旅费管理办法但未在超标准扫描中应用。"
+    },
+    {
+      "answer_evidence": "答案中列出了DUP_001至DUP_006, SPLIT_001至SPLIT_006等异常。",
+      "id": "false-positive-control",
+      "reason": "答案混入了6个重复报销和6个拆分异常，这些不是超标准，造成大量误报。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "build_evidence_matrix中对应记录为重复和拆分。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的记录ID均存在于数据库中，无伪造。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": true,
+      "reason": "只扫描了办公、通讯、培训超标准，遗漏了差旅住宿等超标准，但答案表述为全年扫描，构成partial-scan-presented-as-complete。",
+      "score_cap": 50,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "DUP_001",
+      "DUP_002",
+      "DUP_003",
+      "DUP_004",
+      "DUP_005",
+      "DUP_006",
+      "OVER_001",
+      "OVER_002",
+      "OVER_003",
+      "SPLIT_001",
+      "SPLIT_002",
+      "SPLIT_003",
+      "SPLIT_004",
+      "SPLIT_005",
+      "SPLIT_006"
+    ],
+    "actual_record_ids": [
+      "R000002",
+      "R000005",
+      "R000020",
+      "R000028",
+      "R000037",
+      "R000055",
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206",
+      "R004207",
+      "R004208",
+      "R004209",
+      "R004210",
+      "R004211",
+      "R004212",
+      "R004213",
+      "R004214",
+      "R004215",
+      "R004216",
+      "R004217",
+      "R004218",
+      "R004219",
+      "R004220",
+      "R004221",
+      "R004222",
+      "R004223"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "DUP": 6,
+        "SPLIT": 6
+      },
+      "count_exact": false,
+      "expected_types": {
+        "OVERSTD": 6
+      },
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "citation_count": 6,
+    "elapsed_seconds": 289.508,
+    "expected_anomaly_ids": [
+      "OVERSTD-001",
+      "OVERSTD-002",
+      "OVERSTD-003",
+      "OVERSTD-004",
+      "OVERSTD-005",
+      "OVERSTD-006"
+    ],
+    "expected_record_ids": [
+      "R004221",
+      "R004222",
+      "R004223",
+      "R004224",
+      "R004225",
+      "R004226"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 26,
+      "f1": 0.171429,
+      "missing_count": 3,
+      "precision": 0.103448,
+      "recall": 0.5
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:25:35+08:00",
+  "group": "codex-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.95,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选提交未正确理解“超标准专项扫描”任务要求，返回了所有发现的异常类型，导致超标准召回严重不全，且混入大量其他规则异常。制度引用不完整，扫描方法不精确。得分10/95，因critical failure限制最高50分，但实际得分未超过限制。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 3797,
+      "completion_tokens_details": {
+        "reasoning_tokens": 2989
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 14965,
+      "prompt_tokens": 14965,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 18762
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/codex-baseline/L3-003",
+  "task_id": "L3-003"
+}

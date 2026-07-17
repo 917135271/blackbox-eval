@@ -1,0 +1,61 @@
+{
+  "task_id": "L3-010",
+  "task_scope": {
+    "audit_object": "版本陷阱审计说明",
+    "description": "撰写版本陷阱审计说明，解释旧版审批线可能导致的误判",
+    "audit_period": "制度沿革：2022版→2025版",
+    "expense_types": ["all"],
+    "deliverable": "audit_report"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "2022版审批线（8000元、30000元）与2025版审批线（3000、10000、50000、200000元）的差异是什么？",
+      "policies": ["02_expense_reimbursement_2022_deprecated.md", "01_expense_reimbursement_2025.md", "03_authorization_management.md"]
+    },
+    {
+      "id": "PQ-02",
+      "question": "若审计人员误用旧版审批线，会在哪些金额区间产生误判？",
+      "policies": ["02_expense_reimbursement_2022_deprecated.md", "03_authorization_management.md"]
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-01",
+      "question": "查找金额在旧版审批线区间（8000-9999、30000-49999）的记录，展示版本陷阱的误判风险",
+      "tables": ["expenses", "approvals"],
+      "fields": ["record_id", "amount", "expense_date", "employee_id", "department_id", "approval_roles"]
+    }
+  ],
+  "evidence_requirements": [
+    "2022版制度原文（审批线8000/30000）",
+    "2025版制度+授权管理办法附件二（审批线3000/10000/50000/200000）",
+    "处于版本陷阱区间的实际报销记录示例"
+  ],
+  "execution_steps": [
+    "查询2022版和2025版政策文档，提取审批线差异",
+    "查询授权管理办法附件二，确认现行审批线",
+    "查询业务数据中处于版本陷阱区间的记录",
+    "撰写版本陷阱审计说明",
+    "证据覆盖检查",
+    "审计报告和校验",
+    "提交"
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "policy version comparison (2022 vs 2025)",
+      "threshold boundary analysis (approval lines differ)"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "Complexity 2, single-rule task with clear policy comparison; main agent sufficient"
+  },
+  "stopping_conditions": [
+    "2022版和2025版审批线差异已明确",
+    "版本陷阱区间已识别",
+    "审计说明已撰写并通过校验和提交"
+  ],
+  "unresolved_items": []
+}

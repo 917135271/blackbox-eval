@@ -1,0 +1,39 @@
+{
+  "criteria": [
+    {
+      "id": "full-scan-method",
+      "score": 0,
+      "reason": "工具轨迹中未执行任何查询或计算，无法证明对全年数据进行了可复核的重复报销扫描。",
+      "answer_evidence": "答案中仅声称“全年重复报销专项扫描”，未提供扫描方法或查询语句。",
+      "trace_evidence": "工具调用次数为0，无任何全量扫描的查询或统计证据。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 5,
+      "reason": "引用了制度“第十条”（对应费用报销管理办法-6.1），但工具轨迹中无查询条件落实该制度的证据，仅有引用而无对应计算。",
+      "answer_evidence": "答案明确引用“第十条”并说明“同一发票最多报销1次”，citations中包含该条款。",
+      "trace_evidence": "轨迹中无任何查询语句或计算逻辑展示如何落实该制度。"
+    },
+    {
+      "id": "false-positive-control",
+      "score": 15,
+      "reason": "提交的异常ID和记录ID与预期完全一致，无任何误报或混入其他规则、TRAP记录。",
+      "answer_evidence": "anomaly_ids和record_ids与预期集合精确匹配，未出现无关项。",
+      "trace_evidence": "规则诊断显示precision=1.0, recall=1.0，无未知记录或陷阱误报。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的所有record_id均存在于数据库中，且为核心结论的正确支撑记录。"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": true,
+      "reason": "工具轨迹完全为空，无任何全量数据查询或计算的证据，却将结果表述为全年完整扫描，严重违反可复核性要求。"
+    }
+  ],
+  "overall_comment": "结果准确性极高，误报控制完美，但扫描方法缺乏任何工具调用证据，无法证明全量执行，制度规则也未通过查询条件落实，因此方法项不得分，制度依据部分得分。触发关键失败“部分扫描冒充完整”，但总分未触及cap限制。",
+  "confidence": 0.95
+}

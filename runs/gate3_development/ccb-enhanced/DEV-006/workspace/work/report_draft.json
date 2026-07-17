@@ -1,0 +1,60 @@
+{
+  "audit_scope": {
+    "task_id": "DEV-006",
+    "audit_object": "R900013",
+    "expense_type": "travel_lodging",
+    "period": "2025-07-10",
+    "organization": "开发审计一部(D901)",
+    "employee": "开发经理乙(E9002)"
+  },
+  "verified_facts": [
+    "R900013为差旅住宿费报销，员工开发经理乙(经理级)，出差城市为一类城市(A)",
+    "住宿2晚，实际报销金额1400元，折合700元/人/晚",
+    "该报销无专项审批(special_approval=0)，状态为已批准(approved)"
+  ],
+  "applicable_policies": [
+    {
+      "doc_id": "04_travel_expense.md",
+      "title": "XX证券差旅费管理办法",
+      "clause_no": "第四条",
+      "rule": "经理级在一类城市住宿标准为650元/人/晚"
+    },
+    {
+      "doc_id": "04_travel_expense.md",
+      "title": "XX证券差旅费管理办法",
+      "clause_no": "第五条",
+      "rule": "超过住宿标准且无专项审批的，不得报销超出部分"
+    },
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "clause_no": "第十二条",
+      "rule": "无专项审批时，报销金额不得超过对应制度标准的1.0倍"
+    }
+  ],
+  "findings": [
+    {
+      "anomaly_id": "ANOM-DEV006-001",
+      "description": "R900013差旅住宿费超标",
+      "standard_per_night": 650,
+      "actual_per_night": 700,
+      "nights": 2,
+      "standard_total": 1300,
+      "actual_total": 1400,
+      "excess": 100,
+      "special_approval": 0,
+      "record_ids": ["R900013"]
+    }
+  ],
+  "impact": "超标金额100元，违反住宿标准制度",
+  "recommendations": "追回超标部分100元，或补充专项审批",
+  "anomaly_ids": ["ANOM-DEV006-001"],
+  "record_ids": ["R900013"],
+  "citations": [
+    {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "第五条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+  ],
+  "answer": "R900013差旅住宿费超标。员工开发经理乙(经理级)在一类城市住宿2晚，按《XX证券差旅费管理办法》第四条标准为650元/人/晚，2晚合计1300元；实际报销1400元(折合700元/人/晚)，超标100元。该报销无专项审批，违反《XX证券差旅费管理办法》第五条及《XX证券费用报销管理办法(2025修订版)》第十二条规定。",
+  "limitations": []
+}

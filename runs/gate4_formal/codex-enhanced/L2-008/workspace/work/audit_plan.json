@@ -1,0 +1,86 @@
+{
+  "task_id": "L2-008",
+  "task_question": "结合制度和业务数据,核查以R004212为线索的拆分报销异常,返回异常ID和记录ID集合。",
+  "clue_record": "R004212",
+  "audit_object": "拆分报销(split reimbursement)",
+  "scope": {
+    "employee_id": "E0009",
+    "expense_type": "travel_lodging",
+    "date_range": "2025-04-03 to 2025-04-17 (7 days around 2025-04-10)",
+    "clue_record_details": {
+      "record_id": "R004212",
+      "employee_id": "E0009",
+      "employee_name": "张婷",
+      "department_id": "D009",
+      "department_name": "财务管理部",
+      "expense_type": "travel_lodging",
+      "amount": 5100.0,
+      "expense_date": "2025-04-10",
+      "city_tier": "A",
+      "nights": 7,
+      "invoice_id": "INV004206",
+      "status": "approved"
+    }
+  },
+  "applicable_policies": [
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "effective_date": "2025-01-01",
+      "clause": "第十一条",
+      "rule": "不得将同一事项或同类事项拆分为多笔报销以规避审批权限。同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到《授权管理办法》附件二较高审批线的,应重点核查拆分规避审批。"
+    },
+    {
+      "doc_id": "03_authorization_management.md",
+      "title": "XX证券授权管理办法",
+      "effective_date": "2025-01-01",
+      "clause": "附件二",
+      "rule": "审批权限表: AR-01(0-3000 部门经理), AR-02(3000-10000 部门经理+财务复核), AR-03(10000-50000 部门总经理), AR-04(50000-200000 分管副总), AR-05(>=200000 总经理办公会)"
+    }
+  ],
+  "policy_questions": [
+    "同一员工E0009在2025-04-03至2025-04-17期间，是否存在2笔及以上travel_lodging类型的报销？",
+    "若存在多笔，合计金额是否达到授权管理办法附件二中更高的审批线(AR-03即>=10000元)？",
+    "这些报销是否构成拆分报销以规避审批权限？"
+  ],
+  "data_requirements": {
+    "tables": ["expense_records", "employees", "departments", "approvals"],
+    "key_fields": ["record_id", "employee_id", "expense_type", "expense_date", "amount", "status", "invoice_id", "approval_tier"],
+    "queries": [
+      "list_expenses with employee_id=E0009, expense_type=travel_lodging, date_from=2025-04-03, date_to=2025-04-17",
+      "For each record found, get approvals to determine approval tier",
+      "Sum amounts of all matching records and compare against AR thresholds"
+    ]
+  },
+  "execution_steps": [
+    {"step": "planning", "status": "completed", "artifact": "work/audit_plan.json"},
+    {"step": "policy_verification", "status": "pending", "artifact": "Policy excerpts for Article 11 and 附件二"},
+    {"step": "data_investigation", "status": "pending", "artifact": "Query records for E0009 travel_lodging within 7-day window"},
+    {"step": "aggregation_and_threshold_check", "status": "pending", "artifact": "Sum amounts and compare against AR thresholds"},
+    {"step": "evidence_coverage", "status": "pending", "artifact": "work/evidence_matrix.json"},
+    {"step": "report_and_validate", "status": "pending", "artifact": "work/final_result.json, work/validation_report.json"},
+    {"step": "submit", "status": "pending", "artifact": "Submission via audit_control"}
+  ],
+  "complexity": 3,
+  "complexity_reasons": [
+    "Aggregation, grouping, and batch filtering required (+1)",
+    "Thresholds and date boundaries: 7-day window + AR approval tier comparison (+1)",
+    "Two policies needed: reimbursement management + authorization management (+1)"
+  ],
+  "subagent_plan": {
+    "use_subagent": true,
+    "role": "data_analyst",
+    "reason_code": "AGGREGATION_REQUIRED",
+    "context": {
+      "task": "Find all travel_lodging records for employee E0009 within 2025-04-03 to 2025-04-17 (7 days centered on 2025-04-10). For each record, retrieve its approval chain. Compute the sum of amounts. Determine if any pair or group of records within a 7-day sliding window exceeds the AR-03 threshold (>=10000) while individually staying below it.",
+      "question": "Does employee E0009 have split reimbursement behavior for travel_lodging around R004212 (2025-04-10)?"
+    }
+  },
+  "stopping_conditions": [
+    "All travel_lodging records for E0009 within the 7-day window identified",
+    "Approval tiers for all records verified",
+    "Sum compared against AR thresholds",
+    "Evidence matrix with 100% coverage and pass status"
+  ],
+  "unresolved_items": []
+}

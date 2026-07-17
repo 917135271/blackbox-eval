@@ -1,0 +1,73 @@
+{
+  "task_id": "DEV-011",
+  "task_type": "aggregate_budget",
+  "audit_object": "D902部门年度预算执行",
+  "audit_period": "2025年度",
+  "scope": {
+    "department_id": "D902",
+    "department_name": "开发审计二部",
+    "annual_budget": 50000.0,
+    "budget_year": 2025
+  },
+  "policy_questions": [
+    {
+      "question": "部门年度预算超限的判定标准是什么？",
+      "policy": "08_budget_management.md",
+      "clause": "第三条",
+      "rule": "部门费用累计使用达到年度预算额度的1.0倍后,原则上不得继续报销。"
+    },
+    {
+      "question": "超预算支出需要什么审批？",
+      "policy": "08_budget_management.md",
+      "clause": "第四条",
+      "rule": "因监管要求、客户服务或经营连续性确需超预算支出的,应履行专项审批。"
+    },
+    {
+      "question": "费用报销管理办法关于预算超限的规定？",
+      "policy": "01_expense_reimbursement_2025.md",
+      "clause": "第十三条",
+      "rule": "部门年度预算不足时不得继续报销。预算使用达到预算额度的1.0倍后,确需发生的费用应履行专项审批。"
+    }
+  ],
+  "data_questions": [
+    "D902部门年度预算额度",
+    "D902部门所有已审批报销记录（按日期排序）",
+    "每条记录的专项审批状态",
+    "累计报销金额的逐笔计算",
+    "首次导致累计金额超过预算额度的记录"
+  ],
+  "required_fields": ["record_id", "expense_date", "amount", "special_approval", "status", "department_id", "budget_year"],
+  "evidence_needed": [
+    "D902部门预算额度证明",
+    "所有已审批报销记录列表",
+    "每笔记录的专项审批字段",
+    "累计计算过程"
+  ],
+  "execution_steps": [
+    "1. 查询D902部门年度预算",
+    "2. 查询D902所有已审批报销记录并按日期排序",
+    "3. 计算累计运行金额",
+    "4. 识别首次导致累计超预算的记录",
+    "5. 检查该记录是否有专项审批",
+    "6. 核实后续超预算记录是否有专项审批（避免误报）",
+    "7. 证据覆盖检查",
+    "8. 误报复核",
+    "9. 生成审计报告",
+    "10. 结果校验与提交"
+  ],
+  "complexity": 3,
+  "complexity_reasons": [
+    "聚合/累计计算: +1",
+    "阈值边界判定(1.0倍预算): +1",
+    "专项审批豁免规则: +1"
+  ],
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "仅3条记录，累计计算和专项审批检查极为简单，紧凑模式可直接完成，无需原生子智能体。数据已在主上下文中完整获取。"
+  },
+  "stopping_conditions": [
+    "找到首次超预算且无专项审批的记录",
+    "或确认所有超预算记录均有专项审批（无异常）"
+  ],
+  "unresolved_items": []
+}

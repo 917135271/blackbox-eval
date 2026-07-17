@@ -1,0 +1,73 @@
+{
+  "task_id": "L3-010",
+  "analysis_date": "2026-07-16",
+  "business_period": "2025-01-01 onwards",
+  "policy_timeline": {
+    "2022_version": {
+      "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+      "title": "XX证券费用报销管理办法(2022版)",
+      "status": "deprecated",
+      "effective_from": "2022 (assumed)",
+      "repealed_date": "2025-01-01",
+      "repeal_authority": "01_expense_reimbursement_2025.md 第十四条",
+      "key_clauses": {
+        "clause_2": "单笔报销金额达到8000元的,应提交部门总经理审批。",
+        "clause_3": "单笔报销金额达到30000元的,应提交分管副总审批。"
+      }
+    },
+    "2025_version": {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "status": "current",
+      "effective_from": "2025-01-01",
+      "repealed_date": null,
+      "key_clauses": {
+        "clause_5": "单笔费用报销的审批权限,不在本办法正文列示具体金额,统一按《XX证券授权管理办法》附件二执行。",
+        "clause_14": "本办法自二〇二五年一月一日起施行。原《XX证券费用报销管理办法(2022版)》同时废止。"
+      }
+    },
+    "authorization_2025": {
+      "doc_id": "03_authorization_management.md",
+      "title": "XX证券授权管理办法",
+      "status": "current",
+      "effective_from": "2025-01-01",
+      "repealed_date": null,
+      "key_clauses": {
+        "annex_2": {
+          "AR-01": {"range": "[0, 3000)", "approval": "部门经理"},
+          "AR-02": {"range": "[3000, 10000)", "approval": "部门经理,并经财务复核"},
+          "AR-03": {"range": "[10000, 50000)", "approval": "部门总经理"},
+          "AR-04": {"range": "[50000, 200000)", "approval": "分管副总"},
+          "AR-05": {"range": "[200000, ∞)", "approval": "总经理办公会"}
+        },
+        "clause_2": "本办法附件二适用于费用报销系统自动派生审批角色,相关金额为现行有效审批线。",
+        "clause_4": "授权事项发生调整的,以最新修订版附件为准。"
+      }
+    }
+  },
+  "applicable_policies": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "reason": "现行有效制度,自2025-01-01起施行"},
+    {"doc_id": "03_authorization_management.md", "reason": "现行有效审批权限表,2025版报销制度第五条引用其附件二作为审批依据"}
+  ],
+  "excluded_policies": [
+    {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "reason": "已于2025-01-01被废止(2025修订版第十四条),其审批金额不得作为现行审批依据"}
+  ],
+  "version_trap_zones": [
+    {
+      "zone_id": "VT-01",
+      "amount_range": "[8000, 10000)",
+      "old_threshold_trigger": "旧版第2条: 8000元触发部门总经理审批",
+      "current_rule": "AR-02: [3000, 10000) 仅需部门经理+财务复核",
+      "misjudgment_type": "若误用旧版8000元审批线,会将金额在8000~10000元的报销误判为缺少部门总经理审批"
+    },
+    {
+      "zone_id": "VT-02",
+      "amount_range": "[30000, 50000)",
+      "old_threshold_trigger": "旧版第3条: 30000元触发分管副总审批",
+      "current_rule": "AR-03: [10000, 50000) 仅需部门总经理审批",
+      "misjudgment_type": "若误用旧版30000元审批线,会将金额在30000~50000元的报销误判为缺少分管副总审批"
+    }
+  ],
+  "conflicts": [],
+  "unresolved_items": []
+}

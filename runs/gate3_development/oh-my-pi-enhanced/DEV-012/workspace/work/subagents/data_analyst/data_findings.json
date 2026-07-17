@@ -1,0 +1,327 @@
+{
+  "population": {
+    "total_records": 21,
+    "total_invoices": 20,
+    "total_employees": 4,
+    "total_departments": 2,
+    "all_record_ids": [
+      "R900001",
+      "R900002",
+      "R900003",
+      "R900004",
+      "R900005",
+      "R900006",
+      "R900007",
+      "R900008",
+      "R900009",
+      "R900010",
+      "R900011",
+      "R900012",
+      "R900013",
+      "R900014",
+      "R900015",
+      "R900016",
+      "R900017",
+      "R900018",
+      "R900019",
+      "R900020",
+      "R900021"
+    ]
+  },
+  "rule1_duplicate_reimbursement": {
+    "description": "发票重复报销",
+    "sql": "SELECT invoice_id, COUNT(*) cnt, GROUP_CONCAT(record_id) AS record_ids\nFROM expense_records\nGROUP BY invoice_id\nHAVING cnt > 1",
+    "findings": [
+      {
+        "invoice_id": "INV900001",
+        "usage_count": 2,
+        "record_ids": [
+          "R900001",
+          "R900002"
+        ]
+      }
+    ],
+    "matched_record_ids": [
+      "R900001",
+      "R900002"
+    ]
+  },
+  "rule2_split_reimbursement": {
+    "description": "拆分报销（同员工同类型7天内）",
+    "pairs_examined": [
+      {
+        "record_a": "R900001",
+        "record_b": "R900002",
+        "employee_id": "E9001",
+        "expense_type": "office_supplies",
+        "date_a": "2025-01-05",
+        "date_b": "2025-01-06",
+        "amount_a": 480.0,
+        "amount_b": 480.0,
+        "combined_amount": 960.0,
+        "tier_a": "AR-01",
+        "tier_b": "AR-01",
+        "tier_combined": "AR-01",
+        "days_diff": 1,
+        "flagged": false
+      },
+      {
+        "record_a": "R900003",
+        "record_b": "R900004",
+        "employee_id": "E9001",
+        "expense_type": "travel_transport",
+        "date_a": "2025-02-03",
+        "date_b": "2025-02-06",
+        "amount_a": 5200.0,
+        "amount_b": 5200.0,
+        "combined_amount": 10400.0,
+        "tier_a": "AR-02",
+        "tier_b": "AR-02",
+        "tier_combined": "AR-03",
+        "days_diff": 3,
+        "flagged": true
+      }
+    ],
+    "flagged_pairs": [
+      {
+        "record_a": "R900003",
+        "record_b": "R900004",
+        "employee_id": "E9001",
+        "expense_type": "travel_transport",
+        "date_a": "2025-02-03",
+        "date_b": "2025-02-06",
+        "amount_a": 5200.0,
+        "amount_b": 5200.0,
+        "combined_amount": 10400.0,
+        "tier_a": "AR-02",
+        "tier_b": "AR-02",
+        "tier_combined": "AR-03",
+        "days_diff": 3,
+        "flagged": true
+      }
+    ],
+    "matched_record_ids": [
+      "R900003",
+      "R900004"
+    ]
+  },
+  "rule3_exceeding_standard": {
+    "description": "超标准报销（排除special_approval=1）",
+    "sub_rules": {
+      "3a_travel_lodging": {
+        "record_ids": [
+          "R900013"
+        ],
+        "standard": "E9001=450/night, E9002=650/night"
+      },
+      "3b_business_entertainment": {
+        "record_ids": [
+          "R900005",
+          "R900017"
+        ],
+        "standard": "amount>5000 OR per_person>300"
+      },
+      "3c_office_supplies": {
+        "record_ids": [
+          "R900001",
+          "R900002",
+          "R900007"
+        ],
+        "standard": "monthly per employee > 600"
+      },
+      "3d_communication": {
+        "record_ids": [
+          "R900014",
+          "R900015"
+        ],
+        "standard": "monthly per employee > 300"
+      },
+      "3e_training_fee": {
+        "record_ids": [
+          "R900016"
+        ],
+        "standard": "amount/days > 800"
+      },
+      "3f_training_lodging": {
+        "record_ids": [],
+        "standard": "city_tier A, amount/nights > 500"
+      }
+    },
+    "matched_record_ids": [
+      "R900001",
+      "R900002",
+      "R900005",
+      "R900007",
+      "R900013",
+      "R900014",
+      "R900015",
+      "R900016",
+      "R900017"
+    ]
+  },
+  "rule4_late_reimbursement": {
+    "description": "超期报销（>60天，12月费用次年1/15前除外）",
+    "all_delays": [
+      {
+        "record_id": "R900001",
+        "expense_date": "2025-01-05",
+        "reimburse_date": "2025-01-12",
+        "delay_days": 7
+      },
+      {
+        "record_id": "R900002",
+        "expense_date": "2025-01-06",
+        "reimburse_date": "2025-01-13",
+        "delay_days": 7
+      },
+      {
+        "record_id": "R900003",
+        "expense_date": "2025-02-03",
+        "reimburse_date": "2025-02-08",
+        "delay_days": 5
+      },
+      {
+        "record_id": "R900004",
+        "expense_date": "2025-02-06",
+        "reimburse_date": "2025-02-10",
+        "delay_days": 4
+      },
+      {
+        "record_id": "R900005",
+        "expense_date": "2025-03-12",
+        "reimburse_date": "2025-03-20",
+        "delay_days": 8
+      },
+      {
+        "record_id": "R900006",
+        "expense_date": "2025-03-01",
+        "reimburse_date": "2025-05-05",
+        "delay_days": 65
+      },
+      {
+        "record_id": "R900007",
+        "expense_date": "2025-04-08",
+        "reimburse_date": "2025-04-12",
+        "delay_days": 4
+      },
+      {
+        "record_id": "R900008",
+        "expense_date": "2025-05-05",
+        "reimburse_date": "2025-05-10",
+        "delay_days": 5
+      },
+      {
+        "record_id": "R900009",
+        "expense_date": "2025-05-05",
+        "reimburse_date": "2025-05-10",
+        "delay_days": 5
+      },
+      {
+        "record_id": "R900010",
+        "expense_date": "2025-06-01",
+        "reimburse_date": "2025-06-05",
+        "delay_days": 4
+      },
+      {
+        "record_id": "R900011",
+        "expense_date": "2025-06-09",
+        "reimburse_date": "2025-06-13",
+        "delay_days": 4
+      },
+      {
+        "record_id": "R900012",
+        "expense_date": "2025-12-20",
+        "reimburse_date": "2026-01-10",
+        "delay_days": 21
+      },
+      {
+        "record_id": "R900013",
+        "expense_date": "2025-07-10",
+        "reimburse_date": "2025-07-15",
+        "delay_days": 5
+      },
+      {
+        "record_id": "R900014",
+        "expense_date": "2025-09-03",
+        "reimburse_date": "2025-09-06",
+        "delay_days": 3
+      },
+      {
+        "record_id": "R900015",
+        "expense_date": "2025-09-20",
+        "reimburse_date": "2025-09-23",
+        "delay_days": 3
+      },
+      {
+        "record_id": "R900016",
+        "expense_date": "2025-08-02",
+        "reimburse_date": "2025-08-08",
+        "delay_days": 6
+      },
+      {
+        "record_id": "R900017",
+        "expense_date": "2025-10-06",
+        "reimburse_date": "2025-10-12",
+        "delay_days": 6
+      },
+      {
+        "record_id": "R900018",
+        "expense_date": "2025-01-15",
+        "reimburse_date": "2025-01-20",
+        "delay_days": 5
+      },
+      {
+        "record_id": "R900019",
+        "expense_date": "2025-02-15",
+        "reimburse_date": "2025-02-20",
+        "delay_days": 5
+      },
+      {
+        "record_id": "R900020",
+        "expense_date": "2025-03-15",
+        "reimburse_date": "2025-03-20",
+        "delay_days": 5
+      },
+      {
+        "record_id": "R900021",
+        "expense_date": "2025-12-02",
+        "reimburse_date": "2025-12-08",
+        "delay_days": 6
+      }
+    ],
+    "matched_record_ids": [
+      "R900006"
+    ]
+  },
+  "rule5_over_budget": {
+    "description": "超预算（按部门累计，SA=1免检）",
+    "departments": {
+      "D901": {
+        "budget": 200000,
+        "total_spent": 36760.0
+      },
+      "D902": {
+        "budget": 50000,
+        "total_spent": 56000.0
+      }
+    },
+    "matched_record_ids": [
+      "R900019"
+    ]
+  },
+  "all_anomaly_ids": [
+    "R900001",
+    "R900002",
+    "R900003",
+    "R900004",
+    "R900005",
+    "R900006",
+    "R900007",
+    "R900013",
+    "R900014",
+    "R900015",
+    "R900016",
+    "R900017",
+    "R900019"
+  ]
+}

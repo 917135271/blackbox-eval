@@ -1,0 +1,142 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 92.5,
+  "case_score_raw": 92.5,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "“无异常。...所有记录不存在...异常。”",
+      "id": "clean-conclusion",
+      "reason": "明确给出无异常结论，没有矛盾表述。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "record_ids: [R004233-R004240]",
+      "id": "record-scope",
+      "reason": "候选核查了核心记录R004234和R004235，但提交的记录范围包含8条，多出了无关记录，导致记录集合不准确。",
+      "score": 7.5,
+      "source": "llm_judge",
+      "trace_evidence": "tool calls for R004234, R004235, etc."
+    },
+    {
+      "answer_evidence": "“R004234与R004235为同日同额不同发票,非重复报销且合计未超月度限额”",
+      "id": "case-specific-reason",
+      "reason": "完整说明了不同发票、非重复报销且合计未超限额，符合专属原因。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "查找重复发票，查看明细发票号不同，计算合计金额250+250=500低于AR-02线。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "reverse-check",
+      "reason": "轨迹中调用了重复发票检查、缺失审批检查、获取授权审批表等，进行了反向验证。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "find_reused_invoices, list_records_missing_approval, get_policy_doc for authorization attachment, etc."
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的记录ID均存在于数据库。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "候选未将任何记录判断为异常。",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R004233",
+      "R004234",
+      "R004235",
+      "R004236",
+      "R004237",
+      "R004238",
+      "R004239",
+      "R004240"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 10,
+    "elapsed_seconds": 297.295,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004234",
+      "R004235"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 6,
+      "f1": 0.4,
+      "missing_count": 0,
+      "precision": 0.25,
+      "recall": 1.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:27:28+08:00",
+  "group": "oh-my-pi-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.95,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选正确判断了无异常并给出了合理解释，但提交的记录范围超出了题目核心范围，包含了无关记录，导致记录范围评分未得满分。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2140,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1637
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 9557,
+      "prompt_tokens": 10581,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 12721
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/oh-my-pi-baseline/TRAP-002",
+  "task_id": "TRAP-002"
+}

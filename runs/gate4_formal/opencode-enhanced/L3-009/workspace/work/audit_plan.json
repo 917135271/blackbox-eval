@@ -1,0 +1,108 @@
+{
+  "task_id": "L3-009",
+  "task_type": "audit_report",
+  "question": "请基于全年数据出一份异常审计摘要报告,覆盖五类规则并列出关键异常ID。",
+  "audit_period": "2025-01-01 to 2025-12-31 (full year)",
+  "scope": {
+    "entity": "XX证券",
+    "departments": "all departments",
+    "expense_types": "all expense types (差旅、培训、招待、办公、通讯等)",
+    "policy_docs": ["01_expense_reimbursement_2025.md", "03_authorization_management.md", "04_travel_expense.md", "05_training_expense.md", "06_business_entertainment.md", "07_office_communication.md", "08_budget_management.md"],
+    "applicable_policy_version": "2025修订版 (XX证财规〔2025〕甲号), effective 2025-01-01"
+  },
+  "rule_categories": [
+    {
+      "rule_id": "R01_INVOICE_DUPLICATE",
+      "name": "发票重复报销",
+      "source": "01_expense_reimbursement_2025.md 第十条",
+      "description": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的，应认定为重复报销风险。",
+      "type": "duplicate_invoice"
+    },
+    {
+      "rule_id": "R02_SPLIT_CLAIMS",
+      "name": "拆分报销规避审批",
+      "source": "01_expense_reimbursement_2025.md 第十一条",
+      "description": "同一员工、同一费用类型在7天内出现2笔及以上报销，且合计金额达到《授权管理办法》附件二较高审批线的，应重点核查拆分规避审批。",
+      "type": "split_claims",
+      "threshold_ref": "03_authorization_management.md 附件二 AR-02 (>=3000)"
+    },
+    {
+      "rule_id": "R03_STANDARD_EXCEEDED",
+      "name": "超制度标准报销",
+      "source": "01_expense_reimbursement_2025.md 第十二条 + 各费用管理办法",
+      "description": "无专项审批时，报销金额不得超过对应制度标准的1.0倍。",
+      "type": "standard_exceeded",
+      "standards_ref": {
+        "travel_lodging": "04_travel_expense.md 第四条",
+        "travel_transport": "04_travel_expense.md 第六条",
+        "training_course": "05_training_expense.md 第二条 (<=3500/人次)",
+        "training_internal": "05_training_expense.md 第三条 (<=800/day)",
+        "training_external": "05_training_expense.md 第四条 (<=1200/day)",
+        "training_lodging": "05_training_expense.md 第五条",
+        "entertainment_event": "06_business_entertainment.md 第二条 (<=5000/次)",
+        "entertainment_per_person": "06_business_entertainment.md 第三条 (<=300/人)",
+        "office_supplies": "07_office_communication.md 第二条 (<=600/月)",
+        "communication": "07_office_communication.md 第三条 (<=300/月)"
+      }
+    },
+    {
+      "rule_id": "R04_BUDGET_EXCEEDED",
+      "name": "部门预算不足报销",
+      "source": "01_expense_reimbursement_2025.md 第十三条 + 08_budget_management.md",
+      "description": "部门年度预算不足时不得继续报销。预算使用达到预算额度的1.0倍后，确需发生的费用应履行专项审批。",
+      "type": "budget_exceeded"
+    },
+    {
+      "rule_id": "R05_DELAYED_REIMBURSEMENT",
+      "name": "超期报销",
+      "source": "01_expense_reimbursement_2025.md 第七条",
+      "description": "员工应在费用发生后60天内提交报销申请；超过期限的，原则上不得报销。",
+      "type": "delayed_reimbursement"
+    }
+  ],
+  "policy_questions": [
+    "Which policy version applies? (2025 vs deprecated 2022)",
+    "What are the five rule categories and their exact clauses?",
+    "What are the standard limits for each expense type?",
+    "What are the approval thresholds per authorization attachment?",
+    "How is budget usage calculated?"
+  ],
+  "data_questions": [
+    "Are there invoices used more than once?",
+    "Are there split claims (same employee, same type, within 7 days, total >= higher approval line)?",
+    "Are there expenses exceeding standards without special approval?",
+    "Are there departments exceeding their annual budget?",
+    "Are there expenses submitted more than 60 days after occurrence?"
+  ],
+  "complexity": 5,
+  "complexity_reasons": [
+    "Two or more policies (at least 5 policy documents involved)",
+    "Aggregation, grouping, joins, batch filtering required",
+    "Five business rules must be covered",
+    "Thresholds, dates, exemptions, exceptions present",
+    "Comprehensive audit report required"
+  ],
+  "subagent_plan": {
+    "policy_researcher": null,
+    "data_analyst": {
+      "authorized": false,
+      "reason_code": "MULTI_RECORD_SCOPE",
+      "role": "data_analyst",
+      "task_description": "Run full-year batch analysis across all five rule categories. Query reused invoices, split claims patterns, standard-exceeding records, budget overrun departments, and delayed reimbursements. Return all anomaly IDs and record IDs with supporting evidence.",
+      "artifact_paths": ["work/audit_plan.json"],
+      "requested_token_budget": 8000
+    },
+    "independent_reviewer": null
+  },
+  "evidence_requirements": [
+    "For each anomaly: specific record IDs, invoice numbers, amounts, dates, policy citations",
+    "Evidence matrix with anomaly_id, record_ids, citations, facts",
+    "Coverage of all five rule categories"
+  ],
+  "stopping_conditions": [
+    "All five rule categories investigated with complete data coverage",
+    "Evidence matrix passes coverage check at 100%",
+    "Validation report passes",
+    "Submit result successfully"
+  ]
+}

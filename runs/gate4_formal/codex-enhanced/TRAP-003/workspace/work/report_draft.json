@@ -1,0 +1,47 @@
+{
+  "task_id": "TRAP-003",
+  "audit_scope": {
+    "audited_object": "TRAP-003关联记录R000003及同员工E0061邻近培训费记录",
+    "period": "2025-03-15至2025-05-08",
+    "organization": "D008合规风控部",
+    "data_scope": "R000003核心记录、R003369/R003915关联排查记录"
+  },
+  "verified_facts": [
+    "R000003培训费3209.78元，未超过培训费管理办法每人每期3500元标准",
+    "R000003触发AR-02审批档位，系统中仅有部门经理(E0008)审批记录",
+    "全库approvals表中不存在任何'财务复核'角色记录，95条AR-02记录均为单一部门经理审批，属系统级行为",
+    "R000003与R003369间隔7天但分属不同培训课程，合计金额4711.63元未达AR-03较高审批线(10000元)",
+    "发票FP202500000003仅被使用1次，无重复报销",
+    "R000003费用发生至报销间隔42天，未超60天时限",
+    "D008部门预算使用率77.86%，未超年度预算"
+  ],
+  "applicable_policies": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause": "第七条", "rule": "60天报销时限"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause": "第十条", "rule": "同一发票最多报销1次"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause": "第十一条", "rule": "禁止拆分报销规避审批"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause": "第十三条", "rule": "预算不足不得继续报销"},
+    {"doc_id": "03_authorization_management.md", "clause": "附件二AR-02", "rule": "3000-10000元需部门经理并经财务复核"},
+    {"doc_id": "05_training_expense.md", "clause": "第二条", "rule": "培训课程费每人每期不超过3500元"}
+  ],
+  "findings": [
+    {
+      "type": "no_anomaly",
+      "record_ids": ["R000003"],
+      "description": "六项制度检查全部通过，R000003培训费报销合规"
+    }
+  ],
+  "impact": "无",
+  "recommendations": [],
+  "anomaly_ids": [],
+  "record_ids": ["R000003", "R003369", "R003915"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第七条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二AR-02"},
+    {"doc_id": "05_training_expense.md", "clause_no": "第二条"}
+  ],
+  "answer": "无异常。R000003培训费3209.78元经六项制度核查全部合规:培训费未超3500元标准;审批档位AR-02对应的财务复核缺失经SQL验证属系统级行为(全库无财务复核角色记录,95条AR-02记录均仅有部门经理审批);与邻近记录R003369不构成拆分(不同课程,合计未达较高审批线);发票无重复使用;报销时限42天未超60天;部门预算未超支。关联记录R003369和R003915亦无异常。",
+  "limitations": []
+}

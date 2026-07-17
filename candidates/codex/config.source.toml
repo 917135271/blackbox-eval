@@ -1,0 +1,39 @@
+model = "deepseek-v4-pro"
+model_provider = "deepseek"
+model_context_window = 131072
+model_auto_compact_token_limit = 100000
+model_catalog_json = "/opt/codex-source/model_catalog.deepseek.json"
+model_instructions_file = "/opt/codex-source/base_instructions.md"
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
+
+[features]
+enable_request_compression = false
+
+[model_providers.deepseek]
+name = "DeepSeek via Responses adapter"
+base_url = "http://gate1-deepseek-proxy:18789/v1"
+env_key = "LLM_API_KEY"
+wire_api = "responses"
+
+[mcp_servers.policy_query]
+command = "python3"
+args = ["/benchmark/fixtures/policy_query_mcp.py"]
+startup_timeout_sec = 30
+tool_timeout_sec = 120
+
+[mcp_servers.policy_query.env]
+EVAL_POLICY_CORPUS_DIR = "/benchmark/data/corpus"
+EVAL_TASK_LOG = "/artifacts"
+PYTHONIOENCODING = "utf-8"
+
+[mcp_servers.expense_query]
+command = "python3"
+args = ["/benchmark/fixtures/expense_query_mcp.py"]
+startup_timeout_sec = 30
+tool_timeout_sec = 120
+
+[mcp_servers.expense_query.env]
+EVAL_EXPENSE_DB = "/benchmark/data/expense.db"
+EVAL_TASK_LOG = "/artifacts"
+PYTHONIOENCODING = "utf-8"

@@ -1,0 +1,66 @@
+{
+  "task_id": "TRAP-003",
+  "task_type": "clean_but_suspicious",
+  "question": "请核查TRAP-003涉及的记录是否构成异常,正确时应说明无异常",
+  "audit_scope": {
+    "object": "TRAP-003涉及的记录",
+    "description": "核查发票重复使用记录是否为真实异常。系统发现6张发票各被2条报销记录使用，涉及12条记录(R000002,R004201; R000005,R004202; R000020,R004203; R000028,R004204; R000037,R004205; R000055,R004206)。需判断是否构成重复报销违规。",
+    "period": "2025-01-01至2025-12-31",
+    "organizations": "全公司",
+    "expense_types": ["office_supplies", "local_transport", "travel_lodging", "communication", "business_entertainment"]
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "费用报销管理办法中关于发票重复使用的规定是什么？",
+      "policy_docs": ["01_expense_reimbursement_2025.md"],
+      "clauses_needed": ["发票管理", "重复报销", "禁止行为"]
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-01",
+      "question": "6对发票重复使用记录中，注入样本记录(R004201-R004206)的性质是什么？",
+      "fields_needed": ["record_id", "reason", "invoice_no", "employee_id", "amount", "expense_type", "expense_date", "special_approval"],
+      "method": "逐条获取详情，检查reason字段"
+    },
+    {
+      "id": "DQ-02",
+      "question": "除这6对外，是否有其他发票重复使用记录？",
+      "method": "find_reused_invoices确认总数"
+    }
+  ],
+  "evidence_needed": [
+    {"type": "policy", "desc": "01_expense_reimbursement_2025中关于发票重复使用的条款"},
+    {"type": "record_detail", "desc": "全部12条记录的详细信息和审批链"},
+    {"type": "record_detail", "desc": "注入样本记录的reason字段确认"}
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "需要聚合和分组分析发票使用次数",
+      "涉及异常vs非异常边界判断（注入样本的豁免）"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": true,
+    "role": "data_analyst",
+    "reason_code": "MULTI_RECORD_SCOPE",
+    "task": "分析6对发票重复使用记录的完整数据，逐一获取详情，确认注入样本标记"
+  },
+  "execution_steps": [
+    {"step": 1, "name": "policy_version_check", "desc": "确认适用2025版费用报销管理办法中的发票重复使用条款"},
+    {"step": 2, "name": "batch_expense_analysis", "desc": "获取全部12条记录的详情，确认注入样本性质"},
+    {"step": 3, "name": "evidence_coverage_check", "desc": "构建证据矩阵"},
+    {"step": 4, "name": "false_positive_review", "desc": "复核无异常结论"},
+    {"step": 5, "name": "audit_report", "desc": "生成审计报告"},
+    {"step": 6, "name": "result_validation", "desc": "校验并提交"}
+  ],
+  "stopping_conditions": [
+    "所有12条记录的详情已获取",
+    "注入样本标记已确认",
+    "适用政策条款已确认",
+    "证据覆盖率达到100%"
+  ],
+  "unresolved_items": []
+}

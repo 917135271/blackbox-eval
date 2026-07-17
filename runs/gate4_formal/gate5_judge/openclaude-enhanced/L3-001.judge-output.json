@@ -1,0 +1,39 @@
+{
+  "criteria": [
+    {
+      "id": "full-scan-method",
+      "score": 15,
+      "reason": "使用 find_reused_invoices 工具对全年数据进行全量重复发票扫描，返回所有使用次数>=2的发票，并逐条核验记录详情，扫描范围完整。",
+      "answer_evidence": "答案明确说明“全年重复报销专项扫描共发现6项异常”，列出所有异常ID和记录ID。",
+      "trace_evidence": "工具调用 find_reused_invoices(min_usage_count=2) 返回6对重复记录；后续逐一调用 get_expense_detail 核验所有12条记录。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 10,
+      "reason": "正确引用《XX证券费用报销管理办法(2025修订版)》第十条“同一发票最多报销1次”作为制度依据，并在查询中落实为重复发票条件。",
+      "answer_evidence": "答案中明确引用“《XX证券费用报销管理办法(2025修订版)》第十条‘同一发票最多报销1次’”，并据此解释异常。",
+      "trace_evidence": "工具 search_policy 检索到第十条条文；find_reused_invoices 直接使用发票重复使用次数作为条件，与制度对应。"
+    },
+    {
+      "id": "false-positive-control",
+      "score": 15,
+      "reason": "提交的异常ID和记录ID集合与期望完全一致，无任何误报，未混入其他规则异常或TRAP记录。",
+      "answer_evidence": "anomaly_ids 为 DUP-001 至 DUP-006，record_ids 全部12条，与期望一致。",
+      "trace_evidence": "find_reused_invoices 返回的6对记录与提交一致，后续核验未发现无关记录。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的所有 record_id 均通过 get_expense_detail 成功查询，不存在数据库中不存在的记录。"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": false,
+      "reason": "通过 find_reused_invoices 对全年数据扫描，并核验所有记录，无片面扫描冒充完整之嫌。"
+    }
+  ],
+  "overall_comment": "候选提交正确完成了全年重复报销专项扫描，方法完整，制度依据准确，无任何误报，表现优异。",
+  "confidence": 1.0
+}

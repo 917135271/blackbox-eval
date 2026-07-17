@@ -1,0 +1,60 @@
+{
+  "task_id": "DEV-002",
+  "task_type": "policy_qa",
+  "question": "现行培训制度中，内部培训和外部培训的综合费用每日上限分别是多少？",
+  "audit_scope": {
+    "policy_domain": "培训费用",
+    "business_rules": ["内部培训综合费用日上限", "外部培训综合费用日上限"],
+    "audit_period": "现行制度（2025版）"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-1",
+      "question": "内部培训综合费用每日上限是多少？",
+      "target_doc": "05_training_expense.md",
+      "target_clause": "第三条"
+    },
+    {
+      "id": "PQ-2",
+      "question": "外部培训综合费用每日上限是多少？",
+      "target_doc": "05_training_expense.md",
+      "target_clause": "第四条"
+    }
+  ],
+  "data_questions": [],
+  "required_fields": ["内部培训日上限", "外部培训日上限"],
+  "evidence_requirements": [
+    "制度原文中第三条和第四条的具体金额"
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "规划审计方案", "artifact": "work/audit_plan.json", "status": "completed"},
+    {"step": 2, "action": "查询培训费管理制度原文", "artifact": "policy: 05_training_expense.md", "status": "completed"},
+    {"step": 3, "action": "查询业务数据库（合规要求）", "artifact": "expense query result", "status": "pending"},
+    {"step": 4, "action": "记录checkpoint", "artifact": "work/context_checkpoint.json", "status": "pending"},
+    {"step": 5, "action": "填写final_result.json", "artifact": "work/final_result.json", "status": "pending"},
+    {"step": 6, "action": "运行evidence-coverage-check", "artifact": "work/evidence_matrix.json", "status": "pending"},
+    {"step": 7, "action": "运行result-validator", "artifact": "work/validation_report.json", "status": "pending"},
+    {"step": 8, "action": "调用validate_audit_result", "status": "pending"},
+    {"step": 9, "action": "调用submit_audit_result", "status": "pending"}
+  ],
+  "complexity": {
+    "score": 0,
+    "reasons": [
+      "纯政策问答，单一制度文档",
+      "无版本冲突，无多政策交叉",
+      "无需聚合、分组或复杂查询",
+      "无阈值边界、豁免或例外判断"
+    ]
+  },
+  "subagent_plan": {
+    "requested": false,
+    "reason": "complexity=0，compact主流程即可完成"
+  },
+  "stopping_conditions": [
+    "制度原文中第三条和第四条已读取",
+    "最终答案已写入final_result.json",
+    "validate_audit_result返回valid=true",
+    "submit_audit_result成功"
+  ],
+  "unresolved_items": []
+}

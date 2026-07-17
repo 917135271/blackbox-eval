@@ -1,0 +1,59 @@
+{
+  "task_id": "GATE2_CANARY_INTEGRATION",
+  "task_scope": "GATE2领域增强集成Canary - 验证提交链路完整性",
+  "audit_period": "2025财年",
+  "audit_object": "R000001报销记录",
+  "expense_types": ["general"],
+  "organization_scope": "全部门",
+  "requested_deliverable": "集成链路验证通过，确认R000001可通过只读业务库验证",
+  "policy_questions": [
+    {
+      "id": "PQ-001",
+      "question": "读取01_expense_reimbursement_2025.md第十条，确认政策条款可访问性",
+      "boundaries": {"doc_id": "01_expense_reimbursement_2025.md", "clause": "第十条"}
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-001",
+      "question": "验证R000001记录在expense_query中可被检索",
+      "tables": ["reimbursement_records"],
+      "fields": ["record_id"]
+    }
+  ],
+  "required_fields": ["record_id"],
+  "evidence_requirements": {
+    "policy_evidence": ["01_expense_reimbursement_2025.md第十条"],
+    "data_evidence": ["R000001详情"],
+    "evidence_matrix": "work/evidence_matrix.json"
+  },
+  "execution_steps": [
+    {"step": 1, "action": "audit-query-planner生成计划", "artifact": "work/audit_plan.json"},
+    {"step": 2, "action": "checkpoint_audit_context planning_completed", "artifact": "work/context_checkpoint.json"},
+    {"step": 3, "action": "authorize_audit_subagent policy_researcher", "artifact": "subagent authorization"},
+    {"step": 4, "action": "spawn_agent policy_researcher读取政策第十条", "artifact": "work/subagents/policy_researcher/"},
+    {"step": 5, "action": "complete_audit_subagent", "artifact": "subagent summary"},
+    {"step": 6, "action": "get_expense_detail验证R000001", "artifact": "record detail"},
+    {"step": 7, "action": "创建中间文件evidence_matrix/validation_report/final_result", "artifact": "work/*.json"},
+    {"step": 8, "action": "checkpoint_audit_context validation_ready + submit_audit_result", "artifact": "submission"}
+  ],
+  "complexity": 3,
+  "complexity_reasons": [
+    "policy_version_check: 需要多制度版本核查 (01_expense_reimbursement_2025.md)",
+    "policy_document_access: 需要读取特定制度文档条款"
+  ],
+  "subagent_plan": {
+    "use_subagent": true,
+    "role": "policy_researcher",
+    "reason_code": "MULTI_POLICY_VERSION_CHECK",
+    "complexity": 3,
+    "requested_token_budget": 4000,
+    "task": "使用policy_query读取01_expense_reimbursement_2025.md第十条，保存详细结果到work/subagents/policy_researcher/policy_applicability.json，保存六字段摘要（decision, key_findings, record_ids, citations, unresolved_items, artifact_paths）到work/subagents/policy_researcher/summary.json"
+  },
+  "stopping_conditions": [
+    "subagent完成政策读取并生成summary.json",
+    "R000001通过expense_query验证存在",
+    "submit_audit_result返回status=accepted"
+  ],
+  "unresolved_items": []
+}

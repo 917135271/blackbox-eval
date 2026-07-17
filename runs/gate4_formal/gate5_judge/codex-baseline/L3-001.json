@@ -1,0 +1,173 @@
+{
+  "case_family": "full_year_audit",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "full_year_rule_audit",
+  "criteria": [
+    {
+      "answer_evidence": "",
+      "id": "all-anomaly-ids",
+      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
+      "score": 25.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "all-record-ids",
+      "reason": "record_ids集合F1=1.000",
+      "score": 30.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "候选提交列出6个异常和12条记录，与find_reused_invoices返回结果一致。",
+      "id": "full-scan-method",
+      "reason": "使用find_reused_invoices(min_usage_count=2)对全年重复发票进行全量扫描，并逐条获取详情复核，范围完整。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "find_reused_invoices(page=1, page_size=100)返回所有重复发票，has_next=false说明全覆盖。"
+    },
+    {
+      "answer_evidence": "answer中写明“违反《XX证券费用报销管理办法(2025修订版)》第十条”并附citations。",
+      "id": "policy-basis",
+      "reason": "明确引用《XX证券费用报销管理办法(2025修订版)》第十条“同一发票最多报销1次”，查询条件与规则对应。",
+      "score": 10.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_excerpt查询重复报销条款，返回第十条内容。"
+    },
+    {
+      "answer_evidence": "anomaly_ids与record_ids集合精确匹配期望集合。",
+      "id": "false-positive-control",
+      "reason": "提交的anomaly_ids和record_ids与期望集合完全一致，无混入其他规则异常或TRAP记录。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "rule_diagnostics显示precision=1.0, recall=1.0, 无unknown_record_ids。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的record_id均在预期集合中，无虚构ID。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": false,
+      "reason": "工具调用覆盖全年数据，且提交结果完整，未仅检查部分月份。",
+      "score_cap": 50,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "L3-001-DUP-001",
+      "L3-001-DUP-002",
+      "L3-001-DUP-003",
+      "L3-001-DUP-004",
+      "L3-001-DUP-005",
+      "L3-001-DUP-006"
+    ],
+    "actual_record_ids": [
+      "R000002",
+      "R004201",
+      "R000005",
+      "R004202",
+      "R000020",
+      "R004203",
+      "R000028",
+      "R004204",
+      "R000037",
+      "R004205",
+      "R000055",
+      "R004206"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "DUP": 6
+      },
+      "count_exact": true,
+      "expected_types": {
+        "DUP": 6
+      },
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 107.943,
+    "expected_anomaly_ids": [
+      "DUP-001",
+      "DUP-002",
+      "DUP-003",
+      "DUP-004",
+      "DUP-005",
+      "DUP-006"
+    ],
+    "expected_record_ids": [
+      "R000002",
+      "R000005",
+      "R000020",
+      "R000028",
+      "R000037",
+      "R000055",
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:25:29+08:00",
+  "group": "codex-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选提交准确完成全年重复报销扫描，制度引用正确，无任何误报或遗漏。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 802,
+      "completion_tokens_details": {
+        "reasoning_tokens": 316
+      },
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 6443,
+      "prompt_tokens": 7595,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152
+      },
+      "total_tokens": 8397
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/codex-baseline/L3-001",
+  "task_id": "L3-001"
+}

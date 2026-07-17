@@ -1,0 +1,123 @@
+{
+  "case_family": "retrieval_and_report",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "audit_report",
+  "criteria": [
+    {
+      "answer_evidence": "新版（2025版/授权管理办法附件二）规定：... AR-03（10,000~50,000元）需部门总经理。",
+      "id": "current-threshold",
+      "reason": "明确列出新版审批线中 AR-03 的区间 10,000~50,000 元，现行部门总经理审批线为 10000 元，金额准确且版本清晰。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc 03_authorization_management.md 附件二显示 AR-03 金额区间 10000~50000。"
+    },
+    {
+      "answer_evidence": "旧版（2022版）规定：单笔≥8,000元需部门总经理审批... 已于2025年1月1日废止。",
+      "id": "old-threshold-status",
+      "reason": "准确指出 2022 版要求 8000 元需部门总经理审批，并明确该版本已废止。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc 02_expense_reimbursement_2022_deprecated.md 第二条、第四条。"
+    },
+    {
+      "answer_evidence": "审批权限统一按《XX证券授权管理办法》附件二执行。",
+      "id": "cross-reference",
+      "reason": "明确说明费用报销管理办法通过授权管理办法附件二取得现行审批金额，制度关系完整。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md 第五条；get_policy_doc 03_authorization_management.md 附件二。"
+    },
+    {
+      "answer_evidence": "陷阱一（8,000~9,999元区间）：...如用旧版标准则会错误结论为'缺少部门总经理审批'。审计建议：审计前必须确认被审计期间适用的制度版本。",
+      "id": "risk-explanation",
+      "reason": "具体分析了多个金额区间因旧线导致的误判风险，并提出了确认制度版本、遵守废止声明等校验措施。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "list_expenses 查询到 R004233（金额 9990 元）；get_expense_detail 显示其为 AR-02 审批。"
+    },
+    {
+      "answer_evidence": "整体采用分节审计说明结构，包含背景、对比、陷阱、建议、结论，与结构化结果无冲突。",
+      "id": "report-shape",
+      "reason": "以审计说明形式提交，事实、规则、判断和建议逻辑一致，表达完整。",
+      "score": 5.0,
+      "source": "llm_judge",
+      "trace_evidence": "无异常，字段一致。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "使用的 record_id R004233 真实存在于数据库，无伪造或无关记录。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "始终将 2022 版标注为已废止，未将其作为现行审批依据。",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "L3-010-VTRAP-001"
+    ],
+    "actual_record_ids": [
+      "R004233"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": false,
+      "expected_types": {},
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "citation_count": 6,
+    "elapsed_seconds": 213.145,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [
+      "L3-010-VTRAP-001"
+    ],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:28:53+08:00",
+  "group": "openclaude-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选答案准确指出了现行 10000 元审批线，明确旧版 8000 元已废止，清晰说明了制度引用关系，风险分析具体并提供了版本校验措施，报告形式完整一致。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2454,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1667
+      },
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 5974,
+      "prompt_tokens": 7126,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152
+      },
+      "total_tokens": 9580
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/openclaude-enhanced/L3-010",
+  "task_id": "L3-010"
+}

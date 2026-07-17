@@ -1,0 +1,138 @@
+{
+  "case_family": "retrieval_and_report",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "two_hop_retrieval",
+  "criteria": [
+    {
+      "answer_evidence": "答案明确列出“AR-03([10000,50000)部门总经理)”。",
+      "id": "threshold",
+      "reason": "金额和边界正确，给出部门总经理审批线10000元，区间为[10000,50000)。",
+      "score": 35.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc('03_authorization_management.md') 返回附件二表格：AR-03 >=10000且<50000，必要审批角色部门总经理。"
+    },
+    {
+      "answer_evidence": "答案写道：“XX证券费用报销管理办法(2025修订版)第五条明确规定...统一按《XX证券授权管理办法》附件二执行。”",
+      "id": "two-hop-path",
+      "reason": "两跳路径完整可复核，从费用报销管理办法第五条交叉引用到授权管理办法附件二。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc('01_expense_reimbursement_2025.md') 返回第五条文字；get_policy_doc('03_authorization_management.md') 显示附件二。"
+    },
+    {
+      "answer_evidence": "citations中包含{\"doc_id\":\"01_expense_reimbursement_2025.md\",\"clause_no\":\"第五条\"}，{\"doc_id\":\"03_authorization_management.md\",\"clause_no\":\"第二条\"}，{\"doc_id\":\"03_authorization_management.md\",\"clause_no\":\"附件二\"}。",
+      "id": "citations",
+      "reason": "两份证据均有效，引用了01_expense_reimbursement_2025.md和03_authorization_management.md。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用获取了01_expense_reimbursement_2025.md和03_authorization_management.md，并显示相关条款。"
+    },
+    {
+      "answer_evidence": "答案中引用了两份文档并进行了交叉引用，表明未提前停止。",
+      "id": "no-premature-stop",
+      "reason": "轨迹证明继续检索，未因首份制度未列金额而停止。",
+      "score": 10.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中先搜索政策，获取03_authorization_management.md和01_expense_reimbursement_2025.md，随后继续列出费用、获取详情，未提前结束。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有record_ids均存在于数据库，无捏造痕迹。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未使用废止制度作为现行依据，全部引用现行有效版本。",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "ANOM-001",
+      "ANOM-002",
+      "ANOM-003",
+      "ANOM-004",
+      "ANOM-005"
+    ],
+    "actual_record_ids": [
+      "R004207",
+      "R004208",
+      "R004212",
+      "R004213",
+      "R004214",
+      "R004215",
+      "R004216",
+      "R004217",
+      "R004218",
+      "R004219",
+      "R004220"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "SPLIT": 5
+      },
+      "count_exact": false,
+      "expected_types": {},
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "citation_count": 4,
+    "elapsed_seconds": 310.445,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+      "document:01_expense_reimbursement_2025.md",
+      "document:03_authorization_management.md"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:25:50+08:00",
+  "group": "codex-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选正确识别并通过交叉引用给出了审批阈值，路径和证据完整，无关键错误。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1951,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1273
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 11195,
+      "prompt_tokens": 12219,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 14170
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/codex-baseline/L3-007",
+  "task_id": "L3-007"
+}

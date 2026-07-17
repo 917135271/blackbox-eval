@@ -1,0 +1,38 @@
+{
+  "audit_scope": {
+    "task_id": "DEV-002",
+    "question": "现行培训制度中，内部培训和外部培训的综合费用每日上限分别是多少？",
+    "policy_doc": "XX证券培训费管理办法（XX证人规〔2025〕戊号）",
+    "data_scope": "list_expenses全量21条记录，聚焦training_fee和training_lodging类型",
+    "period": "现行制度（2025版）"
+  },
+  "verified_facts": [
+    "制度第三条规定内部培训综合费用每日不超过800元",
+    "制度第四条规定外部培训综合费用每日不超过1200元",
+    "记录R900016：员工E9001，training_fee，金额850元，1天，事由为内部培训综合费用一天，special_approval=0"
+  ],
+  "applicable_policies": [
+    {"doc_id": "05_training_expense.md", "clause_no": "第三条", "rule": "内部培训综合费用每日不超过800元"},
+    {"doc_id": "05_training_expense.md", "clause_no": "第四条", "rule": "外部培训综合费用每日不超过1200元"}
+  ],
+  "findings": [
+    {
+      "anomaly_id": "DEV-002-001",
+      "rule": "第三条 内部培训综合费用每日不超过800元",
+      "record_ids": ["R900016"],
+      "observed": "850元/日",
+      "limit": "800元/日",
+      "excess": "50元",
+      "impact": "员工E9001（开发员工甲）于2025-08-02的内部培训综合费用超标50元",
+      "recommendation": "追回超标部分50元，加强内部培训费用的事前审批管控"
+    }
+  ],
+  "anomaly_ids": ["DEV-002-001"],
+  "record_ids": ["R900016"],
+  "citations": [
+    {"doc_id": "05_training_expense.md", "clause_no": "第三条"},
+    {"doc_id": "05_training_expense.md", "clause_no": "第四条"}
+  ],
+  "answer_text": "现行培训制度（XX证券培训费管理办法，XX证人规〔2025〕戊号）规定：内部培训综合费用每日不超过800元（第三条），外部培训综合费用每日不超过1200元（第四条）。经查业务数据库，发现记录R900016（内部培训综合费用一天，金额850元）超出800元/日的内部培训上限，存在违规。",
+  "limitations": "数据库中无外部培训（external training）费用记录，无法对第四条进行数据层面的验证"
+}

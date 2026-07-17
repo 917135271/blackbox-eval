@@ -1,0 +1,127 @@
+{
+  "case_family": "policy_and_version",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "near_clause_disambiguation",
+  "criteria": [
+    {
+      "answer_evidence": "差旅住宿标准（《XX证券差旅费管理办法》第四条）",
+      "id": "travel-policy",
+      "reason": "明确指出差旅住宿适用差旅费管理办法，场景正确。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用get_policy_doc('04_travel_expense.md')获取差旅费管理办法全文"
+    },
+    {
+      "answer_evidence": "培训住宿标准（《XX证券培训费管理办法》第五条）",
+      "id": "training-policy",
+      "reason": "明确指出培训住宿适用培训费管理办法，场景正确。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用get_policy_doc('05_training_expense.md')获取培训费管理办法全文"
+    },
+    {
+      "answer_evidence": "制度层面相互排斥；实质层面场景不同，如部门负责人级三类城市差旅600元培训350元，混用导致超标。",
+      "id": "no-mixing",
+      "reason": "从制度和实质两个层面解释了两套标准的场景和数值差异，说明不能混用。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "引用差旅费管理办法第四条和培训费管理办法第五条的标准表，以及具体数值比较。",
+      "id": "comparison-evidence",
+      "reason": "引用了两份制度文档（04_travel_expense.md和05_training_expense.md），并提供了具体标准数值对比。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "track中显示get_policy_doc('04_travel_expense.md')和get_policy_doc('05_training_expense.md')返回内容包含标准表"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有引用的record_id均通过工具调用获取并存在于数据库中，且与结论相关。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未使用任何已废止制度。",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "L3-008-01"
+    ],
+    "actual_record_ids": [
+      "R003992",
+      "R000328",
+      "R002576",
+      "R001150",
+      "R001481"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": false,
+      "expected_types": {},
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "citation_count": 4,
+    "elapsed_seconds": 277.729,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:expense_standards.travel_lodging",
+      "policy:expense_standards.training.training_lodging",
+      "document:04_travel_expense.md",
+      "document:05_training_expense.md"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:31:05+08:00",
+  "group": "oh-my-pi-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选答案完整比较了差旅住宿和培训住宿标准，明确指出适用不同制度，解释了混用的违规风险，并提供了审计案例作为证据。证据充分、推理清晰。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1902,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1410
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 9529,
+      "prompt_tokens": 10553,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 12455
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/oh-my-pi-baseline/L3-008",
+  "task_id": "L3-008"
+}

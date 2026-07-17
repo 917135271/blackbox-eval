@@ -1,0 +1,48 @@
+{
+  "mcpServers": {
+    "policy_query": {
+      "type": "stdio",
+      "command": "python3",
+      "args": [
+        "/benchmark/fixtures/policy_query_mcp.py"
+      ],
+      "timeout": 120000,
+      "env": {
+        "EVAL_POLICY_CORPUS_DIR": "/benchmark/data/corpus",
+        "EVAL_TASK_LOG": "/artifacts/tool_calls.jsonl",
+        "PYTHONIOENCODING": "utf-8"
+      }
+    },
+    "expense_query": {
+      "type": "stdio",
+      "command": "python3",
+      "args": [
+        "/benchmark/fixtures/expense_query_mcp.py"
+      ],
+      "timeout": 120000,
+      "env": {
+        "EVAL_EXPENSE_DB": "/benchmark/data/expense.db",
+        "EVAL_TASK_LOG": "/artifacts/tool_calls.jsonl",
+        "PYTHONIOENCODING": "utf-8"
+      }
+    },
+    "audit_control": {
+      "type": "stdio",
+      "command": "python3",
+      "args": [
+        "/plugin/shared/control-mcp/audit_control_mcp.py"
+      ],
+      "timeout": 120000,
+      "env": {
+        "AUDIT_TASK_ID": "DEV-009",
+        "AUDIT_WORK_DIR": "/workspace",
+        "AUDIT_SUBAGENTS_ENABLED": "1",
+        "AUDIT_FRAMEWORK": "oh-my-pi",
+        "AUDIT_EXPERIMENT_GROUP": "oh-my-pi-enhanced",
+        "EVAL_EXPENSE_DB": "/benchmark/data/expense.db",
+        "EVAL_POLICY_CORPUS_DIR": "/benchmark/data/corpus",
+        "PYTHONIOENCODING": "utf-8"
+      }
+    }
+  }
+}

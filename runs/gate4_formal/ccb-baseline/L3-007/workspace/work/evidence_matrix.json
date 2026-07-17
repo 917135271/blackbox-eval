@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "L3-007-SPLIT-EVASION-001",
+      "record_ids": ["R004207", "R004208"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "R004207与R004208均为员工E0007李丽娟（信息技术部部门经理）提交的travel_lodging类型报销，金额各5200元，发生日期分别为2025-01-10和2025-01-12，间隔仅2天，属于同一员工、同一费用类型在7天内出现2笔报销的情形",
+        "两笔报销单笔金额均为5200元，按附件二分别落入AR-02档位（≥3000且<10000，需部门经理+财务复核），两笔合计10400元已达到AR-03档位（≥10000且<50000，需部门总经理审批）",
+        "两笔报销的approval记录均仅显示E0007本人以部门经理角色审批（AR-02），缺少AR-02档位要求的财务复核环节，且E0007同时为经办人与审批人",
+        "两笔报销原因均标注为'拆分报销注入样本1'，发票号分别为FP2025X0004201和FP2025X0004202，系人工构造的拆分规避审批权限测试用例"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004207", "R004208"],
+  "submitted_record_ids": ["R004207", "R004208"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {},
+  "unresolved_items": []
+}

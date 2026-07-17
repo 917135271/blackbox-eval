@@ -1,0 +1,52 @@
+{
+  "task_id": "DEV-004",
+  "task_type": "single_anomaly",
+  "complexity": 1,
+  "complexity_reasons": [
+    "Single rule (split reimbursement Article 11)",
+    "Single applicable policy (2025 revision)",
+    "One-rule clue-record task with directly related records",
+    "No multi-rule, no multi-policy, no historical version ambiguity"
+  ],
+  "audit_object": "R900003 clue record - split reimbursement check",
+  "audit_period": "2025-02-03 ± 7 days (2025-01-27 to 2025-02-10)",
+  "organization_scope": "Employee E9001, travel_transport type",
+  "rule_scope": {
+    "rule": "Article 11 - split reimbursement to circumvent approval authority",
+    "doc_id": "01_expense_reimbursement_2025.md",
+    "clause_no": "第十一条",
+    "comparison_unit": "same employee + same expense_type + 7-day window",
+    "threshold_doc": "03_authorization_management.md",
+    "threshold_clause": "附件二"
+  },
+  "policy_questions": [
+    "Is Article 11 of 01_expense_reimbursement_2025.md applicable to Feb 2025 events?",
+    "What is the higher approval threshold that split reimbursement would circumvent?",
+    "What approval tier does ¥10,400 (combined) fall under?"
+  ],
+  "data_questions": [
+    "Are there other records for E9001, travel_transport, within 7 days of 2025-02-03?",
+    "What are the individual and combined approval tiers?",
+    "Do the records share the same reason/business event?"
+  ],
+  "execution_steps": [
+    "Get R900003 detail (done)",
+    "Search policy for split reimbursement rules (done)",
+    "Query E9001 travel_transport within date window (done)",
+    "Get R900004 detail (done)",
+    "Get authorization thresholds from attachment 2 (done)",
+    "Policy version check - confirm 2025 policy applies",
+    "Build evidence matrix",
+    "False positive review",
+    "Audit report",
+    "Result validation",
+    "Submit"
+  ],
+  "subagent_plan": "None - complexity 1, compact mode sufficient",
+  "stopping_conditions": [
+    "All records in the 7-day window for same employee/type identified",
+    "Combined amount mapped to authorization tier",
+    "Split intent confirmed or refuted by evidence"
+  ],
+  "unresolved_items": []
+}

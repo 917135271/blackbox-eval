@@ -1,0 +1,150 @@
+{
+  "task_id": "L3-003",
+  "task_type": "full_year_rule_audit",
+  "audit_object": "全年数据超标准专项扫描",
+  "audit_period": "2025-01-01 至 2025-12-31",
+  "organization_scope": "XX证券全部门、全员工",
+  "deliverable": "全部异常ID和记录ID集合",
+
+  "policy_documents": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "role": "primary", "effective_date": "2025-01-01"},
+    {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "role": "deprecated", "note": "已被2025版替代，不作为现行依据"},
+    {"doc_id": "03_authorization_management.md", "role": "approval_thresholds", "effective_date": "2025-01-01"},
+    {"doc_id": "04_travel_expense.md", "role": "travel_standards"},
+    {"doc_id": "05_training_expense.md", "role": "training_standards"},
+    {"doc_id": "06_business_entertainment.md", "role": "entertainment_standards"},
+    {"doc_id": "07_office_communication.md", "role": "office_comm_standards"},
+    {"doc_id": "08_budget_management.md", "role": "budget_constraints"}
+  ],
+
+  "rules_and_checks": [
+    {
+      "rule_id": "R01",
+      "name": "差旅住宿超标准",
+      "policy": "04_travel_expense.md Art.4",
+      "threshold": "按职级×城市档位查表，超出=异常",
+      "exemptions": "有专项审批(特殊审批标记)可豁免；培训期间住宿适用培训标准(04 Art.7)"
+    },
+    {
+      "rule_id": "R02",
+      "name": "市内交通超标准",
+      "policy": "04_travel_expense.md Art.6",
+      "threshold": "一类120元/日,二类100元/日,三类80元/日",
+      "exemptions": "特殊审批"
+    },
+    {
+      "rule_id": "R03",
+      "name": "培训课程费超标准",
+      "policy": "05_training_expense.md Art.2",
+      "threshold": "每人每期>3500元",
+      "exemptions": "特殊审批"
+    },
+    {
+      "rule_id": "R04",
+      "name": "培训日费超标准",
+      "policy": "05_training_expense.md Art.3,4",
+      "threshold": "内部培训>800元/日,外部培训>1200元/日",
+      "exemptions": "特殊审批"
+    },
+    {
+      "rule_id": "R05",
+      "name": "培训住宿超标准",
+      "policy": "05_training_expense.md Art.5",
+      "threshold": "一类500元,二类420元,三类350元/人/晚",
+      "exemptions": "特殊审批"
+    },
+    {
+      "rule_id": "R06",
+      "name": "业务招待费超标准",
+      "policy": "06_business_entertainment.md Art.2,3",
+      "threshold": "单次>5000元 或 人均>300元",
+      "exemptions": "特殊审批"
+    },
+    {
+      "rule_id": "R07",
+      "name": "办公用品超月度限额",
+      "policy": "07_office_communication.md Art.2",
+      "threshold": "每人每月>600元",
+      "exemptions": "特殊审批"
+    },
+    {
+      "rule_id": "R08",
+      "name": "通讯费用超月度限额",
+      "policy": "07_office_communication.md Art.3",
+      "threshold": "每人每月>300元",
+      "exemptions": "特殊审批"
+    },
+    {
+      "rule_id": "R09",
+      "name": "重复报销(同一发票多次使用)",
+      "policy": "01_expense_reimbursement_2025.md Art.10",
+      "threshold": "同一invoice_no出现在≥2条报销记录中",
+      "exemptions": "无豁免"
+    },
+    {
+      "rule_id": "R10",
+      "name": "拆分规避审批",
+      "policy": "01_expense_reimbursement_2025.md Art.11",
+      "threshold": "同一员工+同一费用类型+7天内≥2笔,且合计≥10000元(AR-03线)",
+      "exemptions": "无豁免"
+    },
+    {
+      "rule_id": "R11",
+      "name": "超期报销(>60天)",
+      "policy": "01_expense_reimbursement_2025.md Art.7",
+      "threshold": "expense_date到提交日>60天",
+      "exemptions": "年末费用可延至财政年度结束后15天(Art.9)"
+    },
+    {
+      "rule_id": "R12",
+      "name": "部门预算超支",
+      "policy": "08_budget_management.md Art.3, 01 Art.13",
+      "threshold": "部门累计已批准报销金额>部门年度预算",
+      "exemptions": "有专项审批的可豁免"
+    },
+    {
+      "rule_id": "R13",
+      "name": "超出制度标准1.0倍无专项审批",
+      "policy": "01_expense_reimbursement_2025.md Art.12",
+      "threshold": "无特殊审批时金额>对应制度标准1.0倍",
+      "exemptions": "有特殊审批(special_approval=true)豁免"
+    }
+  ],
+
+  "complexity": {
+    "score": 4,
+    "reasons": [
+      "涉及11条业务规则(R01-R13)",
+      "需要多表关联(expense+employee+department+invoice+approval)",
+      "需要聚合计算(按月聚合办公/通讯,按员工聚合拆分检查)",
+      "涉及阈值、日期边界和豁免条件",
+      "需要出具综合审计报告"
+    ]
+  },
+
+  "execution_steps": [
+    {"step": 1, "action": "planning_and_authorization", "description": "制定审计计划并授权数据分析子智能体"},
+    {"step": 2, "action": "data_analysis", "description": "数据子智能体执行全部规则扫描,输出各规则异常记录"},
+    {"step": 3, "action": "policy_check", "description": "主agent并行执行制度版本检查,确认2025版制度全面适用"},
+    {"step": 4, "action": "evidence_aggregation", "description": "汇总子智能体结果,构建证据矩阵"},
+    {"step": 5, "action": "evidence_coverage_check", "description": "检查证据覆盖率"},
+    {"step": 6, "action": "false_positive_review", "description": "对豁免条件进行独立复核"},
+    {"step": 7, "action": "report_and_validate", "description": "生成报告、验证并提交"}
+  ],
+
+  "subagent_plan": {
+    "data_analyst": {
+      "role": "data_analyst",
+      "reason_code": "MULTI_RECORD_SCOPE",
+      "task": "对全年数据进行全量超标准扫描,包括R01-R13全部规则,输出每项规则的异常记录ID列表和判定依据",
+      "budget": 12000
+    }
+  },
+
+  "stopping_conditions": [
+    "所有R01-R13规则均完成扫描",
+    "每条异常记录均有明确的规则条款引用",
+    "证据矩阵覆盖率100%",
+    "验证通过"
+  ]
+}

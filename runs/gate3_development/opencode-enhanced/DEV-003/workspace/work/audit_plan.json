@@ -1,0 +1,57 @@
+{
+  "task_id": "DEV-003",
+  "question": "以R900001为线索核查重复报销，返回全部相关记录及异常结论",
+  "task_type": "single_anomaly",
+  "audit_scope": {
+    "object": "reimbursement records sharing the same invoice with R900001",
+    "rule": "duplicate reimbursement (reused invoice)",
+    "expense_types": "all",
+    "period": "determined by discovered records",
+    "organization_scope": "determined by discovered records"
+  },
+  "complexity": 1,
+  "complexity_reasons": [
+    "single rule (duplicate reimbursement)",
+    "clue-record based investigation",
+    "only same-invoice records needed",
+    "no aggregation, grouping, multi-policy, or threshold boundary"
+  ],
+  "subagent_plan": {
+    "used": false,
+    "reason": "complexity=1, compact mode sufficient"
+  },
+  "policy_questions": [
+    "What does the policy say about duplicate reimbursement or reused invoices?"
+  ],
+  "data_questions": [
+    "What invoice does R900001 use?",
+    "How many other records share the same invoice?",
+    "Which records share the same invoice with R900001?"
+  ],
+  "required_fields": ["record_id", "invoice_no", "amount", "expense_date", "employee_id", "department_id", "expense_type", "status", "approvals"],
+  "evidence_requirements": {
+    "record_detail": "R900001 and all records sharing its invoice",
+    "policy_clauses": "duplicate reimbursement or invoice reuse rules",
+    "approval_records": "approvals for each involved record"
+  },
+  "execution_steps": [
+    {"step": 1, "action": "get_expense_detail for R900001", "output": "invoice_no and expense facts"},
+    {"step": 2, "action": "find_invoice_usage for the discovered invoice", "output": "all records sharing the invoice"},
+    {"step": 3, "action": "get detailed info for each shared record", "output": "full record details"},
+    {"step": 4, "action": "search policy for duplicate/reused invoice rules", "output": "applicable policy clauses"},
+    {"step": 5, "action": "list approvals for involved records", "output": "approval chain context"},
+    {"step": 6, "action": "evidence coverage check", "output": "evidence_matrix.json with pass status"},
+    {"step": 7, "action": "false positive review (if triggered)", "output": "review decision"},
+    {"step": 8, "action": "audit report and final_result.json", "output": "final anomaly determination"},
+    {"step": 9, "action": "result validator", "output": "validation_report.json with pass status"},
+    {"step": 10, "action": "validate and submit", "output": "valid=true then submission"}
+  ],
+  "stopping_conditions": [
+    "All same-invoice records identified and examined",
+    "Policy clauses on duplicate reimbursement confirmed",
+    "Evidence matrix coverage 100% with pass status",
+    "Validation report passes",
+    "Submission accepted"
+  ],
+  "unresolved_items": []
+}

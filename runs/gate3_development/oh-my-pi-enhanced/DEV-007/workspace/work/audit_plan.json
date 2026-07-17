@@ -1,0 +1,76 @@
+{
+  "task_scope": {
+    "task_id": "DEV-007",
+    "audit_object": "个人办公用品和通讯费月度标准",
+    "expense_types": ["office_supplies", "communication"],
+    "business_period": "all available records",
+    "organization_scope": "all employees",
+    "deliverable": "全部超标准异常记录，按员工和自然月聚合"
+  },
+  "policy_questions": [
+    {
+      "question": "个人办公用品月度标准金额",
+      "policy_doc": "07_office_communication.md",
+      "clause": "第二条",
+      "standard": "每人每月不超过600元"
+    },
+    {
+      "question": "通讯费月度标准金额",
+      "policy_doc": "07_office_communication.md",
+      "clause": "第三条",
+      "standard": "每人每月不超过300元"
+    }
+  ],
+  "data_questions": [
+    {
+      "description": "获取所有 office_supplies 和 communication 报销记录",
+      "tables": ["reimbursement_records", "invoices"],
+      "fields": ["record_id", "employee_id", "expense_type", "expense_date", "amount", "status"],
+      "aggregation": "按 employee_id + 自然月(YEAR-MONTH) GROUP BY, SUM(amount)",
+      "threshold": "office_supplies: 600元/人月, communication: 300元/人月"
+    }
+  ],
+  "evidence_requirements": [
+    "每笔超标的聚合结果需链接到具体 record_ids",
+    "需要确认记录状态(approved等)",
+    "需要验证是否涉及特殊审批豁免"
+  ],
+  "execution_steps": [
+    "1. 已确认政策标准：办公用品≤600元/人月，通讯费≤300元/人月 (07_office_communication.md 第二、三条)",
+    "2. 授权并调用 data_analyst 子智能体进行数据聚合分析",
+    "3. 登记子智能体结果，检查异常记录",
+    "4. 证据覆盖检查",
+    "5. 假阳性复核(如有边界或豁免情况)",
+    "6. 撰写审计报告",
+    "7. 结果校验并提交"
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "涉及聚合、分组、阈值比较",
+      "两个费用类型需要分别处理",
+      "日期边界(自然月分组)",
+      "批量记录扫描"
+    ]
+  },
+  "subagent_plan": {
+    "role": "data_analyst",
+    "reason_code": "AGGREGATION_REQUIRED",
+    "complexity": 3,
+    "context": {
+      "task": "扫描开发库中的个人办公用品(office_supplies)和通讯费(communication)月度标准，返回全部超标准异常记录",
+      "standards": {
+        "office_supplies": {"threshold": 600, "unit": "元/人月", "policy": "07_office_communication.md 第二条"},
+        "communication": {"threshold": 300, "unit": "元/人月", "policy": "07_office_communication.md 第三条"}
+      },
+      "method": "分别对 office_supplies 和 communication 记录，按 employee_id + strftime('%Y-%m', expense_date) 分组求和，筛选 sum(amount) > threshold 的分组，返回组内所有 record_ids"
+    }
+  },
+  "stopping_conditions": [
+    "政策标准已确认",
+    "数据聚合分析完成，所有超标记录已识别",
+    "证据覆盖100%",
+    "验证通过"
+  ],
+  "unresolved_items": []
+}

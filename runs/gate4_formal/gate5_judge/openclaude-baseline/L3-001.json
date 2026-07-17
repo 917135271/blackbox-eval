@@ -1,0 +1,173 @@
+{
+  "case_family": "full_year_audit",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "full_year_rule_audit",
+  "criteria": [
+    {
+      "answer_evidence": "",
+      "id": "all-anomaly-ids",
+      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
+      "score": 25.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "all-record-ids",
+      "reason": "record_ids集合F1=1.000",
+      "score": 30.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "“全年重复报销专项扫描共发现6项异常”",
+      "id": "full-scan-method",
+      "reason": "使用了find_reused_invoices工具对全年数据进行重复发票扫描，逐项核实了所有重复记录，扫描范围完整且可复核。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "调用find_reused_invoices（min_usage_count=2）获取全年所有重复发票，随后对每个涉及记录的record_id调用get_expense_detail确认详情。"
+    },
+    {
+      "answer_evidence": "“违反《XX证券费用报销管理办法(2025修订版)》第十条“同一发票最多报销1次”的规定”",
+      "id": "policy-basis",
+      "reason": "明确引用了《XX证券费用报销管理办法(2025修订版)》第十条“同一发票最多报销1次”，且查询条件（按重复发票扫描）与该条款对应。",
+      "score": 10.0,
+      "source": "llm_judge",
+      "trace_evidence": "search_policy查询“重复报销 重复提交 同一发票 多次报销”，获取并阅读01_expense_reimbursement_2025.md，确认第十条内容。"
+    },
+    {
+      "answer_evidence": "提交的record_ids列表：R000002, R004201, R000005, R004202, R000020, R004203, R000028, R004204, R000037, R004205, R000055, R004206，与预期相符。",
+      "id": "false-positive-control",
+      "reason": "提交的异常记录ID集合与预期完全一致，未混入其他规则异常、TRAP记录或无关业务记录，无误报。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "find_reused_invoices仅返回6对重复记录，每对均经详细核实，无额外异常；rule_diagnostics显示precision/recall均为1.0。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的所有record_id均存在于数据库中，且工具调用均能返回对应详情。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": false,
+      "reason": "find_reused_invoices对全年数据执行了全量扫描，未做月份或样例限制。",
+      "score_cap": 50,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "ANO-L3-001-01",
+      "ANO-L3-001-02",
+      "ANO-L3-001-03",
+      "ANO-L3-001-04",
+      "ANO-L3-001-05",
+      "ANO-L3-001-06"
+    ],
+    "actual_record_ids": [
+      "R000002",
+      "R004201",
+      "R000005",
+      "R004202",
+      "R000020",
+      "R004203",
+      "R000028",
+      "R004204",
+      "R000037",
+      "R004205",
+      "R000055",
+      "R004206"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "DUP": 6
+      },
+      "count_exact": true,
+      "expected_types": {
+        "DUP": 6
+      },
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 124.514,
+    "expected_anomaly_ids": [
+      "DUP-001",
+      "DUP-002",
+      "DUP-003",
+      "DUP-004",
+      "DUP-005",
+      "DUP-006"
+    ],
+    "expected_record_ids": [
+      "R000002",
+      "R000005",
+      "R000020",
+      "R000028",
+      "R000037",
+      "R000055",
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:27:16+08:00",
+  "group": "openclaude-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选答案完全覆盖了全年重复报销专项扫描的要求，方法完整、制度引用准确、无任何误报或遗漏，整体表现优秀。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1227,
+      "completion_tokens_details": {
+        "reasoning_tokens": 634
+      },
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 6810,
+      "prompt_tokens": 7962,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152
+      },
+      "total_tokens": 9189
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/openclaude-baseline/L3-001",
+  "task_id": "L3-001"
+}

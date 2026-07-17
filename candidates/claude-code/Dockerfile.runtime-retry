@@ -1,0 +1,17 @@
+FROM blackbox-eval/ccb-source-nonroot:2.8.3-base
+
+USER root
+
+# claude-code-best 2.8.3 disables retries only in its OpenAI-compatible path.
+# Patch the exact compiled module and fail the build if the upstream artifact
+# no longer matches, so a future version cannot be modified silently.
+RUN test "$(grep -c '^      maxRetries: 0,$' /app/dist/chunk-a6emwr7f.js)" = "1" \
+    && sed -i 's/^      maxRetries: 0,$/      maxRetries: Number.parseInt(process.env.OPENAI_MAX_RETRIES || "2", 10),\n      timeout: Number.parseInt(process.env.OPENAI_TIMEOUT_MS || "120000", 10),/' \
+        /app/dist/chunk-a6emwr7f.js \
+    && test "$(grep -c 'OPENAI_MAX_RETRIES' /app/dist/chunk-a6emwr7f.js)" = "1" \
+    && test "$(grep -c 'OPENAI_TIMEOUT_MS' /app/dist/chunk-a6emwr7f.js)" = "1" \
+    && ! grep -q '^      maxRetries: 0,$' /app/dist/chunk-a6emwr7f.js
+
+ENV OPENAI_MAX_RETRIES=2
+ENV OPENAI_TIMEOUT_MS=120000
+USER bun

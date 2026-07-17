@@ -1,0 +1,71 @@
+{
+  "task_id": "DEV-001",
+  "task_type": "policy_exception",
+  "question": "核查R900012是否构成超期报销。必须同时考虑费用发生后60天规则和会计年度末15天补充提交规则，并说明现行制度为何适用。",
+  "scope": {
+    "record_ids": ["R900012"],
+    "rules": ["费用发生后60天提交(第七条)", "会计年度末15天补充提交(第九条)"],
+    "policy_docs": ["01_expense_reimbursement_2025.md"],
+    "audit_period": "2025-12-20 至 2026-01-10"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ1",
+      "question": "现行制度是2025修订版还是2022版？为何适用？",
+      "clause": "第十四条(施行日期与废止)",
+      "boundary": "2025-01-01施行，2022版废止"
+    },
+    {
+      "id": "PQ2",
+      "question": "R900012报销是否在费用发生后60天内提交？",
+      "clause": "第七条",
+      "boundary": "expense_date=2025-12-20, reimburse_date=2026-01-10, delta=21天 < 60天"
+    },
+    {
+      "id": "PQ3",
+      "question": "R900012是否适用会计年度末15天补充提交规则？若适用，是否合规？",
+      "clause": "第九条",
+      "boundary": "会计年度末=2025-12-31, 15天截止=2026-01-15, reimburse_date=2026-01-10 < 2026-01-15"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ1",
+      "question": "R900012的费用日期、报销日期、状态、金额",
+      "fields": ["expense_date", "reimburse_date", "status", "amount", "expense_type"],
+      "source": "get_expense_detail"
+    }
+  ],
+  "evidence_requirements": [
+    {"anomaly_id": "DEV-001-01", "description": "60天规则核查", "records": ["R900012"], "citations": [{"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第七条"}]},
+    {"anomaly_id": "DEV-001-01", "description": "年末15天补充提交规则核查", "records": ["R900012"], "citations": [{"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第九条"}]},
+    {"anomaly_id": "DEV-001-01", "description": "现行制度适用性说明", "records": ["R900012"], "citations": [{"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条"}]}
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "audit-query-planner", "artifact": "work/audit_plan.json", "stopping_condition": "plan complete"},
+    {"step": 2, "action": "policy-version-check", "artifact": "policy version determination", "stopping_condition": "applicable policy confirmed"},
+    {"step": 3, "action": "data retrieval", "artifact": "expense detail for R900012", "stopping_condition": "record retrieved"},
+    {"step": 4, "action": "evidence-coverage-check", "artifact": "work/evidence_matrix.json", "stopping_condition": "coverage 100% and status pass"},
+    {"step": 5, "action": "audit-report", "artifact": "work/final_result.json", "stopping_condition": "report written"},
+    {"step": 6, "action": "result-validator", "artifact": "work/validation_report.json", "stopping_condition": "status pass"},
+    {"step": 7, "action": "validate_audit_result + submit_audit_result", "artifact": "submission", "stopping_condition": "submitted successfully"}
+  ],
+  "complexity": 1,
+  "complexity_reasons": [
+    "单一已知记录R900012的核查",
+    "单一现行制度适用(2025修订版)，版本关系明确",
+    "两条子规则但均属同一制度内日期计算",
+    "无需聚合、分组或多表关联"
+  ],
+  "subagent_plan": {
+    "needed": false,
+    "reason": "complexity=1, compact main-agent flow sufficient"
+  },
+  "stopping_conditions": [
+    "R900012的60天规则判断完成",
+    "R900012的年末15天规则判断完成",
+    "现行制度适用性说明完成",
+    "final_result.json写入并通过验证提交"
+  ],
+  "unresolved_items": []
+}

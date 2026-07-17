@@ -1,0 +1,34 @@
+{
+  "criteria": [
+    {
+      "id": "audit-conclusion",
+      "score": 20,
+      "reason": "结论正确，异常类型为超标准，与预期一致",
+      "answer_evidence": "anomaly_ids: [\"L2-013-ANM-001\"]，答案明确“超标准异常”",
+      "trace_evidence": "rule_diagnostics: precision=1.0, recall=1.0, actual_types OVERSTD:1"
+    },
+    {
+      "id": "policy-basis",
+      "score": 15,
+      "reason": "引用了费用报销管理办法第十二条（对应6.3）及培训费管理办法第二条，条款有效且直接支持",
+      "answer_evidence": "citations: 01_expense_reimbursement_2025.md 第十二条，05_training_expense.md 第二条",
+      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md 第十二条；get_policy_doc 05_training_expense.md 第二条"
+    },
+    {
+      "id": "case-reasoning",
+      "score": 20,
+      "reason": "完整说明R004223为培训费3700元，超出3500元标准，无专项审批，超标200元",
+      "answer_evidence": "answer: “R004223（培训费，金额3700元）超出…3500元标准…超标200元”",
+      "trace_evidence": "get_expense_detail: amount 3700, expense_type training_fee；get_policy_doc 05_training_expense.md 第二条 3500元"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "R004223在数据库中存在，未使用无关记录"
+    }
+  ],
+  "overall_comment": "候选答案完全正确，异常类型和记录ID匹配预期，制度引用准确，推理清晰。",
+  "confidence": 1.0
+}

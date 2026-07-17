@@ -1,0 +1,63 @@
+{
+  "task_id": "DEV-004",
+  "task_scope": {
+    "audit_object": "split reimbursement (拆分报销)",
+    "clue_record": "R900003",
+    "employee_id": "E9001",
+    "expense_type": "travel_transport",
+    "date_window": {"start": "2025-01-27", "end": "2025-02-10"},
+    "window_rule": "same employee, same expense type, within 7 days of clue record date (2025-02-03)"
+  },
+  "audit_period": "2025-01-27 to 2025-02-10",
+  "policy_questions": [
+    {
+      "id": "PQ1",
+      "question": "Does Article 11 of 01_expense_reimbursement_2025 prohibit split reimbursement?",
+      "answer": "Yes. Article 11 prohibits splitting the same or similar matters into multiple reimbursements to circumvent approval authority."
+    },
+    {
+      "id": "PQ2",
+      "question": "What is the applicable approval threshold for checking split reimbursement?",
+      "answer": "Per Article 11, if same employee/same type within 7 days has 2+ records and the combined amount reaches a higher tier in 03_authorization_management Annex 2, split circumvention should be investigated."
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ1",
+      "question": "What other records exist for E9001, travel_transport, within 2025-01-27 to 2025-02-10?",
+      "method": "list_expenses with filters on employee_id, expense_type, date range"
+    }
+  ],
+  "required_fields": ["record_id", "employee_id", "expense_type", "expense_date", "amount", "reason", "status", "approval_tier"],
+  "evidence_requirements": [
+    "R900003 detail record",
+    "All E9001 travel_transport records within the 7-day window",
+    "Policy Article 11 (01_expense_reimbursement_2025)",
+    "Authorization thresholds (03_authorization_management Annex 2)"
+  ],
+  "execution_steps": [
+    "1. Query R900003 detail (done)",
+    "2. Query all E9001/travel_transport records within 2025-01-27 to 2025-02-10",
+    "3. Analyze if combined amounts reach higher approval tier",
+    "4. Check if records share the same underlying matter (client roadshow)",
+    "5. Form conclusion and write final_result.json",
+    "6. Run evidence-coverage-check",
+    "7. Run audit-report",
+    "8. Run result-validator",
+    "9. Validate and submit"
+  ],
+  "complexity": 1,
+  "complexity_reasons": [
+    "Single rule (Article 11 split reimbursement)",
+    "Single policy (01_expense_reimbursement_2025)",
+    "Known clue record with direct scope",
+    "Simple date-range filter on known employee/type"
+  ],
+  "subagent_plan": null,
+  "stopping_conditions": [
+    "All same-employee/type/7-day records retrieved and analyzed",
+    "Split reimbursement conclusion reached",
+    "All artifacts validated and submitted"
+  ],
+  "unresolved_items": []
+}

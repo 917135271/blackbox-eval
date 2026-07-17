@@ -1,0 +1,57 @@
+{
+  "criteria": [
+    {
+      "id": "overall-count",
+      "score": 0,
+      "reason": "报告仅列出5个异常，未提30个异常总数及5个陷阱位，数量错误",
+      "answer_evidence": "答案指出“识别出5项关键异常”，并列出ANOM-001至005，未提及30个异常和5个TRAP",
+      "trace_evidence": "工具调用中无统计全量异常操作，未产出30异常结论"
+    },
+    {
+      "id": "five-rule-coverage",
+      "score": 20,
+      "reason": "报告明确覆盖重复、拆分、超标准、超预算、超期五类规则",
+      "answer_evidence": "报告章节分别对应超期(ANOM-001)、重复(ANOM-002)、超预算(ANOM-003)、拆分(ANOM-004)、超标准(ANOM-005)"
+    },
+    {
+      "id": "representative-ids",
+      "score": 25,
+      "reason": "每类规则均提供了至少一个正确异常ID及详细记录证据",
+      "answer_evidence": "超期: R004227等；重复: R000002/R004201等；超预算: R004030等；拆分: R004207-R004220；超标准: R004223",
+      "trace_evidence": "get_expense_detail调用验证了R004201、R004207、R004223等记录，事实与报告一致"
+    },
+    {
+      "id": "policy-coverage",
+      "score": 15,
+      "reason": "制度引用准确，费用类引用费用报销管理办法，预算类引用预算管理办法",
+      "answer_evidence": "超期引用第七条，重复引用第十条，超预算引用第十三条及预算管理办法第二、三条，拆分引用第十一条及授权办法附件二，超标引用培训费管理办法第二条",
+      "trace_evidence": "工具获取了01_expense_reimbursement_2025.md、08_budget_management.md、05_training_expense.md等制度文档"
+    },
+    {
+      "id": "report-shape",
+      "score": 2.5,
+      "reason": "报告缺少明确的影响分析部分，结构不够完整",
+      "answer_evidence": "报告有制度依据、异常概述、涉及记录和审计结论建议，但未独立说明影响",
+      "trace_evidence": "无"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的所有record_ids均在工具调用和系统记录中出现，无虚构"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": true,
+      "reason": "工具仅对部分记录进行抽样检查（list_expenses仅一页，get_expense_detail仅18次），未实施全量4240条扫描，却声称覆盖全量，且异常总数远低于预期30个，属于部分扫描冒充完整"
+    },
+    {
+      "id": "trap-included-as-anomaly",
+      "triggered": false,
+      "reason": "未将任何TRAP开头的记录计入异常"
+    }
+  ],
+  "overall_comment": "报告准确覆盖五类规则并提供了制度依据与记录证据，但异常总数错误（仅5个而非30个），且因仅进行部分扫描却声称全量，适用50分上限，总体得分50分。",
+  "confidence": 0.85
+}

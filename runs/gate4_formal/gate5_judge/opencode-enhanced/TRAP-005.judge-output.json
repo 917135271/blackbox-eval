@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "clean-conclusion",
+      "score": 30,
+      "reason": "明确无异常且无矛盾表述",
+      "answer_evidence": "经逐条核查...全部记录均在各项适用政策标准的合规范围内，无异常。",
+      "trace_evidence": "无直接工具调用，但候选answer明确结论。"
+    },
+    {
+      "id": "record-scope",
+      "score": 0,
+      "reason": "核心记录已覆盖，但提交中包含了额外6条无关记录（R004233-R004238），属于加入无关记录。",
+      "answer_evidence": "提交的record_ids字段包含8条记录，远超预期的2条。",
+      "trace_evidence": "无工具调用，但从提交的record_ids可知。"
+    },
+    {
+      "id": "case-specific-reason",
+      "score": 15,
+      "reason": "只说明了符合招待标准和总额未达审批线，未提及发票唯一性，缺少关键原因。",
+      "answer_evidence": "R004239/R004240招待费合计1085元（未达拆分审批线且符合人均标准）。",
+      "trace_evidence": "无工具调用，未核查发票唯一性。"
+    },
+    {
+      "id": "reverse-check",
+      "score": 0,
+      "reason": "轨迹中无任何工具调用证据，无法验证是否对阈值、日期、发票等进行了反向核查。",
+      "answer_evidence": "无。",
+      "trace_evidence": "tool_trace_summary显示call_count为0，无任何工具调用。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的record_id均在数据库中存在。"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "没有将合规记录判为异常。"
+    }
+  ],
+  "overall_comment": "结论正确，但核查范围过大包含了无关记录，合规原因遗漏发票唯一性，且无工具调用证据支持反向核查。",
+  "confidence": 0.95
+}

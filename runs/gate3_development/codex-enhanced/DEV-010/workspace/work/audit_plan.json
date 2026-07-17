@@ -1,0 +1,66 @@
+{
+  "task_id": "DEV-010",
+  "task_scope": {
+    "audit_object": "R900010与R900011合计超过10000元",
+    "rule": "拆分报销核查（2025版第十一条）",
+    "expense_types": ["travel_transport"],
+    "business_period": "2025-06-01至2025-06-09",
+    "organization": "E9001, D901",
+    "deliverable": "判断是否构成7天内拆分报销"
+  },
+  "policy_questions": [
+    {
+      "question": "2025版第十一条拆分报销规则的具体条件是什么？",
+      "boundaries": "同一员工、同一费用类型、7天内2笔及以上、合计金额达到较高审批线"
+    },
+    {
+      "question": "附件二审批线中，AR-02与AR-03的金额分界是什么？",
+      "boundaries": "AR-02: 3000≤金额<10000；AR-03: 10000≤金额<50000"
+    },
+    {
+      "question": "7天内的日期边界如何计算？",
+      "boundaries": "需准确判断2025-06-01至2025-06-09是否为7天内"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "R900010和R900011的详细信息",
+      "fields": ["employee_id", "expense_date", "expense_type", "amount", "reason"]
+    },
+    {
+      "question": "日期差计算",
+      "fields": ["expense_date difference: 2025-06-09 - 2025-06-01 = 8天"]
+    }
+  ],
+  "required_fields": ["record_id", "employee_id", "expense_date", "expense_type", "amount", "reason", "status", "approvals"],
+  "evidence_requirements": [
+    "R900010和R900011完整记录",
+    "2025版报销管理办法第十一条全文",
+    "授权管理办法附件二审批权限表",
+    "日期差精确计算"
+  ],
+  "execution_steps": [
+    {"step": "planning", "status": "in_progress"},
+    {"step": "policy_query", "status": "pending"},
+    {"step": "data_query", "status": "pending"},
+    {"step": "date_boundary_analysis", "status": "pending"},
+    {"step": "evidence_coverage", "status": "pending"},
+    {"step": "report_and_validate", "status": "pending"},
+    {"step": "submit", "status": "pending"}
+  ],
+  "complexity": 1,
+  "complexity_reasons": [
+    "单一规则（第十一条拆分报销）",
+    "已知两条记录，无需批量查询",
+    "单一政策版本（2025版有效）",
+    "主要挑战：日期边界精确判断"
+  ],
+  "subagent_plan": null,
+  "stopping_conditions": [
+    "日期差计算完成",
+    "政策适用性确认",
+    "evidence_coverage通过",
+    "validation通过"
+  ],
+  "unresolved_items": []
+}

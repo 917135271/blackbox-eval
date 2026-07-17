@@ -1,0 +1,56 @@
+{
+  "audit_scope": {
+    "task_id": "DEV-005",
+    "audited_object": "R900005",
+    "expense_type": "business_entertainment",
+    "period": "2025-03-12",
+    "department": "D901 (开发审计一部)",
+    "employee": "E9001 (开发员工甲)"
+  },
+  "verified_facts": [
+    "R900005 为业务招待费报销，金额3600.00元，参与人数10人，人均360.00元",
+    "报销事由为'客户交流餐叙'，报销日期2025-03-20，费用发生日期2025-03-12",
+    "无专项审批（special_approval=0）",
+    "报销状态为已批准（approved）"
+  ],
+  "applicable_policies": [
+    {
+      "doc_id": "06_business_entertainment.md",
+      "title": "XX证券业务招待费管理办法",
+      "relevant_clauses": [
+        {"clause_no": "第二条", "rule": "业务招待单次活动费用不得超过5000元", "observed": "3600元", "judgment": "合规"},
+        {"clause_no": "第三条", "rule": "业务招待费用按参与人数核算，人均不得超过300元", "observed": "360元/人（3600元÷10人）", "judgment": "超标60元/人"}
+      ]
+    },
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "relevant_clauses": [
+        {"clause_no": "第十二条", "rule": "无专项审批时，报销金额不得超过对应制度标准的1.0倍", "observed": "人均360元超过300元标准，无专项审批", "judgment": "违规"}
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "anomaly_id": "ANOM-DEV005-001",
+      "rule": "《XX证券业务招待费管理办法》第三条：人均不得超过300元",
+      "observed": "人均360元（超标60元，超出比例20%）",
+      "type": "人均金额超标",
+      "records": ["R900005"]
+    }
+  ],
+  "impact": "R900005人均业务招待费超标60元/人，超出制度标准20%，且无专项审批豁免",
+  "recommendations": [
+    "要求经办人补充说明超标原因",
+    "超出部分（600元=60元×10人）如无合理依据应按制度追回"
+  ],
+  "anomaly_ids": ["ANOM-DEV005-001"],
+  "record_ids": ["R900005"],
+  "citations": [
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第二条"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第三条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+  ],
+  "answer": "R900005业务招待费单次活动总额3600元未超过5000元上限（合规），但人均金额360元（3600元÷10人）超过《XX证券业务招待费管理办法》第三条规定的300元/人标准，超标60元/人。无专项审批（special_approval=0），根据《XX证券费用报销管理办法(2025修订版)》第十二条，报销金额不得超过对应制度标准的1.0倍。该笔报销人均金额超标，构成违规。",
+  "limitations": []
+}

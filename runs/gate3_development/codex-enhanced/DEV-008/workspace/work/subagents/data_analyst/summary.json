@@ -1,0 +1,24 @@
+{
+  "decision": "reject",
+  "key_findings": [
+    "Scanned all 21 expense records in the development database (read-only SQLite).",
+    "1 record (R900006) confirmed overdue under Article 7: expense_date=2025-03-01, reimburse_date=2025-05-05, gap=65 days > 60-day limit. Employee E9001 (开发员工甲), communication expense ¥200, reason: '三月通讯费延迟报销'. No special_approval.",
+    "2 December records (R900012, R900021) verified valid under Article 9: both reimburse dates fall within the next-year January 15 deadline (2026-01-15). R900012: Dec 20→Jan 10 (21 days, within window); R900021: Dec 2→Dec 8 (6 days, well within window).",
+    "1 record (R900020) has special_approval=1 but is not overdue (gap=5 days); no overdue record has special_approval.",
+    "1 invoice reuse detected: INV900001 used by R900001 and R900002 (both office_supplies, same employee E9001, ¥480 each) — not related to overdue analysis.",
+    "SQL bug identified and corrected: initial year-end query used same-year Jan 15 instead of next-year Jan 15 for Article 9 deadline calculation."
+  ],
+  "record_ids": ["R900006"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "Article 7"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "Article 9"}
+  ],
+  "unresolved_items": [],
+  "artifact_paths": [
+    "work/subagents/data_analyst/summary.json",
+    "work/subagents/data_analyst/data_findings.json",
+    "work/analysis/data_findings.json",
+    "work/analysis/reconcile.py",
+    "work/sql/query.sql"
+  ]
+}

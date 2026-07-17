@@ -1,0 +1,68 @@
+{
+  "task_scope": {
+    "audit_object": "All departments annual expense vs. budget",
+    "expense_types": "All types",
+    "business_period": "2025-01-01 to 2025-12-31",
+    "organization_scope": "All departments",
+    "requested_deliverable": "Over-budget departments with record-level classification (exempt vs. violation)"
+  },
+  "policy_questions": [
+    {
+      "rule": "预算管理办法第2条",
+      "description": "各部门应在年度预算额度内发生费用"
+    },
+    {
+      "rule": "预算管理办法第3条",
+      "description": "部门费用累计使用达到年度预算额度1.0倍后,原则上不得继续报销"
+    },
+    {
+      "rule": "预算管理办法第4条",
+      "description": "因监管要求、客户服务或经营连续性确需超预算支出的,应履行专项审批(special_approval)"
+    }
+  ],
+  "data_questions": [
+    "Which departments have used_amount > annual_budget × 1.0?",
+    "For each over-budget department, what are all reimbursement records in 2025?",
+    "Which records have special_approval=true (exempt)?",
+    "Which records have special_approval=false/null (violation)?"
+  ],
+  "required_fields": [
+    "department_id", "department_name", "annual_budget", "used_amount",
+    "record_id", "employee_id", "expense_type", "amount", "expense_date",
+    "special_approval", "status", "invoice_no"
+  ],
+  "evidence_requirements": [
+    "summarize_department_budgets for all departments (approved and all statuses)",
+    "list_expenses for each over-budget department (full year 2025)",
+    "Policy doc for budget management rules"
+  ],
+  "execution_steps": [
+    "1. Get all department budgets via summarize_department_budgets",
+    "2. Identify over-budget departments (used > budget × 1.0)",
+    "3. For each over-budget department, list all 2025 expenses",
+    "4. Classify records: special_approval=true → exempt; otherwise → violation",
+    "5. Save detailed analysis and compact summary",
+    "6. Run evidence-coverage-check",
+    "7. Run false-positive-review if applicable",
+    "8. Run audit-report",
+    "9. Run result-validator",
+    "10. Submit via validate_audit_result then submit_audit_result"
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "Aggregation, grouping, batch filtering (department-level budget comparison)",
+      "Two business rules (budget cap + special approval exemption)",
+      "Thresholds, exemptions, exceptions (1.0× threshold, special_approval exemption)"
+    ],
+    "subagent_plan": "None — task explicitly prohibits subagent creation"
+  },
+  "stopping_conditions": [
+    "All departments budget data retrieved",
+    "All over-budget department records enumerated",
+    "Each record classified as exempt or violation",
+    "Evidence coverage at 100%",
+    "Validation passes"
+  ],
+  "unresolved_items": []
+}

@@ -1,0 +1,39 @@
+{
+  "criteria": [
+    {
+      "id": "full-scan-method",
+      "score": 15,
+      "reason": "使用find_reused_invoices(min_usage_count=2)全量扫描重复发票，summarize_expenses确认全年范围，方法可复核。",
+      "answer_evidence": "evidence_matrix中reconciled_figures显示total_invoices_scanned: 4240, duplicate_invoices_found: 6。",
+      "trace_evidence": "工具find_reused_invoices返回所有重复发票；summarize_expenses(date_from='2025-01-01', date_to='2025-12-31')确认全年数据。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 10,
+      "reason": "明确引用第十条（对应规则费用报销管理办法-6.1），并落实为查询重复发票的条件。",
+      "answer_evidence": "答案中写明“违反第十条'同一发票最多报销1次'规定”，citations引用doc_id和clause_no '第十条'。",
+      "trace_evidence": "search_policy查询重复报销返回第十条摘要；get_policy_excerpt确认第十条内容。"
+    },
+    {
+      "id": "false-positive-control",
+      "score": 15,
+      "reason": "提交的异常ID和记录ID与预期完全一致，无混入其他规则异常或无关记录。",
+      "answer_evidence": "submitted anomaly_ids与预期一致，record_ids完全匹配，无额外记录。",
+      "trace_evidence": "find_reused_invoices仅返回6个重复发票，每个关联2个记录；get_expense_detail验证所有记录均为重复报销相关。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有record_id均通过get_expense_detail验证存在，无虚构记录。"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": false,
+      "reason": "工具调用覆盖全年数据，答案明确为全年扫描。"
+    }
+  ],
+  "overall_comment": "候选提交准确完成全年重复报销扫描，方法正确，制度依据充分，无误报，各项指标均满分。",
+  "confidence": 1.0
+}

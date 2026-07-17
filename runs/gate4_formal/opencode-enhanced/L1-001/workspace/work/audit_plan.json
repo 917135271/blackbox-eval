@@ -1,0 +1,104 @@
+{
+  "task_id": "L1-001",
+  "task_type": "policy_qa",
+  "question": "现行制度下,单笔费用报销达到多少金额需要部门总经理审批?",
+  "scope": {
+    "audit_object": "单笔费用报销的部门总经理审批金额阈值",
+    "expense_types": ["所有费用报销类型"],
+    "business_period": "现行制度有效期间 (2025修订版)",
+    "organization_scope": "全公司",
+    "deliverable": "金额阈值及对应的制度条款引用"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-1",
+      "question": "现行制度下,单笔费用报销达到多少金额需要部门总经理审批?",
+      "boundaries": {
+        "dates": "现行(2025修订版)制度有效期间",
+        "amounts": "部门总经理审批的最低金额阈值",
+        "conditions": "审批层级: 部门总经理",
+        "exemptions": "待确认",
+        "exceptions": "待确认"
+      }
+    },
+    {
+      "id": "PQ-2",
+      "question": "是否需要确认制度版本适用性(2025版 vs 2022版)?",
+      "boundaries": {
+        "versions": "2025修订版(现行) vs 2022版(已废止)"
+      }
+    }
+  ],
+  "data_questions": [],
+  "required_fields": [
+    "doc_id",
+    "clause_no",
+    "approval_threshold_amount",
+    "approver_role",
+    "policy_version",
+    "effective_date"
+  ],
+  "evidence_requirements": [
+    "现行制度文本中明确规定部门总经理审批金额阈值的条款",
+    "确认该制度为现行有效版本的依据",
+    "如涉及多个审批层级,需完整记录各级审批阈值"
+  ],
+  "execution_steps": [
+    {
+      "step": 1,
+      "action": "policy-version-check",
+      "description": "确认现行制度版本(2025 vs 2022),确定适用的制度文档",
+      "output": "确认doc_id=01_expense_reimbursement_2025.md为现行版本"
+    },
+    {
+      "step": 2,
+      "action": "query_policy",
+      "description": "在现行制度中搜索部门总经理审批金额阈值",
+      "output": "包含阈值金额和条款编号的制度节选"
+    },
+    {
+      "step": 3,
+      "action": "evidence-coverage-check",
+      "description": "验证证据覆盖",
+      "output": "work/evidence_matrix.json"
+    },
+    {
+      "step": 4,
+      "action": "audit-report",
+      "description": "生成审计报告",
+      "output": "work/final_result.json"
+    },
+    {
+      "step": 5,
+      "action": "result-validator",
+      "description": "校验最终结果",
+      "output": "work/validation_report.json"
+    },
+    {
+      "step": 6,
+      "action": "validate_and_submit",
+      "description": "预验证通过后提交",
+      "output": "提交成功"
+    }
+  ],
+  "complexity": {
+    "score": 0,
+    "reasons": [
+      "单一制度政策事实问题",
+      "仅需一次制度查询,无需数据聚合或批量过滤",
+      "无需跨制度比较",
+      "2022版已明确标记为废止,无版本歧义"
+    ]
+  },
+  "subagent_plan": {
+    "required": false,
+    "reason": "复杂度0,主Agent直接处理"
+  },
+  "stopping_conditions": [
+    "找到明确的部门总经理审批金额阈值条款",
+    "确认适用的制度版本为现行有效版本",
+    "证据覆盖检查通过",
+    "校验通过并成功提交"
+  ],
+  "unresolved_items": []
+}

@@ -1,0 +1,55 @@
+{
+  "task_id": "DEV-009",
+  "task_type": "clean_trap",
+  "complexity": 1,
+  "complexity_reasons": [
+    "Single rule question: duplicate reimbursement (Article 10)",
+    "Two known records only, no aggregation or batch filtering needed",
+    "No policy version ambiguity — 2025 version is current and applicable",
+    "Single policy document applies"
+  ],
+  "audit_scope": {
+    "question": "R900008与R900009同日同额且费用类型相同，请核查是否属于重复报销；不同发票时不得误报",
+    "rule": "同一发票在不同报销单中重复出现构成重复报销（第十条）",
+    "records_in_scope": ["R900008", "R900009"],
+    "expense_type": "office_supplies",
+    "date_range": "2025-05-05"
+  },
+  "policy_questions": [
+    {
+      "question": "What constitutes duplicate reimbursement?",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十条"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "Are R900008 and R900009 using the same invoice?",
+      "required_fields": ["invoice_no", "invoice_id", "record_id"],
+      "method": "Compare invoice_no of both records"
+    },
+    {
+      "question": "Is either invoice used in more than one reimbursement?",
+      "required_fields": ["invoice_no", "usage_count"],
+      "method": "Check invoice usage for both FPDEV900008 and FPDEV900009"
+    }
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "Retrieve expense details for R900008 and R900009", "status": "completed"},
+    {"step": 2, "action": "Retrieve applicable policy on duplicate reimbursement", "status": "completed"},
+    {"step": 3, "action": "Verify invoice usage for both invoices", "status": "completed"},
+    {"step": 4, "action": "Compare records and determine if duplicate reimbursement exists", "status": "completed"},
+    {"step": 5, "action": "Build evidence coverage check", "status": "pending"},
+    {"step": 6, "action": "Run false-positive review (compact)", "status": "pending"},
+    {"step": 7, "action": "Write audit report and final result", "status": "pending"},
+    {"step": 8, "action": "Validate and submit", "status": "pending"}
+  ],
+  "subagent_plan": {
+    "needed": false,
+    "reason": "Complexity 1 — compact mode sufficient, no native subagent required"
+  },
+  "stopping_conditions": [
+    "Invoice numbers are confirmed different → no duplicate reimbursement → 无异常",
+    "Invoice numbers are same → duplicate reimbursement confirmed → report anomaly"
+  ]
+}

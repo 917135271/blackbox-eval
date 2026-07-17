@@ -1,0 +1,60 @@
+{
+  "task_id": "DEV-001",
+  "task_type": "policy_exception",
+  "audit_object": "R900012",
+  "question": "核查R900012是否构成超期报销。必须同时考虑费用发生后60天规则和会计年度末15天补充提交规则，并说明现行制度为何适用。",
+  "audit_period": "基于R900012的expense_date和reimburse_date判定",
+  "scope": {
+    "record_ids": ["R900012"],
+    "rules": ["60天报销期限规则", "会计年度末15天补充提交规则"]
+  },
+  "policy_questions": [
+    "费用发生后60天内报销的规则条款",
+    "会计年度末15天补充提交规则条款",
+    "现行制度的生效日期和适用范围"
+  ],
+  "data_questions": [
+    "R900012的expense_date和reimburse_date",
+    "R900012的费用类型、金额、状态",
+    "相关员工和部门信息",
+    "审批链信息（审核日期等）"
+  ],
+  "required_fields": ["record_id", "expense_date", "reimburse_date", "expense_type", "amount", "status", "employee_id", "department_id", "special_approval"],
+  "evidence_needs": [
+    "R900012完整记录",
+    "报销期限相关政策条款",
+    "会计年度定义（如有）",
+    "审批日期时间线"
+  ],
+  "execution_steps": [
+    "获取R900012详细记录",
+    "查询员工和部门信息",
+    "搜索并获取报销期限相关政策文档",
+    "计算expense_date到reimburse_date的天数",
+    "判断是否适用15天补充提交规则",
+    "形成结论并整理制度引用",
+    "证据覆盖检查",
+    "审计报告输出",
+    "结果校验",
+    "提交"
+  ],
+  "complexity": 1,
+  "complexity_reasons": [
+    "单记录核查",
+    "涉及两条规则但均为同一政策内条款",
+    "无聚合、分组需要",
+    "日期边界判定（单记录）",
+    "compact main-agent flow"
+  ],
+  "subagent_plan": {
+    "subagents": [],
+    "reason": "complexity=1, compact main-agent flow, no native subagent needed"
+  },
+  "stopping_conditions": [
+    "R900012记录已获取且日期信息完整",
+    "政策条款已检索并确认适用版本",
+    "天数计算完成且结论明确",
+    "证据覆盖率达100%",
+    "校验通过并成功提交"
+  ]
+}

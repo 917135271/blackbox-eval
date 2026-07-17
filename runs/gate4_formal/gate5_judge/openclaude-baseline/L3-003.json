@@ -1,0 +1,196 @@
+{
+  "case_family": "full_year_audit",
+  "case_score": 19.0,
+  "case_score_raw": 19.0,
+  "category": "full_year_rule_audit",
+  "criteria": [
+    {
+      "answer_evidence": "候选 anomaly_ids: [\"ANOM-SPLIT-001\",…,\"ANOM-STD-001\",\"ANOM-STD-002\",\"ANOM-STD-003\",…] 仅含 3 个超标准 ID。",
+      "id": "all-anomaly-ids",
+      "reason": "候选 anomaly_ids 仅包含 ANOM-STD-001/002/003 三个超标准异常，缺失预期中的三个，达不到 partial 门槛。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用仅针对 office_supplies/communication/training_fee 阈值查询，未覆盖全部超标准类型。"
+    },
+    {
+      "answer_evidence": "候选 record_ids 共 29 条，缺失 3 条预期记录，大量无关记录。",
+      "id": "all-record-ids",
+      "reason": "提交的 record_ids 仅包含 R004221/R004222/R004223，缺失 R004224/R004225/R004226，且混入 26 条无关记录。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具查询返回超标准记录仅 R004221/R004222/R004223，未出现 R004224 等。"
+    },
+    {
+      "answer_evidence": "答案声称完成全年超标准扫描，但仅列出办公/通讯/培训超标，缺少差旅住宿超标记录。",
+      "id": "full-scan-method",
+      "reason": "执行了全年按类型的批量查询，但未按差旅办法进行职级与城市标准比对，扫描范围不完整。",
+      "score": 8.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中 list_expenses 分页拉取所有 expense_type，但仅对 office_supplies>600、communication>300、training_fee>3500 查询，未进行 travel_lodging 标准比对。"
+    },
+    {
+      "answer_evidence": "答案引用《费用报销管理办法》第十二条及《办公通讯》《培训费》标准，未提差旅住宿标准。",
+      "id": "policy-basis",
+      "reason": "引用了费用报销管理办法第十二条及相关专项标准，但未涵盖差旅住宿标准，制度落实不完整。",
+      "score": 6.0,
+      "source": "llm_judge",
+      "trace_evidence": "查询条件 office_supplies>600 等对应制度，但未查询 travel_lodging 按职级/城市标准。"
+    },
+    {
+      "answer_evidence": "答案将 ANOM-SPLIT-/ANOM-DUP- 异常作为超标准扫描发现列出。",
+      "id": "false-positive-control",
+      "reason": "将拆分报销和重复报销等其他规则异常混入超标准扫描结果，存在大量实质误报。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用使用了 find_reused_invoices 和拆分分析，导致最终集合包含 26 条无关记录。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "未发现不存在于数据库的 record_id。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": false,
+      "reason": "虽然扫描范围不完整，但确实读取了全年数据，并非仅检查部分月份或样例记录。",
+      "score_cap": 50,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "ANOM-SPLIT-001",
+      "ANOM-SPLIT-002",
+      "ANOM-SPLIT-003",
+      "ANOM-SPLIT-004",
+      "ANOM-SPLIT-005",
+      "ANOM-SPLIT-006",
+      "ANOM-STD-001",
+      "ANOM-STD-002",
+      "ANOM-STD-003",
+      "ANOM-DUP-001",
+      "ANOM-DUP-002",
+      "ANOM-DUP-003",
+      "ANOM-DUP-004",
+      "ANOM-DUP-005",
+      "ANOM-DUP-006"
+    ],
+    "actual_record_ids": [
+      "R004207",
+      "R004208",
+      "R004209",
+      "R004210",
+      "R004211",
+      "R004212",
+      "R004213",
+      "R004214",
+      "R004215",
+      "R004216",
+      "R004217",
+      "R004218",
+      "R004219",
+      "R004220",
+      "R004221",
+      "R004222",
+      "R004223",
+      "R000002",
+      "R004201",
+      "R000005",
+      "R004202",
+      "R000020",
+      "R004203",
+      "R000028",
+      "R004204",
+      "R000037",
+      "R004205",
+      "R000055",
+      "R004206"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "DUP": 6,
+        "OVERSTD": 3,
+        "SPLIT": 6
+      },
+      "count_exact": false,
+      "expected_types": {
+        "OVERSTD": 6
+      },
+      "f1": 0.285714,
+      "precision": 0.2,
+      "recall": 0.5
+    },
+    "citation_count": 6,
+    "elapsed_seconds": 398.779,
+    "expected_anomaly_ids": [
+      "OVERSTD-001",
+      "OVERSTD-002",
+      "OVERSTD-003",
+      "OVERSTD-004",
+      "OVERSTD-005",
+      "OVERSTD-006"
+    ],
+    "expected_record_ids": [
+      "R004221",
+      "R004222",
+      "R004223",
+      "R004224",
+      "R004225",
+      "R004226"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 26,
+      "f1": 0.171429,
+      "missing_count": 3,
+      "precision": 0.103448,
+      "recall": 0.5
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:26:07+08:00",
+  "group": "openclaude-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选仅覆盖 3 条超标准记录，遗漏差旅住宿超标；将拆分、重复等异常混入，导致严重误报；制度依据不完整。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 3676,
+      "completion_tokens_details": {
+        "reasoning_tokens": 2855
+      },
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 13602,
+      "prompt_tokens": 15010,
+      "prompt_tokens_details": {
+        "cached_tokens": 1408
+      },
+      "total_tokens": 18686
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/openclaude-baseline/L3-003",
+  "task_id": "L3-003"
+}

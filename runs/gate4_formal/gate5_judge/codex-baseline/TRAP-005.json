@@ -1,0 +1,146 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 15.0,
+  "case_score_raw": 15.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "无异常。经核查，TRAP-005涉及6对共12条报销记录...明确标注为系统测试注入数据，并非真实的重复报销行为。",
+      "id": "clean-conclusion",
+      "reason": "结论虽表述为无异常，但基于与题目要求完全无关的记录集，未针对R004239、R004240进行核查，结论无效。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中find_reused_invoices返回的records仅为R000002、R000005、R000020等，未出现R004239或R004240。"
+    },
+    {
+      "answer_evidence": "候选提交的record_ids列表：[\"R000002\",\"R000005\",\"R000020\",\"R000028\",\"R000037\",\"R000055\",\"R004201\",...]",
+      "id": "record-scope",
+      "reason": "未核查核心记录R004239和R004240，提交的record_ids均为与本题无关的记录，范围完全错误。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中所有get_expense_detail调用均针对R000002、R000005、R000020等，未调用R004239或R004240。"
+    },
+    {
+      "answer_evidence": "虽然表面上存在同一发票号被多条记录使用的情况，但注入样本属于测试数据，不构成重复报销违规。",
+      "id": "case-specific-reason",
+      "reason": "给出的合规原因与正确答案完全不符，未提及unique invoices、entertainment standards、total below approval line。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "无相关核查证据。"
+    },
+    {
+      "answer_evidence": "无。",
+      "id": "reverse-check",
+      "reason": "未对R004239和R004240的边界条件（如发票唯一性、招待标准、总金额等）进行任何核查，轨迹中无相关工具调用。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "无对R004239、R004240的get_expense_detail或其他核查调用。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": true,
+      "reason": "候选提交的record_ids均为与题目无关的记录，构成用无关记录支撑核心结论。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "未将合规记录判为实质异常。",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R000002",
+      "R000005",
+      "R000020",
+      "R000028",
+      "R000037",
+      "R000055",
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 181.925,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004239",
+      "R004240"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 12,
+      "f1": 0.0,
+      "missing_count": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:25:16+08:00",
+  "group": "codex-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.95,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选未按题目要求核查指定记录R004239、R004240，而是核查了完全无关的记录集，导致所有评估项均为0分，结论无效。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2075,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1437
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 6618,
+      "prompt_tokens": 7642,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 9717
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/codex-baseline/TRAP-005",
+  "task_id": "TRAP-005"
+}

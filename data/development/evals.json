@@ -1,0 +1,86 @@
+[
+  {
+    "id": "DEV-001",
+    "level": "dev",
+    "category": "policy_exception",
+    "routing_hint": "complexity=1; compact main-agent flow; no native subagent",
+    "prompt": "核查R900012是否构成超期报销。必须同时考虑费用发生后60天规则和会计年度末15天补充提交规则，并说明现行制度为何适用。"
+  },
+  {
+    "id": "DEV-002",
+    "level": "dev",
+    "category": "policy_qa",
+    "routing_hint": "complexity=0; compact main-agent flow; no native subagent",
+    "prompt": "现行培训制度中，内部培训和外部培训的综合费用每日上限分别是多少？"
+  },
+  {
+    "id": "DEV-003",
+    "level": "dev",
+    "category": "single_anomaly",
+    "routing_hint": "complexity=1; only follow same-invoice records; no native subagent",
+    "prompt": "以R900001为线索核查重复报销，返回全部相关记录及异常结论。"
+  },
+  {
+    "id": "DEV-004",
+    "level": "dev",
+    "category": "single_anomaly",
+    "routing_hint": "complexity=1; only follow same employee/type/7-day records; no native subagent",
+    "prompt": "以R900003为线索核查是否存在拆分报销，返回构成同一异常的全部记录。"
+  },
+  {
+    "id": "DEV-005",
+    "level": "dev",
+    "category": "single_anomaly",
+    "routing_hint": "complexity=1; compact threshold calculation; no native subagent",
+    "prompt": "核查R900005的业务招待费是否超标，需要同时计算单次活动总额和人均金额。"
+  },
+  {
+    "id": "DEV-006",
+    "level": "dev",
+    "category": "single_anomaly",
+    "routing_hint": "complexity=1; compact threshold calculation; no native subagent",
+    "prompt": "核查R900013的差旅住宿费是否超标，结合员工职级、城市档位和住宿晚数计算。"
+  },
+  {
+    "id": "DEV-007",
+    "level": "dev",
+    "category": "batch_analysis",
+    "routing_hint": "complexity=3; authorize and invoke data_analyst once",
+    "prompt": "扫描开发库中的个人办公用品和通讯费月度标准，返回全部超标准异常记录；应按员工和自然月聚合。"
+  },
+  {
+    "id": "DEV-008",
+    "level": "dev",
+    "category": "batch_analysis",
+    "routing_hint": "complexity=3; authorize and invoke data_analyst once; review year-end exclusion in main context",
+    "prompt": "扫描开发库中的超期报销，返回全部异常记录，并对年末补充提交记录进行核对。"
+  },
+  {
+    "id": "DEV-009",
+    "level": "dev",
+    "category": "clean_trap",
+    "routing_hint": "complexity=1; compact false-positive review in main context; no native subagent",
+    "prompt": "R900008与R900009同日同额且费用类型相同，请核查是否属于重复报销；不同发票时不得误报。"
+  },
+  {
+    "id": "DEV-010",
+    "level": "dev",
+    "category": "clean_trap",
+    "routing_hint": "complexity=1; compact date-boundary review in main context; no native subagent",
+    "prompt": "R900010与R900011合计超过10000元，请核查是否构成7天内拆分报销，并准确处理日期边界。"
+  },
+  {
+    "id": "DEV-011",
+    "level": "dev",
+    "category": "aggregate_budget",
+    "routing_hint": "complexity=3; authorize and invoke data_analyst once; compact approval review",
+    "prompt": "核查D902部门年度预算执行，识别首次导致预算超限且没有专项审批的报销记录；专项审批记录不得误报。"
+  },
+  {
+    "id": "DEV-012",
+    "level": "dev",
+    "category": "audit_report",
+    "routing_hint": "complexity=4; authorize and invoke data_analyst once; do policy and independent review compactly in main context",
+    "prompt": "对完整开发库执行综合费用审计，至少覆盖重复报销、拆分报销、超标准、超期和超预算规则，返回全部异常记录并给出有制度依据的摘要。"
+  }
+]

@@ -1,0 +1,173 @@
+{
+  "case_family": "full_year_audit",
+  "case_score": 50,
+  "case_score_raw": 80.0,
+  "category": "full_year_rule_audit",
+  "criteria": [
+    {
+      "answer_evidence": "",
+      "id": "all-anomaly-ids",
+      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
+      "score": 25.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "all-record-ids",
+      "reason": "record_ids集合F1=1.000",
+      "score": 30.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "答案仅列出异常，未说明扫描方法",
+      "id": "full-scan-method",
+      "reason": "无工具调用或查询痕迹，未能提供全年重复扫描的计算过程或复核依据",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具轨迹为空，无查询或分析步骤"
+    },
+    {
+      "answer_evidence": "引用《XX证券费用报销管理办法(2025修订版)》第十条",
+      "id": "policy-basis",
+      "reason": "正确引用了第十条，但未展示将条款转化为查询条件的过程",
+      "score": 5.0,
+      "source": "llm_judge",
+      "trace_evidence": "无对应查询条件"
+    },
+    {
+      "answer_evidence": "提交的anomaly_ids和record_ids均与预期一致",
+      "id": "false-positive-control",
+      "reason": "异常ID与记录ID完全匹配预期，无多余或错误",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": true,
+      "reason": "答案宣称全年扫描，但无任何全量查询或处理过程证据，可能仅针对已知样本",
+      "score_cap": 50,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "L3-001-DUP-001",
+      "L3-001-DUP-002",
+      "L3-001-DUP-003",
+      "L3-001-DUP-004",
+      "L3-001-DUP-005",
+      "L3-001-DUP-006"
+    ],
+    "actual_record_ids": [
+      "R000002",
+      "R004201",
+      "R000005",
+      "R004202",
+      "R000020",
+      "R004203",
+      "R000028",
+      "R004204",
+      "R000037",
+      "R004205",
+      "R000055",
+      "R004206"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "DUP": 6
+      },
+      "count_exact": true,
+      "expected_types": {
+        "DUP": 6
+      },
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 97.649,
+    "expected_anomaly_ids": [
+      "DUP-001",
+      "DUP-002",
+      "DUP-003",
+      "DUP-004",
+      "DUP-005",
+      "DUP-006"
+    ],
+    "expected_record_ids": [
+      "R000002",
+      "R000005",
+      "R000020",
+      "R000028",
+      "R000037",
+      "R000055",
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:29:24+08:00",
+  "group": "opencode-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.95,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "异常识别准确，但缺乏全量扫描的可复核性，制度引用正确但未落地到查询",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1782,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1448
+      },
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 2075,
+      "prompt_tokens": 3227,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152
+      },
+      "total_tokens": 5009
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/opencode-baseline/L3-001",
+  "task_id": "L3-001"
+}

@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "threshold",
+      "score": 35,
+      "reason": "明确给出部门总经理审批线为10000元（AR-03区间≥10000且<50000），金额和边界正确。",
+      "answer_evidence": "“AR-03≥10000且<50000元由部门总经理审批”",
+      "trace_evidence": "get_policy_doc 03_authorization_management.md 返回附件二表格，包含 AR-03 区间“大于等于10000元且小于50000元，部门总经理”"
+    },
+    {
+      "id": "two-hop-path",
+      "score": 30,
+      "reason": "清晰说明从费用报销管理办法第五条交叉引用到授权管理办法附件二，二跳路径完整。",
+      "answer_evidence": "“费用报销管理办法(2025修订版)第五条未直接列示审批金额,统一按授权管理办法附件二执行”",
+      "trace_evidence": "get_policy_doc 01 后立即 get_policy_doc 03，且最终答案引用该路径"
+    },
+    {
+      "id": "citations",
+      "score": 20,
+      "reason": "在citations中引用01_expense_reimbursement_2025.md和03_authorization_management.md，两份文档均有效。",
+      "answer_evidence": "引用第五条和附件二，对应doc_id 01和03",
+      "trace_evidence": "工具调用 get_policy_doc 01 和 03 均成功返回相关条款"
+    },
+    {
+      "id": "no-premature-stop",
+      "score": 10,
+      "reason": "工具跟踪显示在读取01后继续调取03和核实费用记录，未提前停止。",
+      "answer_evidence": "最终结论基于交叉引用得到审批档位",
+      "trace_evidence": "get_policy_doc 01后立即get_policy_doc 03，随后多次list_expenses/list_approvals检查记录"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "使用的R000339和R001990均通过list_expenses和get_expense_detail验证存在，非伪造。"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "虽然调取了已废止的2022版，但答案仅基于现行2025版和授权管理办法，未用废止制度作为依据。"
+    }
+  ],
+  "overall_comment": "候选完成二跳检索，准确给出部门总经理审批线10000元，双文档引用充分，检索过程完整，无关键失效。",
+  "confidence": 1.0
+}

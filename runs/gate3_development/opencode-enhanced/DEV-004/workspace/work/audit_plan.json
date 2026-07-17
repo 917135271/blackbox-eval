@@ -1,0 +1,64 @@
+{
+  "task_id": "DEV-004",
+  "task_type": "single_anomaly",
+  "question": "以R900003为线索核查是否存在拆分报销，返回构成同一异常的全部记录。",
+  "audit_scope": {
+    "clue_record": "R900003",
+    "rule": "拆分报销（第十一条）",
+    "employee": "E9001",
+    "expense_type": "travel_transport",
+    "date_range": "2025-01-27 to 2025-02-10 (7-day window around 2025-02-03)",
+    "filter": "same employee, same expense type, within 7 days"
+  },
+  "policy_questions": [
+    "Which policy clause prohibits split reimbursement?",
+    "What are the approval thresholds for the split records?",
+    "Is the 2025 policy the effective one?"
+  ],
+  "data_questions": [
+    "What are R900003's employee, expense type, date, and amount?",
+    "Are there other records for the same employee and type within 7 days?",
+    "Does the combined amount reach a higher approval tier?",
+    "Are the reasons indicative of the same event?"
+  ],
+  "required_fields": [
+    "record_id", "employee_id", "expense_type", "expense_date",
+    "amount", "reason", "invoice_no", "status"
+  ],
+  "evidence_requirements": [
+    "R900003 full detail",
+    "R900004 full detail",
+    "Policy clause 11 from 01_expense_reimbursement_2025.md",
+    "Approval threshold table from 03_authorization_management.md (附件二)"
+  ],
+  "execution_steps": [
+    "1. Get R900003 details (employee, type, date, amount)",
+    "2. Query same employee/type within 7 days",
+    "3. Check policy 第十一条 for split reimbursement definition",
+    "4. Check 附件二 for approval thresholds",
+    "5. Determine if combined amount crosses higher approval tier",
+    "6. Run evidence-coverage-check",
+    "7. Run false-positive-review if triggered",
+    "8. Run audit-report",
+    "9. Run result-validator",
+    "10. Write final_result.json",
+    "11. Validate and submit"
+  ],
+  "complexity": 1,
+  "complexity_reasons": [
+    "Single rule (拆分报销, Clause 11)",
+    "Known clue record",
+    "Direct record lookup, no aggregation needed",
+    "Two records within scope, simple comparison"
+  ],
+  "subagent_plan": {
+    "none_required": true,
+    "reason": "Complexity=1, no native subagent per routing hint"
+  },
+  "stopping_conditions": [
+    "All same employee/type/7-day records identified",
+    "Policy clause 11 and approval thresholds confirmed",
+    "Split or no-split conclusion reached"
+  ],
+  "unresolved_items": []
+}

@@ -47,7 +47,32 @@ Trae Agent's local engineering fixes are preserved as
 `candidates/trae-agent/patches/engineering-usability.patch` and summarized in
 `candidates/trae-agent/setup.md`.
 
-## Model And Candidate Config
+## Expanded Four-Framework Evaluation
+
+The current research scope has been expanded to Claude Code Best, Codex,
+OpenClaude, and OpenCode. Each framework has a baseline and an enhanced group.
+The formal set is now 15 selected cases rather than all 55 legacy tasks, and
+every selected case has a frozen 100-point case-specific rubric.
+
+- Runnable formal prompts: `data/formal_case_rubric/evals.json`
+- Hidden case rubrics: `data/formal_case_rubric/cases.json`
+- Rubric JSON Schema: `schemas/case-rubric.schema.json`
+- Scope and source locks: `config/expanded_eval_plan.yaml`
+- Dataset validator: `runner/validate_case_rubrics.py`
+
+Build and validate the formal dataset with:
+
+```powershell
+python data/formal_case_rubric/build_formal_dataset.py --check
+python runner/validate_case_rubrics.py
+```
+
+The completed two-framework GATE3 artifacts remain a historical checkpoint.
+Formal GATE4 is paused until OpenClaude and OpenCode complete the same source,
+adapter, and development-task checks. The older standard-55 instructions below
+are retained only to reproduce the previous baseline.
+
+## Legacy Model And Candidate Config
 
 Current config enables the standard-55-task candidate set:
 
@@ -186,6 +211,35 @@ python runner/grade.py --run-id gate4_standard_claude_v4pro_v1 --candidate claud
 ```
 
 Use `--judge-mode rule` when you need to reproduce the old deterministic scorer.
+
+## Current 15-Case GATE5
+
+The current source-framework study uses 15 frozen formal cases and 10 groups
+(five frameworks, each with a baseline and enhanced configuration). GATE5 uses
+case-specific Rubrics, deterministic evidence checks, and DeepSeek semantic
+judging:
+
+```powershell
+$env:LLM_API_KEY = [Environment]::GetEnvironmentVariable("LLM_API_KEY", "User")
+python runner/grade_gate5_rubrics.py --workers 8
+python runner/grade_gate5_rubrics.py --only-errors --workers 4
+python runner/grade_gate5_rubrics.py --reapply-rules
+python runner/report_gate5_results.py
+```
+
+Primary outputs:
+
+- `output/gate5_final_report.md`
+- `output/gate5_scores.json`
+- `output/gate5_case_scores.csv`
+- `output/gate5_failure_attribution.jsonl`
+- `output/gate5_human_review_sample.md`
+- `output/gate5_typical_trajectories.md`
+
+Rule diagnostics remain available for audit. When a semantic rule diagnosis
+conflicts with the DeepSeek Judge, the Judge result is final. The generated
+review sample is optional quality assurance and does not change scores or block
+GATE5 completion.
 
 ## Design Decisions
 

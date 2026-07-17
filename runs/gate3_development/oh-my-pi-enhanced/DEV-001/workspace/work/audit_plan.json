@@ -1,0 +1,44 @@
+{
+  "task_id": "DEV-001",
+  "task_type": "policy_exception",
+  "audit_object": "R900012",
+  "audit_period": "2025-12-20 to 2026-01-10",
+  "scope": "核查R900012是否构成超期报销，考虑60天规则和会计年度末15天补充提交规则",
+  "policy_questions": [
+    "费用发生后60天提交规则（第七条）是否被违反",
+    "会计年度末15天补充提交规则（第九条）是否适用及是否被违反",
+    "现行2025版制度为何适用于此记录"
+  ],
+  "data_questions": [
+    "R900012的费用日期、报销日期、费用类型、金额、原因",
+    "费用日期与报销日期的天数间隔",
+    "费用日期是否属于会计年度末"
+  ],
+  "required_fields": ["record_id", "expense_date", "reimburse_date", "expense_type", "amount", "reason", "status", "special_approval"],
+  "evidence_requirements": [
+    "R900012完整记录",
+    "2025版制度第七条和第九条原文",
+    "2025版制度生效日期（第十四条）",
+    "2022版制度废止状态"
+  ],
+  "execution_steps": [
+    "查询R900012详情",
+    "查询制度文档并定位适用条款",
+    "计算60天规则期限",
+    "计算15天补充提交期限",
+    "判定是否超期",
+    "构建证据矩阵",
+    "撰写报告",
+    "校验并提交"
+  ],
+  "complexity": 1,
+  "complexity_reasons": ["单一已知记录的单规则核查", "仅需直接查询，无聚合或批处理"],
+  "subagent_plan": "无，复杂度为1，主智能体直接处理",
+  "stopping_conditions": [
+    "已获取R900012完整记录",
+    "已确认适用制度版本及条款",
+    "已完成两类期限计算",
+    "已完成证据覆盖100%"
+  ],
+  "unresolved_items": []
+}

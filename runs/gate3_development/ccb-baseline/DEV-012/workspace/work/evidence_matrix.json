@@ -1,0 +1,185 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "DEV012-ANOM-001",
+      "record_ids": ["R900001", "R900002"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
+      ],
+      "facts": [
+        "发票FPDEV900001在R900001（2025-01-05，项目装订用品第一次报销，480元）和R900002（2025-01-06，项目装订用品第二次报销，480元）中重复使用",
+        "发票复用查询确认FPDEV900001 usage_count=2，关联record_ids为R900001和R900002",
+        "两笔报销均为同一员工E9001、同一部门D901、状态均为approved",
+        "《费用报销管理办法》第十条规定同一发票最多报销1次，重复出现应认定为重复报销风险"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "DEV012-ANOM-002",
+      "record_ids": ["R900003", "R900004"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "R900003（2025-02-03，5200元）与R900004（2025-02-06，5200元）为同一员工E9001、同一费用类型travel_transport",
+        "两笔报销日期间隔仅3天，在7天窗口内",
+        "合计金额10400元，达到《授权管理办法》附件二AR-03档阈值（≥10000元），AR-03需部门总经理审批",
+        "拆分后每笔5200元落入AR-02档（3000-10000元），仅需部门经理+财务复核审批",
+        "报销事由分别为'同一客户路演交通费第一笔'和'同一客户路演交通费第二笔'，明确为同一事项拆分"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "DEV012-ANOM-003",
+      "record_ids": ["R900006"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第七条"}
+      ],
+      "facts": [
+        "R900006费用发生日期2025-03-01，报销提交日期2025-05-05，延迟65天",
+        "《费用报销管理办法》第七条规定员工应在费用发生后60天内提交报销申请",
+        "65天超过60天法定期限",
+        "该记录为三月通讯费，非年末费用，不适用第九条年末延长期"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "DEV012-ANOM-004",
+      "record_ids": ["R900007"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第二条"}
+      ],
+      "facts": [
+        "R900007为员工E9001四月办公用品费650元",
+        "《办公与通讯费用管理办法》第二条规定员工个人办公用品报销每人每月不超过600元",
+        "650元超出600元月度标准50元"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "DEV012-ANOM-005",
+      "record_ids": ["R900013"],
+      "citations": [
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第五条"}
+      ],
+      "facts": [
+        "R900013为经理级员工E9002在一类城市差旅住宿2晚共1400元，折合700元/晚",
+        "《差旅费管理办法》第四条规定经理级一类城市住宿标准为650元/晚",
+        "700元/晚超出标准50元/晚，无专项审批记录",
+        "第五条明确超过住宿标准且无专项审批的不得报销超出部分"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "DEV012-ANOM-006",
+      "record_ids": ["R900014", "R900015"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "R900014（2025-09-03，180元）和R900015（2025-09-20，160元）均为员工E9001九月通讯费",
+        "两项合计340元",
+        "《办公与通讯费用管理办法》第三条规定员工通讯费用每人每月不超过300元",
+        "340元超出300元月度标准40元"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "DEV012-ANOM-007",
+      "record_ids": ["R900016"],
+      "citations": [
+        {"doc_id": "05_training_expense.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "R900016为员工E9001内部培训综合费用一天850元",
+        "《培训费管理办法》第三条规定内部培训综合费用每日不超过800元",
+        "850元超出800元标准50元"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "DEV012-ANOM-008",
+      "record_ids": ["R900017"],
+      "citations": [
+        {"doc_id": "06_business_entertainment.md", "clause_no": "第二条"}
+      ],
+      "facts": [
+        "R900017为员工E9001业务招待费5200元（客户交流活动二十人）",
+        "《业务招待费管理办法》第二条规定单次活动费用不得超过5000元",
+        "5200元超出5000元标准200元",
+        "人均260元（5200÷20）未超过300元/人标准，但单次总额超标"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "DEV012-ANOM-009",
+      "record_ids": ["R900019", "R900020"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"},
+        {"doc_id": "08_budget_management.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "开发审计二部（D902）年度预算50000元",
+        "R900018（45000元）后累计45000元，使用率0.9，在预算内",
+        "R900019（6000元）使累计达51000元，使用率1.02，首次超过预算额度1.0倍",
+        "R900020（5000元）使累计达56000元，使用率1.12，进一步超预算",
+        "《费用报销管理办法》第十三条和《预算管理办法》第三条均规定预算使用达1.0倍后原则上不得继续报销，确需发生的应履行专项审批",
+        "无R900019和R900020的专项审批记录"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": [
+    "R900001", "R900002", "R900003", "R900004", "R900005", "R900006",
+    "R900007", "R900008", "R900009", "R900010", "R900011", "R900012",
+    "R900013", "R900014", "R900015", "R900016", "R900017", "R900018",
+    "R900019", "R900020", "R900021"
+  ],
+  "submitted_record_ids": [
+    "R900001", "R900002", "R900003", "R900004", "R900006", "R900007",
+    "R900013", "R900014", "R900015", "R900016", "R900017", "R900019", "R900020"
+  ],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true,
+    "checked_records": ["R900005", "R900008", "R900009", "R900010", "R900011", "R900012", "R900018", "R900021"],
+    "evaluation": "R900005(业务招待3600元，单次≤5000元，未超标准；人均无数据无法确认)；R900008(办公用品590元≤600元/月，合规)；R900009(办公用品590元≤600元/月，合规)；R900010(交通5300元，与R900011间隔8天>7天拆分窗口，不构成拆分)；R900011(交通5300元，同上)；R900012(年末费用，21天≤60天，且在财政年度结束后15天内，合规)；R900018(45000元，D902累计未超预算时发生，有部门总经理审批AR-03，合规)；R900021(培训住宿480元≤500元/晚，合规)"
+  },
+  "reconciled_figures": {
+    "total_expense_records": 21,
+    "total_anomalies": 9,
+    "total_anomalous_records": 13,
+    "total_clean_records": 8,
+    "duplicate_reimbursement_count": 1,
+    "split_reimbursement_count": 1,
+    "overdue_count": 1,
+    "over_standard_count": 5,
+    "over_budget_count": 1
+  },
+  "unresolved_items": []
+}

@@ -1,0 +1,138 @@
+{
+  "case_family": "record_audit",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "policy_data_comparison",
+  "criteria": [
+    {
+      "answer_evidence": "答案中：“发现以R000020为线索的重复报销异常”，anomaly_ids: [\"L2-003-DUP-001\"]。",
+      "id": "audit-conclusion",
+      "reason": "明确判断为重复报销异常，异常类型正确（DUP），结论完整。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "find_invoice_usage返回同一发票FP202500000020的usage_count=2，记录R000020和R004203。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "anomaly-id",
+      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
+      "score": 15.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "record-set",
+      "reason": "record_ids集合F1=1.000",
+      "score": 25.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "答案中：“违反《XX证券费用报销管理办法(2025修订版)》第十条同一发票最多报销1次的规定”，citations: [{\"clause_no\":\"第十条\",\"doc_id\":\"01_expense_reimbursement_2025.md\"}]。",
+      "id": "policy-basis",
+      "reason": "引用了现行费用报销管理办法第十条，条款内容“同一发票最多报销1次”直接支持重复报销结论。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "search_policy返回“第十条 同一发票最多报销1次”，get_policy_excerpt确认条款。"
+    },
+    {
+      "answer_evidence": "答案中：“发票FP202500000020（INV000020）在记录R000020和R004203中被重复使用报销...金额均为669.5元”。",
+      "id": "case-reasoning",
+      "reason": "明确列出同一发票FP202500000020在R000020和R004203中重复使用，金额均为669.5元，事实完整一致。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_expense_detail对R000020返回amount:669.5，对R004203返回amount:669.5，find_invoice_usage显示同一发票关联两个记录。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的记录ID（R000020, R004203）均在数据库中存在，且均为重复报销相关记录。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "L2-003-DUP-001"
+    ],
+    "actual_record_ids": [
+      "R000020",
+      "R004203"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "DUP": 1
+      },
+      "count_exact": true,
+      "expected_types": {
+        "DUP": 1
+      },
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 120.144,
+    "expected_anomaly_ids": [
+      "DUP-003"
+    ],
+    "expected_record_ids": [
+      "R000020",
+      "R004203"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [
+      "clause:费用报销管理办法-6.1"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:28:11+08:00",
+  "group": "openclaude-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选提交准确识别重复报销异常，引用制度正确，推理事实完整。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2055,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1530
+      },
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 3925,
+      "prompt_tokens": 4821,
+      "prompt_tokens_details": {
+        "cached_tokens": 896
+      },
+      "total_tokens": 6876
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/openclaude-enhanced/L2-003",
+  "task_id": "L2-003"
+}

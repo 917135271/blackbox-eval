@@ -1,0 +1,119 @@
+{
+  "case_family": "policy_and_version",
+  "case_score": 87.5,
+  "case_score_raw": 87.5,
+  "category": "version_trap",
+  "criteria": [
+    {
+      "answer_evidence": "《XX证券授权管理办法》附件二AR-03档规定：单笔金额大于等于10000元且小于50000元，必要审批角色为部门总经理。",
+      "id": "current-value",
+      "reason": "明确指出了2025修订版现行值10000元",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "tool_trace中get_policy_doc('03_authorization_management.md')返回附件二包含'AR-03 | 大于等于10000元且小于50000元 | 部门总经理'"
+    },
+    {
+      "answer_evidence": "原2022版同时废止；2022版...第一条明确仅为制度沿革留档，第四条规定审批金额已被后续制度替代，不得作为现行审批依据。",
+      "id": "deprecated-value",
+      "reason": "指出2022版已废止，但未明确提及旧值8000元",
+      "score": 12.5,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc('02_expense_reimbursement_2022_deprecated.md')返回文本包含'单笔报销金额达到8000元的，应提交部门总经理审批'，但候选未引用此具体金额。"
+    },
+    {
+      "answer_evidence": "应采用2025修订版。理由：(1)2025修订版...第十四条明确自2025年1月1日起施行，原2022版同时废止",
+      "id": "applicable-version",
+      "reason": "明确选择2025修订版并说明施行时间，原2022版废止",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc('01_expense_reimbursement_2025.md')获取文档内容，其中包含第十四条施行的信息（从候选人引用合理推断）"
+    },
+    {
+      "answer_evidence": "引用包含了01_expense_reimbursement_2025.md和02_expense_reimbursement_2022_deprecated.md的条款",
+      "id": "two-version-evidence",
+      "reason": "提供了新旧两份制度的可核查出处",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "tool_trace中调用了get_policy_doc获取这两个文档"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "本题为纯政策版本判定，未涉及任何record_id",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "候选人明确否定2022版适用性，未将其作为现行依据",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 7,
+    "elapsed_seconds": 84.077,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount",
+      "document:01_expense_reimbursement_2025.md",
+      "document:02_expense_reimbursement_2022_deprecated.md"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:28:20+08:00",
+  "group": "openclaude-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "总体准确，明确了现行版本和审批线，仅未提及旧版8000元具体数值，建议补充。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2972,
+      "completion_tokens_details": {
+        "reasoning_tokens": 2332
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 2464,
+      "prompt_tokens": 3488,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 6460
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/openclaude-enhanced/L3-006",
+  "task_id": "L3-006"
+}

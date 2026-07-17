@@ -1,0 +1,30 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [],
+  "candidate_record_ids": ["R900010", "R900011"],
+  "submitted_record_ids": ["R900010", "R900011"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true,
+    "searched_population": "R900010与R900011两条报销记录",
+    "query_conditions": "同一员工E9001、同一费用类型travel_transport、7天内（2025-06-01至2025-06-08）",
+    "checked_rules": [
+      "拆分报销第十一条：同一员工、同一费用类型、7天内2笔及以上、合计金额达到较高审批线",
+      "关键条件逐项核查：员工一致(E9001)、费用类型一致(travel_transport)、日期间隔8天>7天、合计10600≥10000",
+      "日期边界计算：2025-06-09 - 2025-06-01 = 8天 > 7天窗口"
+    ],
+    "population_count": 2,
+    "conclusion": "R900010（2025-06-01，5300元）与R900011（2025-06-09，5300元）虽满足同一员工、同一费用类型、合计金额≥10000元的条件，但两笔报销的expense_date间隔为8天，超出第七条规定的7天窗口，不构成拆分报销。结论：无异常。"
+  },
+  "reconciled_figures": {
+    "combined_amount": 10600.0,
+    "date_delta_days": 8,
+    "threshold_days": 7,
+    "higher_approval_line": 10000.0
+  },
+  "unresolved_items": []
+}

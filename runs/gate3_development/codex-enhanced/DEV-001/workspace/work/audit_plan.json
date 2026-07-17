@@ -1,0 +1,61 @@
+{
+  "task_id": "DEV-001",
+  "task_type": "policy_exception",
+  "audit_object": "R900012",
+  "question": "核查R900012是否构成超期报销。必须同时考虑费用发生后60天规则和会计年度末15天补充提交规则，并说明现行制度为何适用。",
+  "scope": {
+    "record_ids": ["R900012"],
+    "rules": ["费用发生后60天内提交报销（第七条）", "会计年度末15天补充提交（第九条）"],
+    "expense_types": ["other"],
+    "audit_period": "2025-12-20 至 2026-01-10"
+  },
+  "policy_questions": [
+    "现行适用制度是哪个版本？2025版还是2022版？",
+    "第七条60天规则与第九条15天规则的关系如何？",
+    "R900012的费用日期2025-12-20是否属于'会计年度末发生的费用'？",
+    "R900012的报销日期2026-01-10是否在制度规定期限内？"
+  ],
+  "data_questions": [
+    "R900012的费用日期、报销日期、金额、费用类型和特殊审批状态",
+    "该记录的审批链是否完整"
+  ],
+  "required_fields": ["record_id", "expense_date", "reimburse_date", "expense_type", "amount", "reason", "special_approval", "status", "budget_year"],
+  "evidence_requirements": [
+    "R900012完整记录详情",
+    "2025版费用报销管理办法第七条和第九条全文",
+    "2022版废止条款（第十四条）",
+    "日期计算证明"
+  ],
+  "execution_steps": [
+    {"step": "查询R900012记录详情", "status": "completed"},
+    {"step": "检索并确认适用政策版本", "status": "completed"},
+    {"step": "运行policy-version-check确认制度适用性", "status": "in_progress"},
+    {"step": "运行batch-expense-analysis完成数据核查", "status": "pending"},
+    {"step": "运行evidence-coverage-check", "status": "pending"},
+    {"step": "运行audit-report生成报告", "status": "pending"},
+    {"step": "运行result-validator校验", "status": "pending"},
+    {"step": "提交最终结果", "status": "pending"}
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "单一已知记录核查（clue-record task）",
+      "单一规则范围内双条款（60天+15天）",
+      "无聚合、分组或批量过滤",
+      "无政策版本冲突（2025版明确有效，2022版已废止）",
+      "无阈值边界临界判断"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "complexity=1，保持主智能体紧凑流程"
+  },
+  "stopping_conditions": [
+    "R900012记录详情已获取",
+    "适用政策版本和条款已确认",
+    "日期计算已明确",
+    "evidence_matrix覆盖率达到100%",
+    "validation_report通过"
+  ],
+  "unresolved_items": []
+}

@@ -1,0 +1,53 @@
+{
+  "criteria": [
+    {
+      "id": "all-anomaly-ids",
+      "score": 0,
+      "reason": "提交的异常ID（L3-003-A01~A09）与预期完全不符，且包含6个重复发票异常，不属于超标准专项扫描范围。预期6个超标准异常一个未以正确ID出现，零召回。",
+      "answer_evidence": "anomaly_ids: ['L3-003-A01',...,'L3-003-A09']，全部为自定义ID，无OVERSTD-*。",
+      "trace_evidence": "工具调用中未生成任何OVERSTD-*的ID，系统诊断precision=0.0, recall=0.0。"
+    },
+    {
+      "id": "all-record-ids",
+      "score": 0,
+      "reason": "预期6个超标准记录，提交15个记录，仅命中R004221,R004222,R004223，缺失R004224,R004225,R004226；另12个为重复发票记录（R000002等），recall=0.5，precision=0.2，远未达到80%且混入大量无关记录，不满足partial锚点。",
+      "answer_evidence": "submitted_record_ids: ['R000002',...,'R004223']，缺R004224~R004226。",
+      "trace_evidence": "find_reused_invoices返回多张重复发票，其record_ids全部被纳入结果；list_expenses未系统检出全部超标准记录。"
+    },
+    {
+      "id": "full-scan-method",
+      "score": 7,
+      "reason": "执行了多费用类型和分页查询，但超标准比对不完整：仅用min_amount简单过滤（如office_supplies≥600、communication≥300），未对差旅住宿、招待等按城市、职级等明细标准逐条复核，导致漏掉3个超标准记录，复核不充分。",
+      "answer_evidence": "answer提及对office_supplies/communication/training_fee做了检查，但未展示其他类型完整比对过程。",
+      "trace_evidence": "summarize_expenses仅按employee_id,month汇总，未结合标准；list_expenses用min_amount粗略筛选，travel_lodging等实际未完成逐笔标准校验。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 3,
+      "reason": "引用了办公通讯管理办法和培训管理办法的具体条款，但未明确引用费用报销管理办法-6.3（对应第十二条综合标准条款），且查询条件与标准条款的对应关系不清晰，未在计算中体现完整规则映射。",
+      "answer_evidence": "citations中列出了第十条、第二条等，缺少6.3条款。",
+      "trace_evidence": "未查询或引用01_expense_reimbursement_2025.md中关于超标准的核心规则条款。"
+    },
+    {
+      "id": "false-positive-control",
+      "score": 0,
+      "reason": "混入了6个重复发票异常（L3-003-A01~A06），属于其他规则领域，实质误报占提交异常的2/3，严重违反误报控制要求。",
+      "answer_evidence": "anomaly_ids中A01~A06描述均为发票重复使用，与超标准无关。",
+      "trace_evidence": "find_reused_invoices结果被直接当作超标准异常输出。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": true,
+      "reason": "未提交不存在的record_id，但使用了重复发票记录（R000002等）支撑超标准专项结论，属于用无关记录支撑核心结论，触发条件后半部分。"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": false,
+      "reason": "工具调用覆盖了全年各费用类型的全量列表，未见仅检查部分月份或样例，漏报系方法不完善所致，不满足“只检查部分月份或样例记录”的条件。"
+    }
+  ],
+  "overall_comment": "候选将超标准规则与重复发票规则混淆，未能正确输出全部6个超标准异常，尽管扫描范围覆盖全年数据，但核查方法不完整且存在大量误报，制度依据不清晰，总分受fabricated-record-id关键失败限制为20，实际得分12。",
+  "confidence": 0.3
+}

@@ -1,0 +1,42 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANO-SPLIT-001",
+      "record_ids": ["R004212", "R004213"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "员工张婷(E0009)于2025-04-10报销住宿费¥5,100(记录R004212),审批档位AR-02(部门经理+财务复核)",
+        "同一员工张婷于2025-04-15再次报销住宿费¥5,100(记录R004213),审批档位AR-02(部门经理+财务复核)",
+        "两笔报销日期相差5天,在7天窗口内",
+        "两笔报销费用类型均为travel_lodging,理由均为'拆分报销注入样本3',指向同一业务事项",
+        "两笔合计金额¥10,200达到AR-03审批线(≥¥10,000),按附件二应经部门总经理审批",
+        "单笔¥5,100仅触发AR-02审批,通过拆分规避了AR-03部门总经理审批权限"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004212", "R004213"],
+  "submitted_record_ids": ["R004212", "R004213"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true
+  },
+  "reconciled_figures": {
+    "R004212_amount": 5100.0,
+    "R004213_amount": 5100.0,
+    "combined_amount": 10200.0,
+    "current_tier_per_record": "AR-02",
+    "effective_tier_combined": "AR-03"
+  },
+  "unresolved_items": []
+}

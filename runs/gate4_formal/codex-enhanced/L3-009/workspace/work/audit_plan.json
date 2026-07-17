@@ -1,0 +1,128 @@
+{
+  "task_id": "L3-009",
+  "task_type": "audit_report",
+  "audit_period": {"from": "2025-01-01", "to": "2025-12-31"},
+  "scope": {
+    "description": "全年全部门全费用类型的异常审计摘要报告，覆盖五类规则",
+    "expense_types": ["差旅费", "培训费", "业务招待费", "办公费", "通讯费"],
+    "departments": "all",
+    "employees": "all"
+  },
+  "applicable_policies": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "title": "XX证券费用报销管理办法(2025修订版)", "effective": "2025-01-01"},
+    {"doc_id": "03_authorization_management.md", "title": "XX证券授权管理办法", "effective": "2025-01-01"},
+    {"doc_id": "04_travel_expense.md", "title": "XX证券差旅费管理办法"},
+    {"doc_id": "05_training_expense.md", "title": "XX证券培训费管理办法"},
+    {"doc_id": "06_business_entertainment.md", "title": "XX证券业务招待费管理办法"},
+    {"doc_id": "07_office_communication.md", "title": "XX证券办公与通讯费用管理办法"},
+    {"doc_id": "08_budget_management.md", "title": "XX证券预算管理办法"}
+  ],
+  "rule_questions": [
+    {
+      "rule_id": "R1_时限超期",
+      "clause": "第七条、第八条、第九条",
+      "question": "费用发生后是否在60天内提交报销？差旅借款是否在30天内冲销？年末费用是否在次年1月15日前提交？",
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第七条、第八条、第九条"
+    },
+    {
+      "rule_id": "R2_重复报销",
+      "clause": "第十条",
+      "question": "是否存在同一发票在多个报销记录中重复使用？",
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第十条"
+    },
+    {
+      "rule_id": "R3_拆分规避审批",
+      "clause": "第十一条",
+      "question": "是否存在同一员工、同一费用类型在7天内≥2笔报销且合计金额达到较高审批线的拆分规避？",
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第十一条"
+    },
+    {
+      "rule_id": "R4_超标报销",
+      "clause": "第十二条",
+      "question": "无专项审批时，报销金额是否超过对应制度标准的1.0倍？",
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第十二条"
+    },
+    {
+      "rule_id": "R5_预算不足",
+      "clause": "第十三条",
+      "question": "部门年度预算使用是否达到1.0倍后仍有报销且无专项审批？",
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第十三条"
+    }
+  ],
+  "data_questions": [
+    "获取2025全年所有报销记录（reimbursement records）",
+    "按发票号分组，找出usage_count≥2的重复发票",
+    "同一员工同一费用类型7天内多笔报销，计算合计是否达到更高审批线",
+    "各费用类型是否有超标（无special_approval时金额>标准）",
+    "各部门预算使用率，是否有超预算后仍报销"
+  ],
+  "required_fields": [
+    "record_id", "employee_id", "department_id", "expense_type", "expense_date",
+    "reimburse_date", "amount", "invoice_no", "status", "special_approval",
+    "city_tier", "employee_level", "budget_year", "budget_amount"
+  ],
+  "evidence_requirements": [
+    "每类规则的违规记录列表",
+    "重复发票详情（发票号、关联record_ids）",
+    "拆分规避详情（员工、费用类型、日期范围、合计金额）",
+    "超标详情（记录、标准值、超出额）",
+    "预算超支详情（部门、预算、已用、超支记录）"
+  ],
+  "execution_steps": [
+    {"step": "planning", "status": "pending", "artifact": "work/audit_plan.json"},
+    {"step": "policy_version_check", "status": "pending", "artifact": "work/policy_check.json"},
+    {"step": "data_analysis", "status": "pending", "artifact": "work/data_analysis.json"},
+    {"step": "evidence_coverage_check", "status": "pending", "artifact": "work/evidence_matrix.json"},
+    {"step": "false_positive_review", "status": "pending", "artifact": "work/review_result.json"},
+    {"step": "audit_report", "status": "pending", "artifact": "work/report.md"},
+    {"step": "result_validation", "status": "pending", "artifact": "work/validation_report.json"},
+    {"step": "submit", "status": "pending", "artifact": "work/final_result.json"}
+  ],
+  "complexity": {
+    "score": 5,
+    "reasons": [
+      "policy version with effective date and repeal (2025 vs 2022)",
+      "multiple policies (7+ policies involved)",
+      "aggregation, grouping, joins, batch filtering required",
+      "five business rules across multiple dimensions",
+      "thresholds, dates, exemptions across all rules",
+      "comprehensive audit report deliverable"
+    ]
+  },
+  "subagent_plan": [
+    {
+      "role": "policy_researcher",
+      "reason_code": "MULTI_POLICY_VERSION_CHECK",
+      "task": "解析2025年费用报销制度五类规则的精确边界：确认2025版自2025-01-01生效，2022版废止；核实五类规则条款原文、豁免条件、特殊审批例外；整理各费用类型标准表（差旅住宿按职级城市、培训按内外/城市、招待按单次和人均、办公600/月、通讯300/月）；确认授权审批线（AR-01至AR-05）",
+      "context": {
+        "question": "请确认2025全年适用的五类费用报销规则的精确条款边界、各项费用标准、审批权限线和豁免条件",
+        "policies": ["01_expense_reimbursement_2025.md", "02_expense_reimbursement_2022_deprecated.md", "03_authorization_management.md", "04_travel_expense.md", "05_training_expense.md", "06_business_entertainment.md", "07_office_communication.md", "08_budget_management.md"]
+      },
+      "artifact_paths": [],
+      "requested_token_budget": 16000
+    },
+    {
+      "role": "data_analyst",
+      "reason_code": "AGGREGATION_REQUIRED",
+      "task": "对2025全年所有报销记录执行五类规则批量分析：1)时限超期(expense_date到reimburse_date>60天，或travel类型借款超30天未冲销，年末需考虑15天宽限); 2)重复发票(同一invoice_no被≥2条记录使用); 3)拆分规避(同一employee同一expense_type在7天内≥2笔且合计达AR-03及以上即≥10000元); 4)超标(按费用类型映射标准，无special_approval时金额>标准); 5)预算超支(部门累计已用≥预算且仍报销)。输出每类规则的违规记录列表和详情。",
+      "context": {
+        "question": "请对2025全年费用报销数据进行五类规则批量分析，输出每类违规的record_ids和详情",
+        "period": "2025-01-01 to 2025-12-31"
+      },
+      "artifact_paths": [],
+      "requested_token_budget": 32000
+    }
+  ],
+  "stopping_conditions": [
+    "所有五类规则均完成数据查询且证据覆盖100%",
+    "evidence_matrix status为pass",
+    "validation_report valid=true",
+    "submit_audit_result返回成功"
+  ],
+  "unresolved_items": []
+}

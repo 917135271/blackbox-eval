@@ -1,0 +1,43 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "DEV-011-BUDGET-OVERRUN-001",
+      "record_ids": ["R900019"],
+      "citations": [
+        {"doc_id": "08_budget_management.md", "clause_no": "第二条"},
+        {"doc_id": "08_budget_management.md", "clause_no": "第三条"},
+        {"doc_id": "08_budget_management.md", "clause_no": "第四条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"}
+      ],
+      "facts": [
+        "D902部门(开发审计二部)年度预算额度为50,000元",
+        "R900019于2025-02-15报销6,000元(special_approval=0)，此时累计金额达51,000元(预算1.02倍)，首次超过年度预算50,000元",
+        "R900019在累计已达预算1.0倍时未取得专项审批(special_approval=0)",
+        "08_budget_management.md第三条：部门费用累计使用达到年度预算额度1.0倍后原则上不得继续报销",
+        "08_budget_management.md第四条：超预算支出应履行专项审批",
+        "01_expense_reimbursement_2025.md第十三条：预算达1.0倍后确需发生的费用应履行专项审批",
+        "R900020(special_approval=1)已取得专项审批，属有效豁免，不构成违规"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900019"],
+  "submitted_record_ids": ["R900019"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "annual_budget": 50000.0,
+    "cumulative_after_R900019": 51000.0,
+    "budget_ratio": 1.02,
+    "total_records_department": 3,
+    "anomaly_record_count": 1
+  },
+  "unresolved_items": []
+}

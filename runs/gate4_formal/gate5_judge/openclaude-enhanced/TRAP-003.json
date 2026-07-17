@@ -1,0 +1,135 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "candidate_submission.answer: '无异常'，anomaly_ids: []",
+      "id": "clean-conclusion",
+      "reason": "明确判断无异常，anomaly_ids为空，答案无矛盾",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "evidence_matrix中no_anomaly_coverage.reason: '两笔间隔8天>7天窗口,不触发拆分核查'"
+    },
+    {
+      "answer_evidence": "",
+      "id": "record-scope",
+      "reason": "record_ids集合F1=1.000",
+      "score": 15.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "evidence_matrix中no_anomaly_coverage.reason明确提及'两笔间隔8天>7天窗口,不触发拆分核查'",
+      "id": "case-specific-reason",
+      "reason": "完整说明outside aggregation window：日期间隔8天>7天，不触发拆分",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_expense_detail(R004236/R004237)获取日期，结合search_policy查得的第十一条拆分窗口（7天）计算间隔8天"
+    },
+    {
+      "answer_evidence": "evidence_matrix记载'date_gap_days:8, policy_split_window_days:7'，并核查标准、审批等",
+      "id": "reverse-check",
+      "reason": "轨迹中核对日期间隔、拆分窗口、差旅标准，完成反向核查",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "list_expenses, get_expense_detail(R004236,R004237)获取日期；search_policy确认第十一条；计算间隔8天"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "record_ids均为预期数据库记录，无伪造",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "未将合规记录判为异常，结论正确",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 6,
+    "elapsed_seconds": 383.081,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:28:40+08:00",
+  "group": "openclaude-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选正确识别无异常，充分核查拆分窗口并给出合理合规原因，无关键错误。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1986,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1561
+      },
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 9677,
+      "prompt_tokens": 10573,
+      "prompt_tokens_details": {
+        "cached_tokens": 896
+      },
+      "total_tokens": 12559
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/openclaude-enhanced/TRAP-003",
+  "task_id": "TRAP-003"
+}

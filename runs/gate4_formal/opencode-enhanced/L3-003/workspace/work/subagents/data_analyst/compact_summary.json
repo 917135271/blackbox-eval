@@ -1,0 +1,148 @@
+{
+  "decision": "pass",
+  "key_findings": [
+    {
+      "rule": "R01",
+      "description": "travel_lodging above standard per night for employee level + city tier",
+      "population": 883,
+      "violations": 1,
+      "detail": "R004225: D1 employee (李丽娟), tier A, 900/night exceeds standard 850"
+    },
+    {
+      "rule": "R02",
+      "description": "local_transport above standard per day for city tier",
+      "population": 770,
+      "violations": 1,
+      "detail": "R004226: tier C, 92/day exceeds standard 80"
+    },
+    {
+      "rule": "R03",
+      "description": "training_fee per person > 3500 per session",
+      "population": 578,
+      "violations": 1,
+      "detail": "R004223: 3700 exceeds threshold 3500 (participants NULL, treated as 1)"
+    },
+    {
+      "rule": "R04",
+      "description": "training daily rate internal >800 or external >1200",
+      "population": 578,
+      "violations": 0,
+      "detail": "No training_fee records have days > 0; cannot compute daily rate"
+    },
+    {
+      "rule": "R05",
+      "description": "training lodging above standard per person per night",
+      "population": 0,
+      "violations": 0,
+      "detail": "No training_lodging records; training_fee records lack nights/city_tier"
+    },
+    {
+      "rule": "R06",
+      "description": "business_entertainment >5000/event or >300/person",
+      "population": 675,
+      "violations": 1,
+      "detail": "R004224: 700/2=350 per person exceeds 300"
+    },
+    {
+      "rule": "R07",
+      "description": "office_supplies >600 per person per month",
+      "population": 694,
+      "violations": 287,
+      "detail": "115 employee-months exceed 600 cap; all non-exempt records in those months flagged"
+    },
+    {
+      "rule": "R08",
+      "description": "communication >300 per person per month",
+      "population": 640,
+      "violations": 307,
+      "detail": "Multiple employee-months exceed 300 cap; all non-exempt records in those months flagged"
+    },
+    {
+      "rule": "R09",
+      "description": "duplicate invoices: same invoice_no in >=2 records",
+      "population": 4240,
+      "violations": 12,
+      "detail": "6 invoice pairs reused: FP202500000002,005,020,028,037,055 each used twice"
+    },
+    {
+      "rule": "R10",
+      "description": "split claims: same employee+type within 7 days, >=2 records, total >=10000",
+      "population": 4240,
+      "violations": 14,
+      "detail": "6 split claim groups (2 or 3 records each) by employees E0007/E0008/E0009/E0010 for travel_lodging, each group total >=10000"
+    },
+    {
+      "rule": "R11",
+      "description": "late submission: >60 days (or >75 if expense after Nov 1)",
+      "population": 4240,
+      "violations": 6,
+      "detail": "6 injected records with delays of 65-120 days, all from R004227-R004232"
+    },
+    {
+      "rule": "R12",
+      "description": "department cumulative approved exceeds annual budget",
+      "population": 4240,
+      "violations": 1196,
+      "detail": "6 departments exceeded budgets (D001-D006); all post-crossing records flagged. D007-D010 within budget."
+    },
+    {
+      "rule": "R13",
+      "description": "amount > 1.0x standard without special_approval (Art.12 catch-all)",
+      "population": 4240,
+      "violations": 6,
+      "detail": "R004221 (office 650>600), R004222 (comm 330>300), R004223 (training 3700>3500), R004224 (entertainment 350>300pp), R004225 (lodging 900>850), R004226 (transport 92>80)"
+    }
+  ],
+  "record_ids_summary": {
+    "total_unique": 1643,
+    "full_list_in": "work/subagents/data_analyst/summary.json",
+    "per_rule": {
+      "R01": ["R004225"],
+      "R02": ["R004226"],
+      "R03": ["R004223"],
+      "R04": [],
+      "R05": [],
+      "R06": ["R004224"],
+      "R07": "287 records (see rule_analysis.json)",
+      "R08": "307 records (see rule_analysis.json)",
+      "R09": ["R000002","R004201","R000005","R004202","R000020","R004203","R000028","R004204","R000037","R004205","R000055","R004206"],
+      "R10": ["R004207","R004208","R004209","R004210","R004211","R004212","R004213","R004214","R004215","R004216","R004217","R004218","R004219","R004220"],
+      "R11": ["R004227","R004228","R004229","R004230","R004231","R004232"],
+      "R12": "1196 records (see rule_analysis.json)",
+      "R13": ["R004221","R004222","R004223","R004224","R004225","R004226"]
+    }
+  },
+  "all_violation_record_ids": "See work/subagents/data_analyst/summary.json for complete list of 1643 unique IDs",
+  "citations": [
+    {"doc_id": "04_travel_expense.md", "clause_no": "Art.4"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "Art.6"},
+    {"doc_id": "05_training_expense.md", "clause_no": "Art.2"},
+    {"doc_id": "05_training_expense.md", "clause_no": "Art.3"},
+    {"doc_id": "05_training_expense.md", "clause_no": "Art.4"},
+    {"doc_id": "05_training_expense.md", "clause_no": "Art.5"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "Art.2"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "Art.3"},
+    {"doc_id": "07_office_communication.md", "clause_no": "Art.2"},
+    {"doc_id": "07_office_communication.md", "clause_no": "Art.3"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "Art.7"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "Art.9"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "Art.10"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "Art.11"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "Art.12"},
+    {"doc_id": "08_budget_management.md", "clause_no": "Art.3"}
+  ],
+  "unresolved_items": [],
+  "artifact_paths": [
+    "work/subagents/data_analyst/rule_analysis.json",
+    "work/subagents/data_analyst/summary.json",
+    "work/subagents/data_analyst/analyze_all.py"
+  ],
+  "data_quality_notes": {
+    "special_approval": "0 records with special_approval=true; exemption rules not triggered",
+    "training_fee_fields": "All 578 training_fee records have participants=NULL, days=NULL, nights=NULL, city_tier=NULL. Per-person and per-day checks default to divisor=1. Only R04 (daily) returns 0 because no days field is set.",
+    "city_tier": "Values are A/B/C (mapped to 一类/二类/三类). 2587 records have NULL city_tier (office_supplies, communication, some training_fee). Travel_lodging (883) and local_transport (770) all have city_tier set.",
+    "budget_years": "All 4240 records are budget_year=2025",
+    "status": "All 4240 records are status='approved'",
+    "population_coverage": "Full 2025 population scanned; no records excluded from scope"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "threshold",
+      "score": 35,
+      "reason": "明确给出部门总经理审批线10000元，边界清晰（10000≤金额<50000元）",
+      "answer_evidence": "答案中：'AR-03档(10000≤金额<50000元)需部门总经理'",
+      "trace_evidence": "无工具调用轨迹，无法验证检索过程，但答案直接给出正确金额"
+    },
+    {
+      "id": "two-hop-path",
+      "score": 30,
+      "reason": "完整说明从费用报销管理办法第五条交叉引用到授权管理办法附件二，路径清晰可复核",
+      "answer_evidence": "答案中：'《XX证券费用报销管理办法(2025修订版)》第五条不直接在正文列示审批金额,统一按《XX证券授权管理办法》附件二执行'",
+      "trace_evidence": "工具调用轨迹为空，但答案中描述了完整的交叉引用路径"
+    },
+    {
+      "id": "citations",
+      "score": 20,
+      "reason": "引用两份制度：01_expense_reimbursement_2025.md和03_authorization_management.md，条款分别为第五条和附件二，均有效",
+      "answer_evidence": "citations字段包含：{doc_id: '01_expense_reimbursement_2025.md', clause_no: '第五条'}, {doc_id: '03_authorization_management.md', clause_no: '附件二'}",
+      "trace_evidence": "无工具调用，但引用文档在corpus中有效（校验报告确认）"
+    },
+    {
+      "id": "no-premature-stop",
+      "score": 5,
+      "reason": "答案正确且显示了交叉引用，未提前停止，但工具调用轨迹缺失，无法证明检索过程，故部分得分",
+      "answer_evidence": "答案包含了附件二的详细档位，证明继续追踪了交叉引用",
+      "trace_evidence": "tool_trace_summary.call_count=0，无任何工具调用记录"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的record_ids均在数据库中存在（校验通过record_ids_in_database=true）"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "引用的制度为2025修订版，未发现使用废止制度的证据"
+    }
+  ],
+  "overall_comment": "候选正确给出了审批金额和交叉引用路径，文档引用准确。但工具轨迹缺失，无法验证检索完整性。整体回答质量高。",
+  "confidence": 0.95
+}

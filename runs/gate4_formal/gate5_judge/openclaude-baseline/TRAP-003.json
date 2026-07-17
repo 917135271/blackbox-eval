@@ -1,0 +1,135 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "anomaly_ids: [], 回答: '无异常。'",
+      "id": "clean-conclusion",
+      "reason": "明确判断无异常，无矛盾表述。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "提交异常ID列表为空。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "record-scope",
+      "reason": "record_ids集合F1=1.000",
+      "score": 15.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "两笔报销日期(2025-10-01与2025-10-09)相隔8天,超过《费用报销管理办法》第十一条规定的7天拆分核查窗口,不构成拆分规避审批。",
+      "id": "case-specific-reason",
+      "reason": "完整说明专属原因：相隔8天超过7天拆分核查窗口，不构成拆分规避。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "获取R004236和R004237详情，expense_date分别为2025-10-01和2025-10-09，相隔8天。"
+    },
+    {
+      "answer_evidence": "同时检查住宿标准743元/晚 vs 850元限额，审批层级AR-02合规。",
+      "id": "reverse-check",
+      "reason": "轨迹中核对了日期窗口、员工信息、差旅标准、审批层级，并执行了发票重用和审批检查等反向核查。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "调用find_reused_invoices, list_records_missing_approval, get_employee(E0010), get_policy_doc(04_travel_expense.md)等。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交记录ID R004236和R004237均真实存在。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "结论为无异常，未判异常。",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 3,
+    "elapsed_seconds": 298.915,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:27:21+08:00",
+  "group": "openclaude-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.95,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "正确识别了本题合规记录，基于日期窗口差异和标准核查给出无异常结论，反向验证全面。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1340,
+      "completion_tokens_details": {
+        "reasoning_tokens": 860
+      },
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 8906,
+      "prompt_tokens": 9802,
+      "prompt_tokens_details": {
+        "cached_tokens": 896
+      },
+      "total_tokens": 11142
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/openclaude-baseline/TRAP-003",
+  "task_id": "TRAP-003"
+}

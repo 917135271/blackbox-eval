@@ -1,0 +1,53 @@
+{
+  "criteria": [
+    {
+      "id": "all-anomaly-ids",
+      "score": 0,
+      "reason": "提交的异常ID全是其他类型（DUP、SPLIT），未包含任何预期的OVERSTD-xxx，完全错误。",
+      "answer_evidence": "候选提交anomaly_ids包含DUP_001等，预期为OVERSTD-001等。",
+      "trace_evidence": "规则诊断显示实际异常ID无匹配，precision=0, recall=0。"
+    },
+    {
+      "id": "all-record-ids",
+      "score": 0,
+      "reason": "提交的记录中包含了R004221-004223，但遗漏了R004224-004226，且多出26个无关记录，召回率50%且大量错误。",
+      "answer_evidence": "提交的record_ids包含[R000002, ..., R004221, R004222, R004223]，缺少R004224等。",
+      "trace_evidence": "规则诊断显示missing_count=3, extra_count=26, precision=0.103, recall=0.5。"
+    },
+    {
+      "id": "full-scan-method",
+      "score": 5,
+      "reason": "执行了针对超标准的list_expenses查询，但仅针对部分费用类型（办公、通讯、培训），未对差旅住宿等按标准全量扫描，导致遗漏。",
+      "answer_evidence": "答案仅报告3项超标准，而预期6项。",
+      "trace_evidence": "轨迹显示list_expenses with training_fee>3500, office_supplies>600, communication>300，但未对travel_lodging按职级和城市标准进行全量扫描。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 5,
+      "reason": "引用了费用报销管理办法第十二条及办公、培训标准，但未引用差旅住宿标准，制度依据不完整。",
+      "answer_evidence": "答案中提及“违反相应制度标准及《费用报销管理办法》第十二条”，但未提及差旅住宿标准。",
+      "trace_evidence": "轨迹中获取了差旅费管理办法但未在超标准扫描中应用。"
+    },
+    {
+      "id": "false-positive-control",
+      "score": 0,
+      "reason": "答案混入了6个重复报销和6个拆分异常，这些不是超标准，造成大量误报。",
+      "answer_evidence": "答案中列出了DUP_001至DUP_006, SPLIT_001至SPLIT_006等异常。",
+      "trace_evidence": "build_evidence_matrix中对应记录为重复和拆分。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的记录ID均存在于数据库中，无伪造。"
+    },
+    {
+      "id": "partial-scan-presented-as-complete",
+      "triggered": true,
+      "reason": "只扫描了办公、通讯、培训超标准，遗漏了差旅住宿等超标准，但答案表述为全年扫描，构成partial-scan-presented-as-complete。"
+    }
+  ],
+  "overall_comment": "候选提交未正确理解“超标准专项扫描”任务要求，返回了所有发现的异常类型，导致超标准召回严重不全，且混入大量其他规则异常。制度引用不完整，扫描方法不精确。得分10/95，因critical failure限制最高50分，但实际得分未超过限制。",
+  "confidence": 0.95
+}

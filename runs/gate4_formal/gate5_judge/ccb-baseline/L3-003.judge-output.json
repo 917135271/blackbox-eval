@@ -1,0 +1,32 @@
+{
+  "all-anomaly-ids": {
+    "score": 0,
+    "reason": "预期仅返回6个超标准异常ID，实际提交了30个异常ID，包含重复发票、超期、拆分、预算等其他类型，类型错误严重。",
+    "answer_evidence": "candidate_submission.anomaly_ids共30项，包含ANOM-DUP-*, ANOM-OVERDUE-*, ANOM-SPLIT-*, ANOM-OVERSTD-*, ANOM-BUDGET-*等。",
+    "trace_evidence": "无"
+  },
+  "all-record-ids": {
+    "score": 0,
+    "reason": "预期仅6条超标准记录，实际提交record_ids列表包含约3126条记录，混入大量无关记录，精确率极低。",
+    "answer_evidence": "candidate_submission.record_ids包含R004221～R004226，但还有数千条如R000002, R004201等非超标准记录。",
+    "trace_evidence": "无"
+  },
+  "full-scan-method": {
+    "score": 10,
+    "reason": "对所提交的超标准异常均有金额、标准和special_approval核对，表明执行了超标准专项扫描；但结果未单独复核且混入大量非超标准异常，扣分。",
+    "answer_evidence": "evidence_matrix中ANOM-OVERSTD-001至006均列出具体金额、制度标准和special_approval=0的检查。",
+    "trace_evidence": "无工具调用轨迹，但从提交的详细证据可推断进行了查询比对。"
+  },
+  "policy-basis": {
+    "score": 10,
+    "reason": "明确引用费用报销管理办法第十二条（对应评测规则6.3）及各费用类型专项标准，并在每个超标准异常中落实为查询条件，制度依据充分。",
+    "answer_evidence": "ANOM-OVERSTD-001引用第十二条和07_office_communication第二条；ANOM-OVERSTD-002引用第十二条和07_office_communication第三条等，均正确对应。",
+    "trace_evidence": "无"
+  },
+  "false-positive-control": {
+    "score": 0,
+    "reason": "提交结果中混入大量重复发票、超期、拆分、预算等其他规则异常和数千条无关记录，严重超出超标准专项扫描范围。",
+    "answer_evidence": "anomaly_ids包含ANOM-DUP-*, ANOM-OVERDUE-*, ANOM-SPLIT-*, ANOM-BUDGET-*，record_ids包含大量非R004221～R004226的记录。",
+    "trace_evidence": "无"
+  }
+}

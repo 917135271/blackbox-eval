@@ -1,0 +1,83 @@
+{
+  "task_id": "DEV-007",
+  "task_type": "batch_analysis",
+  "question": "扫描开发库中的个人办公用品和通讯费月度标准，返回全部超标准异常记录；应按员工和自然月聚合。",
+  "scope": {
+    "expense_types": ["office_supplies", "communication"],
+    "audit_period": "2025-01-01 to 2025-12-31",
+    "organization": "all departments in development database",
+    "rule": "Monthly personal office supplies ≤600元/person; Monthly communication fee ≤300元/person; No exceeding 1.0x standard without special approval"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ1",
+      "question": "个人办公用品月度报销标准是多少？",
+      "policy_doc": "07_office_communication.md",
+      "clause": "第二条",
+      "answer": "每人每月不超过600元"
+    },
+    {
+      "id": "PQ2",
+      "question": "通讯费用月度报销标准是多少？",
+      "policy_doc": "07_office_communication.md",
+      "clause": "第三条",
+      "answer": "每人每月不超过300元"
+    },
+    {
+      "id": "PQ3",
+      "question": "超标报销是否需要专项审批？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十二条",
+      "answer": "无专项审批时，报销金额不得超过对应制度标准的1.0倍"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ1",
+      "question": "哪些记录属于office_supplies和communication类型？",
+      "records": ["R900001","R900002","R900006","R900007","R900008","R900009","R900014","R900015"]
+    },
+    {
+      "id": "DQ2",
+      "question": "按员工和自然月聚合后，哪些组合超过月度标准？",
+      "required_aggregation": "SUM(amount) GROUP BY employee_id, strftime('%Y-%m', expense_date), expense_type"
+    }
+  ],
+  "required_fields": ["record_id", "employee_id", "employee_name", "expense_date", "expense_type", "amount", "status"],
+  "evidence_requirements": [
+    "Policy clause for office supplies monthly cap",
+    "Policy clause for communication monthly cap",
+    "Policy clause for no exceeding standard without approval",
+    "Aggregated amounts per employee per month per expense type",
+    "Comparison of aggregated amounts vs. standard"
+  ],
+  "execution_steps": [
+    {"step": 1, "name": "planning", "status": "completed"},
+    {"step": 2, "name": "policy_check", "status": "pending"},
+    {"step": 3, "name": "data_analyst_subagent", "status": "pending"},
+    {"step": 4, "name": "evidence_coverage_check", "status": "pending"},
+    {"step": 5, "name": "false_positive_review", "status": "pending"},
+    {"step": 6, "name": "audit_report", "status": "pending"},
+    {"step": 7, "name": "result_validation", "status": "pending"},
+    {"step": 8, "name": "submission", "status": "pending"}
+  ],
+  "complexity": 3,
+  "complexity_reasons": [
+    "two or more policies (07_office_communication + 01_expense_reimbursement)",
+    "aggregation/grouping required (GROUP BY employee, month, expense_type)",
+    "two business rules (office_supplies ≤600, communication ≤300)",
+    "threshold comparisons"
+  ],
+  "subagent_plan": {
+    "role": "data_analyst",
+    "reason_code": "AGGREGATION_REQUIRED",
+    "task": "Aggregate office_supplies and communication records by employee_id and calendar month. Compare each aggregated monthly total against the standard (600 for office_supplies, 300 for communication). Identify all employee-month combinations where the sum exceeds the standard. Return the violating records, employee, month, expense_type, total amount, and standard."
+  },
+  "stopping_conditions": [
+    "All office_supplies and communication records aggregated by employee and month",
+    "All over-standard combinations identified",
+    "Evidence matrix at 100% coverage with pass status",
+    "Validation report passes"
+  ],
+  "unresolved_items": []
+}

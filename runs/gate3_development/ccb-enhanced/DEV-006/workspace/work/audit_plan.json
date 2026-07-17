@@ -1,0 +1,63 @@
+{
+  "task_id": "DEV-006",
+  "task_scope": "核查R900013的差旅住宿费是否超标，结合员工职级、城市档位和住宿晚数计算",
+  "audit_object": "R900013",
+  "audit_period": "2025-07-10",
+  "expense_type": "travel_lodging",
+  "policy_questions": [
+    "经理级员工在一类城市的差旅住宿标准是多少？",
+    "无专项审批时超标如何处理？"
+  ],
+  "data_questions": [
+    "R900013的员工职级、城市档位、住宿晚数、报销金额是多少？",
+    "是否有专项审批？"
+  ],
+  "required_fields": ["employee_level", "city_tier", "nights", "amount", "special_approval"],
+  "evidence_requirements": {
+    "policies": ["04_travel_expense.md 第四条(住宿标准)", "04_travel_expense.md 第五条(超标处理)", "01_expense_reimbursement_2025.md 第十二条(超标限制)"],
+    "records": ["R900013"]
+  },
+  "execution_steps": [
+    {"step": 1, "action": "查询R900013详细信息", "status": "completed"},
+    {"step": 2, "action": "查询差旅费管理办法住宿标准", "status": "completed"},
+    {"step": 3, "action": "查询报销管理办法超标限制", "status": "completed"},
+    {"step": 4, "action": "计算标准与实际对比", "status": "pending"},
+    {"step": 5, "action": "编写audit_plan.json", "status": "in_progress"},
+    {"step": 6, "action": "记录planning_completed checkpoint", "status": "pending"},
+    {"step": 7, "action": "执行policy-version-check", "status": "pending"},
+    {"step": 8, "action": "执行evidence-coverage-check", "status": "pending"},
+    {"step": 9, "action": "执行audit-report", "status": "pending"},
+    {"step": 10, "action": "执行result-validator", "status": "pending"},
+    {"step": 11, "action": "提交最终结果", "status": "pending"}
+  ],
+  "complexity_score": 1,
+  "complexity_reasons": [
+    "单一规则(住宿标准超标)",
+    "单一记录(R900013)",
+    "明确的政策标准(2025版差旅费管理办法)",
+    "无政策版本冲突",
+    "直接阈值计算,无聚合/分组需求"
+  ],
+  "subagent_plan": {
+    "required": false,
+    "reason": "complexity=1, compact threshold calculation, no native subagent per task routing hint"
+  },
+  "stopping_conditions": [
+    "计算住宿标准与实际金额对比完成",
+    "确认有无专项审批",
+    "证据矩阵覆盖100%",
+    "验证报告通过"
+  ],
+  "preliminary_finding": {
+    "employee_level": "经理级",
+    "city_tier": "A(一类城市)",
+    "nights": 2,
+    "standard_per_night": 650,
+    "standard_total": 1300,
+    "actual_amount": 1400,
+    "excess": 100,
+    "special_approval": 0,
+    "potential_anomaly": true
+  },
+  "unresolved_items": []
+}

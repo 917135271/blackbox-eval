@@ -1,0 +1,66 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-001",
+      "record_ids": ["R900007"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "E9001(开发员工甲) 2025年4月办公用品报销R900007，金额650元，单张发票FPDEV900007",
+        "07_office_communication.md 第二条规定个人办公用品每人每月不超过600元",
+        "650元 > 600元阈值，超出50元(8.3%)",
+        "special_approval=0，无专项审批豁免",
+        "仅AR-01标准审批(部门经理E9002)，无超额特批",
+        "01_expense_reimbursement_2025.md第十二条：无专项审批时报销金额不得超过制度标准的1.0倍"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "record_ids": ["R900014", "R900015"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第三条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "E9001(开发员工甲) 2025年9月通讯费报销：R900014(180元,FPDEV900014)+R900015(160元,FPDEV900015)，合计340元",
+        "07_office_communication.md 第三条规定通讯费每人每月不超过300元",
+        "340元 > 300元阈值，超出40元(13.3%)",
+        "两笔记录使用不同发票，非重复报销",
+        "special_approval=0，无专项审批豁免",
+        "01_expense_reimbursement_2025.md第十二条：无专项审批时报销金额不得超过制度标准的1.0倍"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900001","R900002","R900006","R900007","R900008","R900009","R900014","R900015"],
+  "submitted_record_ids": ["R900007","R900014","R900015"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true,
+    "searched_population": "全部office_supplies(5条)和communication(3条)记录",
+    "query_conditions": "expense_type IN ('office_supplies','communication'), GROUP BY employee_id + strftime('%Y-%m', expense_date), SUM(amount) vs threshold",
+    "checked_rules": ["07_office_communication.md 第二条(办公用品≤600元/人月)", "07_office_communication.md 第三条(通讯费≤300元/人月)"],
+    "population_count": 8,
+    "conclusion": "R900001/R900002共享发票FPDEV900001(480元)，依01_expense_reimbursement_2025.md第十条去重后有效月支出480元≤600元，已裁定不超标；R900006(200元≤300元)、R900008(590元≤600元)、R900009(590元≤600元)均裁定合规",
+    "adjudicated_candidates": ["R900001","R900002","R900006","R900008","R900009"]
+  },
+  "reconciled_figures": {
+    "office_supplies_over_limit_groups": 1,
+    "communication_over_limit_groups": 1,
+    "de_duplicated_invoice_groups": 1,
+    "total_anomaly_records": 3
+  },
+  "unresolved_items": []
+}

@@ -1,0 +1,80 @@
+{
+  "task_id": "L3-004",
+  "task_type": "full_year_rule_audit",
+  "question": "请对全年数据做超预算专项扫描,返回全部异常ID和记录ID集合。",
+  "audit_period": "2025-01-01 至 2025-12-31",
+  "scope": {
+    "rule": "超预算报销",
+    "description": "部门年度累计费用超过其年度预算1.0倍后，未经专项审批的报销记录构成超预算违规",
+    "applicable_policies": [
+      {
+        "doc_id": "08_budget_management.md",
+        "title": "XX证券预算管理办法",
+        "clauses": ["第三条", "第四条"]
+      },
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "title": "XX证券费用报销管理办法(2025修订版)",
+        "clauses": ["第十三条"]
+      }
+    ],
+    "departments": ["D001","D002","D003","D004","D005","D006","D007","D008","D009","D010"],
+    "expense_types": "all"
+  },
+  "rule_questions": [
+    {
+      "question": "部门年度累计费用是否超过其年度预算的1.0倍",
+      "trigger": "cumulative_expense > annual_budget",
+      "boundary": "1.0倍",
+      "exemption": "专项审批（监管要求、客户服务、经营连续性）"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "各超预算部门的费用记录按时间排序，确定超出预算的时刻点及之后的所有记录",
+      "requires": ["department_id", "record_id", "expense_date", "amount", "approval_status"],
+      "method": "cumulative running total by department, ordered by expense_date"
+    },
+    {
+      "question": "超预算后的记录中是否有专项审批豁免",
+      "requires": ["record_id", "approval_type", "special_approval_flag"],
+      "method": "filter post-budget records for special approval"
+    }
+  ],
+  "required_fields": ["record_id", "department_id", "expense_date", "amount", "approval_status", "approval_type"],
+  "evidence_requirements": {
+    "per_anomaly": ["record_id", "department_id", "expense_date", "amount", "cumulative_before", "budget_threshold", "violation_reason", "policy_clause"],
+    "no_anomaly_departments": ["department_id", "annual_budget", "cumulative_expense", "usage_rate"]
+  },
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "aggregation/grouping/cumulative tracking (+1)",
+      "threshold boundary at 1.0x budget (+1)"
+    ],
+    "explanation": "单规则超预算扫描，但需要按部门累计计算、确定阈值穿越点、过滤专项审批。属复杂度2-3范围。"
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "authorize_audit_subagent返回UNKNOWN_ROLE，所有角色名均不匹配。复杂度2任务可由主代理通过batch-expense-analysis Skill + 直接查询完成。compact mode sufficient。"
+  },
+  "execution_steps": [
+    {"step": 1, "name": "planning", "action": "audit-query-planner", "status": "done"},
+    {"step": 2, "name": "authorize_subagent", "action": "authorize_audit_subagent for data-analyst", "status": "pending"},
+    {"step": 3, "name": "data_analysis", "action": "launch data-analyst subagent for cumulative budget analysis", "status": "pending"},
+    {"step": 4, "name": "complete_subagent", "action": "complete_audit_subagent and consume results", "status": "pending"},
+    {"step": 5, "name": "policy_check", "action": "policy-version-check for effective period", "status": "pending"},
+    {"step": 6, "name": "evidence_coverage", "action": "evidence-coverage-check", "status": "pending"},
+    {"step": 7, "name": "false_positive_review", "action": "false-positive-review if triggered", "status": "pending"},
+    {"step": 8, "name": "audit_report", "action": "audit-report", "status": "pending"},
+    {"step": 9, "name": "result_validation", "action": "result-validator", "status": "pending"},
+    {"step": 10, "name": "submit", "action": "validate_audit_result then submit_audit_result", "status": "pending"}
+  ],
+  "stopping_conditions": [
+    "所有超预算部门已按时间排序完成累计计算",
+    "每个超预算记录已确认是否有专项审批",
+    "anomaly_ids与record_ids一一对应且无遗漏",
+    "evidence_matrix覆盖率100%"
+  ],
+  "unresolved_items": []
+}

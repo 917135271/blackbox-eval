@@ -1,0 +1,64 @@
+{
+  "task_id": "TRAP-005",
+  "task_type": "clean_but_suspicious",
+  "audit_scope": "核查TRAP-005涉及的记录是否构成异常",
+  "audit_period": "2025年度",
+  "policy_questions": [
+    {
+      "rule": "Article 7 - 60天报销时限",
+      "policy_ref": "01_expense_reimbursement_2025.md",
+      "clause": "第七条",
+      "question": "记录R004238的报销延迟正好60天，是否违反60天内提交的规定？"
+    },
+    {
+      "rule": "Article 11 - 禁止拆分报销",
+      "policy_ref": "01_expense_reimbursement_2025.md",
+      "clause": "第十一条",
+      "question": "R004234/R004235同日同额不同发票、R004236/R004237相隔8日同员工同类型报销是否构成拆分规避审批？"
+    },
+    {
+      "rule": "Article 5 - 审批权限",
+      "policy_ref": "03_authorization_management.md, 附件二",
+      "clause": "第五条",
+      "question": "R004233金额9990元是否触发正确的审批层级？"
+    },
+    {
+      "rule": "Article 12 - 报销金额标准",
+      "policy_ref": "01_expense_reimbursement_2025.md",
+      "clause": "第十二条",
+      "question": "记录金额是否超过对应制度标准？"
+    }
+  ],
+  "data_questions": [
+    {
+      "records": ["R004233", "R004234", "R004235", "R004236", "R004237", "R004238", "R004239", "R004240"],
+      "fields_needed": ["record_id", "employee_id", "expense_date", "reimburse_date", "expense_type", "amount", "reason", "invoice_no", "status", "special_approval", "city_tier", "nights", "days", "participants"]
+    }
+  ],
+  "complexity": 3,
+  "complexity_reasons": [
+    "涉及多个陷阱样本记录需要逐条核查",
+    "涉及多条款判定(时限、拆分、审批权限、金额标准)",
+    "日期边界判定(正好60日、相隔8日)",
+    "需要聚合计算(同日同额合计)"
+  ],
+  "subagent_plan": {
+    "required": false,
+    "reason": "记录数量可控（8条），可通过直接查询完成全部核查，无需专业子智能体"
+  },
+  "execution_steps": [
+    "检查所有陷阱样本记录的完整详情",
+    "逐条对照政策条款核查",
+    "特别关注: R004238的60日边界判定、R004234/235的合计金额是否达到AR-02线、R004236/237的8日间隔判定",
+    "检查各类型费用标准上限",
+    "证据覆盖检查",
+    "假阳性复核",
+    "生成审计报告",
+    "验证并提交"
+  ],
+  "stopping_conditions": [
+    "所有8条陷阱样本记录逐条核查完毕",
+    "所有相关条款已引用"
+  ],
+  "unresolved_items": []
+}

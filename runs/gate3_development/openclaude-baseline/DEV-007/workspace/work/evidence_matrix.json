@@ -1,0 +1,62 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "DEV-007-001",
+      "record_ids": ["R900001", "R900002"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "开发员工甲(E9001)在2025年1月报销2笔个人办公用品：R900001(480元,2025-01-05)和R900002(480元,2025-01-06)，同一自然月合计960元，超过《办公与通讯费用管理办法》第二条规定的每人每月600元标准，且无专项审批",
+        "两笔报销使用同一发票FPDEV900001(invoice_id: INV900001)，金额各480元"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "DEV-007-002",
+      "record_ids": ["R900007"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "开发员工甲(E9001)在2025年4月8日报销个人办公用品R900007金额650元，超过《办公与通讯费用管理办法》第二条规定的每人每月600元标准，且无专项审批(special_approval=0)"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "DEV-007-003",
+      "record_ids": ["R900014", "R900015"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第三条"},
+        {"doc_id": "07_office_communication.md", "clause_no": "第四条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "开发员工甲(E9001)在2025年9月报销2笔通讯费：R900014(180元,2025-09-03,'九月通讯费上半月')和R900015(160元,2025-09-20,'九月通讯费下半月')，同一自然月合计340元，超过《办公与通讯费用管理办法》第三条规定的每人每月300元标准，且无专项审批",
+        "两笔报销均在同月拆分报销（上半月/下半月），涉嫌以拆分方式绕开月度控制，违反第四条规定"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900001", "R900002", "R900007", "R900014", "R900015"],
+  "submitted_record_ids": ["R900001", "R900002", "R900007", "R900014", "R900015"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true
+  },
+  "reconciled_figures": {},
+  "unresolved_items": []
+}

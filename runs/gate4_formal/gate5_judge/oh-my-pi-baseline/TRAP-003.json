@@ -1,0 +1,135 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "答案明确写“无异常”，anomaly_ids为空列表",
+      "id": "clean-conclusion",
+      "reason": "明确判断无异常且无矛盾表述",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具轨迹获取R004236和R004237详情，未发现异常"
+    },
+    {
+      "answer_evidence": "",
+      "id": "record-scope",
+      "reason": "record_ids集合F1=1.000",
+      "score": 15.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "回答中说明两笔费用间隔8天，超过第十一条规定的7天拆分核查窗口",
+      "id": "case-specific-reason",
+      "reason": "完整说明专属边界：超出7天聚合窗口",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "调用get_expense_detail获取R004236(expense_date: 2025-10-01)和R004237(expense_date: 2025-10-09)，间隔8天"
+    },
+    {
+      "answer_evidence": "无（答案未直接列出核查步骤）",
+      "id": "reverse-check",
+      "reason": "工具核查了日期间隔、重复发票等边界条件",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中调用get_expense_detail对比两个记录日期，并调用find_reused_invoices检查重复发票"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的R004236和R004237均存在于数据库，且为核心记录",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "结论为无异常，未将合规记录判为异常",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 5,
+    "elapsed_seconds": 278.766,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:31:30+08:00",
+  "group": "oh-my-pi-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选正确识别本题无异常，原因正确（超出7天拆分窗口），且通过工具验证了日期和发票等边界条件，结论可靠。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2141,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1711
+      },
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 8755,
+      "prompt_tokens": 9651,
+      "prompt_tokens_details": {
+        "cached_tokens": 896
+      },
+      "total_tokens": 11792
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/oh-my-pi-baseline/TRAP-003",
+  "task_id": "TRAP-003"
+}

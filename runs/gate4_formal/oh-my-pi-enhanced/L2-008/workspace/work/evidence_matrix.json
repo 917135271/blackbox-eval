@@ -1,0 +1,45 @@
+{
+  "status": "pass",
+  "coverage_percent": 100.0,
+  "evidence_rows": [
+    {
+      "anomaly_id": "SPLIT-001",
+      "record_ids": ["R004212", "R004213"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "R004212与R004213属于同一员工E0009（张婷）",
+        "两笔报销费用类型均为travel_lodging（差旅住宿）",
+        "R004212费用日期2025-04-10，R004213费用日期2025-04-15，间隔5天，在7天窗口内",
+        "两笔金额各为¥5,100.00，合计¥10,200.00",
+        "单笔¥5,100落在AR-02档（¥3,000-¥10,000：部门经理+财务复核）",
+        "合计¥10,200达到AR-03档（¥10,000-¥50,000：部门总经理），属于较高审批线",
+        "两笔记录均无特殊审批（special_approval=0）",
+        "两笔使用不同发票（FP2025X0004206 vs FP2025X0004207），不涉及重复发票"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004212", "R004213"],
+  "submitted_record_ids": ["R004212", "R004213"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "combined_amount": 10200.0,
+    "ar03_threshold": 10000.0,
+    "days_between_expenses": 5,
+    "policy_window_days": 7,
+    "r004212_amount": 5100.0,
+    "r004213_amount": 5100.0,
+    "individual_approval_tier": "AR-02",
+    "combined_approval_tier": "AR-03"
+  },
+  "unresolved_items": []
+}

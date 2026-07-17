@@ -1,0 +1,146 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 45.0,
+  "case_score_raw": 45.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "提交的anomaly_ids为空，answer为'无异常'",
+      "id": "clean-conclusion",
+      "reason": "结论为无异常，无矛盾表述",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "最终输出anomaly_ids:[]，结论明确"
+    },
+    {
+      "answer_evidence": "提交的record_ids为[R000002, R000005, ...]，未包含R004234或R004235",
+      "id": "record-scope",
+      "reason": "未核查预期的核心记录R004234,R004235，而是核查了无关记录",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用中只查询了R000002等记录，未出现R004234,R004235的get_expense_detail调用"
+    },
+    {
+      "answer_evidence": "answer中仅说无异常，引用第十条，未提供本题专属合规原因",
+      "id": "case-specific-reason",
+      "reason": "合规原因错误，未说明different invoices and total below approval line，而是归因于测试注入样本",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "evidence_matrix称'重复发票注入样本，不构成实质性违规异常'，与预期原因不符"
+    },
+    {
+      "answer_evidence": "无相关证据",
+      "id": "reverse-check",
+      "reason": "未对真正边界条件进行核查，核查了错误的记录集",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用未出现对R004234,R004235的详情、发票、审批等核查"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的record_ids均为数据库中存在的记录",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "未将合规记录判为异常",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R000002",
+      "R000005",
+      "R000020",
+      "R000028",
+      "R000037",
+      "R000055",
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 184.98,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004234",
+      "R004235"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 12,
+      "f1": 0.0,
+      "missing_count": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:26:10+08:00",
+  "group": "openclaude-enhanced",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选结论正确，但核查过程中未针对预期的核心记录(R004234,R004235)进行核查，合法原因错误，反向验证缺失，导致得分较低。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1826,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1321
+      },
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 7236,
+      "prompt_tokens": 8388,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152
+      },
+      "total_tokens": 10214
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/openclaude-enhanced/TRAP-002",
+  "task_id": "TRAP-002"
+}

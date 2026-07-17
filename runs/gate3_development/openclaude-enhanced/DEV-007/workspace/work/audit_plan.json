@@ -1,0 +1,29 @@
+{
+  "task_id": "DEV-007",
+  "complexity": 3,
+  "rule_scope": {
+    "policy_doc": "07_office_communication.md",
+    "clauses": [
+      "第二条",
+      "第三条",
+      "第四条"
+    ],
+    "office_supplies_limit": "每人每月不超过600元",
+    "communication_limit": "每人每月不超过300元"
+  },
+  "data_scope": {
+    "expense_types": [
+      "office_supplies",
+      "communication"
+    ],
+    "aggregation": "按员工和自然月聚合"
+  },
+  "selected_subagent": "data_analyst",
+  "analysis_plan": "扫描office_supplies和communication类型的全部记录，按员工+自然月聚合金额，与月度标准比较，输出超标记录",
+  "subagent_plan": {
+    "data_analyst": {
+      "reason_code": "AGGREGATION_REQUIRED",
+      "role_task": "扫描office_supplies和communication全部记录，按employee_id+自然月(YYYY-MM)聚合金额，与政策标准比较：办公用品每人每月≤600元，通讯费每人每月≤300元。输出所有超标异常记录，包括employee_id、月份、费用类型、聚合金额、超标金额、涉及record_ids。"
+    }
+  }
+}

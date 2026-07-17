@@ -1,0 +1,78 @@
+{
+  "trap_interval_8000_10000": {
+    "population": 1,
+    "records": [
+      {
+        "record_id": "R004233",
+        "record_no": "BX2025X004233",
+        "employee_id": "E0012",
+        "employee_name": "杨丽华",
+        "employee_level": "X1",
+        "position_role": "分管副总",
+        "department_id": "D008",
+        "department_name": "合规风控部",
+        "expense_date": "2025-10-03",
+        "reimburse_date": "2025-10-09",
+        "expense_type": "travel_lodging",
+        "amount": 9990.0,
+        "reason": "陷阱样本:低于审批线但接近阈值的合规住宿费",
+        "invoice_no": "FP2025X0004227",
+        "invoice_id": "INV004227",
+        "vendor_name": "XX注入供应商R004233",
+        "invoice_date": "2025-10-03",
+        "invoice_amount": 9990.0,
+        "status": "approved",
+        "city_tier": "A",
+        "nights": 10,
+        "budget_year": 2025,
+        "special_approval": 0,
+        "approval_chain": [
+          {
+            "approval_id": "A004233",
+            "tier_id": "AR-02",
+            "approver_employee_id": "E0008",
+            "approver_role": "部门经理",
+            "approved_at": "2025-10-09",
+            "approval_status": "approved"
+          }
+        ],
+        "old_policy_analysis": {
+          "old_threshold_applies": true,
+          "old_required_approver": "部门总经理",
+          "old_rule": "≥8000 requires 部门总经理 (2022 policy)",
+          "actual_approvers_present": [
+            "部门经理"
+          ],
+          "missing_approver_under_old_policy": "部门总经理",
+          "misjudged_under_old_policy": true
+        },
+        "new_policy_analysis": {
+          "new_threshold_applies": false,
+          "new_required_approver": "部门经理+财务复核",
+          "new_rule": "≥10000 requires 部门总经理; below that: 部门经理+财务复核 (2025 policy)",
+          "correctly_approved_under_new_policy": true
+        }
+      }
+    ]
+  },
+  "trap_interval_30000_50000": {
+    "population": 0,
+    "records": []
+  },
+  "misjudged_under_old_policy": [
+    {
+      "record_id": "R004233",
+      "amount": 9990.0,
+      "trap_interval": "[8000, 10000)",
+      "old_policy_requirement": "部门总经理 (≥8000)",
+      "actual_approvers": [
+        "部门经理"
+      ],
+      "new_policy_requirement": "部门经理+财务复核 (<10000)",
+      "verdict": "Old policy would require 部门总经理; only 部门经理 present. Misjudged under old policy."
+    }
+  ],
+  "all_record_ids_checked": [
+    "R004233"
+  ]
+}

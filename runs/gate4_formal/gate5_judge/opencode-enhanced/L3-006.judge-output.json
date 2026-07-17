@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "current-value",
+      "score": 30,
+      "reason": "明确给出部门总经理审批线为单笔金额大于等于10000元且小于50000元，现行值10000元准确。",
+      "answer_evidence": "单笔金额大于等于10000元且小于50000元",
+      "trace_evidence": "无工具调用，答案基于文档直接给出。"
+    },
+    {
+      "id": "deprecated-value",
+      "score": 12.5,
+      "reason": "清晰说明2022版被废止、旧审批金额被替代，但未明确提及旧值8000元，仅废止状态正确。",
+      "answer_evidence": "2022版已被2025修订版第十四条正式废止...旧版审批金额已被后续制度替代",
+      "trace_evidence": "无工具调用，答案来自文档解读。"
+    },
+    {
+      "id": "applicable-version",
+      "score": 20,
+      "reason": "明确选择2025修订版，并引用废止条款和旧版存档声明，理由充分。",
+      "answer_evidence": "应采用2025修订版。2022版已被2025修订版第十四条正式废止...",
+      "trace_evidence": "无工具调用，推论过程合理。"
+    },
+    {
+      "id": "two-version-evidence",
+      "score": 20,
+      "reason": "同时引用01_expense_reimbursement_2025.md第十四条和02_expense_reimbursement_2022_deprecated.md第一、四条，两份制度证据齐全。",
+      "answer_evidence": "citations中包含doc_id 01_expense_reimbursement_2025.md和02_expense_reimbursement_2022_deprecated.md",
+      "trace_evidence": "无工具调用，但引用的文档存在于语料库。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "无费用记录，未提交任何record_id，不存在伪造。"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "明确指出2022版已废止，未将其作为现行依据。"
+    }
+  ],
+  "overall_comment": "答案准确指出应采用2025修订版，并正确给出部门总经理审批线10000元。对旧版已废止状态交代清楚，但未提及具体旧值8000元，因此该项部分扣分。证据引用充分，无关键失败。",
+  "confidence": 1.0
+}

@@ -1,0 +1,274 @@
+{
+  "budget": {
+    "timeout_seconds": 900
+  },
+  "context": {
+    "checkpoint_count": 3,
+    "compaction_count": 0,
+    "last_checkpoint_stage": "review_ready",
+    "last_usage_percent": 45.0
+  },
+  "event_sequence": 130,
+  "experiment_group": "oh-my-pi-enhanced",
+  "framework": "oh-my-pi",
+  "phase": "review_ready",
+  "subagent_calls": {
+    "data_analyst": 1,
+    "independent_reviewer": 1,
+    "policy_researcher": 1
+  },
+  "subagent_invocations": {
+    "1535831e-2347-47f5-8f29-240b72152d08": {
+      "artifact_paths": [
+        "work/audit_plan.json"
+      ],
+      "artifacts": [
+        {
+          "path": "work/subagents/data_analyst/full_record_ids.json",
+          "sha256": "1524bb35c08074288307c240a0a6ff4606f3ccaf5027c7a50172e9cbdb6ea1fb",
+          "size_bytes": 6597
+        }
+      ],
+      "authorized_at": 1784207057.8518922,
+      "completed_at": 1784207510.339977,
+      "complexity": 5,
+      "invocation_id": "1535831e-2347-47f5-8f29-240b72152d08",
+      "reason_code": "AGGREGATION_REQUIRED",
+      "role": "data_analyst",
+      "status": "completed",
+      "summary": {
+        "artifact_paths": [
+          "work/subagents/data_analyst/full_record_ids.json"
+        ],
+        "citations": [
+          {
+            "clause_no": "Art.12",
+            "doc_id": "01_expense_reimbursement_2025.md"
+          },
+          {
+            "clause_no": "Art.4",
+            "doc_id": "04_travel_expense.md"
+          },
+          {
+            "clause_no": "Art.6",
+            "doc_id": "04_travel_expense.md"
+          },
+          {
+            "clause_no": "Art.3",
+            "doc_id": "06_business_entertainment.md"
+          },
+          {
+            "clause_no": "Art.2",
+            "doc_id": "07_office_communication.md"
+          },
+          {
+            "clause_no": "Art.3",
+            "doc_id": "07_office_communication.md"
+          }
+        ],
+        "decision": "reject",
+        "key_findings": [
+          "4240 records scanned in FY2025; 0 special_approval exemptions found",
+          "Rule1-TravelLodging: 1 anomaly (R004225, 900/night > 850 standard)",
+          "Rule2-LocalTransport: 1 anomaly (R004226, 92/day > 80 standard)",
+          "Rule3-TrainingFee: 578 records unevaluable due to NULL participants/days/nights/city_tier",
+          "Rule4-Entertainment: 1 anomaly (R004224, 350/person > 300 standard)",
+          "Rule5-OfficeSupplies: 287 records exceeding 600/month/person cap",
+          "Rule6-Communication: 307 records exceeding 300/month/person cap",
+          "Total 597 unique anomaly records; full ID list saved to role work dir"
+        ],
+        "record_ids": [
+          "R004225",
+          "R004226",
+          "R004224"
+        ],
+        "unresolved_items": [
+          "R004223: TrainingFee NULL fields, cannot evaluate per 05_training_expense.md standards"
+        ]
+      },
+      "token_budget": 5000,
+      "token_usage": {}
+    },
+    "8e63c574-b968-43e5-acb3-96b09a00264e": {
+      "artifact_paths": [
+        "work/evidence_matrix.json",
+        "work/analysis/data_findings.json"
+      ],
+      "artifacts": [
+        {
+          "path": "work/subagents/independent_reviewer/review.json",
+          "sha256": "93d2278b3ad8b49652e71f3a14a75c8e8458ba9e78d82ce003138947ae526477",
+          "size_bytes": 12155
+        }
+      ],
+      "authorized_at": 1784207594.4242384,
+      "completed_at": 1784207827.156886,
+      "complexity": 5,
+      "invocation_id": "8e63c574-b968-43e5-acb3-96b09a00264e",
+      "reason_code": "COMPREHENSIVE_AUDIT",
+      "role": "independent_reviewer",
+      "status": "completed",
+      "summary": {
+        "artifact_paths": [
+          "work/subagents/independent_reviewer/review.json"
+        ],
+        "citations": [
+          {
+            "clause_no": "Art.4",
+            "doc_id": "04_travel_expense.md"
+          },
+          {
+            "clause_no": "Art.6",
+            "doc_id": "04_travel_expense.md"
+          },
+          {
+            "clause_no": "Art.3",
+            "doc_id": "06_business_entertainment.md"
+          },
+          {
+            "clause_no": "Art.2",
+            "doc_id": "07_office_communication.md"
+          },
+          {
+            "clause_no": "Art.3",
+            "doc_id": "07_office_communication.md"
+          }
+        ],
+        "decision": "pass",
+        "key_findings": [
+          "All 597 anomalies confirmed: R004225 lodging 900>850, R004226 transport 92>80, R004224 entertainment 350>300",
+          "287 office supplies records exceeding 600/month, 307 communication exceeding 300/month - all confirmed",
+          "Boundary cases R001519+R001567 (300.17>300) correctly flagged",
+          "04 Art.7 cross-reference verified - no training lodging misclassification",
+          "R004223 + 578 training_fee records: NULL dim fields, structurally unevaluable - data limitation",
+          "Zero special_approval=1 records found, Art.12 exemption correctly not triggered",
+          "Cross-validation: 597 entries = 597 unique IDs, zero mismatches"
+        ],
+        "record_ids": [
+          "R004225",
+          "R004226",
+          "R004224"
+        ],
+        "unresolved_items": [
+          "R004223: training_fee NULL dim fields, cannot evaluate; 578 training records structurally unevaluable"
+        ]
+      },
+      "token_budget": 4000,
+      "token_usage": {}
+    },
+    "a783d068-d098-4e23-b9e9-76a9939dff8c": {
+      "artifact_paths": [
+        "work/audit_plan.json"
+      ],
+      "artifacts": [
+        {
+          "path": "work/subagents/policy_researcher/policy_applicability.json",
+          "sha256": "614bce8f3317f7ba1acf67b7a7cfe96011612b31ee6bd0c192f3d65f8dea5c77",
+          "size_bytes": 2488
+        },
+        {
+          "path": "work/subagents/policy_researcher/policy_standards_detail.json",
+          "sha256": "447a88a07c8a3a0490b533cacdef423dc87636a69029e5c39ee36af372a6c92f",
+          "size_bytes": 4393
+        }
+      ],
+      "authorized_at": 1784207048.40079,
+      "completed_at": 1784207362.445619,
+      "complexity": 5,
+      "invocation_id": "a783d068-d098-4e23-b9e9-76a9939dff8c",
+      "reason_code": "MULTI_CLAUSE_SUPPORT",
+      "role": "policy_researcher",
+      "status": "completed",
+      "summary": {
+        "artifact_paths": [
+          "work/subagents/policy_researcher/policy_applicability.json",
+          "work/subagents/policy_researcher/policy_standards_detail.json"
+        ],
+        "citations": [
+          {
+            "clause_no": "Art.12",
+            "doc_id": "01_expense_reimbursement_2025.md"
+          },
+          {
+            "clause_no": "Art.14",
+            "doc_id": "01_expense_reimbursement_2025.md"
+          },
+          {
+            "clause_no": "Art.3",
+            "doc_id": "04_travel_expense.md"
+          },
+          {
+            "clause_no": "Art.4",
+            "doc_id": "04_travel_expense.md"
+          },
+          {
+            "clause_no": "Art.5",
+            "doc_id": "04_travel_expense.md"
+          },
+          {
+            "clause_no": "Art.6",
+            "doc_id": "04_travel_expense.md"
+          },
+          {
+            "clause_no": "Art.7",
+            "doc_id": "04_travel_expense.md"
+          },
+          {
+            "clause_no": "Art.2",
+            "doc_id": "05_training_expense.md"
+          },
+          {
+            "clause_no": "Art.3",
+            "doc_id": "05_training_expense.md"
+          },
+          {
+            "clause_no": "Art.4",
+            "doc_id": "05_training_expense.md"
+          },
+          {
+            "clause_no": "Art.5",
+            "doc_id": "05_training_expense.md"
+          },
+          {
+            "clause_no": "Art.6",
+            "doc_id": "05_training_expense.md"
+          },
+          {
+            "clause_no": "Art.2",
+            "doc_id": "06_business_entertainment.md"
+          },
+          {
+            "clause_no": "Art.3",
+            "doc_id": "06_business_entertainment.md"
+          },
+          {
+            "clause_no": "Art.2",
+            "doc_id": "07_office_communication.md"
+          },
+          {
+            "clause_no": "Art.3",
+            "doc_id": "07_office_communication.md"
+          }
+        ],
+        "decision": "pass",
+        "key_findings": [
+          "01_expense_reimbursement_2025.md (effective 2025-01-01, Art.14) is the sole effective reimbursement policy; 02 (2022) is explicitly repealed.",
+          "Travel lodging caps (04 Art.4): 4 employee levels × 3 city tiers — employee: ¥450/¥380/¥300, manager: ¥650/¥550/¥450, dept-head: ¥850/¥700/¥600, executive: ¥1100/¥900/¥750 per night.",
+          "Local transport per-day caps (04 Art.6): tier-1 ¥120, tier-2 ¥100, tier-3 ¥80.",
+          "Training standards (05): course fee ≤¥3500/person/course (Art.2), internal daily ≤¥800 (Art.3), external daily ≤¥1200 (Art.4), lodging by city tier: ¥500/¥420/¥350 (Art.5).",
+          "Business entertainment (06): per event ≤¥5000 (Art.2), per person ≤¥300 (Art.3).",
+          "Office supplies (07 Art.2): ≤¥600/person/month. Communication (07 Art.3): ≤¥300/person/month.",
+          "Exemption rule confirmed: 01 Art.12 — special_approval=true exempts records from the 1.0× standard cap.",
+          "Cross-reference confirmed: 04 Art.7 — training lodging uses 05 standards, not 04 lodging table."
+        ],
+        "record_ids": [],
+        "unresolved_items": []
+      },
+      "token_budget": 4000,
+      "token_usage": {}
+    }
+  },
+  "submission_attempts": 0,
+  "submission_status": "not_submitted",
+  "task_id": "L3-003"
+}

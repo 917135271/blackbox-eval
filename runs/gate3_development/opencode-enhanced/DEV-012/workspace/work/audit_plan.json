@@ -1,0 +1,116 @@
+{
+  "task_id": "DEV-012",
+  "task_type": "audit_report",
+  "audit_object": "XX证券开发库综合费用",
+  "audit_period": "2025年度",
+  "organization_scope": "D901开发审计一部、D902开发审计二部",
+  "data_scope": {
+    "total_records": 21,
+    "departments": ["D901", "D902"],
+    "employees": ["E9001", "E9002", "E9003", "E9004"],
+    "expense_types": ["office_supplies", "travel_transport", "travel_lodging", "training_fee", "training_lodging", "communication", "business_entertainment", "other"]
+  },
+  "rules": [
+    {
+      "rule_id": "duplicate_reimbursement",
+      "rule_name": "重复报销",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十条",
+      "description": "同一发票最多报销1次",
+      "check_method": "Find invoices with usage_count >= 2, verify each record"
+    },
+    {
+      "rule_id": "split_reimbursement",
+      "rule_name": "拆分报销",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十一条",
+      "description": "同一员工、同一费用类型在7天内2笔及以上，合计金额达到AR-03较高审批线(≥10000元)应核查",
+      "check_method": "Group by employee, expense_type, 7-day window; sum amounts; compare to AR-03 threshold"
+    },
+    {
+      "rule_id": "over_standard",
+      "rule_name": "超标准报销",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十二条",
+      "description": "无专项审批时报销金额不得超过对应制度标准的1.0倍",
+      "sub_rules": [
+        {"type": "office_supplies", "standard": "600元/人/月", "doc": "07_office_communication.md", "clause": "第二条"},
+        {"type": "communication", "standard": "300元/人/月", "doc": "07_office_communication.md", "clause": "第三条"},
+        {"type": "travel_lodging", "standard": "按职级和城市档位", "doc": "04_travel_expense.md", "clause": "第四条"},
+        {"type": "travel_transport_local", "standard": "按城市档位120/100/80元/日", "doc": "04_travel_expense.md", "clause": "第六条"},
+        {"type": "training_fee", "standard": "内部≤800元/日, 外部≤1200元/日, 课程≤3500元/人/期", "doc": "05_training_expense.md", "clause": "第二至四条"},
+        {"type": "training_lodging", "standard": "按城市档位500/420/350元/晚", "doc": "05_training_expense.md", "clause": "第五条"},
+        {"type": "business_entertainment", "standard": "≤5000元/次, ≤300元/人", "doc": "06_business_entertainment.md", "clause": "第二至三条"}
+      ]
+    },
+    {
+      "rule_id": "overdue",
+      "rule_name": "超期报销",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第七条",
+      "description": "费用发生后60天内提交报销，年末费用可在年度结束后15天内补充",
+      "check_method": "Calculate days between expense_date and reimburse_date; check >60 days; check year-end exception (Art.9)"
+    },
+    {
+      "rule_id": "over_budget",
+      "rule_name": "超预算报销",
+      "policy_doc": "08_budget_management.md",
+      "clause": "第三条",
+      "description": "部门累计使用达到年度预算1.0倍后不得继续报销",
+      "check_method": "Calculate cumulative per department, identify first breaching record, check special_approval"
+    }
+  ],
+  "policy_questions": [
+    "2025版制度(01)是否为现行有效版本？2022版(02)已废止？",
+    "各费用类型的标准阈值是多少？",
+    "拆分报销的审批线AR-03门槛为10000元？",
+    "年末费用补充提交的15天宽限期如何计算？",
+    "超预算时专项审批是否为有效豁免？"
+  ],
+  "data_questions": [
+    "哪些发票被多次使用？对应哪些记录？",
+    "同一员工同一费用类型7天内有哪些记录组？合计是否触发AR-03？",
+    "每笔记录的实际标准是多少（需查participants/days/nights/city_tier/level）？",
+    "哪些记录的expense_date到reimburse_date超过60天？",
+    "D902预算累计何时突破50000？突破记录是否有special_approval？"
+  ],
+  "required_fields": [
+    "record_id", "employee_id", "expense_date", "reimburse_date", "expense_type", "amount",
+    "invoice_no", "department_id", "status", "special_approval",
+    "participants", "days", "nights", "city_tier", "employee_level"
+  ],
+  "complexity": 4,
+  "complexity_reasons": [
+    "multi_policy: 涉及01/04/05/06/07/08多个制度文件",
+    "aggregation: 需按月按人等维度聚合",
+    "multi_rule: 覆盖重复/拆分/超标准/超期/超预算五个规则",
+    "thresholds: 涉及日期边界、金额阈值、豁免条件",
+    "comprehensive: 综合审计报告"
+  ],
+  "subagent_plan": {
+    "data_analyst": {
+      "authorized": true,
+      "reason_code": "MULTI_RECORD_SCOPE",
+      "task": "对21条记录执行五规则完整分析：1)查重复发票及对应记录; 2)按员工/费用类型/7天窗口查拆分; 3)逐笔计算适用标准阈值并对比实际金额(需查detail获取participants/days/nights/city_tier/special_approval); 4)计算expense_date到reimburse_date天数超出60天的记录; 5)按部门计算累计预算使用,识别首次突破记录并检查special_approval。同时需查D902的R900019和R900020的special_approval状态。所有21条记录均需获取detail以取得完整字段。",
+      "context": {
+        "total_records": 21,
+        "departments": ["D901", "D902"],
+        "department_budgets": {"D901": 200000, "D902": 50000},
+        "known_candidates": {
+          "duplicate_invoice": "FPDEV900001 used by R900001,R900002",
+          "potential_splits": [["R900003","R900004"], ["R900010","R900011"], ["R900014","R900015"]],
+          "potential_overdue": ["R900006: expense 2025-03-01, reimburse 2025-05-05 = 65 days"],
+          "potential_over_budget": "D902 used 56000 > 50000; R900018(45000),R900019(6000),R900020(5000)"
+        }
+      },
+      "required_outputs": ["work/analysis/data_findings.json", "work/analysis/query.sql", "work/analysis/results.csv"],
+      "token_budget": 8000
+    }
+  },
+  "stopping_conditions": [
+    "所有21条记录的detail已获取并分析",
+    "五个规则均有明确结论和匹配的record_ids",
+    "无未解决的证据缺口"
+  ],
+  "unresolved_items": []
+}

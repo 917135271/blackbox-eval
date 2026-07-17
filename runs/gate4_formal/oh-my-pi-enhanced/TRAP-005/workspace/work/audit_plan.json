@@ -1,0 +1,59 @@
+{
+  "task_id": "TRAP-005",
+  "task_type": "clean_but_suspicious",
+  "question": "请核查TRAP-005涉及的记录是否构成异常,正确时应说明无异常",
+  "audit_scope": {
+    "records": "R004233, R004234, R004235, R004236, R004237, R004238, R004239, R004240",
+    "description": "八条标注为'陷阱样本'的记录,涉及接近阈值、边界日期、拆分窗口外等可疑但合规的场景",
+    "period": "2025-07-01 to 2025-10-30",
+    "organization": "XX证券各部门"
+  },
+  "policy_questions": [
+    "Article 7: R004238的报销延迟60天是否超过60天期限",
+    "Article 10: R004234/R004235同日同额是否构成重复报销",
+    "Article 11: R004236/R004237相隔8天是否构成拆分报销; R004239/R004240相邻日期同类型是否构成拆分报销; R004234/R004235同日同类型合计是否触发更高审批线",
+    "Article 12: R004233住宿费9990元是否超过差旅住宿标准; R004236/R004237住宿费5200元是否超过差旅住宿标准; R004234/R004235办公费合计是否超过月度上限; R004238通讯费是否超过月度上限; R004239/R004240招待费是否超过单次/人均标准"
+  ],
+  "data_questions": [
+    "核实每位员工的职级与差旅住宿标准对应关系",
+    "核实每条记录的发票号、日期、金额、参与人数等信息",
+    "计算拆分检查的7天窗口边界"
+  ],
+  "required_fields": [
+    "record_id, employee_id, employee_level, position_role, expense_date, reimburse_date, expense_type, amount, invoice_no, invoice_id, vendor_name, city_tier, nights, days, participants, special_approval, budget_year, status, approver_role, tier_id"
+  ],
+  "evidence_requirements": [
+    "每条陷阱样本记录的完整详情",
+    "适用的政策条款原文及生效日期",
+    "职级与住宿标准映射关系",
+    "日期计算证明（延迟天数、相隔天数）"
+  ],
+  "execution_steps": [
+    "1. 获取全部8条陷阱样本记录详情",
+    "2. 政策版本检查:确认2025版费用报销管理办法为适用政策",
+    "3. 逐条对照政策规则分析每条记录",
+    "4. 证据覆盖率检查",
+    "5. 误报复核",
+    "6. 编写审计报告",
+    "7. 结果校验与提交"
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "涉及多个政策规则(第7、10、11、12条)",
+      "涉及金额阈值和日期边界判断",
+      "需要多表关联查询(员工职级映射)"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "任务为8条已知记录的逐条核查,策略明确,可在主智能体中以内联模式完成"
+  },
+  "stopping_conditions": [
+    "所有8条记录均完成逐条政策合规性分析",
+    "证据矩阵覆盖率100%",
+    "误报复核通过",
+    "校验结果为valid=true"
+  ],
+  "unresolved_items": []
+}

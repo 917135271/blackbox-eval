@@ -1,0 +1,41 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-DEV-004-001",
+      "record_ids": ["R900003", "R900004"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "R900003: 员工E9001(开发员工甲)，差旅交通费，2025-02-03，¥5,200，事由为'同一客户路演交通费第一笔'，审批档位AR-02(部门经理+财务复核)",
+        "R900004: 员工E9001(开发员工甲)，差旅交通费，2025-02-06，¥5,200，事由为'同一客户路演交通费第二笔'，审批档位AR-02(部门经理+财务复核)",
+        "两笔记录为同一员工(E9001)、同一费用类型(travel_transport)，间隔仅3天(2025-02-03与2025-02-06)，在7天内",
+        "事由'第一笔''第二笔'明确表明为同一事项(同一客户路演)拆分为两笔报销",
+        "单笔¥5,200处于AR-02档位(¥3,000-¥9,999，部门经理+财务复核)；合计¥10,400达到AR-03档位(¥10,000-¥49,999，部门总经理)，拆分后回避了部门总经理审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900003", "R900004"],
+  "submitted_record_ids": ["R900003", "R900004"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": false
+  },
+  "reconciled_figures": {
+    "total_records": 2,
+    "combined_amount": 10400,
+    "individual_amounts": [5200, 5200],
+    "ar_tier_individual": "AR-02",
+    "ar_tier_combined": "AR-03"
+  },
+  "unresolved_items": []
+}

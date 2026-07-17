@@ -1,0 +1,51 @@
+{
+  "task_id": "DEV-006",
+  "task_type": "single_anomaly",
+  "question": "核查R900013的差旅住宿费是否超标，结合员工职级、城市档位和住宿晚数计算。",
+  "scope": {
+    "audit_object": "R900013",
+    "expense_type": "travel_lodging",
+    "business_period": "2025-07-10 (expense_date), 2025 budget_year",
+    "organization": "D901 (开发审计一部), E9002 (开发经理乙)"
+  },
+  "policy_questions": [
+    {
+      "question": "经理级员工在一类城市(A档)的差旅住宿标准是多少元/人/晚？",
+      "policy_doc": "04_travel_expense.md",
+      "clause": "第四条"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "R900013的员工职级、城市档位、住宿晚数、报销金额分别是多少？",
+      "tables": ["expense_detail"],
+      "fields": ["employee_level", "city_tier", "nights", "amount"]
+    }
+  ],
+  "required_fields": ["record_id", "employee_id", "employee_level", "city_tier", "nights", "amount", "expense_type", "expense_date"],
+  "evidence_requirements": [
+    "04_travel_expense.md 第四条住宿标准表证实经理级一类城市标准为650元/人/晚",
+    "R900013 expense detail证实员工职级、城市档位、住宿晚数和金额"
+  ],
+  "steps": [
+    {"step": "查询R900013费用明细和员工信息", "status": "completed"},
+    {"step": "查询差旅费管理办法住宿标准", "status": "completed"},
+    {"step": "计算比较并形成初步结论", "status": "pending"},
+    {"step": "运行evidence-coverage-check", "status": "pending"},
+    {"step": "运行audit-report生成final_result", "status": "pending"},
+    {"step": "运行result-validator", "status": "pending"},
+    {"step": "提交结果", "status": "pending"}
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "单记录核查，单规则（住宿标准），只需一次查询和一次表查找"
+    ]
+  },
+  "subagent_plan": "none - complexity 1, compact mode",
+  "stopping_conditions": [
+    "能够明确判断R900013是否超标",
+    "证据覆盖率达到100%"
+  ],
+  "unresolved_items": []
+}

@@ -1,0 +1,62 @@
+{
+  "task_id": "L2-003",
+  "task_scope": {
+    "audit_object": "以R000020为线索的重复报销异常",
+    "clue_record": "R000020",
+    "rule": "Article 10 - 同一发票最多报销1次",
+    "expense_types": ["travel_lodging"],
+    "business_period": "2025-01-01 to 2025-12-31",
+    "organization_scope": "E0028 (杜丹), D009 (财务管理部)"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "同一发票是否允许在不同报销单中重复报销？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "relevant_clause": "第十条",
+      "clause_text": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-01",
+      "question": "发票FP202500000020是否在多个报销记录中使用？",
+      "tables": ["expenses", "invoices"],
+      "method": "find_invoice_usage"
+    },
+    {
+      "id": "DQ-02",
+      "question": "R000020和关联重复记录的详细信息是什么？",
+      "tables": ["expenses", "invoices", "approvals"],
+      "method": "get_expense_detail"
+    }
+  ],
+  "complexity": 1,
+  "complexity_reasons": [
+    "单一规则(第十条重复报销)",
+    "单一线索记录(R000020)",
+    "直接关联记录查询",
+    "无需多表聚合或批量阈值分析"
+  ],
+  "subagent_plan": {
+    "planned_roles": [],
+    "reason": "Complexity 1 - compact mode sufficient, no subagent needed"
+  },
+  "execution_steps": [
+    {"step": 1, "action": "获取R000020详情", "status": "completed"},
+    {"step": 2, "action": "搜索重复报销政策", "status": "completed"},
+    {"step": 3, "action": "查询FP202500000020发票使用情况", "status": "completed", "finding": "R000020和R004203使用同一发票"},
+    {"step": 4, "action": "获取R004203详情", "status": "completed"},
+    {"step": 5, "action": "证据覆盖检查", "status": "pending"},
+    {"step": 6, "action": "误报复核", "status": "pending"},
+    {"step": 7, "action": "生成审计报告", "status": "pending"},
+    {"step": 8, "action": "结果校验", "status": "pending"},
+    {"step": 9, "action": "提交结果", "status": "pending"}
+  ],
+  "stopping_conditions": [
+    "发票使用查询覆盖所有记录",
+    "重复报销违规确认并有政策依据",
+    "证据矩阵覆盖100%"
+  ],
+  "unresolved_items": []
+}

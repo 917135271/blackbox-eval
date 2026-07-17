@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "current-threshold",
+      "score": 45,
+      "reason": "金额10000元且包含边界（大于等于），完全正确。",
+      "answer_evidence": "答案明确写明“单笔金额大于等于10,000元且小于50,000元为AR-03档位”。",
+      "trace_evidence": "轨迹中get_policy_excerpt(03_authorization_management)返回表格“AR-03 | 大于等于10000元且小于50000元 | 部门总经理”。"
+    },
+    {
+      "id": "current-version",
+      "score": 20,
+      "reason": "明确依据2025修订版，且轨迹仅查询了现行制度。",
+      "answer_evidence": "答案引用了“《XX证券费用报销管理办法(2025修订版)》”。",
+      "trace_evidence": "list_policy_docs列出01_expense_reimbursement_2025.md和02_expense_reimbursement_2022_deprecated.md，但候选只使用了2025版。"
+    },
+    {
+      "id": "policy-citation",
+      "score": 20,
+      "reason": "引用了费用报销管理办法第五条和授权管理办法附件二，均支持10000元门槛。",
+      "answer_evidence": "答案中注明“依据《XX证券费用报销管理办法(2025修订版)》第五条及《XX证券授权管理办法》第二条(附件二)”。",
+      "trace_evidence": "轨迹get_policy_excerpt(01_expense_reimbursement_2025.md)返回第五条，get_policy_excerpt(03_authorization_management.md)返回附件二表格。"
+    },
+    {
+      "id": "old-value-control",
+      "score": 5,
+      "reason": "未明确排除旧值8000元，但当前值正确。",
+      "answer_evidence": "答案仅提及10000元，未涉及8000元。",
+      "trace_evidence": "无排除旧值的语句。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的R004207和R004212均在数据库存在，且未被用作核心结论唯一支撑。"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未使用废弃制度，始终依据2025修订版。"
+    }
+  ],
+  "overall_comment": "候选正确回答现行审批线为10000元，引用有效制度，未犯关键错误。",
+  "confidence": 1.0
+}

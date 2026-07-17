@@ -1,0 +1,146 @@
+{
+  "case_family": "clean_trap",
+  "case_score": 15.0,
+  "case_score_raw": 15.0,
+  "category": "clean_but_suspicious",
+  "criteria": [
+    {
+      "answer_evidence": "candidate submission: anomaly_ids为空，answer为“无异常”，但讨论的是R000002等记录而非目标记录",
+      "id": "clean-conclusion",
+      "reason": "结论未针对TRAP-005的目标记录，实际分析的记录与题目无关，不符合无异常判定的要求",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用未访问目标记录R004239和R004240，全部围绕重复发票和注入记录展开"
+    },
+    {
+      "answer_evidence": "submitted record_ids: [R000002, R000005, R000020, R000028, R000037, R000055, R004201, R004202, R004203, R004204, R004205, R004206]，不含R004239和R004240",
+      "id": "record-scope",
+      "reason": "未核查目标记录R004239和R004240，提交的记录集完全错误，属于未核查核心记录并加入无关记录",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "所有get_expense_detail调用均针对无关记录，缺少对R004239和R004240的任何查询"
+    },
+    {
+      "answer_evidence": "answer仅提及“重复发票注入样本”，未涉及目标记录的专属合规边界",
+      "id": "case-specific-reason",
+      "reason": "未说明本题所属的合规原因（unique invoices, within entertainment standards, total below approval line），原因完全错误",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中无对R004239或R004240的娱乐标准、发票唯一性或总额阈值的分析"
+    },
+    {
+      "answer_evidence": "answer中无任何针对目标记录的阈值或标准比对",
+      "id": "reverse-check",
+      "reason": "未对目标记录进行任何反向验证，仅根据题目无关的重复发票注入记录得出结论",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": "工具调用仅包含list_policy_docs、search_policy、find_reused_invoices、get_expense_detail（无关记录）等，无核对R004239和R004240边界条件的步骤"
+    },
+    {
+      "answer_evidence": "",
+      "id": "no-unsupported-output",
+      "reason": "未提交实质异常",
+      "score": 10.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": true,
+      "reason": "用无关记录（R000002等）支撑核心结论，未使用目标记录R004239和R004240，实质偏离题目要求",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "",
+      "score_cap": 30,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R000002",
+      "R000005",
+      "R000020",
+      "R000028",
+      "R000037",
+      "R000055",
+      "R004201",
+      "R004202",
+      "R004203",
+      "R004204",
+      "R004205",
+      "R004206"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 1,
+    "elapsed_seconds": 161.374,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": [
+      "R004239",
+      "R004240"
+    ],
+    "record_metrics": {
+      "exact": false,
+      "extra_count": 12,
+      "f1": 0.0,
+      "missing_count": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "required_citations": [],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:27:40+08:00",
+  "group": "oh-my-pi-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选完全忽略了题目要求的TRAP-005目标记录（R004239和R004240），转而分析无关的重复发票注入记录，结论无效。所有评分项均为0分，触发关键失败“fabricated-record-id”，总分限制为20以下，最终得分0。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1949,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1312
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 6816,
+      "prompt_tokens": 7840,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 9789
+    }
+  },
+  "passed": false,
+  "run_path": "runs/gate4_formal/oh-my-pi-baseline/TRAP-005",
+  "task_id": "TRAP-005"
+}

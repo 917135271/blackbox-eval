@@ -1,0 +1,132 @@
+{
+  "case_family": "policy_and_version",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "near_clause_disambiguation",
+  "criteria": [
+    {
+      "answer_evidence": "差旅住宿标准（04_travel_expense.md 第四条）：按员工职级和城市档位双重分级，共4×3=12个费率档位。",
+      "id": "travel-policy",
+      "reason": "明确说明差旅住宿适用差旅费管理办法，引用04_travel_expense.md第四条，场景清晰。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc 04_travel_expense.md 返回第四条差旅住宿费标准表。"
+    },
+    {
+      "answer_evidence": "培训住宿标准（05_training_expense.md 第五条）：仅按城市档位分级，不区分职级，共3个费率档位。",
+      "id": "training-policy",
+      "reason": "明确说明培训住宿适用培训费管理办法，引用05_training_expense.md第五条，场景清晰。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc 05_training_expense.md 返回第五条培训住宿标准表。"
+    },
+    {
+      "answer_evidence": "不能混用的原因：制度明确禁止（04第七条、05第六条）、适用场景不同、混用实质风险（如部门负责人一级差旅850 vs 培训500）、预算核算分离。",
+      "id": "no-mixing",
+      "reason": "完整说明了差旅与培训是不同业务场景，标准结构、数值差异，并结合两项制度的禁止条款和风险解释不能混用。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "无特定工具输出，基于政策文档比较推理。"
+    },
+    {
+      "answer_evidence": "一、标准对比：1. 差旅住宿标准...4×3矩阵；2. 培训住宿标准...一维向量。具体数值对比。",
+      "id": "comparison-evidence",
+      "reason": "直接引用04和05文档的具体条款，并给出可核查的标准对比表（如4×3矩阵与1×3向量对比），证据完整。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "get_policy_doc 04_travel_expense.md 和 05_training_expense.md 分别获取了完整标准表，用于对比。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的record_ids均为系统返回的有效记录，无虚构或无关记录。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "仅引用了现行有效的04_travel_expense.md和05_training_expense.md，未使用废止制度。",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R000347",
+      "R003992",
+      "R002457",
+      "R000442",
+      "R002003",
+      "R000328",
+      "R001870",
+      "R002576",
+      "R001150",
+      "R002604",
+      "R001215",
+      "R003071"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 4,
+    "elapsed_seconds": 295.659,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:expense_standards.travel_lodging",
+      "policy:expense_standards.training.training_lodging",
+      "document:04_travel_expense.md",
+      "document:05_training_expense.md"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:27:01+08:00",
+  "group": "openclaude-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "答案完整准确地比较了两类住宿标准，明确了各自适用的制度，并详细说明了不能混用的原因，证据引用充分。所有评分点均为满分。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1668,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1000
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 7716,
+      "prompt_tokens": 8740,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 10408
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/openclaude-baseline/L3-008",
+  "task_id": "L3-008"
+}

@@ -1,0 +1,47 @@
+{
+  "in_scope_population_count": 2,
+  "candidate_count": 0,
+  "matched_record_ids": [],
+  "aggregate_results": {
+    "employee_id": "E9001",
+    "expense_type": "travel_transport",
+    "records": [
+      {"record_id": "R900010", "expense_date": "2025-06-01", "amount": 5300.0, "invoice_no": "FPDEV900010"},
+      {"record_id": "R900011", "expense_date": "2025-06-09", "amount": 5300.0, "invoice_no": "FPDEV900011"}
+    ],
+    "combined_amount": 10600.0,
+    "date_delta_days": 8,
+    "same_employee": true,
+    "same_expense_type": true,
+    "different_invoices": true,
+    "higher_approval_line": "AR-03 (≥10000元)",
+    "combined_reaches_higher_line": true,
+    "within_7_days": false,
+    "split_reimbursement_conclusion": "不构成拆分报销——日期间隔8天，超出7天窗口"
+  },
+  "rule_by_population_coverage": {
+    "split_reimbursement_rule_11": {
+      "checked": true,
+      "conditions": {
+        "same_employee": {"met": true, "value": "E9001"},
+        "same_expense_type": {"met": true, "value": "travel_transport"},
+        "within_7_days": {"met": false, "value": "8 days (> 7)"},
+        "combined_reaches_higher_line": {"met": true, "value": "10600 ≥ 10000"}
+      },
+      "result": "日期边界条件不满足，不构成违规"
+    }
+  },
+  "completed_checks": [
+    "同一员工检查：E9001 = E9001 ✓",
+    "同一费用类型检查：travel_transport = travel_transport ✓",
+    "日期间隔计算：2025-06-01至2025-06-09 = 8天 > 7天 ✗",
+    "合计金额检查：10600 ≥ 10000 (AR-03) ✓",
+    "发票不重复检查：FPDEV900010 ≠ FPDEV900011 ✓",
+    "特殊审批检查：两者均无special_approval"
+  ],
+  "query_artifacts": [],
+  "result_artifacts": [],
+  "data_quality_issues": [],
+  "limitations": [],
+  "unresolved_items": []
+}

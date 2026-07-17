@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "clean-conclusion",
+      "score": 30,
+      "reason": "明确判断无异常，无矛盾表述",
+      "answer_evidence": "答案为“无异常”，anomaly_ids为空",
+      "trace_evidence": "不需要"
+    },
+    {
+      "id": "record-scope",
+      "score": 0,
+      "reason": "提交的记录集合R004227-R004232与预期R004234、R004235完全不同，且未核查核心记录",
+      "answer_evidence": "answer中record_ids为[R004227, R004228, R004229, R004230, R004231, R004232]",
+      "trace_evidence": "轨迹中get_expense_detail调用针对R004227等无关记录，未触及R004234、R004235"
+    },
+    {
+      "id": "case-specific-reason",
+      "score": 0,
+      "reason": "未说明合规原因是发票不同且合计金额低于审批线，而是用条款弹性解释超期，完全偏离",
+      "answer_evidence": "答案强调“原则上”非绝对禁止，讨论通讯费上限和审批层级，未提及发票不同或金额合计",
+      "trace_evidence": "轨迹中未对R004234、R004235的发票号进行比较，也未计算合计金额与审批线对比"
+    },
+    {
+      "id": "reverse-check",
+      "score": 0,
+      "reason": "没有针对正确记录的边界条件（发票唯一性、合计金额阈值）进行任何工具核查",
+      "answer_evidence": "不需要",
+      "trace_evidence": "工具调用全部围绕无关记录，未发现针对R004234、R004235的发票使用或聚合金额检查"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": true,
+      "reason": "候选提交的record_ids全为与本案例无关的记录，用无关记录支撑核心结论"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "结论为无异常，未判为实质异常"
+    }
+  ],
+  "overall_comment": "候选答案方向错误，核查了完全无关的记录集，合规原因严重偏离，无有效核查证据；受critical failure影响，得分上限20。",
+  "confidence": 1.0
+}

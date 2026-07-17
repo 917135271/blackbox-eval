@@ -1,0 +1,64 @@
+{
+  "task_id": "L3-007",
+  "question_type": "two_hop_retrieval",
+  "question": "报销办法没有直接列审批金额时，请通过交叉引用找到单笔费用审批档位。",
+  "audit_scope": {
+    "audit_object": "单笔费用审批档位",
+    "policy_cross_reference": "XX证券费用报销管理办法(2025修订版) 第五条 → XX证券授权管理办法 附件二",
+    "business_period": "2025年1月1日起施行",
+    "organization_scope": "XX证券全部门"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "报销办法是否直接列示审批金额？",
+      "answer": "否，第五条明确不在正文列示具体金额，统一按《XX证券授权管理办法》附件二执行。"
+    },
+    {
+      "id": "PQ-02",
+      "question": "授权管理办法附件二中的审批档位和金额区间是什么？",
+      "policy_doc": "03_authorization_management.md"
+    }
+  ],
+  "data_questions": [],
+  "required_fields": ["单笔金额区间", "必要审批角色", "档位编号"],
+  "evidence_requirements": [
+    {
+      "source": "01_expense_reimbursement_2025.md",
+      "clause": "第五条",
+      "content": "单笔费用报销的审批权限不在本办法正文列示具体金额，统一按《XX证券授权管理办法》附件二执行"
+    },
+    {
+      "source": "03_authorization_management.md",
+      "clause": "附件二",
+      "content": "费用报销审批权限表，包含AR-01至AR-05共5个档位"
+    }
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "audit-query-planner", "output": "work/audit_plan.json", "status": "completed"},
+    {"step": 2, "action": "policy-version-check", "output": "work/policy_version.json", "status": "pending"},
+    {"step": 3, "action": "evidence-coverage-check", "output": "work/evidence_matrix.json", "status": "pending"},
+    {"step": 4, "action": "audit-report", "output": "work/final_result.json", "status": "pending"},
+    {"step": 5, "action": "result-validator", "output": "work/validation_report.json", "status": "pending"},
+    {"step": 6, "action": "validate and submit", "output": null, "status": "pending"}
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "单一规则（审批档位查询）",
+      "两个制度文件交叉引用（报销办法+授权管理办法）",
+      "不涉及数据聚合、分组、关联或批量过滤",
+      "不涉及阈值边界、日期边界、例外或豁免判断",
+      "不涉及复杂审计报告"
+    ]
+  },
+  "subagent_plan": {
+    "required": false,
+    "reason": "复杂度为1，无需原生子智能体"
+  },
+  "stopping_conditions": [
+    "已从授权管理办法附件二获取完整的5档审批权限表",
+    "已确认2025修订版为现行有效版本"
+  ],
+  "unresolved_items": []
+}

@@ -1,0 +1,60 @@
+{
+  "task_id": "DEV-009",
+  "task_type": "clean_trap",
+  "question": "R900008与R900009同日同额且费用类型相同，请核查是否属于重复报销；不同发票时不得误报。",
+  "scope": {
+    "audit_object": "R900008 and R900009 duplicate reimbursement check",
+    "expense_types": ["office_supplies"],
+    "business_period": "2025-05-05",
+    "organization_scope": ["D901"],
+    "records_in_scope": ["R900008", "R900009"]
+  },
+  "policy_questions": [
+    {
+      "question": "What is the rule for duplicate reimbursement?",
+      "rule": "Article 10: 同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。",
+      "doc_id": "01_expense_reimbursement_2025.md"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "Are R900008 and R900009 using the same invoice?",
+      "finding": "R900008 uses FPDEV900008; R900009 uses FPDEV900009; different invoices"
+    }
+  ],
+  "required_fields": ["record_id", "invoice_no", "expense_date", "amount", "expense_type", "employee_id"],
+  "evidence_requirements": [
+    "Invoice numbers for both records",
+    "Invoice usage counts to verify no reuse",
+    "Policy clause on duplicate reimbursement"
+  ],
+  "execution_steps": [
+    {"step": "planning", "status": "in_progress"},
+    {"step": "policy_check", "status": "pending"},
+    {"step": "data_analysis", "status": "pending"},
+    {"step": "evidence_coverage", "status": "pending"},
+    {"step": "false_positive_review", "status": "pending"},
+    {"step": "reporting", "status": "pending"},
+    {"step": "validation", "status": "pending"},
+    {"step": "submission", "status": "pending"}
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "Single rule (Article 10)",
+      "Two directly related records",
+      "Simple comparison of invoice numbers",
+      "No aggregation, grouping, or batch filtering needed",
+      "No policy version ambiguity"
+    ]
+  },
+  "subagent_plan": {
+    "requested": false,
+    "reason": "Complexity 1; compact mode in main context is sufficient"
+  },
+  "stopping_conditions": [
+    "Both invoice numbers confirmed different → no duplicate",
+    "If same invoice found → duplicate anomaly"
+  ],
+  "unresolved_items": []
+}

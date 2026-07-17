@@ -1,0 +1,27 @@
+[agents.policy_researcher]
+description = "Resolve applicable policy versions, dates, conflicts, exceptions, and clauses."
+config_file = "./agents/policy_researcher.toml"
+nickname_candidates = ["PolicyResearcher"]
+
+[agents.data_analyst]
+description = "Execute complete read-only SQLite and Python expense analysis."
+config_file = "./agents/data_analyst.toml"
+nickname_candidates = ["DataAnalyst"]
+
+[agents.independent_reviewer]
+description = "Challenge findings for exceptions, boundaries, omissions, and false positives."
+config_file = "./agents/independent_reviewer.toml"
+nickname_candidates = ["IndependentReviewer"]
+
+[mcp_servers.audit_control]
+command = "python3"
+args = ["${AUDIT_PLUGIN_ROOT}/shared/control-mcp/audit_control_mcp.py"]
+startup_timeout_sec = 30
+tool_timeout_sec = 120
+
+[mcp_servers.audit_control.env]
+AUDIT_TASK_ID = "${AUDIT_TASK_ID}"
+AUDIT_WORK_DIR = "${AUDIT_WORK_DIR}"
+EVAL_EXPENSE_DB = "${EVAL_EXPENSE_DB}"
+EVAL_POLICY_CORPUS_DIR = "${EVAL_POLICY_CORPUS_DIR}"
+PYTHONIOENCODING = "utf-8"

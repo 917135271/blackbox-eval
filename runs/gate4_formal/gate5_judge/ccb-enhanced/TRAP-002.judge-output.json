@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "clean-conclusion",
+      "score": 0,
+      "reason": "候选虽然字面结论为无异常，但所判断的记录并非本题TRAP-002涉及的记录，实质结论无效。",
+      "answer_evidence": "“无异常。TRAP-002涉及的记录R000002和R004201不构成异常。”",
+      "trace_evidence": "无"
+    },
+    {
+      "id": "record-scope",
+      "score": 0,
+      "reason": "核查的记录为R000002和R004201，完全偏离正确的R004234和R004235。",
+      "answer_evidence": "record_ids: [\"R000002\", \"R004201\"]",
+      "trace_evidence": "find_reused_invoices返回R000002和R004201，未出现R004234或R004235。"
+    },
+    {
+      "id": "case-specific-reason",
+      "score": 0,
+      "reason": "给出的原因（测试注入数据、不构成真实异常）与本题专属合规原因（different invoices and total below approval line）完全不符。",
+      "answer_evidence": "“R004201事由明确标注‘重复发票注入样本’，且发票日期晚于费用日期达6个月，上述标记明确表明R004201为测试注入数据而非真实费用报销。”",
+      "trace_evidence": "无"
+    },
+    {
+      "id": "reverse-check",
+      "score": 0,
+      "reason": "轨迹中仅核查了无关记录（R000002/R004201）的重复发票、金额阈值等，未针对本题真正的边界（不同的发票和总额低于审批线）进行任何核查。",
+      "answer_evidence": "无",
+      "trace_evidence": "get_expense_detail均针对R000002/R004201等无关记录；find_invoice_usage查询FP202500000002，与正确记录无关。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": true,
+      "reason": "候选用无关记录R000002和R004201支撑核心无异常结论，未核查真正的TRAP-002记录R004234和R004235。"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "未将合规记录判为实质异常。"
+    }
+  ],
+  "overall_comment": "候选完全用错了记录，将其它案例的重复发票记录当作TRAP-002涉及对象，导致所有评分项均不满足。fabricated-record-id触发，总分上限20，实际得分为0。",
+  "confidence": 1.0
+}

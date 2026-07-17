@@ -1,0 +1,64 @@
+{
+  "task_id": "L3-008",
+  "task_type": "near_clause_disambiguation",
+  "question": "比较差旅住宿和培训住宿标准,说明为什么不能混用。",
+  "audit_scope": {
+    "object": "差旅住宿标准与培训住宿标准比较",
+    "expense_types": ["差旅住宿", "培训住宿"],
+    "period": "当前适用制度",
+    "organization": "XX证券全体员工"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ1",
+      "question": "差旅住宿标准是什么？按什么维度分类？",
+      "doc_id": "04_travel_expense.md",
+      "clauses": ["第四条", "第七条"]
+    },
+    {
+      "id": "PQ2",
+      "question": "培训住宿标准是什么？按什么维度分类？",
+      "doc_id": "05_training_expense.md",
+      "clauses": ["第五条", "第六条"]
+    },
+    {
+      "id": "PQ3",
+      "question": "两种标准能否混用？制度如何规定？",
+      "doc_id": ["04_travel_expense.md", "05_training_expense.md"],
+      "clauses": ["04第七条", "05第六条"]
+    }
+  ],
+  "data_questions": [],
+  "required_fields": [],
+  "evidence_needs": [
+    "差旅住宿标准全文（含金额表）",
+    "培训住宿标准全文（含金额表）",
+    "两种制度的互引条款"
+  ],
+  "execution_steps": [
+    "获取差旅费管理办法全文（04_travel_expense.md）",
+    "获取培训费管理办法全文（05_training_expense.md）",
+    "提取并比较两类住宿标准：分类维度、金额、适用场景",
+    "提取互引禁止条款",
+    "形成比较分析结论",
+    "证据覆盖检查",
+    "产出审计报告",
+    "结果校验与提交"
+  ],
+  "complexity": 2,
+  "complexity_reasons": [
+    "涉及两个独立制度文件",
+    "两类业务规则（差旅住宿、培训住宿）",
+    "含金额阈值比较"
+  ],
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "复杂度2，制度条款已通过search定位清晰，无需子智能体；主智能体直接完成全文对比分析。"
+  },
+  "stopping_conditions": [
+    "两类住宿标准全部提取并比较完成",
+    "互引禁止条款明确引用",
+    "证据矩阵覆盖100%"
+  ],
+  "unresolved_items": []
+}

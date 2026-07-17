@@ -1,0 +1,138 @@
+{
+  "case_family": "record_audit",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "policy_data_comparison",
+  "criteria": [
+    {
+      "answer_evidence": "员工E0009(张婷)将同一差旅住宿事项拆分为两笔报销...违反《费用报销管理办法》第十一条禁止拆分报销的规定。",
+      "id": "audit-conclusion",
+      "reason": "结论明确识别为拆分报销，异常类型正确。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "",
+      "id": "anomaly-id",
+      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
+      "score": 15.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "",
+      "id": "record-set",
+      "reason": "record_ids集合F1=1.000",
+      "score": 25.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "citations中包含doc_id 01_expense_reimbursement_2025.md clause_no 第十一条。",
+      "id": "policy-basis",
+      "reason": "正确引用了费用报销管理办法第十一条（对应评测规则6.2），条款有效且直接支持拆分报销结论。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "两笔报销发生在7天内(2025-04-10与2025-04-15),合计金额10200元达到《授权管理办法》附件二AR-03档位(10000元以上)审批线,但实际仅按AR-02档位审批。",
+      "id": "case-reasoning",
+      "reason": "完整给出了7天内两笔合计10200元、超过10000元审批线的关键事实和推理。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有record_id均在预期内，无虚构。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "L2-008-SPLIT-001"
+    ],
+    "actual_record_ids": [
+      "R004212",
+      "R004213"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {
+        "SPLIT": 1
+      },
+      "count_exact": true,
+      "expected_types": {
+        "SPLIT": 1
+      },
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 2,
+    "elapsed_seconds": 94.515,
+    "expected_anomaly_ids": [
+      "SPLIT-003"
+    ],
+    "expected_record_ids": [
+      "R004212",
+      "R004213"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [
+      "clause:费用报销管理办法-6.2"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:29:10+08:00",
+  "group": "opencode-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选正确识别拆分报销，引用条款恰当，推理完整准确。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1283,
+      "completion_tokens_details": {
+        "reasoning_tokens": 897
+      },
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 1106,
+      "prompt_tokens": 2002,
+      "prompt_tokens_details": {
+        "cached_tokens": 896
+      },
+      "total_tokens": 3285
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/opencode-baseline/L2-008",
+  "task_id": "L2-008"
+}

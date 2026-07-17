@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "clean-conclusion",
+      "score": 30,
+      "reason": "明确判断无异常，无矛盾表述",
+      "answer_evidence": "无异常。经核查,TRAP-005涉及的8条陷阱样本记录在全部适用政策规则下均合规",
+      "trace_evidence": "工具调用均支持合规判断，未发现异常"
+    },
+    {
+      "id": "record-scope",
+      "score": 12,
+      "reason": "核心记录R004239、R004240已核查，但提交范围包含了额外6条记录，不符合预期集合",
+      "answer_evidence": "record_ids: [R004233-R004240]",
+      "trace_evidence": "get_expense_detail对R004233-R004240均进行了调用，未遗漏核心记录但范围冗余"
+    },
+    {
+      "id": "case-specific-reason",
+      "score": 25,
+      "reason": "完整说明了发票唯一性、招待标准合规、合计低于审批线等专属原因",
+      "answer_evidence": "R004239/R004240:相邻日不同发票非重复;合计¥1,085<AR-01门槛;人均未超标;单次未超标",
+      "trace_evidence": "find_reused_invoices验证无重复发票；get_policy_doc获取招待标准；get_expense_detail获取具体数据"
+    },
+    {
+      "id": "reverse-check",
+      "score": 15,
+      "reason": "轨迹中对发票、阈值、日期等条件进行了工具验证",
+      "answer_evidence": "逐条分析记录并引用政策标准",
+      "trace_evidence": "find_reused_invoices、list_records_by_reimburse_delay、get_policy_doc等工具调用覆盖边界条件"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有record_id均通过get_expense_detail返回，数据库中存在"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "候选明确判定无异常，未将合规记录判为异常"
+    }
+  ],
+  "overall_comment": "候选正确判定无异常，核实了关键记录，但记录了额外的不相关记录，范围不精确。",
+  "confidence": 0.92
+}

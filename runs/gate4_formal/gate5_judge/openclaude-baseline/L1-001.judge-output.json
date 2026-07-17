@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "current-threshold",
+      "score": 45,
+      "reason": "金额明确10000元且包含边界",
+      "answer_evidence": "答案写明“达到10,000元（含）且低于50,000元时，需要部门总经理审批”",
+      "trace_evidence": "工具调用get_policy_excerpt和get_policy_doc确认AR-03为大于等于10000元，需部门总经理"
+    },
+    {
+      "id": "current-version",
+      "score": 20,
+      "reason": "明确识别现行版本为2025修订版",
+      "answer_evidence": "引用《XX证券授权管理办法》（XX证综规〔2025〕丙号）和《XX证券费用报销管理办法（2025修订版）》",
+      "trace_evidence": "list_policy_docs列出2025修订版，get_policy_doc返回授权管理办法发文字号2025丙号"
+    },
+    {
+      "id": "policy-citation",
+      "score": 20,
+      "reason": "引用了有效制度且定位到正确审批档位",
+      "answer_evidence": "引用“附件二费用报销审批权限表AR-03档位”及“《XX证券费用报销管理办法（2025修订版）》第五条”",
+      "trace_evidence": "get_policy_excerpt返回附件二AR-03，金额10000-50000需部门总经理；费用报销管理办法第五条指向授权管理办法附件二"
+    },
+    {
+      "id": "old-value-control",
+      "score": 10,
+      "reason": "未提及旧值但当前值正确，无错误使用8000元",
+      "answer_evidence": "答案仅涉及现行制度下10000元，未出现8000元",
+      "trace_evidence": "无使用2022版记录，工具调用都针对2025版"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "提交的record_ids均在数据库中存在，未用无关记录支撑结论"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未使用已废止制度，均引用2025修订版"
+    }
+  ],
+  "overall_comment": "候选回答完全正确，明确现行审批线为10000元（含），引用有效制度，无使用旧版或虚假记录。",
+  "confidence": 1.0
+}

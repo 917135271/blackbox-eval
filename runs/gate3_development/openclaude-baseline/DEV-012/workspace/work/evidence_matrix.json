@@ -1,0 +1,177 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "DUP-001",
+      "record_ids": ["R900001", "R900002"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
+      ],
+      "facts": [
+        "发票FPDEV900001在R900001（BXDEV900001，2025-01-05，480元）和R900002（BXDEV900002，2025-01-06，480元）中重复出现",
+        "find_reused_invoices查询确认FPDEV900001使用次数为2，关联记录为R900001和R900002",
+        "两笔均为同一员工E9001、同一费用类型office_supplies、状态均为approved"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "SPL-001",
+      "record_ids": ["R900003", "R900004"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"}
+      ],
+      "facts": [
+        "R900003（2025-02-03，5200元）与R900004（2025-02-06，5200元）同为员工E9001的travel_transport类型报销",
+        "两笔间隔仅3天，在7日核查窗口内",
+        "事由分别为'同一客户路演交通费第一笔'和'同一客户路演交通费第二笔'，明确为同一事项",
+        "合计金额10400元达到AR-03档位（≥10000元需部门总经理审批），但两笔各自仅经AR-02部门经理审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "OVR-001",
+      "record_ids": ["R900007"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R900007为E9001员工2025年4月办公用品报销，金额650元",
+        "《办公与通讯费用管理办法》第二条规定每人每月办公用品不超过600元",
+        "650元超过600元标准50元，且special_approval=0无专项审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "OVR-002",
+      "record_ids": ["R900013"],
+      "citations": [
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R900013为经理级员工E9002在一类城市（city_tier=A）差旅住宿，2晚共1400元，折合700元/晚",
+        "《差旅费管理办法》第四条规定经理级一类城市住宿标准为650元/晚",
+        "700元/晚超过标准50元/晚，且special_approval=0无专项审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "OVR-003",
+      "record_ids": ["R900016"],
+      "citations": [
+        {"doc_id": "05_training_expense.md", "clause_no": "第三条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R900016为E9001内部培训综合费用，1天共850元",
+        "《培训费管理办法》第三条规定内部培训综合费用每日不超过800元",
+        "850元超过标准50元，且special_approval=0无专项审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "OVR-004",
+      "record_ids": ["R900017"],
+      "citations": [
+        {"doc_id": "06_business_entertainment.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R900017为E9001业务招待费，20人参与，金额5200元",
+        "《业务招待费管理办法》第二条规定单次活动费用不得超过5000元",
+        "5200元超过5000元上限200元，special_approval=0无专项审批",
+        "人均5200/20=260元，未超过人均300元标准"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "OVR-005",
+      "record_ids": ["R900014", "R900015"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第三条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R900014为E9001九月通讯费180元（2025-09-03），R900015为E9001九月通讯费160元（2025-09-20）",
+        "同一员工同一月份通讯费合计180+160=340元",
+        "《办公与通讯费用管理办法》第三条规定每人每月通讯费不超过300元",
+        "340元超过300元标准40元"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "LAT-001",
+      "record_ids": ["R900006"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第七条"}
+      ],
+      "facts": [
+        "R900006费用发生日期2025-03-01，报销日期2025-05-05，间隔65天",
+        "《费用报销管理办法》第七条规定费用发生后60天内提交报销申请",
+        "65天超过60天期限5天"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "BUD-001",
+      "record_ids": ["R900019"],
+      "citations": [
+        {"doc_id": "08_budget_management.md", "clause_no": "第三条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"}
+      ],
+      "facts": [
+        "D902开发审计二部年度预算为50000元",
+        "R900018（45000元）先用预算，R900019（6000元）使累计达51000元，超出预算1000元",
+        "R900019的special_approval=0，无专项审批",
+        "《预算管理办法》第三条规定累计使用达年度预算1.0倍后原则上不得继续报销，超预算需专项审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": [
+    "R900001", "R900002", "R900003", "R900004", "R900005", "R900006",
+    "R900007", "R900008", "R900009", "R900010", "R900011", "R900012",
+    "R900013", "R900014", "R900015", "R900016", "R900017", "R900018",
+    "R900019", "R900020", "R900021"
+  ],
+  "submitted_record_ids": [
+    "R900001", "R900002", "R900003", "R900004", "R900006",
+    "R900007", "R900013", "R900014", "R900015", "R900016",
+    "R900017", "R900019"
+  ],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true,
+    "explanation": "R900005（招待3600元，在5000单次上限内无参与人数数据）、R900008/R900009（不同员工各自在600元限额内）、R900010/R900011（间隔8天超7日核查窗口）、R900012（年末费用在15天宽限内）、R900018（预算内）、R900020（有special_approval=1专项审批）、R900021（培训住宿480元在一类城市500元标准内）均不构成违规"
+  },
+  "reconciled_figures": {
+    "total_records": 21,
+    "anomalies_found": 9,
+    "records_with_anomaly": 12,
+    "records_without_anomaly": 9
+  },
+  "unresolved_items": []
+}

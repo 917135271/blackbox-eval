@@ -1,0 +1,123 @@
+{
+  "case_family": "retrieval_and_report",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "audit_report",
+  "criteria": [
+    {
+      "answer_evidence": "答案中写明“现行(2025)审批线(附件二)：AR-03: 10000元≤金额<50000元 → 部门总经理”。",
+      "id": "current-threshold",
+      "reason": "明确指出2025修订版现行部门总经理审批线为10000元，金额准确且版本清晰。",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中调用get_policy_doc获取03_authorization_management.md，返回附件二显示AR-03为10000元≤金额<50000元需部门总经理。"
+    },
+    {
+      "answer_evidence": "答案中写明“旧版(2022)审批线：单笔≥8000元 → 部门总经理审批”，并说明“2022版已被2025修订版废止”。",
+      "id": "old-threshold-status",
+      "reason": "正确指出2022版8000元审批线已废止，旧值与废止状态均明确。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中get_policy_doc返回02_expense_reimbursement_2022_deprecated.md，第二条提及8000元审批线，第四条声明不得作为现行审批依据。"
+    },
+    {
+      "answer_evidence": "答案中写明“2025修订版不再在正文列示审批金额，统一按《XX证券授权管理办法》(XX证综规〔2025〕丙号)附件二执行”。",
+      "id": "cross-reference",
+      "reason": "完整说明2025修订版报销办法通过授权管理办法附件二取得现行审批金额，制度关系清晰。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中get_policy_doc返回01_expense_reimbursement_2025.md，第五条明确审批权限统一按授权管理办法附件二执行。"
+    },
+    {
+      "answer_evidence": "答案中说明“区间[8000, 10000)：旧版要求部门总经理审批，现行仅需部门经理+财务复核……会将本区间内合规报销误判”及“审计建议……审批规则配置进行版本基线审查”。",
+      "id": "risk-explanation",
+      "reason": "具体解释了[8000,10000)和[30000,50000)区间的误判风险，并给出实证案例与版本校验建议，风险及建议均具体。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "答案按背景、新旧对比、误判风险、实证案例、建议结构化叙述，且submitted_json中anomaly_ids、record_ids与内容一致。",
+      "id": "report-shape",
+      "reason": "以审计说明形式提交，事实、规则、判断和建议一致，字段之间无冲突。",
+      "score": 5.0,
+      "source": "llm_judge",
+      "trace_evidence": "提交的anomaly_ids为VERSION_TRAP_DEPRECATED_APPROVAL_LINE，record_ids为R004233，与叙述中的版本陷阱和案例记录完全吻合。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "VERSION_TRAP_DEPRECATED_APPROVAL_LINE"
+    ],
+    "actual_record_ids": [
+      "R004233"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": false,
+      "expected_types": {},
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "citation_count": 6,
+    "elapsed_seconds": 129.736,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [
+      "VERSION_TRAP_DEPRECATED_APPROVAL_LINE"
+    ],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:25:58+08:00",
+  "group": "codex-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "候选答案准确识别并解释了旧版审批线导致的版本陷阱，所有评分项均获得满分，证据充分且表述符合审计说明形式。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2094,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1355
+      },
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 4528,
+      "prompt_tokens": 5680,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152
+      },
+      "total_tokens": 7774
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/codex-baseline/L3-010",
+  "task_id": "L3-010"
+}

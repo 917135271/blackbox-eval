@@ -1,0 +1,40 @@
+{
+  "audit_scope": {
+    "task_id": "DEV-008",
+    "audit_object": "超期报销及年末补充提交核对",
+    "period": "2025年度",
+    "organization": "全部部门",
+    "data_scope": "全量报销记录(21条)"
+  },
+  "verified_facts": [
+    "全库共21条报销记录,全部为approved状态",
+    "R900006: expense_date=2025-03-01, reimburse_date=2025-05-05, delay=65天, amount=200元, employee=E9001(开发员工甲), department=D901(开发审计一部), expense_type=communication, special_approval=0",
+    "R900012: expense_date=2025-12-20, reimburse_date=2026-01-10, delay=21天, 费用发生于年末(12月), 报销日期在次年1月15日前",
+    "R900021: expense_date=2025-12-02, reimburse_date=2025-12-08, delay=6天, 合规",
+    "其余18条记录延迟均在8天以内, 均未超过60天期限"
+  ],
+  "applicable_policies": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第七条", "description": "员工应在费用发生后60天内提交报销申请;超过期限的,原则上不得报销。"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第九条", "description": "会计年度末发生的费用,最迟可在财政年度结束后15天内补充提交,逾期按超期报销处理。"}
+  ],
+  "findings": [
+    {
+      "anomaly_id": "ANOM-001",
+      "record_ids": ["R900006"],
+      "finding": "R900006费用发生于2025年3月1日(非年末),报销日期为2025年5月5日,延迟65天,超过第七条规定的60天期限。该记录费用日期非会计年度末,不适用第九条年末补充提交豁免。无特殊审批(special_approval=0)。认定为超期报销违规。"
+    }
+  ],
+  "impact": "R900006涉及金额200元,属通讯费,违规程度较低。",
+  "recommendations": [
+    "对R900006补充说明延迟原因,按制度进行合规处理",
+    "加强报销时限提醒,确保员工在60天内提交报销"
+  ],
+  "anomaly_ids": ["ANOM-001"],
+  "record_ids": ["R900006"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第七条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第九条"}
+  ],
+  "answer": "扫描开发库全部21条报销记录,发现1条超期报销违规记录R900006(延迟65天,超过第七条规定的60天期限,且非年末费用不适用第九条豁免)。年末补充提交记录R900012(12月费用,次年1月10日报销)与R900021(12月费用,当月报销)经核对均符合第九条规定,无异常。",
+  "limitations": "无"
+}

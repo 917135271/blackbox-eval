@@ -1,0 +1,23 @@
+FROM debian:bookworm-slim
+
+RUN apt-get -o Acquire::Retries=5 update \
+    && apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+        ca-certificates \
+        git \
+        python3 \
+        ripgrep \
+        sqlite3 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN useradd --create-home --uid 1000 codex \
+    && mkdir -p /home/codex/.codex \
+    && chown -R codex:codex /home/codex
+
+COPY --chmod=0755 source-artifacts/codex /usr/local/bin/codex
+COPY model_catalog.deepseek.json /opt/codex-source/model_catalog.deepseek.json
+COPY vendor/codex/codex-rs/models-manager/prompt.md /opt/codex-source/base_instructions.md
+
+ENV HOME=/home/codex
+USER codex
+
+ENTRYPOINT ["codex"]

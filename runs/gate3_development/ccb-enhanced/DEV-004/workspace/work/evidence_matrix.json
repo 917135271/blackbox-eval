@@ -1,0 +1,39 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "DEV004-SPLIT-001",
+      "record_ids": ["R900003", "R900004"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "R900003: E9001开发员工甲, travel_transport, 2025-02-03, 5200元, 同一客户路演交通费第一笔, AR-02审批",
+        "R900004: E9001开发员工甲, travel_transport, 2025-02-06, 5200元, 同一客户路演交通费第二笔, AR-02审批",
+        "两笔记录同一员工、同一费用类型、同一事项（客户路演交通费），间隔3天（7天内）",
+        "合计金额10,400元，达到AR-03档位（≥10,000元），但实际仅经过AR-02（部门经理）审批",
+        "单笔分别控制在AR-02区间内（3,000-10,000），规避了AR-03部门总经理审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900003", "R900004"],
+  "submitted_record_ids": ["R900003", "R900004"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true
+  },
+  "reconciled_figures": {
+    "combined_amount": 10400,
+    "threshold_triggered": "AR-03",
+    "days_between": 3
+  },
+  "unresolved_items": []
+}

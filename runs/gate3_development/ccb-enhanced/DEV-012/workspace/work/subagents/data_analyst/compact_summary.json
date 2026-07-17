@@ -1,0 +1,62 @@
+{
+  "decision": "Audit DEV-012 found 10 violations across 5 rules involving 12 unique records and 2 departments. D901 has isolated over-standard and procedural issues; D902 exceeded its annual budget by 12%. Total anomaly records: 12 of 21 (57%).",
+  "key_findings": {
+    "duplicate_invoice": {
+      "result": "1 violation",
+      "detail": "Invoice FPDEV900001 (INV900001, 480 yuan) was submitted twice: R900001 (2025-01-05, first claim valid) and R900002 (2025-01-06, duplicate claim). Art.10 prohibits same invoice reimbursement more than once.",
+      "record_ids": ["R900001", "R900002"]
+    },
+    "split_claims": {
+      "result": "1 violation",
+      "detail": "E9001 submitted two travel_transport claims: R900003 (2025-02-03, 5200) and R900004 (2025-02-06, 5200), 3 days apart. Each at 5200 falls under AR-02 (3000-10000), but combined 10400 reaches AR-03 (10000-50000). This constitutes deliberate split to avoid higher approval tier under Art.11.",
+      "record_ids": ["R900003", "R900004"]
+    },
+    "over_standard": {
+      "result": "6 violations across 4 categories",
+      "detail": [
+        "office_supplies: R900007 (E9001, Apr 2025) 650 > 600/person/month cap (07_office_communication Art.2). Note: Jan R900001+R900002 share invoice FPDEV900001; after duplicate reconciliation Jan sum is 480, within standard.",
+        "communication: R900014 (180) + R900015 (160) = 340 for E9001 Sep 2025, exceeds 300/person/month (07_office_communication Art.3).",
+        "travel_lodging: R900013 (E9002 manager, tier1 city A, 2 nights, 1400 total = 700/night) exceeds 650/night for manager tier1 (04_travel Art.4).",
+        "training_fee: R900016 (E9001, 1 day, 850) exceeds 800/day internal training cap (05_training Art.3).",
+        "business_entertainment: R900005 (3600/10ppl = 360/person) exceeds 300/person cap (06_business_entertainment Art.3); R900017 (5200/event) exceeds 5000/event cap (Art.2)."
+      ],
+      "record_ids": ["R900005", "R900007", "R900013", "R900014", "R900015", "R900016", "R900017"]
+    },
+    "overdue": {
+      "result": "1 violation",
+      "detail": "R900006 (E9001, communication, expense 2025-03-01, reimbursed 2025-05-05, delay 65 days) exceeds 60-day limit (Art.7). R900012 (Dec expense, 21-day delay with 15-day Dec extension applied = 75-day threshold) is within limits (Art.7+Art.9).",
+      "record_ids": ["R900006"]
+    },
+    "over_budget": {
+      "result": "1 department violation, 0 anomaly records",
+      "detail": "D902 (开发审计二部) budget 50000, actual used 56000 (112%). R900018 (45000) pre-crossing; R900019 (6000) first crosses the budget at 51000; R900020 (5000) has special_approval=1 (valid exemption). Per instructions, all crossing records are approved or specially approved, so no unapproved anomaly records to flag. D901 (200000 budget, 36760 used, 18.38%) within budget.",
+      "record_ids": []
+    }
+  },
+  "record_ids": [
+    "R900001", "R900002", "R900003", "R900004", "R900005",
+    "R900006", "R900007", "R900013", "R900014", "R900015",
+    "R900016", "R900017"
+  ],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025", "clause_no": "Art.10"},
+    {"doc_id": "01_expense_reimbursement_2025", "clause_no": "Art.11"},
+    {"doc_id": "01_expense_reimbursement_2025", "clause_no": "Art.12"},
+    {"doc_id": "01_expense_reimbursement_2025", "clause_no": "Art.7"},
+    {"doc_id": "01_expense_reimbursement_2025", "clause_no": "Art.9"},
+    {"doc_id": "07_office_communication", "clause_no": "Art.2"},
+    {"doc_id": "07_office_communication", "clause_no": "Art.3"},
+    {"doc_id": "04_travel", "clause_no": "Art.4"},
+    {"doc_id": "05_training", "clause_no": "Art.3"},
+    {"doc_id": "05_training", "clause_no": "Art.5"},
+    {"doc_id": "06_business_entertainment", "clause_no": "Art.2-3"},
+    {"doc_id": "08_budget_management", "clause_no": "Art.3"}
+  ],
+  "unresolved_items": [
+    "D902 over-budget: all crossing records (R900018, R900019, R900020) are approved. Whether the approved budget exceedance itself requires remedial action beyond flagging is outside this subagent scope."
+  ],
+  "artifact_paths": [
+    "/workspace/work/subagents/data_analyst/batch_analysis.py",
+    "/workspace/work/subagents/data_analyst/analysis_results.json"
+  ]
+}

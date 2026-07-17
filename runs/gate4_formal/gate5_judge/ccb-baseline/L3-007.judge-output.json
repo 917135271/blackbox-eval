@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "threshold",
+      "score": 35,
+      "reason": "金额正确，边界清晰（≥10000且<50000元），符合AR-03部门总经理审批线。",
+      "answer_evidence": "“AR-03（≥10000且<50000元，部门总经理）”",
+      "trace_evidence": ""
+    },
+    {
+      "id": "two-hop-path",
+      "score": 30,
+      "reason": "明确说明从费用报销管理办法第五条交叉引用到授权管理办法附件二。",
+      "answer_evidence": "“XX证券费用报销管理办法(2025修订版)第五条未直接列示审批金额，统一按《XX证券授权管理办法》附件二执行。”",
+      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md → get_policy_doc 03_authorization_management.md"
+    },
+    {
+      "id": "citations",
+      "score": 20,
+      "reason": "有效引用了01_expense_reimbursement_2025.md和03_authorization_management.md两份制度。",
+      "answer_evidence": "citations中明确列出01和03文档",
+      "trace_evidence": ""
+    },
+    {
+      "id": "no-premature-stop",
+      "score": 10,
+      "reason": "轨迹显示在查阅2025版后发现引用授权管理办法，立即检索并获取附件二，未提前停止。",
+      "answer_evidence": "“经两跳检索发现...”",
+      "trace_evidence": "get_policy_doc 01 → get_policy_doc 03，并继续完成后续查询。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "R004207和R004208在轨迹中通过get_expense_detail可查，非虚构。"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未使用废止的2022版作为现行依据，结论依据2025版及附件二。"
+    }
+  ],
+  "overall_comment": "候选答案完整满足所有评分标准，审批金额正确，二跳路径清晰，双文档证据有效，检索过程未提前终止。",
+  "confidence": 1.0
+}

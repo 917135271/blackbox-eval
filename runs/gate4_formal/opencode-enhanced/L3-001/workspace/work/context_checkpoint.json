@@ -1,0 +1,189 @@
+{
+  "artifact_paths": [
+    "final_submission.json",
+    "submission_receipt.json",
+    "traces/context_events.jsonl",
+    "traces/events.jsonl",
+    "traces/subagents.jsonl",
+    "traces/tool_calls.jsonl",
+    "work/artifact_index.json",
+    "work/audit_plan.json",
+    "work/context_checkpoint.json",
+    "work/decision_log.jsonl",
+    "work/evidence_index.json",
+    "work/evidence_matrix.json",
+    "work/final_result.json",
+    "work/report_draft.json",
+    "work/subagents/data_analyst/analysis.json",
+    "work/task_state.json",
+    "work/validation_report.json"
+  ],
+  "compacted": false,
+  "context_usage_percent": 0.0,
+  "created_at": 1784206804.7553554,
+  "estimation_method": "outer_runner_finalization",
+  "retained_state": {
+    "applicable_policies": [
+      "01_expense_reimbursement_2025.md"
+    ],
+    "artifact_index": [
+      "final_submission.json",
+      "submission_receipt.json",
+      "traces/context_events.jsonl",
+      "traces/events.jsonl",
+      "traces/subagents.jsonl",
+      "traces/tool_calls.jsonl",
+      "work/artifact_index.json",
+      "work/audit_plan.json",
+      "work/context_checkpoint.json",
+      "work/decision_log.jsonl",
+      "work/evidence_index.json",
+      "work/evidence_matrix.json",
+      "work/final_result.json",
+      "work/report_draft.json",
+      "work/subagents/data_analyst/analysis.json",
+      "work/task_state.json",
+      "work/validation_report.json"
+    ],
+    "audit_plan": {
+      "applicable_policy": {
+        "applicable_clause": "第十条",
+        "citation": {
+          "clause_no": "第十条",
+          "doc_id": "01_expense_reimbursement_2025.md"
+        },
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "rule_text": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。",
+        "title": "XX证券费用报销管理办法(2025修订版)"
+      },
+      "artifact_requirements": {
+        "audit_plan": "work/audit_plan.json",
+        "evidence_matrix": "work/evidence_matrix.json",
+        "final_result": "work/final_result.json",
+        "validation_report": "work/validation_report.json"
+      },
+      "audit_period": {
+        "end": "2025-12-31",
+        "policy_effective_date": "2025-01-01",
+        "start": "2025-01-01"
+      },
+      "complexity": 2,
+      "complexity_reasons": [
+        "批量聚合/分组/连接（按invoice分组，跨全年纪录连接）：+1",
+        "综合审计报告交付物：+1",
+        "单一规则（第十条），无政策版本冲突，无多政策，无阈值模糊",
+        "总计：2"
+      ],
+      "data_questions": [
+        {
+          "id": "DQ-1",
+          "method": "使用 find_reused_invoices 获取重复发票列表，再用 find_invoice_usage 或 get_expense_detail 获取关联记录",
+          "question": "全年所有被重复使用的发票及其关联的报销记录",
+          "required_fields": [
+            "invoice_no",
+            "record_id",
+            "expense_date",
+            "amount",
+            "employee_id",
+            "department_id",
+            "status"
+          ]
+        }
+      ],
+      "execution_steps": [
+        {
+          "action": "确认第十条适用性，2025年政策生效日期，无政策版本冲突",
+          "name": "Policy Research",
+          "status": "completed",
+          "step": 1
+        },
+        {
+          "action": "批量查询所有 reused invoices (usage_count >= 2)，获取所有关联报销记录",
+          "name": "Data Analysis - Batch",
+          "reason_code": "AGGREGATION_REQUIRED",
+          "step": 2,
+          "subagent": "data_analyst"
+        },
+        {
+          "action": "运行 evidence-coverage-check 确保证据覆盖完整",
+          "name": "Evidence Coverage Check",
+          "step": 3
+        },
+        {
+          "action": "检查是否有豁免或例外情况",
+          "name": "False Positive Review",
+          "step": 4
+        },
+        {
+          "action": "生成审计报告",
+          "name": "Audit Report",
+          "step": 5
+        },
+        {
+          "action": "运行 result-validator 和 validate_audit_result，通过后提交",
+          "name": "Validation and Submission",
+          "step": 6
+        }
+      ],
+      "policy_questions": [
+        {
+          "boundary": "发票使用次数 >= 2",
+          "id": "PQ-1",
+          "question": "哪些发票在全年报销记录中被使用了超过1次（即同一invoice_no出现在不同record_id中）？",
+          "rule": "第十条：同一发票最多报销1次"
+        }
+      ],
+      "stopping_conditions": [
+        "所有 reused invoices 已检索完毕",
+        "所有关联报销记录已查明",
+        "证据矩阵覆盖率达到100%",
+        "无更多需要核查的发票"
+      ],
+      "subagent_plan": {
+        "reason_code": "AGGREGATION_REQUIRED",
+        "role": "data_analyst",
+        "task": "查询全年所有重复使用的发票（usage_count >= 2）及其关联的所有报销记录详情，按发票分组输出"
+      },
+      "tables_and_fields": [
+        "invoices: invoice_no, amount, usage_count, linked_record_ids",
+        "expenses: record_id, expense_date, amount, status, employee_id, department_id, expense_type, invoice_no"
+      ],
+      "task_scope": {
+        "audit_object": "重复报销 (Duplicate Reimbursement)",
+        "question": "对全年数据做重复报销专项扫描，返回全部异常ID和记录ID集合",
+        "task_id": "L3-001",
+        "type": "full_year_rule_audit"
+      }
+    },
+    "constraints": [
+      "isolated GATE3 workspace",
+      "formal answer assets prohibited",
+      "outer runner timeout enforced"
+    ],
+    "evidence_status": "pass",
+    "record_ids": [
+      "R000002",
+      "R004201",
+      "R000005",
+      "R004202",
+      "R000020",
+      "R004203",
+      "R000028",
+      "R004204",
+      "R000037",
+      "R004205",
+      "R000055",
+      "R004206"
+    ],
+    "remaining_budget": {
+      "elapsed_seconds": 256.042,
+      "remaining_seconds": 643.958,
+      "timeout_seconds": 900
+    },
+    "submission_status": "accepted",
+    "task": "你正在执行 GATE4 正式证券费用审计评测，当前为领域增强组。\n\n任务ID：L3-001\n题型：full_year_rule_audit\n问题：请对全年数据做重复报销专项扫描,返回全部异常ID和记录ID集合。\n\n必须遵循已安装的证券费用审计 Skills；先规划并记录Checkpoint，再按触发条件调查、复核、校验并通过统一工具提交。若复杂度至少为2且存在符合路由规则的角色，必须先授权原生子智能体，并在角色结束后登记结构化摘要和产物。\n\n\n要求：\n1. 必须查询制度和只读业务库后作答，可以使用 Shell、Python、SQLite 和当前工作区临时文件。\n2. 只处理当前独立任务。禁止读取 ground_truth、cases.json、Rubric、判卷代码、历史答案、其他任务或候选轨迹，也不得访问与题目无关的互联网。\n3. anomaly_ids 必须与审计发现一一对应、稳定且类型明确；不得为了迎合未知答案猜测隐藏编号。record_ids 必须完整、准确且只覆盖本题范围。\n4. 有异常时，record_ids 只包含参与本题所问违规的记录，不含累计计算背景、有效豁免或无关规则记录；无异常时仍保留题目直接核查或结论覆盖的记录，并在 answer 中明确写“无异常”。\n5. 必须维护 work/final_result.json、work/evidence_matrix.json 和 work/validation_report.json 三个预置文件。对应Schema的绝对路径分别是 /runtime-schemas/final_result.schema.json、/runtime-schemas/evidence_matrix.schema.json 和 /runtime-schemas/validation_report.schema.json；当前工作区兼容路径分别是 /workspace/runtime-schemas/final_result.schema.json、/workspace/runtime-schemas/evidence_matrix.schema.json 和 /workspace/runtime-schemas/validation_report.schema.json。当前目录已经是 /workspace，禁止拼成 /workspace/workspace，也禁止把 .schema.json 猜成普通 .json。\n6. 先调用 audit_control.validate_audit_result；取得 valid=true 后，再以 result_path=\"work/final_result.json\" 调用 audit_control.submit_audit_result。不得把完整结果直接打印出来代替提交。\n7. 提交成功后最终只输出 GATE4_TASK_PASS；无法提交时只输出 GATE4_TASK_FAIL。\n",
+    "unresolved_items": []
+  },
+  "stage": "submission_ready",
+  "task_id": "L3-001"
+}

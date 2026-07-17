@@ -1,0 +1,45 @@
+{
+  "audit_scope": {
+    "task_id": "DEV-011",
+    "object": "D902开发审计二部年度预算执行",
+    "period": "2025年度",
+    "organization": "D902开发审计二部",
+    "data_scope": "D902部门全部已批准（approved）报销记录",
+    "record_count": 3
+  },
+  "verified_facts": [
+    "D902开发审计二部年度预算为50,000.00元",
+    "共3笔已批准报销记录，均为E9003（开发员工丙）提交，总金额56,000.00元",
+    "按expense_date排序：R900018（2025-01-15，45,000元），R900019（2025-02-15，6,000元），R900020（2025-03-15，5,000元）",
+    "累计金额：R900018后45,000元（90%），R900019后51,000元（102%），R900020后56,000元（112%）",
+    "R900019 special_approval=false，仅有AR-02部门经理审批，无专项审批",
+    "R900020 special_approval=true，有专项审批豁免，不在违规范围内"
+  ],
+  "applicable_policies": [
+    {"doc_id": "08_budget_management.md", "clause": "第二条", "content": "各部门应在年度预算额度内发生费用"},
+    {"doc_id": "08_budget_management.md", "clause": "第三条", "content": "部门费用累计使用达到年度预算额度的1.0倍后,原则上不得继续报销"},
+    {"doc_id": "08_budget_management.md", "clause": "第四条", "content": "因监管要求、客户服务或经营连续性确需超预算支出的,应履行专项审批"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause": "第十三条", "content": "预算使用达到预算额度的1.0倍后,确需发生的费用应履行专项审批"}
+  ],
+  "findings": [
+    {
+      "anomaly_id": "ANOM-D902-001",
+      "record_ids": ["R900019"],
+      "description": "R900019为首次导致D902部门累计支出（51,000元）超过年度预算（50,000元）的报销记录，且未履行专项审批（special_approval=false），违反预算管理办法及费用报销管理办法相关条款",
+      "impact": "无专项审批超预算报销6,000元，累计超支1,000元",
+      "threshold": "预算额度50,000元的1.0倍=50,000元",
+      "observed": "R900019报销后累计51,000元（102%）"
+    }
+  ],
+  "recommendations": ["补办R900019的专项审批手续，或收回超预算部分"],
+  "anomaly_ids": ["ANOM-D902-001"],
+  "record_ids": ["R900019"],
+  "citations": [
+    {"doc_id": "08_budget_management.md", "clause_no": "第二条"},
+    {"doc_id": "08_budget_management.md", "clause_no": "第三条"},
+    {"doc_id": "08_budget_management.md", "clause_no": "第四条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"}
+  ],
+  "answer": "D902开发审计二部年度预算50,000.00元，共3笔已批准报销记录。按expense_date排序计算累计金额：R900018（2025-01-15，45,000元）后累计45,000元（90%），未超预算；R900019（2025-02-15，6,000元）后累计51,000元（102%），首次超出预算额度；R900020（2025-03-15，5,000元）后累计56,000元（112%），但special_approval=true，有专项审批豁免。R900019的special_approval=false，无专项审批，是首次导致预算超限且没有专项审批的报销记录，违反《XX证券预算管理办法》第二、三、四条及《XX证券费用报销管理办法(2025修订版)》第十三条。",
+  "limitations": []
+}

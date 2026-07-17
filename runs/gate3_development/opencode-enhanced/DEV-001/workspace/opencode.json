@@ -1,0 +1,100 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "autoupdate": false,
+  "model": "deepseek/deepseek-v4-pro",
+  "enabled_providers": [
+    "deepseek"
+  ],
+  "provider": {
+    "deepseek": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "DeepSeek",
+      "options": {
+        "baseURL": "https://api.deepseek.com",
+        "apiKey": "{env:LLM_API_KEY}"
+      },
+      "models": {
+        "deepseek-v4-pro": {
+          "name": "deepseek-v4-pro"
+        }
+      }
+    }
+  },
+  "instructions": [
+    "AGENTS.md"
+  ],
+  "permission": {
+    "*": "allow",
+    "webfetch": "deny",
+    "websearch": "deny",
+    "task": {
+      "*": "deny",
+      "policy-researcher": "allow",
+      "data-analyst": "allow",
+      "independent-reviewer": "allow"
+    }
+  },
+  "mcp": {
+    "policy_query": {
+      "type": "local",
+      "command": [
+        "python3",
+        "/benchmark/fixtures/policy_query_mcp.py"
+      ],
+      "enabled": true,
+      "env": {
+        "EVAL_POLICY_CORPUS_DIR": "/benchmark/data/corpus",
+        "EVAL_TASK_LOG": "/artifacts/tool_calls.jsonl",
+        "PYTHONIOENCODING": "utf-8"
+      }
+    },
+    "expense_query": {
+      "type": "local",
+      "command": [
+        "python3",
+        "/benchmark/fixtures/expense_query_mcp.py"
+      ],
+      "enabled": true,
+      "env": {
+        "EVAL_EXPENSE_DB": "/benchmark/data/expense.db",
+        "EVAL_TASK_LOG": "/artifacts/tool_calls.jsonl",
+        "PYTHONIOENCODING": "utf-8"
+      }
+    },
+    "audit_control": {
+      "type": "local",
+      "command": [
+        "python3",
+        "/plugin/shared/control-mcp/audit_control_mcp.py"
+      ],
+      "enabled": true,
+      "env": {
+        "AUDIT_TASK_ID": "DEV-001",
+        "AUDIT_WORK_DIR": "/workspace",
+        "AUDIT_SUBAGENTS_ENABLED": "1",
+        "AUDIT_FRAMEWORK": "opencode",
+        "AUDIT_EXPERIMENT_GROUP": "opencode-enhanced",
+        "EVAL_EXPENSE_DB": "/benchmark/data/expense.db",
+        "EVAL_POLICY_CORPUS_DIR": "/benchmark/data/corpus",
+        "PYTHONIOENCODING": "utf-8"
+      }
+    }
+  },
+  "agent": {
+    "policy-researcher": {
+      "description": "Resolve applicable policy versions, conflicts, exceptions, and clauses.",
+      "mode": "subagent",
+      "prompt": "{file:./.opencode/agents/policy-researcher.md}"
+    },
+    "data-analyst": {
+      "description": "Execute complete read-only SQLite and Python expense analysis.",
+      "mode": "subagent",
+      "prompt": "{file:./.opencode/agents/data-analyst.md}"
+    },
+    "independent-reviewer": {
+      "description": "Challenge findings for exceptions, boundaries, omissions, and false positives.",
+      "mode": "subagent",
+      "prompt": "{file:./.opencode/agents/independent-reviewer.md}"
+    }
+  }
+}

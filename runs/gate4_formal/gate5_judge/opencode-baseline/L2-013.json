@@ -1,0 +1,135 @@
+{
+  "case_family": "record_audit",
+  "case_score": 85.0,
+  "case_score_raw": 85.0,
+  "category": "policy_data_comparison",
+  "criteria": [
+    {
+      "answer_evidence": "R004223为培训费报销，金额3700.00元...违反...无专项审批...",
+      "id": "audit-conclusion",
+      "reason": "结论正确识别为超标准异常，异常类型明确。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "anomaly_ids: [\"ANOM-L2-013-001\"]",
+      "id": "anomaly-id",
+      "reason": "返回的异常ID为ANOM-L2-013-001，与预期的OVERSTD-003不符。",
+      "score": 0.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "",
+      "id": "record-set",
+      "reason": "record_ids集合F1=1.000",
+      "score": 25.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    },
+    {
+      "answer_evidence": "违反《XX证券费用报销管理办法(2025修订版)》第十二条...",
+      "id": "policy-basis",
+      "reason": "引用了《费用报销管理办法》第十二条（对应规则6.3）并说明适用性，条款有效。",
+      "score": 15.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "R004223...培训费...金额3700.00元...超出...3500元标准...",
+      "id": "case-reasoning",
+      "reason": "明确列出费用类型training_fee、金额3700元、标准3500元，推理完整。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有record_id均来自数据库，无虚构记录。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "ANOM-L2-013-001"
+    ],
+    "actual_record_ids": [
+      "R004223"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {
+        "OVERSTD": 1
+      },
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "citation_count": 2,
+    "elapsed_seconds": 160.086,
+    "expected_anomaly_ids": [
+      "OVERSTD-003"
+    ],
+    "expected_record_ids": [
+      "R004223"
+    ],
+    "record_metrics": {
+      "exact": true,
+      "extra_count": 0,
+      "f1": 1.0,
+      "missing_count": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "required_citations": [
+      "clause:费用报销管理办法-6.3"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T23:26:28+08:00",
+  "group": "opencode-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 0.95,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "结论正确，推理完整，制度依据准确，但异常ID命名与预期不符导致该项失分。",
+    "shape_attempt": 1,
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1672,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1297
+      },
+      "prompt_cache_hit_tokens": 512,
+      "prompt_cache_miss_tokens": 1484,
+      "prompt_tokens": 1996,
+      "prompt_tokens_details": {
+        "cached_tokens": 512
+      },
+      "total_tokens": 3668
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/opencode-baseline/L2-013",
+  "task_id": "L2-013"
+}

@@ -1,0 +1,77 @@
+{
+  "audit_scope": {
+    "task_id": "DEV-007",
+    "object": "个人办公用品(office_supplies)和通讯费(communication)月度标准执行情况",
+    "period": "2025-01-01 至 2025-12-31",
+    "organization": "开发数据库全部部门",
+    "data_scope": "全部office_supplies和communication类型报销记录共8条，涉及2名员工",
+    "excluded_types": ["travel_transport", "travel_lodging", "business_entertainment", "training_fee", "training_lodging", "other"]
+  },
+  "verified_facts": [
+    "开发库中共有office_supplies记录5条(R900001,R900002,R900007,R900008,R900009)，communication记录3条(R900006,R900014,R900015)",
+    "按员工和自然月聚合后形成6个员工-月份组合",
+    "开发员工甲(E9001)2025年1月办公用品合计960元(标准600元)",
+    "开发员工甲(E9001)2025年4月办公用品合计650元(标准600元)",
+    "开发员工甲(E9001)2025年9月通讯费合计340元(标准300元)",
+    "开发员工甲(E9001)2025年3月通讯费200元、5月办公用品590元均在标准内",
+    "开发经理乙(E9002)2025年5月办公用品590元在标准内",
+    "全部5条违规记录special_approval均为0，无专项审批豁免"
+  ],
+  "applicable_policies": [
+    {"doc_id": "07_office_communication.md", "title": "XX证券办公与通讯费用管理办法", "clause_no": "第二条", "rule": "员工个人办公用品报销按月控制，每人每月不超过600元"},
+    {"doc_id": "07_office_communication.md", "title": "XX证券办公与通讯费用管理办法", "clause_no": "第三条", "rule": "员工通讯费用报销按月控制，每人每月不超过300元"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "title": "XX证券费用报销管理办法(2025修订版)", "clause_no": "第十二条", "rule": "无专项审批时，报销金额不得超过对应制度标准的1.0倍"}
+  ],
+  "findings": [
+    {
+      "anomaly_id": "DEV-007-A1",
+      "description": "开发员工甲2025年1月办公用品超标",
+      "employee": "E9001 开发员工甲",
+      "month": "2025-01",
+      "expense_type": "office_supplies",
+      "records": ["R900001", "R900002"],
+      "total_amount": 960.0,
+      "standard": 600.0,
+      "excess": 360.0,
+      "policy_basis": ["07_office_communication.md 第二条", "01_expense_reimbursement_2025.md 第十二条"],
+      "special_approval": false
+    },
+    {
+      "anomaly_id": "DEV-007-A2",
+      "description": "开发员工甲2025年4月办公用品超标",
+      "employee": "E9001 开发员工甲",
+      "month": "2025-04",
+      "expense_type": "office_supplies",
+      "records": ["R900007"],
+      "total_amount": 650.0,
+      "standard": 600.0,
+      "excess": 50.0,
+      "policy_basis": ["07_office_communication.md 第二条", "01_expense_reimbursement_2025.md 第十二条"],
+      "special_approval": false
+    },
+    {
+      "anomaly_id": "DEV-007-A3",
+      "description": "开发员工甲2025年9月通讯费超标",
+      "employee": "E9001 开发员工甲",
+      "month": "2025-09",
+      "expense_type": "communication",
+      "records": ["R900014", "R900015"],
+      "total_amount": 340.0,
+      "standard": 300.0,
+      "excess": 40.0,
+      "policy_basis": ["07_office_communication.md 第三条", "01_expense_reimbursement_2025.md 第十二条"],
+      "special_approval": false
+    }
+  ],
+  "impact": "3项超标涉及同一员工(开发员工甲)3个不同月份，合计超额450元。其中1月办公用品超额360元(60%)最为显著。",
+  "recommendations": "建议对超标记录进行财务复核，确认是否存在合理事由或补办专项审批；同时关注R900001与R900002共用同一发票FPDEV900001的情况。",
+  "anomaly_ids": ["DEV-007-A1", "DEV-007-A2", "DEV-007-A3"],
+  "record_ids": ["R900001", "R900002", "R900007", "R900014", "R900015"],
+  "citations": [
+    {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+    {"doc_id": "07_office_communication.md", "clause_no": "第三条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+  ],
+  "answer_text": "扫描开发库中全部个人办公用品(office_supplies)和通讯费(communication)记录共8条，按员工和自然月聚合后得到6个员工-月份组合。发现3项超标准异常：DEV-007-A1：开发员工甲(E9001)2025年1月办公用品合计960元(R900001:480元+R900002:480元)，超出月度标准600元，超额360元；DEV-007-A2：开发员工甲(E9001)2025年4月办公用品合计650元(R900007)，超出月度标准600元，超额50元；DEV-007-A3：开发员工甲(E9001)2025年9月通讯费合计340元(R900014:180元+R900015:160元)，超出月度标准300元，超额40元。以上三项均无专项审批豁免(special_approval=0)，违反《XX证券办公与通讯费用管理办法》第二条、第三条及《XX证券费用报销管理办法(2025修订版)》第十二条。其余员工-月份组合均在标准范围内。",
+  "limitations": []
+}

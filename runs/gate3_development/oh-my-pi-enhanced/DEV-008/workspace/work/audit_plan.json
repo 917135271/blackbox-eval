@@ -1,0 +1,81 @@
+{
+  "task_id": "DEV-008",
+  "task_type": "batch_analysis",
+  "task_question": "扫描开发库中的超期报销，返回全部异常记录，并对年末补充提交记录进行核对。",
+  "audit_object": "全部报销记录的超期合规性",
+  "audit_period": {
+    "fiscal_year": 2025,
+    "fiscal_year_end": "2025-12-31",
+    "year_end_grace_end": "2026-01-15",
+    "policy_effective_date": "2025-01-01"
+  },
+  "policy_questions": [
+    {
+      "rule": "Article 7",
+      "description": "员工应在费用发生后60天内提交报销申请;超过期限的,原则上不得报销。",
+      "condition": "reimburse_date - expense_date > 60 days",
+      "exemptions": []
+    },
+    {
+      "rule": "Article 9",
+      "description": "会计年度末发生的费用,最迟可在财政年度结束后15天内补充提交,逾期按超期报销处理。",
+      "condition": "Year-end expenses: reimburse_date > 2026-01-15 → overdue",
+      "exemptions": ["Year-end expense with reimburse_date <= 2026-01-15 is exempt from Article 7"],
+      "year_end_definition": "Expenses in December 2025 (会计年度末)"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "Identify all records where expense_date to reimburse_date exceeds 60 days",
+      "fields": ["record_id", "expense_date", "reimburse_date", "amount", "expense_type", "employee_id", "department_id", "status"]
+    },
+    {
+      "question": "For records with delay > 60 days, check if expense is year-end (Dec 2025) and reimburse_date <= 2026-01-15",
+      "fields": ["record_id", "expense_date", "reimburse_date"]
+    },
+    {
+      "question": "Identify year-end expenses (Dec 2025) submitted after 2026-01-15 that violate Article 9",
+      "fields": ["record_id", "expense_date", "reimburse_date"]
+    }
+  ],
+  "required_fields": ["record_id", "expense_date", "reimburse_date", "amount", "expense_type", "employee_id", "department_id", "status", "invoice_no"],
+  "evidence_requirements": [
+    "For each anomaly: record_id, expense_date, reimburse_date, delay_days, rule violated",
+    "Year-end exclusion verification: records with expense in Dec 2025 AND reimburse_date <= 2026-01-15 → exempt"
+  ],
+  "execution_steps": [
+    "1. Write audit plan and checkpoint (planning_completed)",
+    "2. Authorize and invoke data_analyst native subagent for full data scan",
+    "3. Main agent reviews year-end exclusion logic (Article 9) against data_analyst results",
+    "4. Form preliminary findings",
+    "5. Run evidence-coverage-check",
+    "6. Run false-positive-review",
+    "7. Run audit-report",
+    "8. Run result-validator",
+    "9. Submit via audit_control.submit_audit_result"
+  ],
+  "complexity": 3,
+  "complexity_reasons": [
+    "Two business rules (Articles 7 and 9) require combined logic",
+    "Aggregation and batch filtering across all records",
+    "Date thresholds and year-end exemption boundary"
+  ],
+  "subagent_plan": {
+    "data_analyst": {
+      "role": "data_analyst",
+      "reason_code": "DATE_AMOUNT_BOUNDARY",
+      "task": "Scan all reimbursement records for overdue claims. For each record, compute delay = reimburse_date - expense_date. A record is overdue if: (1) delay > 60 days AND the expense is NOT a year-end expense exempted under Article 9; OR (2) the expense is year-end (December 2025) AND reimburse_date > 2026-01-15. Return all overdue records with fields: record_id, expense_date, reimburse_date, delay_days, amount, expense_type, employee_id, department_id, status. Also provide: total record count, overdue count, year-end exempted count, and the list of year-end exempted records for main agent verification.",
+      "artifact_paths": ["work/audit_plan.json"]
+    }
+  },
+  "stopping_conditions": [
+    "All reimbursement records scanned",
+    "Overdue records identified per Articles 7 and 9",
+    "Year-end exclusion correctly applied",
+    "Evidence matrix passes at 100%",
+    "Validation passes with valid=true"
+  ],
+  "unresolved_items": [
+    "Exact definition of '会计年度末发生的费用' — assumes December 2025 expenses"
+  ]
+}

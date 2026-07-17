@@ -1,0 +1,79 @@
+{
+  "task_id": "L3-007",
+  "task_type": "two_hop_retrieval",
+  "question": "报销办法没有直接列审批金额时,请通过交叉引用找到单笔费用审批档位",
+  "scope": {
+    "audit_period": "2025-01-01 onwards",
+    "policies_in_scope": ["01_expense_reimbursement_2025.md", "03_authorization_management.md"],
+    "expense_types": "all",
+    "organization": "XX证券全部门"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-1",
+      "question": "报销办法正文是否直接列示了审批金额？",
+      "expected": "否 - 第五条规定不在正文列示,统一按授权管理办法附件二执行"
+    },
+    {
+      "id": "PQ-2",
+      "question": "授权管理办法附件二的审批档位和金额区间是什么？",
+      "expected": "AR-01到AR-05共五档,分别对应不同金额区间和审批角色"
+    },
+    {
+      "id": "PQ-3",
+      "question": "AR-02档位需要哪些审批角色？",
+      "expected": "部门经理 + 财务复核"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-1",
+      "question": "各费用记录的审批档位(tier_id)是否与金额匹配？",
+      "expected": "应匹配AR-01(0-3000)、AR-02(3000-10000)等"
+    },
+    {
+      "id": "DQ-2",
+      "question": "AR-02档位记录是否具有完整的审批(部门经理+财务复核)？",
+      "expected": "应有两条审批记录"
+    }
+  ],
+  "required_fields": ["record_id", "amount", "tier_id", "approver_role", "approval_status"],
+  "evidence_requirements": [
+    "报销办法2025第五条原文(交叉引用)",
+    "授权管理办法附件二原文(审批档位表)",
+    "缺失财务复核的AR-02记录详情"
+  ],
+  "execution_steps": [
+    "1. 读取报销办法2025第五条确认交叉引用",
+    "2. 读取授权管理办法附件二获取审批档位表",
+    "3. 查询AR-02区间(>=3000且<10000)的报销记录",
+    "4. 核查AR-02记录的审批链是否包含财务复核",
+    "5. 统计缺失财务复核的记录",
+    "6. 证据覆盖校验",
+    "7. 生成审计报告并提交"
+  ],
+  "complexity": 3,
+  "complexity_reasons": [
+    "涉及两个制度文档的交叉引用",
+    "需要按金额区间聚合分组筛选",
+    "涉及审批缺失阈值边界判定(>=3000)",
+    "政策引用链: 报销办法→授权管理办法附件二"
+  ],
+  "subagent_plan": {
+    "planned": true,
+    "role": "data_analyst",
+    "reason_code": "AGGREGATION_REQUIRED",
+    "question": "统计2025年度金额>=3000元且<10000元的所有已批准报销记录中,哪些缺少财务复核审批角色",
+    "context": {
+      "policy": "授权管理办法附件二AR-02档位(>=3000且<10000)需部门经理+财务复核双审批",
+      "expected_check": "验证每笔AR-02记录的审批链是否同时包含部门经理和财务复核"
+    }
+  },
+  "stopping_conditions": [
+    "明确交叉引用关系(报销办法第五条→授权管理办法附件二)",
+    "获取完整审批档位表",
+    "明确AR-02档位缺失财务复核的记录清单",
+    "证据覆盖率100%"
+  ],
+  "unresolved_items": []
+}

@@ -1,0 +1,34 @@
+{
+  "criteria": [
+    {
+      "id": "audit-conclusion",
+      "score": 20,
+      "reason": "结论正确，识别为拆分报销异常，异常类型为SPLIT。",
+      "answer_evidence": "answer中明确“发现拆分报销异常”、“构成拆分规避审批”，anomaly_ids包含SPLIT类型。",
+      "trace_evidence": "tool调用分析两笔记录并引用制度第十一条，确认拆分行为。"
+    },
+    {
+      "id": "policy-basis",
+      "score": 15,
+      "reason": "引用费用报销管理办法第十一条（对应6.2）和授权管理办法附件二，条款有效且直接支持结论。",
+      "answer_evidence": "citations中引用了第十一条和附件二，answer中说明违反第十一条。",
+      "trace_evidence": "get_policy_excerpt获取第十一条内容，get_policy_doc获取附件二审批线。"
+    },
+    {
+      "id": "case-reasoning",
+      "score": 20,
+      "reason": "准确陈述两笔报销金额5100元，间隔5天（7天内），合计10200元，达到AR-03审批线，数据完整。",
+      "answer_evidence": "answer中“金额均为5100元”、“间隔仅5天”、“合计金额10200元已达到AR-03审批线”。",
+      "trace_evidence": "get_expense_detail返回R004212和R004213的金额均为5100元，expense_date分别为2025-04-10和2025-04-15，间隔5天；get_policy_doc显示AR-03线为≥10000元。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的record_ids均存在于数据库，且与核心结论直接相关。"
+    }
+  ],
+  "overall_comment": "候选答案正确识别了拆分报销异常，制度依据充分，推理清晰，数据准确。",
+  "confidence": 1.0
+}

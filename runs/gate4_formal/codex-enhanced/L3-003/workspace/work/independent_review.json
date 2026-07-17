@@ -1,0 +1,22 @@
+{
+  "decision": "pass",
+  "challenged_findings": [],
+  "supporting_evidence": [
+    "R004225: D1级别/A类城市, 900÷1=900 > 850, 确认违规",
+    "R004226: C类城市, 92÷1=92 > 80, 确认违规",
+    "R004224: 700÷2=350 > 300, 确认违规",
+    "R9 114组: 全部按employee_id×月GROUP BY, 已去重发票, sum>600且全组special_approval=false",
+    "R10 132组: 同上, sum>300且全组special_approval=false",
+    "R11 6条: 每部门首个未审批超标记录, 已按reimburse_date排序验证累计值"
+  ],
+  "opposing_evidence": [],
+  "exceptions_or_boundaries": [
+    "R10 E0018 Jul 2025: excess仅0.17元(300.17 vs 300), 但规则明确>300即违规, 无豁免条款",
+    "R9 E0056 Nov 2025: excess仅7.94元(607.94 vs 600), 但规则明确>600即违规",
+    "R10 E0044 Nov 2025: excess仅2.43元(302.43 vs 300), 无豁免依据",
+    "发现2张重复发票(FP202500000028用于R000028和R004204, FP202500000002用于R004201和R000002), 已在月度聚合中去重处理, 不纳入异常但属于policy clause 10风险"
+  ],
+  "required_changes": [],
+  "rationale": "所有边界案例虽接近阈值但规则无豁免空间; training_fee R3-R6因数据缺失无法判定但不影响其他规则; R9/R10边界案例确认违规; 重复发票已在聚合中正确处理; 所有11条规则已完整扫描",
+  "unresolved_conflicts": []
+}

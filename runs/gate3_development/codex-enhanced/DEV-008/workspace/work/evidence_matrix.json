@@ -1,0 +1,57 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "OVERDUE-001",
+      "record_ids": ["R900006"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第七条"}
+      ],
+      "facts": [
+        "Record R900006: expense_date=2025-03-01, reimburse_date=2025-05-05, gap=65 days",
+        "Article 7 requires submission within 60 days of expense; 65 days exceeds this limit",
+        "Record has special_approval=0, no exemption applies",
+        "Approved by department manager E9002 on 2025-05-05, amount ¥200, expense_type=communication"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": [
+    "R900001","R900002","R900003","R900004","R900005","R900006",
+    "R900007","R900008","R900009","R900010","R900011","R900012",
+    "R900013","R900014","R900015","R900016","R900017","R900018",
+    "R900019","R900020","R900021"
+  ],
+  "submitted_record_ids": ["R900006"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第九条"}
+  ],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true,
+    "searched_population": "21 records in expense_records table",
+    "query_conditions": "Article 7: non-December records with gap_days > 60; Article 9: December records with reimburse_date > next-year Jan 15",
+    "checked_rules": ["Article 7 (60-day rule)", "Article 9 (year-end supplementary deadline)"],
+    "population_count": 21,
+    "year_end_verification": {
+      "R900012": "expense_date=2025-12-20, reimburse_date=2026-01-10, deadline=2026-01-15, status=valid",
+      "R900021": "expense_date=2025-12-02, reimburse_date=2025-12-08, deadline=2026-01-15, status=valid"
+    },
+    "conclusion_2022_policy": "2022 version repealed effective 2025-01-01, not applicable"
+  },
+  "reconciled_figures": {
+    "total_scanned": 21,
+    "article7_candidates": 1,
+    "article7_confirmed_overdue": 1,
+    "article9_candidates": 2,
+    "article9_overdue": 0,
+    "special_approval_records": 1,
+    "overdue_with_special_approval": 0
+  },
+  "unresolved_items": []
+}

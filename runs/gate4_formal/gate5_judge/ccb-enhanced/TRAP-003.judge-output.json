@@ -1,0 +1,46 @@
+{
+  "criteria": [
+    {
+      "id": "clean-conclusion",
+      "score": 30,
+      "reason": "候选明确判断无异常，anomaly_ids为空，答案结论与预期一致，无矛盾表述。",
+      "answer_evidence": "答案中明确“无异常”，anomaly_ids为空。",
+      "trace_evidence": "工具最终输出与提交一致，无异常标记。"
+    },
+    {
+      "id": "record-scope",
+      "score": 0,
+      "reason": "提交的record_ids包含8条记录，超出了预期的R004236与R004237，加入了无关记录。",
+      "answer_evidence": "提交的record_ids为R004233-R004240共8条，多出6条。",
+      "trace_evidence": "工具调用获取了多条expense详情，但未局限于预期核心记录。"
+    },
+    {
+      "id": "case-specific-reason",
+      "score": 25,
+      "reason": "针对核心记录明确指出了超出7天聚合窗口（outside aggregation window）的合规原因，解释完整。",
+      "answer_evidence": "答案中说明“R004236与R004237日期相隔8天...超出第十一条7天拆分核查窗口”。",
+      "trace_evidence": "工具调用包括list_expenses与get_expense_detail，结合政策条款进行了日期比对。"
+    },
+    {
+      "id": "reverse-check",
+      "score": 15,
+      "reason": "轨迹中调用了find_reused_invoices、get_expense_detail等工具，对阈值、日期、发票进行了反向核查，未仅凭提示直接下结论。",
+      "answer_evidence": "答案中展示了具体的金额、日期、发票号及政策条款比对。",
+      "trace_evidence": "轨迹中多次调用get_expense_detail获取记录详情，并使用find_reused_invoices核查发票重复情况。"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "所有提交的record_id均存在于数据库中，无虚构记录。"
+    },
+    {
+      "id": "trap-false-positive",
+      "triggered": false,
+      "reason": "候选将记录正确判定为无异常，未误报成异常。"
+    }
+  ],
+  "overall_comment": "候选准确判断无异常并给出合规原因，但核查范围超出预期，引入了无关记录，导致record-scope失分。其余项表现良好。",
+  "confidence": 0.95
+}

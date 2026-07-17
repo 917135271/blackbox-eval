@@ -1,0 +1,122 @@
+{
+  "case_family": "policy_and_version",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "near_clause_disambiguation",
+  "criteria": [
+    {
+      "answer_evidence": "差旅住宿标准（04_travel_expense.md 第四条）按「职级×城市档位」双重维度设定...",
+      "id": "travel-policy",
+      "reason": "制度和场景均正确，明确指出差旅住宿适用差旅费管理办法。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "调用 get_policy_doc 获取 04_travel_expense.md，内容包含差旅住宿标准表。"
+    },
+    {
+      "answer_evidence": "培训住宿标准（05_training_expense.md 第五条）仅按「城市档位」单维度设定...",
+      "id": "training-policy",
+      "reason": "制度和场景均正确，明确指出培训住宿适用培训费管理办法。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "调用 get_policy_doc 获取 05_training_expense.md，内容包含培训住宿标准表。"
+    },
+    {
+      "answer_evidence": "差旅住宿标准适用于公务出差期间的住宿...培训住宿标准适用于培训期间住宿...两者适用场景互斥。数值差异显著：以经理级为例，差旅一类城市650元高于培训500元30%。",
+      "id": "no-mixing",
+      "reason": "说明了场景互斥（差旅出差 vs 培训期间）和数值差异（如经理级一类城市650 vs 500），两个差异均明确。",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": ""
+    },
+    {
+      "answer_evidence": "citations 包含 doc_id: 04_travel_expense.md (第四条、第七条) 和 05_training_expense.md (第五条、第六条)。",
+      "id": "comparison-evidence",
+      "reason": "两份制度证据完整，答案引用了04_travel_expense.md和05_training_expense.md的具体条款。",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "轨迹中成功调用 get_policy_doc 获取 04_travel_expense.md 和 05_training_expense.md 全文。"
+    },
+    {
+      "answer_evidence": "",
+      "id": "submission",
+      "reason": "统一提交已接受且Schema有效",
+      "score": 5.0,
+      "source": "rule",
+      "trace_evidence": "规则程序计算"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "未使用不存在记录或无关记录支撑核心结论。",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "未使用已废止制度形成当前适用结论。",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [],
+    "actual_record_ids": [
+      "R000166",
+      "R000214"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": true,
+      "expected_types": {},
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "citation_count": 5,
+    "elapsed_seconds": 197.459,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:expense_standards.travel_lodging",
+      "policy:expense_standards.training.training_lodging",
+      "document:04_travel_expense.md",
+      "document:05_training_expense.md"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:25:21+08:00",
+  "group": "codex-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "回答完整比较了差旅住宿与培训住宿标准的结构和数值差异，并依据制度条款说明了两者的适用场景互斥和不得混用的规定，证据充分。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 1691,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1080
+      },
+      "prompt_cache_hit_tokens": 1024,
+      "prompt_cache_miss_tokens": 5250,
+      "prompt_tokens": 6274,
+      "prompt_tokens_details": {
+        "cached_tokens": 1024
+      },
+      "total_tokens": 7965
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/codex-baseline/L3-008",
+  "task_id": "L3-008"
+}

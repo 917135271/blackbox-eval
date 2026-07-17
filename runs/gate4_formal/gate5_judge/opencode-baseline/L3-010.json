@@ -1,0 +1,123 @@
+{
+  "case_family": "retrieval_and_report",
+  "case_score": 100.0,
+  "case_score_raw": 100.0,
+  "category": "audit_report",
+  "criteria": [
+    {
+      "answer_evidence": "2025版（现行有效）的审批线...AR-03（10000≤金额<50000）：部门总经理",
+      "id": "current-threshold",
+      "reason": "明确指出现行2025版部门总经理审批线为10000元",
+      "score": 30.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用，所有证据来自答案正文"
+    },
+    {
+      "answer_evidence": "2022版（已废止）的审批线 - 单笔报销金额≥8000元：需部门总经理审批",
+      "id": "old-threshold-status",
+      "reason": "正确指出2022版8000元审批线已废止",
+      "score": 25.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用"
+    },
+    {
+      "answer_evidence": "2025版（现行有效）的审批线（依据《XX证券授权管理办法》附件二）",
+      "id": "cross-reference",
+      "reason": "明确说明报销办法通过授权管理办法附件二取得现行审批金额",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用"
+    },
+    {
+      "answer_evidence": "若审计人员以2022版为审计依据，将错误地将该区间内的合规记录判定为\"缺少部门总经理审批\"...建议：审计底稿应明确标注所依据的制度版本及生效日期；费用系统应增加版本标识字段；审计人员上岗前应培训考核",
+      "id": "risk-explanation",
+      "reason": "解释了使用旧线会导致错误判定缺少审批，并提出了版本标注、培训等校验措施",
+      "score": 20.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用"
+    },
+    {
+      "answer_evidence": "标题为版本陷阱审计说明，分背景、差异、陷阱、实证、结论建议，anomaly_ids和record_ids对应",
+      "id": "report-shape",
+      "reason": "以审计说明形式提交，结构完整，字段一致",
+      "score": 5.0,
+      "source": "llm_judge",
+      "trace_evidence": "无工具调用"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "fabricated-record-id",
+      "triggered": false,
+      "reason": "记录R004233在系统中存在，未发现虚构",
+      "score_cap": 20,
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-policy-as-current",
+      "triggered": false,
+      "reason": "所有结论均基于2025版现行制度，未将废止制度作为当前适用依据",
+      "score_cap": 40,
+      "source": "llm_judge"
+    }
+  ],
+  "diagnostics": {
+    "actual_anomaly_ids": [
+      "VER-TRAP-L3-010-001"
+    ],
+    "actual_record_ids": [
+      "R004233"
+    ],
+    "anomaly_metrics": {
+      "actual_types": {},
+      "count_exact": false,
+      "expected_types": {},
+      "f1": 0.0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "citation_count": 6,
+    "elapsed_seconds": 137.882,
+    "expected_anomaly_ids": [],
+    "expected_record_ids": null,
+    "record_metrics": null,
+    "required_citations": [
+      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount"
+    ],
+    "schema_valid": true,
+    "submission_accepted": true,
+    "timed_out": false,
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [
+      "VER-TRAP-L3-010-001"
+    ],
+    "unknown_record_ids": []
+  },
+  "graded_at": "2026-07-16T22:29:48+08:00",
+  "group": "opencode-baseline",
+  "judge": {
+    "attempt": 1,
+    "confidence": 1.0,
+    "finish_reason": "stop",
+    "model": "deepseek-v4-pro",
+    "overall_comment": "答案全面准确指出版本差异、旧版废止状态和现行审批线，通过授权管理办法附件二建立制度关联，详细解释误判风险并提出具体校验建议，报告形式完整，无关键错误。",
+    "status": "ok",
+    "usage": {
+      "completion_tokens": 2000,
+      "completion_tokens_details": {
+        "reasoning_tokens": 1375
+      },
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 2140,
+      "prompt_tokens": 3292,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152
+      },
+      "total_tokens": 5292
+    }
+  },
+  "passed": true,
+  "run_path": "runs/gate4_formal/opencode-baseline/L3-010",
+  "task_id": "L3-010"
+}
