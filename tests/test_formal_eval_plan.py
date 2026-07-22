@@ -24,7 +24,7 @@ def test_formal_plan_is_internally_consistent() -> None:
     assert plan.JUDGE_AUDIT_REPEAT_COUNT == 2
     assert plan.DATASET_ID == "securities-expense-audit-formal-15-v9"
     assert plan.RUBRIC_VERSION == "atomic-binary-checklist-v7"
-    assert plan.CHECKLIST_ITEM_COUNT == 249
+    assert plan.CHECKLIST_ITEM_COUNT == 251
     assert plan.REPLACEMENT_CANARY_CASE_IDS == (
         "PV-CASE-001",
         "RA-CASE-001",

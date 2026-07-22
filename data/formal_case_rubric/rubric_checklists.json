@@ -1121,13 +1121,18 @@
       "check": "引用各费用类型对应的专项标准",
       "metric": "policy",
       "evaluation_mode": "hybrid",
-      "expected": "04至07号专项费用标准",
+      "expected": [
+        "04_travel_expense.md",
+        "05_training_expense.md",
+        "06_business_entertainment.md",
+        "07_office_communication.md"
+      ],
       "evidence_sources": [
         "submitted_json",
         "tool_trace"
       ],
-      "pass_condition": "专项标准与查询条件对应",
-      "fail_condition": "未完全满足通过条件：专项标准与查询条件对应"
+      "pass_condition": "四份专项标准均已引用且与对应查询条件一致",
+      "fail_condition": "未完全满足通过条件：四份专项标准均已引用且与对应查询条件一致"
     },
     {
       "id": "submission",
@@ -2475,13 +2480,18 @@
       "check": "超标准结论引用对应专项费用标准",
       "metric": "policy",
       "evaluation_mode": "hybrid",
-      "expected": "04至07号专项费用标准",
+      "expected": [
+        "04_travel_expense.md",
+        "05_training_expense.md",
+        "06_business_entertainment.md",
+        "07_office_communication.md"
+      ],
       "evidence_sources": [
         "submitted_json",
         "tool_trace"
       ],
-      "pass_condition": "专项费用标准与超标准发现对应",
-      "fail_condition": "未完全满足通过条件：专项费用标准与超标准发现对应"
+      "pass_condition": "四份专项费用标准均已引用且与超标准发现对应",
+      "fail_condition": "未完全满足通过条件：四份专项费用标准均已引用且与超标准发现对应"
     },
     {
       "id": "policy-coverage-budget",
@@ -2797,17 +2807,30 @@
       "fail_condition": "未完全满足通过条件：准确引用AR-02和10000元审批线出处"
     },
     {
-      "id": "policy-travel",
-      "check": "引用差旅办法X1级一类城市住宿标准",
+      "id": "policy-history",
+      "check": "引用2022版费用报销办法的8000元旧线及废止依据",
       "metric": "policy",
       "evaluation_mode": "hybrid",
-      "expected": "04_travel_expense.md#第三条",
+      "expected": "02_expense_reimbursement_2022_deprecated.md#第一条、第二条、第四条",
       "evidence_sources": [
         "submitted_json",
         "tool_trace"
       ],
-      "pass_condition": "准确引用支持1100元每晚标准的条款",
-      "fail_condition": "未完全满足通过条件：准确引用支持1100元每晚标准的条款"
+      "pass_condition": "准确引用历史制度中的8000元旧线和废止状态",
+      "fail_condition": "未完全满足通过条件：准确引用历史制度中的8000元旧线和废止状态"
+    },
+    {
+      "id": "policy-travel",
+      "check": "引用差旅办法的适用维度及X1级一类城市住宿标准",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "04_travel_expense.md#第三条、第四条",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "准确引用第三条的适用维度和第四条的1100元每晚标准",
+      "fail_condition": "未完全满足通过条件：准确引用第三条的适用维度和第四条的1100元每晚标准"
     },
     {
       "id": "submission",
@@ -3161,7 +3184,7 @@
     },
     {
       "id": "threshold",
-      "check": "将10200元与现行10000元较高审批线正确比较",
+      "check": "将10200元与现行部门总经理审批线10000元正确比较",
       "metric": "reasoning",
       "evaluation_mode": "hybrid",
       "expected": 10000,
@@ -3169,8 +3192,8 @@
         "final_answer",
         "tool_trace"
       ],
-      "pass_condition": "明确说明合计达到较高审批线",
-      "fail_condition": "未完全满足通过条件：明确说明合计达到较高审批线"
+      "pass_condition": "明确说明合计达到部门总经理审批线10000元",
+      "fail_condition": "未完全满足通过条件：明确说明合计达到部门总经理审批线10000元"
     },
     {
       "id": "distinct-invoices",
@@ -3195,8 +3218,8 @@
         "submitted_json",
         "tool_trace"
       ],
-      "pass_condition": "引用7天聚合及达到较高审批线的拆分核查规则",
-      "fail_condition": "未完全满足通过条件：引用7天聚合及达到较高审批线的拆分核查规则"
+      "pass_condition": "引用7天聚合及达到部门总经理审批线的拆分核查规则",
+      "fail_condition": "未完全满足通过条件：引用7天聚合及达到部门总经理审批线的拆分核查规则"
     },
     {
       "id": "policy-authorization",
@@ -3208,8 +3231,8 @@
         "submitted_json",
         "tool_trace"
       ],
-      "pass_condition": "引用现行10000元较高审批线出处",
-      "fail_condition": "未完全满足通过条件：引用现行10000元较高审批线出处"
+      "pass_condition": "引用现行部门总经理审批线10000元出处",
+      "fail_condition": "未完全满足通过条件：引用现行部门总经理审批线10000元出处"
     },
     {
       "id": "window-investigation",
@@ -3403,7 +3426,7 @@
     },
     {
       "id": "current-threshold",
-      "check": "采用现行10000元较高审批线",
+      "check": "采用现行部门总经理审批线10000元",
       "metric": "policy",
       "evaluation_mode": "hybrid",
       "expected": 10000,
@@ -3411,8 +3434,8 @@
         "final_answer",
         "tool_trace"
       ],
-      "pass_condition": "正确引用并采用现行10000元线",
-      "fail_condition": "未完全满足通过条件：正确引用并采用现行10000元线"
+      "pass_condition": "正确引用并采用现行部门总经理审批线10000元",
+      "fail_condition": "未完全满足通过条件：正确引用并采用现行部门总经理审批线10000元"
     },
     {
       "id": "current-conclusion",
@@ -3515,6 +3538,19 @@
       ],
       "pass_condition": "准确引用10000元现行审批线出处",
       "fail_condition": "未完全满足通过条件：准确引用10000元现行审批线出处"
+    },
+    {
+      "id": "policy-history",
+      "check": "引用2022版费用报销办法的8000元旧线及废止依据",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "02_expense_reimbursement_2022_deprecated.md#第一条、第二条、第四条",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "准确引用历史制度中的8000元旧线和废止状态",
+      "fail_condition": "未完全满足通过条件：准确引用历史制度中的8000元旧线和废止状态"
     },
     {
       "id": "policy-training",

@@ -28,14 +28,13 @@
 
 ## 当前执行状态
 
-48次候选运行已全部完成并通过统一提交，格式成功率为100%。首次高并发运行出现2次OpenClaude超时；在单任务环境复核后，一项直接成功，另一项暴露Canary提示未明确`validation_report.json`固定字段名的问题。补充通用提交协议并增加回归测试后，该项在308秒内成功提交，原失败轨迹保留在`retry-history`。
+旧版48次候选运行均完成统一提交，其中28次取得Judge结果，20次因DeepSeek账户返回`HTTP 402 Payment Required`未完成判分。最终复核又发现候选可见制度中的“较高审批线”存在档位歧义，正式库也未显式提供`employee_level`和`city_tier`编码映射；两处均已修正。因此旧轨迹与分数只保留为历史诊断，当前报告状态为`invalidated`，不得仅补判原20个错误项。
 
-LLM Judge已完成28次判分，另外20次因DeepSeek账户返回`HTTP 402 Payment Required`而未完成。当前报告状态为`incomplete`，Judge错误不按0分计入极差或标准差，也不据此冻结题库。账户额度恢复后执行以下命令，仅补判错误项：
+账户额度恢复后，应对修正后的四题执行完整12组重跑并重新判分：
 
 ```powershell
 $env:LLM_API_KEY = [Environment]::GetEnvironmentVariable("LLM_API_KEY", "User")
-python runner/grade_replacement_discrimination_canary.py --workers 4 --only-errors
+python runner/run_replacement_discrimination_canary.py --resume --force --workers 12
+python runner/grade_replacement_discrimination_canary.py --reset --workers 4
 python runner/report_replacement_discrimination_canary.py
 ```
-
-当前28个有效结果只提供方向性信号：`PV-CASE-001`、`RA-CASE-001`和`RA-CASE-002`已出现明显分差；`RR-CASE-001`的6个已判组均因误报被封顶40分，必须等待其余6组补判后才能判断该题是有效陷阱题还是对所有候选同样困难。

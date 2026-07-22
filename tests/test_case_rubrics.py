@@ -4,6 +4,7 @@ import importlib.util
 import json
 import os
 import re
+import sqlite3
 import subprocess
 import sys
 import unittest
@@ -90,7 +91,7 @@ class CaseRubricTests(unittest.TestCase):
         dataset = json.loads(CASES.read_text(encoding="utf-8"))
         self.assertEqual(
             sum(len(case["rubric"]["checklist"]) for case in dataset["cases"]),
-            249,
+            251,
         )
         for case in dataset["cases"]:
             item_ids = {item["id"] for item in case["rubric"]["checklist"]}
@@ -154,6 +155,18 @@ class CaseRubricTests(unittest.TestCase):
         )
         self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
 
+    def test_formal_database_exposes_business_code_mappings(self) -> None:
+        with sqlite3.connect(ROOT / "data" / "formal_case_rubric" / "expense_formal.db") as connection:
+            mappings = dict(
+                connection.execute(
+                    "SELECT code, display_name FROM business_codebook WHERE field_name = 'employee_level'"
+                )
+            )
+        self.assertEqual(
+            mappings,
+            {"E1": "员工级", "M1": "经理级", "D1": "部门负责人级", "X1": "高管级"},
+        )
+
     def test_positive_and_clean_record_prompts_are_neutral_and_matched(self) -> None:
         dataset = json.loads(CASES.read_text(encoding="utf-8"))
         cases = {case["id"]: case for case in dataset["cases"]}
@@ -198,6 +211,19 @@ class CaseRubricTests(unittest.TestCase):
                 clause_no = citation["clause_no"]
                 self.assertIn(f"document:{doc_id}", refs, case["id"])
                 self.assertIn(f"clause:{doc_id}#{clause_no}", refs, case["id"])
+
+    def test_split_threshold_is_unambiguous_in_candidate_visible_policy(self) -> None:
+        policy = (ROOT / "data" / "corpus" / "01_expense_reimbursement_2025.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("附件二所列部门总经理审批线", policy)
+
+    def test_every_required_citation_is_represented_in_the_case_rubric(self) -> None:
+        dataset = json.loads(CASES.read_text(encoding="utf-8"))
+        for case in dataset["cases"]:
+            rubric_text = json.dumps(case["rubric"]["checklist"], ensure_ascii=False)
+            for citation in case["expected_output"].get("required_citations", []):
+                self.assertIn(citation["doc_id"], rubric_text, case["id"])
 
     def test_comprehensive_expectations_are_derived_from_ground_truth(self) -> None:
         dataset = json.loads(CASES.read_text(encoding="utf-8"))

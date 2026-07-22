@@ -68,6 +68,45 @@ TRAVEL_LIMITS = {
     "X1": {"A": 1100, "B": 900, "C": 750},
 }
 LOCAL_TRANSPORT_LIMITS = {"A": 120, "B": 100, "C": 80}
+CHINESE_DIGITS = {"零": 0, "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9}
+
+
+def chinese_number(value: str) -> int:
+    if value == "十":
+        return 10
+    if "十" in value:
+        left, right = value.split("十", 1)
+        return (CHINESE_DIGITS.get(left, 1) * 10) + CHINESE_DIGITS.get(right, 0)
+    return CHINESE_DIGITS[value]
+
+
+def chinese_numeral(value: int) -> str:
+    digits = "零一二三四五六七八九"
+    if value < 10:
+        return digits[value]
+    tens, ones = divmod(value, 10)
+    prefix = "十" if tens == 1 else f"{digits[tens]}十"
+    return prefix if ones == 0 else f"{prefix}{digits[ones]}"
+
+
+def citation_labels(clause_no: str) -> list[str]:
+    if re.fullmatch(r"附件[一二三四五六七八九十]+", clause_no):
+        return [clause_no]
+    labels: list[str] = []
+    for part in clause_no.split("、"):
+        range_match = re.fullmatch(r"第([一二三四五六七八九十]+)条至第([一二三四五六七八九十]+)条", part)
+        single_match = re.fullmatch(r"第([一二三四五六七八九十]+)条", part)
+        if range_match:
+            start = chinese_number(range_match.group(1))
+            end = chinese_number(range_match.group(2))
+            if start > end:
+                return []
+            labels.extend(f"第{chinese_numeral(value)}条" for value in range(start, end + 1))
+        elif single_match:
+            labels.append(part)
+        else:
+            return []
+    return labels
 
 
 def require(condition: bool, message: str, errors: list[str]) -> None:
@@ -205,6 +244,7 @@ def validate_case(case: dict[str, Any], errors: list[str]) -> None:
             errors,
         )
     refs = [str(ref) for ref in case.get("ground_truth_refs", [])]
+    rubric_text = json.dumps(checklist, ensure_ascii=False)
     require(
         not any(re.search(r"(?:费用报销管理办法-6\.[1-4]|预算管理办法-4\.1)", ref) for ref in refs),
         f"{case_id}: legacy logical policy reference remains",
@@ -213,10 +253,31 @@ def validate_case(case: dict[str, Any], errors: list[str]) -> None:
     for citation in case.get("expected_output", {}).get("required_citations", []):
         doc_id = str(citation.get("doc_id", ""))
         clause_no = str(citation.get("clause_no", ""))
+        document_path = CORPUS_DIR / doc_id
         require(f"document:{doc_id}" in refs, f"{case_id}: document reference missing for {doc_id}", errors)
         require(
             f"clause:{doc_id}#{clause_no}" in refs,
             f"{case_id}: clause reference missing for {doc_id}#{clause_no}",
+            errors,
+        )
+        require(doc_id in rubric_text, f"{case_id}: required citation is not represented in rubric: {doc_id}", errors)
+        labels = citation_labels(clause_no)
+        require(bool(labels), f"{case_id}: unsupported citation expression: {clause_no}", errors)
+        if document_path.exists() and labels:
+            document_text = document_path.read_text(encoding="utf-8")
+            for label in labels:
+                pattern = rf"^(?:##\s+)?{re.escape(label)}(?:\s|$)"
+                require(
+                    re.search(pattern, document_text, re.MULTILINE) is not None,
+                    f"{case_id}: cited clause does not exist: {doc_id}#{label}",
+                    errors,
+                )
+
+    if case_id in {"RA-CASE-002", "TRAP-002", "TRAP-003", "TRAP-005", "RR-CASE-001"}:
+        split_policy = (CORPUS_DIR / "01_expense_reimbursement_2025.md").read_text(encoding="utf-8")
+        require(
+            "附件二所列部门总经理审批线" in split_policy,
+            f"{case_id}: split-reimbursement threshold is ambiguous in the candidate-visible policy",
             errors,
         )
 
@@ -341,6 +402,28 @@ def validate_semantics(cases: list[dict[str, Any]], errors: list[str]) -> dict[s
         return {}
     facts = recompute_semantic_ground_truth(FORMAL_DB)
     case_map = {str(case["id"]): case for case in cases}
+
+    with sqlite3.connect(FORMAL_DB) as connection:
+        codebook = {
+            (str(field_name), str(code)): str(display_name)
+            for field_name, code, display_name in connection.execute(
+                "SELECT field_name, code, display_name FROM business_codebook"
+            )
+        }
+    require(
+        codebook
+        == {
+            ("employee_level", "E1"): "员工级",
+            ("employee_level", "M1"): "经理级",
+            ("employee_level", "D1"): "部门负责人级",
+            ("employee_level", "X1"): "高管级",
+            ("city_tier", "A"): "一类城市",
+            ("city_tier", "B"): "二类城市",
+            ("city_tier", "C"): "三类城市",
+        },
+        "formal database business codebook is missing or inconsistent",
+        errors,
+    )
 
     expected_sets = {
         "L3-001": facts["duplicate_records"],

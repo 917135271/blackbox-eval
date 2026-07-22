@@ -24,7 +24,8 @@ Rubric版本：`atomic-binary-checklist-v7`。本文件由`runner/render_formal_
 | `legacy-impact` | `reasoning` | `llm` | 说明误用8000元线会错误升级8000元至10000元以下记录 | 准确说明受影响区间和错误升级方向，并联系R004233说明 |
 | `policy-expense` | `policy` | `hybrid` | 引用费用报销办法第五条、第十二条和第十四条中的适用依据 | 引用覆盖审批交叉引用、不得超标准和旧版废止依据 |
 | `policy-authorization` | `policy` | `hybrid` | 引用授权管理办法附件二 | 准确引用AR-02和10000元审批线出处 |
-| `policy-travel` | `policy` | `hybrid` | 引用差旅办法X1级一类城市住宿标准 | 准确引用支持1100元每晚标准的条款 |
+| `policy-history` | `policy` | `hybrid` | 引用2022版费用报销办法的8000元旧线及废止依据 | 准确引用历史制度中的8000元旧线和废止状态 |
+| `policy-travel` | `policy` | `hybrid` | 引用差旅办法的适用维度及X1级一类城市住宿标准 | 准确引用第三条的适用维度和第四条的1100元每晚标准 |
 | `submission` | `format` | `deterministic` | 统一Schema结果提交成功 | 提交回执状态为accepted且Schema校验通过 |
 
 **严重错误封顶：**
@@ -122,10 +123,10 @@ Rubric版本：`atomic-binary-checklist-v7`。本文件由`runner/render_formal_
 | `window-dates` | `reasoning` | `hybrid` | 列明三笔费用日期并计算首尾相隔4天 | 三个日期完整且正确判断位于7天窗口内 |
 | `amounts` | `reasoning` | `hybrid` | 列明三笔金额均为3400元 | 三笔金额完整准确 |
 | `sum` | `reasoning` | `hybrid` | 计算窗口内合计金额为10200元 | 合计金额计算正确 |
-| `threshold` | `reasoning` | `hybrid` | 将10200元与现行10000元较高审批线正确比较 | 明确说明合计达到较高审批线 |
+| `threshold` | `reasoning` | `hybrid` | 将10200元与现行部门总经理审批线10000元正确比较 | 明确说明合计达到部门总经理审批线10000元 |
 | `distinct-invoices` | `false_positive` | `hybrid` | 说明三张发票不同，排除重复发票规则 | 正确区分拆分报销与重复报销，不报告DUP |
-| `policy-expense` | `policy` | `hybrid` | 引用费用报销办法第十一条 | 引用7天聚合及达到较高审批线的拆分核查规则 |
-| `policy-authorization` | `policy` | `hybrid` | 引用授权管理办法附件二 | 引用现行10000元较高审批线出处 |
+| `policy-expense` | `policy` | `hybrid` | 引用费用报销办法第十一条 | 引用7天聚合及达到部门总经理审批线的拆分核查规则 |
+| `policy-authorization` | `policy` | `hybrid` | 引用授权管理办法附件二 | 引用现行部门总经理审批线10000元出处 |
 | `window-investigation` | `evidence` | `hybrid` | 通过员工、费用类型和日期范围查询获得完整三记录窗口 | 在结论前完成等价的窗口查询并保留完整记录结果 |
 | `submission` | `format` | `deterministic` | 统一Schema结果提交成功 | 提交回执状态为accepted且Schema校验通过 |
 
@@ -227,7 +228,7 @@ Rubric版本：`atomic-binary-checklist-v7`。本文件由`runner/render_formal_
 | `full-scan-method-transport` | `reasoning` | `hybrid` | 市内交通按城市和天数计算 | 市内交通标准同时使用城市档位和出差天数 |
 | `full-scan-method-reconcile` | `reasoning` | `hybrid` | 查询结果与最终提交数量能够核对一致 | 中间统计为6条且与最终6项发现一致 |
 | `policy-basis-expense` | `policy` | `hybrid` | 引用费用报销办法第十二条 | 引用超标准总则条款 |
-| `policy-basis-special` | `policy` | `hybrid` | 引用各费用类型对应的专项标准 | 专项标准与查询条件对应 |
+| `policy-basis-special` | `policy` | `hybrid` | 引用各费用类型对应的专项标准 | 四份专项标准均已引用且与对应查询条件一致 |
 | `submission` | `format` | `deterministic` | 统一Schema结果提交成功 | 提交回执状态为accepted且Schema校验通过 |
 
 **严重错误封顶：**
@@ -407,7 +408,7 @@ Rubric版本：`atomic-binary-checklist-v7`。本文件由`runner/render_formal_
 | `representative-evidence-budget` | `evidence` | `hybrid` | BUDGET类至少有1个可复核发现及record_id | BUDGET类同时给出稳定发现ID和正确record_id证据 |
 | `representative-evidence-overdue` | `evidence` | `hybrid` | OVERDUE类至少有1个可复核发现及record_id | OVERDUE类同时给出稳定发现ID和正确record_id证据 |
 | `policy-coverage-expense` | `policy` | `hybrid` | 引用费用报销办法中五类规则的对应条款 | 费用报销办法规则条款可核查 |
-| `policy-coverage-special` | `policy` | `hybrid` | 超标准结论引用对应专项费用标准 | 专项费用标准与超标准发现对应 |
+| `policy-coverage-special` | `policy` | `hybrid` | 超标准结论引用对应专项费用标准 | 四份专项费用标准均已引用且与超标准发现对应 |
 | `policy-coverage-budget` | `policy` | `hybrid` | 超预算结论引用预算管理办法 | 预算管理条款可核查 |
 | `clean-boundary-control` | `false_positive` | `deterministic` | 不得将已知合规边界记录计入异常结果 | 提交的record_ids不包含任何已知合规边界记录 |
 | `report-shape-fact` | `reasoning` | `llm` | 报告包含事实 | 报告中存在可识别的事实内容 |
@@ -442,7 +443,7 @@ Rubric版本：`atomic-binary-checklist-v7`。本文件由`runner/render_formal_
 | `window-dates` | `reasoning` | `hybrid` | 识别费用日期从2025-12-18至2025-12-25且首尾相隔7天 | 日期边界完整且按费用发生日期正确计算7天窗口 |
 | `amount-list` | `reasoning` | `hybrid` | 列明四笔金额 | 四笔金额与对应记录完整一致 |
 | `amount-sum` | `reasoning` | `hybrid` | 计算四笔合计9764.73元 | 合计金额计算正确 |
-| `current-threshold` | `policy` | `hybrid` | 采用现行10000元较高审批线 | 正确引用并采用现行10000元线 |
+| `current-threshold` | `policy` | `hybrid` | 采用现行部门总经理审批线10000元 | 正确引用并采用现行部门总经理审批线10000元 |
 | `current-conclusion` | `conclusion` | `hybrid` | 判断9764.73元低于现行线，不构成拆分规避审批 | 明确给出无拆分异常结论且无矛盾表述 |
 | `legacy-threshold` | `policy` | `hybrid` | 识别2022版旧审批线为8000元 | 正确给出旧值及其历史版本来源 |
 | `legacy-status` | `false_positive` | `llm` | 说明2022版8000元线已废止，不得作为现行依据 | 明确排除旧线的现行适用性 |
@@ -451,6 +452,7 @@ Rubric版本：`atomic-binary-checklist-v7`。本文件由`runner/render_formal_
 | `distinct-invoices` | `false_positive` | `hybrid` | 说明四条记录发票互不相同，排除重复报销 | 通过发票证据正确排除重复报销 |
 | `policy-expense` | `policy` | `hybrid` | 引用现行费用报销办法第十一条、第十二条和第十四条 | 引用覆盖拆分核查、超标准和旧版废止依据 |
 | `policy-authorization` | `policy` | `hybrid` | 引用授权管理办法附件二 | 准确引用10000元现行审批线出处 |
+| `policy-history` | `policy` | `hybrid` | 引用2022版费用报销办法的8000元旧线及废止依据 | 准确引用历史制度中的8000元旧线和废止状态 |
 | `policy-training` | `policy` | `hybrid` | 引用培训费办法第二条 | 准确引用3500元课程费标准 |
 | `version-control` | `reasoning` | `llm` | 提出校验制度生效日期、废止状态和交叉引用目标的可执行控制 | 控制措施覆盖三个要素且不是泛泛建议 |
 | `independent-investigation` | `reasoning` | `hybrid` | 在结论前完成同员工、同费用类型、日期窗口和发票的独立查询 | 工具轨迹或工作产物证明完成完整窗口和发票核查，不能仅凭最终答案通过 |

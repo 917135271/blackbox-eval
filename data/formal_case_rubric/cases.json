@@ -39,7 +39,7 @@
         "document:03_authorization_management.md",
         "clause:03_authorization_management.md#附件二",
         "document:04_travel_expense.md",
-        "clause:04_travel_expense.md#第三条"
+        "clause:04_travel_expense.md#第三条、第四条"
       ],
       "expected_output": {
         "scoring_kind": "no_anomaly",
@@ -69,7 +69,7 @@
           },
           {
             "doc_id": "04_travel_expense.md",
-            "clause_no": "第三条"
+            "clause_no": "第三条、第四条"
           }
         ]
       },
@@ -281,17 +281,30 @@
             "fail_condition": "未完全满足通过条件：准确引用AR-02和10000元审批线出处"
           },
           {
-            "id": "policy-travel",
-            "check": "引用差旅办法X1级一类城市住宿标准",
+            "id": "policy-history",
+            "check": "引用2022版费用报销办法的8000元旧线及废止依据",
             "metric": "policy",
             "evaluation_mode": "hybrid",
-            "expected": "04_travel_expense.md#第三条",
+            "expected": "02_expense_reimbursement_2022_deprecated.md#第一条、第二条、第四条",
             "evidence_sources": [
               "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "准确引用支持1100元每晚标准的条款",
-            "fail_condition": "未完全满足通过条件：准确引用支持1100元每晚标准的条款"
+            "pass_condition": "准确引用历史制度中的8000元旧线和废止状态",
+            "fail_condition": "未完全满足通过条件：准确引用历史制度中的8000元旧线和废止状态"
+          },
+          {
+            "id": "policy-travel",
+            "check": "引用差旅办法的适用维度及X1级一类城市住宿标准",
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "04_travel_expense.md#第三条、第四条",
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "pass_condition": "准确引用第三条的适用维度和第四条的1100元每晚标准",
+            "fail_condition": "未完全满足通过条件：准确引用第三条的适用维度和第四条的1100元每晚标准"
           },
           {
             "id": "submission",
@@ -984,7 +997,7 @@
         "expected_facts": [
           "三条记录属于同一员工E0008和同一费用类型travel_lodging",
           "费用日期为2025-02-26、2025-02-28和2025-03-02，首尾相隔4天",
-          "三笔金额均为3400元，合计10200元，达到现行10000元较高审批线",
+          "三笔金额均为3400元，合计10200元，达到现行部门总经理审批线10000元",
           "三张发票不同，异常依据是7天内同类费用聚合达到审批线而非重复发票"
         ],
         "expected_record_ids": [
@@ -1184,7 +1197,7 @@
           },
           {
             "id": "threshold",
-            "check": "将10200元与现行10000元较高审批线正确比较",
+            "check": "将10200元与现行部门总经理审批线10000元正确比较",
             "metric": "reasoning",
             "evaluation_mode": "hybrid",
             "expected": 10000,
@@ -1192,8 +1205,8 @@
               "final_answer",
               "tool_trace"
             ],
-            "pass_condition": "明确说明合计达到较高审批线",
-            "fail_condition": "未完全满足通过条件：明确说明合计达到较高审批线"
+            "pass_condition": "明确说明合计达到部门总经理审批线10000元",
+            "fail_condition": "未完全满足通过条件：明确说明合计达到部门总经理审批线10000元"
           },
           {
             "id": "distinct-invoices",
@@ -1218,8 +1231,8 @@
               "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "引用7天聚合及达到较高审批线的拆分核查规则",
-            "fail_condition": "未完全满足通过条件：引用7天聚合及达到较高审批线的拆分核查规则"
+            "pass_condition": "引用7天聚合及达到部门总经理审批线的拆分核查规则",
+            "fail_condition": "未完全满足通过条件：引用7天聚合及达到部门总经理审批线的拆分核查规则"
           },
           {
             "id": "policy-authorization",
@@ -1231,8 +1244,8 @@
               "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "引用现行10000元较高审批线出处",
-            "fail_condition": "未完全满足通过条件：引用现行10000元较高审批线出处"
+            "pass_condition": "引用现行部门总经理审批线10000元出处",
+            "fail_condition": "未完全满足通过条件：引用现行部门总经理审批线10000元出处"
           },
           {
             "id": "window-investigation",
@@ -2354,13 +2367,18 @@
             "check": "引用各费用类型对应的专项标准",
             "metric": "policy",
             "evaluation_mode": "hybrid",
-            "expected": "04至07号专项费用标准",
+            "expected": [
+              "04_travel_expense.md",
+              "05_training_expense.md",
+              "06_business_entertainment.md",
+              "07_office_communication.md"
+            ],
             "evidence_sources": [
               "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "专项标准与查询条件对应",
-            "fail_condition": "未完全满足通过条件：专项标准与查询条件对应"
+            "pass_condition": "四份专项标准均已引用且与对应查询条件一致",
+            "fail_condition": "未完全满足通过条件：四份专项标准均已引用且与对应查询条件一致"
           },
           {
             "id": "submission",
@@ -2872,7 +2890,7 @@
           "R004234",
           "R004235"
         ],
-        "expected_reason": "两条记录发票不同，且同一员工同类费用7天内合计500元，未达到10000元审批线",
+        "expected_reason": "两条记录发票不同，且同一员工同类费用7天内合计500元，未达到部门总经理审批线10000元",
         "expected_anomaly_ids": [],
         "required_citations": [
           {
@@ -3104,7 +3122,7 @@
           "R004236",
           "R004237"
         ],
-        "expected_reason": "两条记录合计10400元，虽达到10000元审批线，但费用发生日期相隔8天，超出7天聚合窗口",
+        "expected_reason": "两条记录合计10400元，虽达到部门总经理审批线10000元，但费用发生日期相隔8天，超出7天聚合窗口",
         "expected_anomaly_ids": [],
         "required_citations": [
           {
@@ -3351,7 +3369,7 @@
           "R004239",
           "R004240"
         ],
-        "expected_reason": "两条记录分别对应客户甲产品方案交流和客户乙投行业务沟通，费用发生日期相隔1天；发票不同，单次金额分别为540元和545元、各3人，人均分别为180元和约181.67元，均未超过单次5000元和人均300元标准，合计也未达到10000元审批线",
+        "expected_reason": "两条记录分别对应客户甲产品方案交流和客户乙投行业务沟通，费用发生日期相隔1天；发票不同，单次金额分别为540元和545元、各3人，人均分别为180元和约181.67元，均未超过单次5000元和人均300元标准，合计也未达到部门总经理审批线10000元",
         "expected_anomaly_ids": [],
         "required_citations": [
           {
@@ -4424,13 +4442,18 @@
             "check": "超标准结论引用对应专项费用标准",
             "metric": "policy",
             "evaluation_mode": "hybrid",
-            "expected": "04至07号专项费用标准",
+            "expected": [
+              "04_travel_expense.md",
+              "05_training_expense.md",
+              "06_business_entertainment.md",
+              "07_office_communication.md"
+            ],
             "evidence_sources": [
               "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "专项费用标准与超标准发现对应",
-            "fail_condition": "未完全满足通过条件：专项费用标准与超标准发现对应"
+            "pass_condition": "四份专项费用标准均已引用且与超标准发现对应",
+            "fail_condition": "未完全满足通过条件：四份专项费用标准均已引用且与超标准发现对应"
           },
           {
             "id": "policy-coverage-budget",
@@ -4592,7 +4615,7 @@
         "expected_facts": [
           "四条记录属于同一员工E0041和同一费用类型training_fee，费用日期从2025-12-18至2025-12-25，首尾相隔7天",
           "四笔金额为2157.72元、2917.45元、2606.07元和2083.49元，合计9764.73元",
-          "9764.73元低于2025现行10000元较高审批线，不构成拆分规避审批",
+          "9764.73元低于2025现行部门总经理审批线10000元，不构成拆分规避审批",
           "9764.73元高于已废止的2022版8000元线，误用旧线会产生拆分报销误报",
           "四笔课程费分别未超过每人每期3500元标准，且发票互不相同"
         ],
@@ -4792,7 +4815,7 @@
           },
           {
             "id": "current-threshold",
-            "check": "采用现行10000元较高审批线",
+            "check": "采用现行部门总经理审批线10000元",
             "metric": "policy",
             "evaluation_mode": "hybrid",
             "expected": 10000,
@@ -4800,8 +4823,8 @@
               "final_answer",
               "tool_trace"
             ],
-            "pass_condition": "正确引用并采用现行10000元线",
-            "fail_condition": "未完全满足通过条件：正确引用并采用现行10000元线"
+            "pass_condition": "正确引用并采用现行部门总经理审批线10000元",
+            "fail_condition": "未完全满足通过条件：正确引用并采用现行部门总经理审批线10000元"
           },
           {
             "id": "current-conclusion",
@@ -4904,6 +4927,19 @@
             ],
             "pass_condition": "准确引用10000元现行审批线出处",
             "fail_condition": "未完全满足通过条件：准确引用10000元现行审批线出处"
+          },
+          {
+            "id": "policy-history",
+            "check": "引用2022版费用报销办法的8000元旧线及废止依据",
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "02_expense_reimbursement_2022_deprecated.md#第一条、第二条、第四条",
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "pass_condition": "准确引用历史制度中的8000元旧线和废止状态",
+            "fail_condition": "未完全满足通过条件：准确引用历史制度中的8000元旧线和废止状态"
           },
           {
             "id": "policy-training",

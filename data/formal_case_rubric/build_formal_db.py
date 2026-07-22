@@ -36,6 +36,16 @@ FORMAL_REASON_OVERRIDES = {
     "R004240": "客户乙投行业务沟通招待费",
 }
 
+BUSINESS_CODEBOOK = [
+    ("employee_level", "E1", "员工级"),
+    ("employee_level", "M1", "经理级"),
+    ("employee_level", "D1", "部门负责人级"),
+    ("employee_level", "X1", "高管级"),
+    ("city_tier", "A", "一类城市"),
+    ("city_tier", "B", "二类城市"),
+    ("city_tier", "C", "三类城市"),
+]
+
 
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
@@ -77,6 +87,21 @@ def sanitize_database(destination: Path) -> None:
                     """,
                     (vendor, invoice_id),
                 )
+        connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS business_codebook (
+                field_name TEXT NOT NULL,
+                code TEXT NOT NULL,
+                display_name TEXT NOT NULL,
+                PRIMARY KEY (field_name, code)
+            )
+            """
+        )
+        connection.execute("DELETE FROM business_codebook")
+        connection.executemany(
+            "INSERT INTO business_codebook(field_name, code, display_name) VALUES (?, ?, ?)",
+            BUSINESS_CODEBOOK,
+        )
         connection.commit()
 
 
@@ -105,6 +130,11 @@ def validate_database(path: Path) -> None:
         )
         if boundary_reasons != FORMAL_REASON_OVERRIDES:
             raise ValueError("TRAP-005 business contexts are not distinct and reproducible")
+        codebook_rows = connection.execute(
+            "SELECT field_name, code, display_name FROM business_codebook ORDER BY field_name, code"
+        ).fetchall()
+        if codebook_rows != sorted(BUSINESS_CODEBOOK):
+            raise ValueError("business codebook is incomplete or inconsistent")
         for table, excluded in {
             "expense_records": {"reason"},
             "invoices": {"vendor_name"},
