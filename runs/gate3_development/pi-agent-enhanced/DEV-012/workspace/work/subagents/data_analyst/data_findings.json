@@ -1,0 +1,73 @@
+{
+  "in_scope_population": {
+    "total_records": 21,
+    "total_employees": 4,
+    "total_departments": 2,
+    "date_range": "2025-01-05 to 2025-12-20",
+    "budget_year": 2025,
+    "all_record_ids": ["R900001","R900002","R900003","R900004","R900005","R900006","R900007","R900008","R900009","R900010","R900011","R900012","R900013","R900014","R900015","R900016","R900017","R900018","R900019","R900020","R900021"]
+  },
+  "rule_results": {
+    "duplicate_reimbursement": {
+      "matched_record_ids": ["R900001","R900002"],
+      "details": [
+        {"invoice_id":"INV900001","invoice_no":"FPDEV900001","record_ids":["R900001","R900002"],"usage_count":2}
+      ]
+    },
+    "split_reimbursement": {
+      "matched_record_ids": ["R900003","R900004"],
+      "groups": [
+        {"employee_id":"E9001","expense_type":"travel_transport","record_ids":["R900003","R900004"],"date1":"2025-02-03","date2":"2025-02-06","day_gap":3,"total_amount":10400.0}
+      ]
+    },
+    "over_standard": {
+      "travel_lodging": [
+        {"record_id":"R900013","employee_id":"E9002","employee_level":"经理级","city_tier":"A","nights":2,"amount":1400.0,"per_night":700.0,"standard":650,"special_approval":0}
+      ],
+      "training_lodging": [],
+      "training_fee": [],
+      "business_entertainment": [
+        {"record_id":"R900005","amount":3600.0,"participants":10,"per_person":360.0,"violation":"per_person>300","special_approval":0},
+        {"record_id":"R900017","amount":5200.0,"participants":20,"per_person":260.0,"violation":"per_event>5000","special_approval":0}
+      ],
+      "office_supplies": [
+        {"employee_id":"E9001","month":"2025-01","total":960.0,"threshold":600,"record_ids":["R900001","R900002"]},
+        {"employee_id":"E9001","month":"2025-04","total":650.0,"threshold":600,"record_ids":["R900007"]}
+      ],
+      "communication": [
+        {"employee_id":"E9001","month":"2025-09","total":340.0,"threshold":300,"record_ids":["R900014","R900015"]}
+      ],
+      "all_matched_ids": ["R900013","R900005","R900017","R900001","R900002","R900007","R900014","R900015"]
+    },
+    "overdue": {
+      "matched_record_ids": ["R900006"],
+      "details": [
+        {"record_id":"R900006","employee_id":"E9001","expense_date":"2025-03-01","reimburse_date":"2025-05-05","delay_days":65}
+      ]
+    },
+    "over_budget": {
+      "matched_record_ids": ["R900019"],
+      "context_record_ids": ["R900018"],
+      "exempted_record_ids": ["R900020"],
+      "details": [
+        {"department_id":"D902","department_name":"开发审计二部","annual_budget":50000.0,"record_id":"R900019","expense_date":"2025-02-15","amount":6000.0,"cum_sum":51000.0,"special_approval":0,"first_crossing":true}
+      ]
+    }
+  },
+  "all_matched_record_ids": ["R900001","R900002","R900003","R900004","R900005","R900006","R900007","R900013","R900014","R900015","R900017","R900019"],
+  "completed_checks": [
+    "duplicate_reimbursement",
+    "split_reimbursement",
+    "over_standard_travel_lodging",
+    "over_standard_training_lodging",
+    "over_standard_training_fee",
+    "over_standard_business_entertainment",
+    "over_standard_office_supplies",
+    "over_standard_communication",
+    "overdue",
+    "over_budget"
+  ],
+  "data_quality_issues": [],
+  "limitations": [],
+  "unresolved_items": []
+}

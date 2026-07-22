@@ -1,0 +1,58 @@
+{
+  "task_id": "PV-CASE-001",
+  "records": {
+    "R004233": {
+      "record_id": "R004233",
+      "employee_id": "E0012",
+      "employee_name": "杨丽华",
+      "employee_level": "X1",
+      "position_role": "分管副总",
+      "department_id": "D008",
+      "department_name": "合规风控部",
+      "expense_date": "2025-10-03",
+      "reimburse_date": "2025-10-09",
+      "expense_type": "travel_lodging",
+      "amount": 9990.0,
+      "city_tier": "A",
+      "nights": 10,
+      "status": "approved",
+      "approval_tier": "AR-02",
+      "approver_role": "部门经理",
+      "approver_id": "E0008",
+      "approver_name": "杨丹",
+      "has_financial_review": false,
+      "standard_per_night": 1100,
+      "actual_per_night": 999.0,
+      "standard_total": 11000,
+      "within_standard": true,
+      "within_budget": true
+    }
+  },
+  "policies": {
+    "01_expense_reimbursement_2025.md": {
+      "status": "current",
+      "effective": "2025-01-01",
+      "key_clauses": ["第三条", "第五条", "第十二条", "第十四条"]
+    },
+    "02_expense_reimbursement_2022_deprecated.md": {
+      "status": "deprecated",
+      "key_rules": {"部门总经理线": 8000, "分管副总线": 30000}
+    },
+    "03_authorization_management.md": {
+      "status": "current",
+      "effective": "2025-01-01",
+      "ar_tiers": {"AR-02": "≥3000且<10000:部门经理+财务复核"}
+    },
+    "04_travel_expense.md": {
+      "status": "current",
+      "lodging_standard": {"高管级_A类": 1100}
+    }
+  },
+  "findings": {
+    "approval_path": "anomaly",
+    "approval_issue": "缺少财务复核(AR-02要求'部门经理,并经财务复核')",
+    "expense_standard": "compliant",
+    "standard_calc": "¥999/晚 ≤ ¥1,100/晚",
+    "historical_bias": "继续使用历史审批线(≥8000→部门总经理)会误判审批级别不足"
+  }
+}

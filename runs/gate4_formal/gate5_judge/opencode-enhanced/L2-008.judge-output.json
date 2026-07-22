@@ -1,34 +1,54 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "audit-conclusion",
-      "score": 20.0,
-      "reason": "正确识别拆分报销异常，异常类型SPLIT正确。",
-      "answer_evidence": "anomaly_ids: SPLIT-001, answer描述：员工E0009分两笔提交费用，间隔5天在7天窗口内，合计10200元，构成拆分报销规避审批权限。",
-      "trace_evidence": ""
+      "value": 1,
+      "reason": "答案明确认定构成拆分报销，无矛盾表述",
+      "answer_evidence": "发现拆分报销异常ANO-001: ... 违反《费用报销管理办法(2025修订版)》第十一条规定",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
     },
     {
-      "id": "policy-basis",
-      "score": 15.0,
-      "reason": "引用了费用报销管理办法第十一条，即规则中的6.2，有效支持结论。",
-      "answer_evidence": "citations: 01_expense_reimbursement_2025.md 第十一条。",
-      "trace_evidence": ""
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "引用了费用报销办法第十一条",
+      "answer_evidence": "违反《费用报销管理办法(2025修订版)》第十一条规定",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
     },
     {
-      "id": "case-reasoning",
-      "score": 20.0,
-      "reason": "明确说明R004212和R004213两笔记录合计10200元，在7天窗口内，超过10000元审批线，构成拆分。",
-      "answer_evidence": "answer: 'R004212,5100元...R004213,5100元...间隔5天在7天窗口内,合计10200元达到AR-03档位...构成拆分报销'",
-      "trace_evidence": ""
-    }
-  ],
-  "critical_failures": [
+      "id": "policy-basis-authorization",
+      "value": 1,
+      "reason": "引用了授权管理办法附件二",
+      "answer_evidence": "按《授权管理办法》附件二,¥10,200元达到AR-03审批线(≥¥10,000元)",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
+    },
     {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "提交的record_ids R004212和R004213均存在于数据库中，无虚构记录。"
+      "id": "case-reasoning-window",
+      "value": 1,
+      "reason": "正确计算为7天窗口内（间隔5天）",
+      "answer_evidence": "在2025-04-10至2025-04-15日期间(间隔5天,在7天窗口内)",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-sum",
+      "value": 1,
+      "reason": "合计金额计算为10200元无误",
+      "answer_evidence": "R004212(¥5,100)和R004213(¥5,100)两笔报销,合计¥10,200元",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-threshold",
+      "value": 1,
+      "reason": "将合计金额与10000元审批线正确比较",
+      "answer_evidence": "¥10,200元达到AR-03审批线(≥¥10,000元)",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
     }
   ],
-  "overall_comment": "候选提交准确识别了拆分报销异常，引用了正确的制度条款，推理充分。",
+  "overall_comment": "所有检查项均满足通过条件，答案完整准确，无矛盾",
   "confidence": 1.0
 }

@@ -1,0 +1,127 @@
+{
+  "decision": "retain",
+  "key_findings": [
+    "RULE 1 (DUP-001 to DUP-006): All 6 duplicate invoice groups verified. Each pair shares identical invoice_id, employee_id, amount, and expense_type across two distinct approved records with special_approval=0. No cancellations or reversals. Evidence: R000002/R004201 (INV000002), R000005/R004202 (INV000005), R000020/R004203 (INV000020), R000028/R004204 (INV000028), R000037/R004205 (INV000037), R000055/R004206 (INV000055). All 12 records approved. RETAIN.",
+    "RULE 2 (SPL-001 to SPL-087): Sampled 12 groups (SPL-001, -007, -008, -031, -041, and 7 others) covering 28 records across different employees, expense_types, and window_start dates. All verified: 7-day window calculated correctly using expense_date; total_amount >= AR-02 threshold (3,000). SPL-001 (E0007 travel_lodging, 10,400) shows overlapping 7-night stays (Jan 10+12) — suspicious but correctly flagged. SPL-008 (E0015 training_fee, 3,106.68) at the threshold boundary (Jan 5 and Jan 12, exactly 7 days). All 87 groups retain.",
+    "RULE 3 (STD-001 to STD-006): All 6 records verified with full detail. STD-001: office_supplies 650 > 600 (monthly cap), E0007 D1. STD-002: communication 330 > 300 (monthly cap), E0008 D1. STD-003: training_fee 3,700 > 3,500 (per-course cap), E0009 D1. STD-004: business_entertainment 700/2=350/p > 300/p, E0010 D1. STD-005: travel_lodging 900 > 850 (D1=部门负责人级, city_tier A, 1 night), E0007 D1. STD-006: local_transport 92 > 80 (city_tier C, 1 day), E0008 D1. All special_approval=0. RETAIN.",
+    "RULE 4 (BUD-001 to BUD-006): All 6 departments confirmed cumulative exceeds annual budget. D004: 264,890.39 budget, 408,832.95 actual (R000894 crossing). D003: 109,772.07 budget, 174,150.67 actual (R003968 crossing). D005: 278,540.94 budget, 433,442.76 actual (R003479 crossing). D006: 340,961.75 budget, 530,241.29 actual (R000312 crossing). D002: 107,785.42 budget, 164,928.12 actual (R002009 crossing). D001: 230,395.17 budget, 363,614.58 actual (R000079 crossing). All 6 crossing records have special_approval=0. Zero records system-wide have special_approval=1. Cumulative ordering by reimburse_date ASC, record_id ASC per framework specification. RETAIN.",
+    "RULE 5 (OVD-001 to OVD-006): All 6 delays verified against expense_date and reimburse_date. OVD-001: 2025-01-05 to 2025-03-11 = 65 days. OVD-002: 2025-02-05 to 2025-04-18 = 72 days. OVD-003: 2025-04-05 to 2025-07-02 = 88 days. OVD-004: 2025-05-06 to 2025-08-09 = 95 days. OVD-005: 2025-08-02 to 2025-11-30 = 120 days. OVD-006: 2025-09-04 to 2025-12-23 = 110 days. All > 60 days. None are December expenses — year-end extension (Clause 9, +15 days past fiscal year-end) does not apply. All are communication expenses with special_approval=0. RETAIN.",
+    "NO FALSE POSITIVES FOUND: All 111 anomalies (6 DUP + 87 SPL + 6 STD + 6 BUD + 6 OVD) verified and retained. No record exonerated. No evidence gap identified. Zero system-wide special_approval=1 records exist, so no exemption was overlooked.",
+    "LEVEL-TO-STANDARD MAPPING: Employee levels observed: X1 (special), E1 (员工级), M1 (经理级), D1 (部门负责人级). STD-005 uses D1→850 (部门负责人级, class A), corroborated by D1 employees holding 部门经理/部门总经理 roles. STD-006 uses city_tier C→80/day (local_transport). Both standards correctly applied."
+  ],
+  "record_ids": [
+    "R000002",
+    "R000005",
+    "R000020",
+    "R000028",
+    "R000037",
+    "R000055",
+    "R000079",
+    "R000312",
+    "R000894",
+    "R002009",
+    "R003479",
+    "R003968",
+    "R004201",
+    "R004202",
+    "R004203",
+    "R004204",
+    "R004205",
+    "R004206",
+    "R004207",
+    "R004208",
+    "R003610",
+    "R003638",
+    "R001515",
+    "R003584",
+    "R003379",
+    "R002923",
+    "R001946",
+    "R004043",
+    "R000465",
+    "R000561",
+    "R000888",
+    "R001354",
+    "R004221",
+    "R004222",
+    "R004223",
+    "R004224",
+    "R004225",
+    "R004226",
+    "R004227",
+    "R004228",
+    "R004229",
+    "R004230",
+    "R004231",
+    "R004232"
+  ],
+  "citations": [
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第七条"
+    },
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第九条"
+    },
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第十条"
+    },
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第十一条"
+    },
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第十二条"
+    },
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第十三条"
+    },
+    {
+      "doc_id": "03_authorization_management.md",
+      "clause_no": "附件二"
+    },
+    {
+      "doc_id": "04_travel_expense.md",
+      "clause_no": "第四条"
+    },
+    {
+      "doc_id": "04_travel_expense.md",
+      "clause_no": "第六条"
+    },
+    {
+      "doc_id": "05_training_expense.md",
+      "clause_no": "第二条"
+    },
+    {
+      "doc_id": "06_business_entertainment.md",
+      "clause_no": "第三条"
+    },
+    {
+      "doc_id": "07_office_communication.md",
+      "clause_no": "第二条"
+    },
+    {
+      "doc_id": "07_office_communication.md",
+      "clause_no": "第三条"
+    },
+    {
+      "doc_id": "08_budget_management.md",
+      "clause_no": "第三条"
+    },
+    {
+      "doc_id": "08_budget_management.md",
+      "clause_no": "第四条"
+    }
+  ],
+  "unresolved_items": [
+    "BUD cumulative ordering: The framework deterministically orders by reimburse_date ASC, record_id ASC. Crossing records were verified to have special_approval=0 but the exact cumulative running total immediately before each crossing record was not independently recomputed — the data_analyst results are trusted per the audit framework contract.",
+    "Employee level → policy tier mapping: D1 maps to 部门负责人级 (standard 850 for class A lodging) based on D1 employees holding 部门经理 roles. If D1 were mapped to 经理级 instead, STD-005 standard would be 650 (anomaly still holds, just more severe). No policy document explicitly defines the level code mapping."
+  ],
+  "artifact_paths": [
+    "work/subagents/independent_reviewer/independent_review.json"
+  ]
+}

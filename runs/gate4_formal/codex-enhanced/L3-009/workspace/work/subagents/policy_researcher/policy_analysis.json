@@ -1,0 +1,264 @@
+{
+  "audit_period": "2025-01-01 to 2025-12-31",
+  "applicable_policy_version": "2025修订版",
+  "policy_effective_date": "2025-01-01",
+  "deprecated_policy": {
+    "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+    "title": "XX证券费用报销管理办法(2022版)",
+    "status": "废止(deprecated)",
+    "replacement": "01_expense_reimbursement_2025.md",
+    "repeal_clause": "2025版第十四条: 本办法自二〇二五年一月一日起施行。原2022版同时废止。",
+    "note": "2022版旧审批金额(8000/30000)已被附件二审批线替代,不得作为现行审批依据"
+  },
+  "rules_analysis": [
+    {
+      "rule_id": "DUPLICATE_REIMBURSEMENT",
+      "rule_name": "重复报销",
+      "governing_clause": {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条",
+        "text": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。"
+      },
+      "threshold": {
+        "type": "count",
+        "value": "同一发票报销次数 > 1",
+        "numeric_value": 1,
+        "unit": "次(count)"
+      },
+      "exemption_conditions": [],
+      "special_approval_applicable": false,
+      "effective_date": "2025-01-01",
+      "cross_references": [],
+      "conflicts": [],
+      "notes": "无豁免条件。同一invoice_no出现在多条报销记录中即构成异常,无论金额大小。"
+    },
+    {
+      "rule_id": "SPLIT_REIMBURSEMENT",
+      "rule_name": "拆分报销",
+      "governing_clause": {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条",
+        "text": "不得将同一事项或同类事项拆分为多笔报销以规避审批权限。同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到《授权管理办法》附件二较高审批线的,应重点核查拆分规避审批。"
+      },
+      "threshold": {
+        "conditions": {
+          "employee_match": "同一员工(employee_id)",
+          "expense_type_match": "同一费用类型(expense_type)",
+          "time_window": "7天内(expense_date差值 ≤ 7天)",
+          "min_records": "≥ 2笔报销记录",
+          "amount_threshold": "合计金额 ≥ AR-02线",
+          "ar02_amount": 3000,
+          "ar02_unit": "CNY"
+        }
+      },
+      "exemption_conditions": [],
+      "special_approval_applicable": false,
+      "effective_date": "2025-01-01",
+      "cross_references": [
+        {
+          "doc_id": "03_authorization_management.md",
+          "clause_no": "附件二",
+          "text": "AR-02: 大于等于3000元且小于10000元,审批角色:部门经理+财务复核"
+        }
+      ],
+      "conflicts": [],
+      "notes": "拆分报销规则没有明确的豁免条件。'较高审批线'指附件二AR-02(≥3000 CNY)。需同时满足: (1)同员工+同类型+7天内≥2笔; (2)合计金额≥3000 CNY。"
+    },
+    {
+      "rule_id": "OVER-STANDARD",
+      "rule_name": "超标准报销",
+      "governing_clause": {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十二条",
+        "text": "无专项审批时,报销金额不得超过对应制度标准的1.0倍。"
+      },
+      "threshold": {
+        "type": "single_transaction_ratio",
+        "value": "单笔报销金额 > 适用标准 × 1.0",
+        "multiplier": 1.0
+      },
+      "exemption_conditions": [
+        {
+          "field": "special_approval",
+          "description": "存在专项审批(special_approval=true)时,超标准可豁免"
+        }
+      ],
+      "special_approval_applicable": true,
+      "effective_date": "2025-01-01",
+      "standards_by_type": {
+        "业务招待(business_entertainment)": {
+          "doc_id": "06_business_entertainment.md",
+          "single_event_max": 5000,
+          "per_person_max": 300,
+          "unit_single_event": "CNY/次",
+          "unit_per_person": "CNY/人",
+          "applicable_clauses": ["第二条: 单次活动≤5000元", "第三条: 人均≤300元"],
+          "evaluation_logic": "单笔报销金额 > 5000 或 单笔金额/参与人数 > 300 则异常(无special_approval时)",
+          "note": "两条标准为AND关系还是分别独立判断:按保守原则,两条均需检查,任一超标即异常"
+        },
+        "培训(training)": {
+          "doc_id": "05_training_expense.md",
+          "course_per_person_max": 3500,
+          "internal_daily_max": 800,
+          "external_daily_max": 1200,
+          "hotel_class1": 500,
+          "hotel_class2": 420,
+          "hotel_class3": 350,
+          "unit_course": "CNY/人/期",
+          "unit_daily": "CNY/天",
+          "unit_hotel": "CNY/人/晚",
+          "applicable_clauses": [
+            "第二条: 课程费≤3500元/人/期",
+            "第三条: 内部培训≤800元/天",
+            "第四条: 外部培训≤1200元/天",
+            "第五条: 住宿 class1≤500, class2≤420, class3≤350"
+          ],
+          "note": "培训住宿标准与差旅住宿标准互斥(05第六条),培训期间住宿只能用培训标准"
+        },
+        "差旅(travel)": {
+          "doc_id": "04_travel_expense.md",
+          "hotel_by_level_city": {
+            "员工级(employee)": {"class1": 450, "class2": 380, "class3": 300},
+            "经理级(manager)": {"class1": 650, "class2": 550, "class3": 450},
+            "部门负责人级(dept_head)": {"class1": 850, "class2": 700, "class3": 600},
+            "高管级(executive)": {"class1": 1100, "class2": 900, "class3": 750}
+          },
+          "local_transport_daily": {"class1": 120, "class2": 100, "class3": 80},
+          "unit_hotel": "CNY/人/晚",
+          "unit_transport": "CNY/天",
+          "applicable_clauses": [
+            "第四条: 住宿标准按职级+城市档位",
+            "第五条: 超住宿标准且无专项审批,不得报销超出部分",
+            "第六条: 市内交通包干 class1=120, class2=100, class3=80"
+          ],
+          "note": "培训期间住宿不适用差旅住宿表(04第七条)"
+        },
+        "办公(office)": {
+          "doc_id": "07_office_communication.md",
+          "monthly_per_person": 600,
+          "unit": "CNY/人/月",
+          "applicable_clause": "第二条: 每人每月≤600元",
+          "task_instruction_note": "月度累计不纳入本次评估,仅单笔超600需检查"
+        },
+        "通讯(communication)": {
+          "doc_id": "07_office_communication.md",
+          "monthly_per_person": 300,
+          "unit": "CNY/人/月",
+          "applicable_clause": "第三条: 每人每月≤300元",
+          "task_instruction_note": "月度累计不纳入本次评估,仅单笔超300需检查"
+        }
+      },
+      "cross_references": [
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四-六条", "relation": "差旅住宿+交通标准"},
+        {"doc_id": "05_training_expense.md", "clause_no": "第二-五条", "relation": "培训费用标准"},
+        {"doc_id": "06_business_entertainment.md", "clause_no": "第二-三条", "relation": "业务招待标准"},
+        {"doc_id": "07_office_communication.md", "clause_no": "第二-三条", "relation": "办公通讯标准"}
+      ],
+      "conflicts": [],
+      "notes": "超标准判断基数为1.0倍。special_approval为豁免条件。需根据费用类型(expense_type)匹配对应制度标准。"
+    },
+    {
+      "rule_id": "OVER-BUDGET",
+      "rule_name": "超预算报销",
+      "governing_clauses": [
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第十三条",
+          "text": "部门年度预算不足时不得继续报销。预算使用达到预算额度的1.0倍后,确需发生的费用应履行专项审批。"
+        },
+        {
+          "doc_id": "08_budget_management.md",
+          "clause_no": "第三条",
+          "text": "部门费用累计使用达到年度预算额度的1.0倍后,原则上不得继续报销。"
+        }
+      ],
+      "threshold": {
+        "type": "cumulative_ratio",
+        "value": "部门累计报销金额 > 部门年度预算 × 1.0",
+        "multiplier": 1.0
+      },
+      "key_record_definition": "按expense_date排序,累计金额首次超过预算额度1.0x的那条记录,若无special_approval则为关键异常记录",
+      "exemption_conditions": [
+        {
+          "field": "special_approval",
+          "description": "存在专项审批(special_approval=true)时,超预算可豁免"
+        },
+        {
+          "doc_id": "08_budget_management.md",
+          "clause_no": "第四条",
+          "text": "因监管要求、客户服务或经营连续性确需超预算支出的,应履行专项审批。",
+          "note": "专项审批依据08第四条"
+        }
+      ],
+      "special_approval_applicable": true,
+      "effective_date": "2025-01-01",
+      "cross_references": [
+        {"doc_id": "08_budget_management.md", "clause_no": "第二-四条", "relation": "预算执行与超支审批"}
+      ],
+      "conflicts": [],
+      "notes": "需要部门级别的累计计算。关键记录是第一笔导致累计超出预算1.0x的记录(按expense_date排序)。以department_id为粒度。"
+    },
+    {
+      "rule_id": "OVERDUE_REIMBURSEMENT",
+      "rule_name": "超期报销",
+      "governing_clause": {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第七条",
+        "text": "员工应在费用发生后60天内提交报销申请;超过期限的,原则上不得报销。"
+      },
+      "threshold": {
+        "type": "days_difference",
+        "value": "reimburse_date - expense_date > 60天",
+        "numeric_value": 60,
+        "unit": "天(days)"
+      },
+      "exception_condition": {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第九条",
+        "text": "会计年度末发生的费用,最迟可在财政年度结束后15天内补充提交,逾期按超期报销处理。",
+        "extension": "年末费用(reimburse_date在次年): 最迟可至次年1月15日(财政年度结束后15天)",
+        "note": "该例外条款延长了年末费用的提交期限,但仍以'逾期按超期报销处理'为兜底"
+      },
+      "exemption_conditions": [],
+      "special_approval_applicable": false,
+      "effective_date": "2025-01-01",
+      "cross_references": [],
+      "conflicts": [],
+      "notes": "超期报销无special_approval豁免。Art.7使用'原则上'措辞,但Art.9明确年末费用可延长至次年1月15日。判断逻辑: reimburse_date - expense_date > 60, 但若expense_date在年末且reimburse_date ≤ 次年1月15日,适用Art.9例外。"
+    }
+  ],
+  "policy_conflicts_summary": {
+    "has_conflicts": false,
+    "conflicts_found": [],
+    "notes": "经全面检索,2025政策体系内部未发现冲突。2022版已明示废止。各费用类型标准文档之间界限清晰:培训住宿(05)与差旅住宿(04)通过05第六条和04第七条明确互斥。"
+  },
+  "effective_dates_summary": {
+    "primary_policy": {"doc_id": "01", "effective": "2025-01-01", "prior_version": "2022版(已废止)"},
+    "authorization": {"doc_id": "03", "effective": "2025-01-01"},
+    "travel": {"doc_id": "04", "effective": "2025-01-01", "source": "发文字号XX证行规〔2025〕丁号,推定与主政策同步"},
+    "training": {"doc_id": "05", "effective": "2025-01-01", "source": "发文字号XX证人规〔2025〕戊号,推定与主政策同步"},
+    "entertainment": {"doc_id": "06", "effective": "2025-01-01", "source": "发文字号XX证客规〔2025〕己号,推定与主政策同步"},
+    "office_comm": {"doc_id": "07", "effective": "2025-01-01", "source": "发文字号XX证办规〔2025〕庚号,推定与主政策同步"},
+    "budget": {"doc_id": "08", "effective": "2025-01-01", "source": "发文字号XX证财规〔2025〕辛号,推定与主政策同步"}
+  },
+  "exclusion_analysis": {
+    "2022_version": {
+      "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+      "reason": "2025版第十四条明示废止,2022 Art.1自述仅作制度沿革留档,2022 Art.4声明审批金额已被替代。2025-01-01前发生且在该日期前提交的费用可能受2022版管辖,但审计期间为2025全年,2022版不适用。"
+    },
+    "non_relevant_docs": {
+      "09_information_security.md": "信息安全,无关",
+      "10_seal_management.md": "印章管理,无关",
+      "11_attendance_management.md": "考勤休假,无关",
+      "12_archive_management.md": "档案管理,无关",
+      "13_procurement_management.md": "采购管理,无关",
+      "14_hr_transfer.md": "人员调动,无关",
+      "15_meeting_management.md": "会议管理,无关",
+      "16_contract_management.md": "合同管理,无关",
+      "17_confidentiality.md": "保密管理,无关",
+      "18_it_asset.md": "IT资产管理,无关",
+      "19_office_environment.md": "办公环境,无关",
+      "20_customer_complaint.md": "客户投诉,无关"
+    }
+  }
+}

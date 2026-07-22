@@ -1,0 +1,75 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-R004209-001",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "citations": [
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第五条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R004209: 杨丹(E0008,D1/部门经理)2025-02-26报销项目现场住宿费3400元/5晚/A类城市,每晚680元,超出经理级一类城市标准650元/晚,超支150元",
+        "R004210: 杨丹(E0008)2025-02-28报销项目现场住宿费3400元/5晚/A类城市,每晚680元,超出标准650元/晚,超支150元",
+        "R004211: 杨丹(E0008)2025-03-02报销项目现场住宿费3400元/5晚/A类城市,每晚680元,超出标准650元/晚,超支150元",
+        "三笔记录special_approval均为0,无专项审批",
+        "三笔合计超支450元,违反制度第十二条及差旅费管理办法第四、五条"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-R004209-002",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "R004209(2/26)+R004210(2/28)+R004211(3/2)为同一员工E0008同一费用类型travel_lodging,在5个日历日内发生3笔报销",
+        "三笔合计金额10,200元,达到AR-03审批线(≥10,000元,需部门总经理审批)",
+        "三笔均按AR-02(3,000-10,000元,部门经理审批)单独申报,合计金额已触发更高审批档位",
+        "拆分行为规避了部门总经理审批,违反制度第十一条"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-R004209-003",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "citations": [
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "AR-02档位(≥3,000且<10,000)要求审批角色为'部门经理,并经财务复核'",
+        "R004209审批记录: 仅E0008(杨丹)以部门经理身份自我审批,无财务复核记录",
+        "R004210审批记录: 仅E0008(杨丹)以部门经理身份自我审批,无财务复核记录",
+        "R004211审批记录: 仅E0008(杨丹)以部门经理身份自我审批,无财务复核记录",
+        "三笔均缺少制度要求的财务复核环节"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004209", "R004210", "R004211"],
+  "submitted_record_ids": ["R004209", "R004210", "R004211"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "total_amount": 10200,
+    "total_claimed_nights": 15,
+    "calendar_days_in_period": 5,
+    "standard_per_night": 650,
+    "actual_per_night": 680,
+    "total_excess": 450
+  },
+  "unresolved_items": []
+}

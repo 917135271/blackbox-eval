@@ -1,146 +1,209 @@
 {
+  "group": "opencode-baseline",
+  "task_id": "TRAP-002",
   "case_family": "clean_trap",
-  "case_score": 20,
-  "case_score_raw": 45.0,
   "category": "clean_but_suspicious",
-  "criteria": [
+  "graded_at": "2026-07-21T21:01:10+08:00",
+  "checklist_passed": 10,
+  "checklist_total": 14,
+  "checklist_pass_rate": 71.429,
+  "checklist": [
     {
-      "answer_evidence": "answer: 无异常",
       "id": "clean-conclusion",
-      "reason": "明确给出无异常结论，无矛盾表述",
-      "score": 30.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用，结论表述清晰"
+      "value": 1,
+      "reason": "明确结论为无异常，无矛盾表述。",
+      "answer_evidence": "answer中明确写有“无异常”",
+      "trace_evidence": "无工具调用，但final_answer足以证明。",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "record_ids: [R000002, R004201, R000005, R004202, R000020, R004203, R000028, R004204, R000037, R004205, R000055, R004206]，不含预期记录",
-      "id": "record-scope",
-      "reason": "未核查核心记录R004234, R004235，提交的全部是与题目无关的记录",
-      "score": 0.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用，未触及预期记录"
-    },
-    {
-      "answer_evidence": "answer: 无异常，未提及原因",
-      "id": "case-specific-reason",
-      "reason": "未说明专属合规原因（如不同发票、总额低于审批线）",
-      "score": 0.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用，无推理证据"
-    },
-    {
-      "answer_evidence": "无",
-      "id": "reverse-check",
-      "reason": "未进行任何反向核查（阈值、日期、发票等关键条件）",
-      "score": 0.0,
-      "source": "llm_judge",
-      "trace_evidence": "call_count: 0"
-    },
-    {
+      "id": "record-scope-include-r004234",
+      "value": 1,
+      "reason": "期望record_id已提交",
       "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-include-r004235",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "case-specific-reason-invoice",
+      "value": 1,
+      "reason": "准确说明了两条记录发票不同。",
+      "answer_evidence": "answer中注明“R004234使用发票FP2025X0004228，R004235使用发票FP2025X0004229，两张发票编号不同”",
+      "trace_evidence": "无工具调用，candidate_evidence_matrix中invoice_same为false。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "准确计算了7天内合计金额500元。",
+      "answer_evidence": "answer中写有“合计金额为500元”",
+      "trace_evidence": "无工具调用，candidate_evidence_matrix中combined_amount_7days为500.0。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 0,
+      "reason": "未正确比较合计金额与10000元审批线，误述为3000元。",
+      "answer_evidence": "answer中称“未达到...AR-02档位（3000元及以上）的较高审批线”，未提及10000元。",
+      "trace_evidence": "无工具调用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-invoice",
+      "value": 0,
+      "reason": "轨迹无工具调用或独立核验过程，无法证明发票不同。",
+      "answer_evidence": "无。",
+      "trace_evidence": "tool_trace_summary显示call_count为0。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 0,
+      "reason": "轨迹无工具调用或独立核验过程，无法证明合计金额计算。",
+      "answer_evidence": "无。",
+      "trace_evidence": "tool_trace_summary显示call_count为0。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 0,
+      "reason": "轨迹无工具调用或独立核验过程，无法证明审批线比较。",
+      "answer_evidence": "无。",
+      "trace_evidence": "tool_trace_summary显示call_count为0。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用了01_expense_reimbursement_2025.md第十条、第十一条。",
+      "answer_evidence": "citations中包含两项关于该制度的引用。",
+      "trace_evidence": "无工具调用，但citations字段直接体现。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "准确引用了03_authorization_management.md附件二。",
+      "answer_evidence": "citations中包含附件二的引用。",
+      "trace_evidence": "无工具调用，但citations字段直接体现。",
+      "source": "llm_judge"
+    },
+    {
       "id": "no-unsupported-output",
-      "reason": "未提交实质异常",
-      "score": 10.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    },
-    {
+      "value": 1,
+      "reason": "未提交异常ID",
       "answer_evidence": "",
-      "id": "submission",
-      "reason": "统一提交已接受且Schema有效",
-      "score": 5.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": true,
-      "reason": "提交的12条记录均为无关记录，未使用预期记录R004234、R004235作为核心支撑",
-      "score_cap": 20,
-      "source": "llm_judge"
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     },
     {
-      "id": "trap-false-positive",
-      "triggered": false,
-      "reason": "未将合规记录误判为异常",
-      "score_cap": 30,
-      "source": "llm_judge"
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 92.51,
+    "expected_anomaly_ids": [],
     "actual_anomaly_ids": [],
-    "actual_record_ids": [
-      "R000002",
-      "R004201",
-      "R000005",
-      "R004202",
-      "R000020",
-      "R004203",
-      "R000028",
-      "R004204",
-      "R000037",
-      "R004205",
-      "R000055",
-      "R004206"
-    ],
     "anomaly_metrics": {
-      "actual_types": {},
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
       "count_exact": true,
       "expected_types": {},
-      "f1": 1.0,
-      "precision": 1.0,
-      "recall": 1.0
+      "actual_types": {}
     },
-    "citation_count": 1,
-    "elapsed_seconds": 115.748,
-    "expected_anomaly_ids": [],
     "expected_record_ids": [
       "R004234",
       "R004235"
     ],
+    "actual_record_ids": [
+      "R004234",
+      "R004235"
+    ],
     "record_metrics": {
-      "exact": false,
-      "extra_count": 12,
-      "f1": 0.0,
-      "missing_count": 2,
-      "precision": 0.0,
-      "recall": 0.0
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
     },
-    "required_citations": [],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
     "trap_tokens_in_conclusion": [],
-    "unknown_record_ids": []
+    "citation_count": 4,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条、第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T23:26:57+08:00",
-  "group": "opencode-baseline",
   "judge": {
-    "attempt": 1,
-    "confidence": 1.0,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "结论正确但核查记录完全错误，且未提供任何推理依据或验证证据，触发关键失败，总分限制为20。",
-    "shape_attempt": 1,
     "status": "ok",
+    "confidence": 0.8,
+    "overall_comment": "候选正确判定无异常并解释发票不同、合计金额，但未提及10000元审批线且未提供工具轨迹独立核验。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 2510,
-      "completion_tokens_details": {
-        "reasoning_tokens": 2035
-      },
-      "prompt_cache_hit_tokens": 1152,
-      "prompt_cache_miss_tokens": 993,
-      "prompt_tokens": 2145,
-      "prompt_tokens_details": {
-        "cached_tokens": 1152
-      },
-      "total_tokens": 4655
-    }
+      "prompt_tokens": 2582,
+      "completion_tokens": 2535,
+      "total_tokens": 5117,
+      "prompt_cache_hit_tokens": 2560,
+      "prompt_cache_miss_tokens": 22
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 2582,
+          "completion_tokens": 2535,
+          "total_tokens": 5117,
+          "prompt_tokens_details": {
+            "cached_tokens": 2560
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1745
+          },
+          "prompt_cache_hit_tokens": 2560,
+          "prompt_cache_miss_tokens": 22
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 9
+      }
+    ]
   },
-  "passed": false,
-  "run_path": "runs/gate4_formal/opencode-baseline/TRAP-002",
-  "task_id": "TRAP-002"
+  "run_path": "runs/gate4_formal/opencode-baseline/TRAP-002"
 }

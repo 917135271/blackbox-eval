@@ -1,68 +1,73 @@
 {
   "task_id": "TRAP-005",
   "task_type": "clean_but_suspicious",
-  "question": "请核查TRAP-005涉及的记录是否构成异常,正确时应说明无异常。",
-  "scope": {
-    "audit_object": "TRAP-005涉及的费用报销记录",
-    "identified_records": ["R000005", "R004202"],
-    "shared_invoice": "FP202500000005 (INV000005)",
-    "expense_types": ["local_transport"],
-    "business_period": "2025-01至2025-12",
-    "organization_scope": "XX证券全部门"
+  "question": "请核查R004239和R004240是否构成重复报销、拆分报销或业务招待费超标准。必须核对发票、日期、单次金额和人均金额；若不构成异常，请明确说明无异常、原因和制度依据。",
+  "audit_scope": {
+    "record_ids": ["R004239", "R004240"],
+    "rules_to_check": ["duplicate_reimbursement", "split_reimbursement", "excessive_business_entertainment"],
+    "business_period": "2025-10-25 to 2025-10-26",
+    "organization_scope": "E0008 杨丹, D008 合规风控部"
   },
   "policy_questions": [
     {
-      "question": "同一发票FP202500000005在R000005和R004202中重复出现，是否违反第十条关于同一发票最多报销1次的规定？",
-      "applicable_policy": "01_expense_reimbursement_2025.md",
-      "applicable_clause": "第十条",
-      "clause_text": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。"
-    }
-  ],
-  "data_questions": [
-    {
-      "question": "R000005和R004202的发票FP202500000005是否存在重复使用？",
-      "tables": ["expenses", "invoices"],
-      "fields": ["record_id", "invoice_no", "invoice_id", "reason", "status", "expense_date", "reimburse_date"]
+      "rule": "duplicate_reimbursement",
+      "policy": "01_expense_reimbursement_2025.md",
+      "clause": "Article 10",
+      "condition": "同一发票最多报销1次",
+      "data_needed": ["invoice_no for R004239", "invoice_no for R004240", "invoice usage counts"]
     },
     {
-      "question": "R004202是否为测试注入数据？",
-      "fields": ["reason", "record_no", "special_approval", "status"]
+      "rule": "split_reimbursement",
+      "policies": [
+        {"doc": "01_expense_reimbursement_2025.md", "clause": "Article 11", "condition": "同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到较高审批线"},
+        {"doc": "06_business_entertainment.md", "clause": "Article 4", "condition": "同一客户拜访或同一会议安排不得拆分为多个报销事项"}
+      ],
+      "data_needed": ["employee_id", "expense_type", "dates", "amounts", "reasons/clients", "approval tiers per 03_authorization_management.md 附件二"]
+    },
+    {
+      "rule": "excessive_business_entertainment",
+      "policy": "06_business_entertainment.md",
+      "clauses": [
+        {"clause": "Article 2", "condition": "单次活动费用 ≤ 5000元"},
+        {"clause": "Article 3", "condition": "人均 ≤ 300元"}
+      ],
+      "data_needed": ["amount", "participants for each record"]
     }
   ],
-  "required_fields": ["record_id", "record_no", "invoice_no", "invoice_id", "reason", "expense_type", "amount", "expense_date", "reimburse_date", "employee_name", "department_name", "status", "special_approval", "approvals"],
+  "required_fields": ["record_id", "employee_id", "expense_date", "expense_type", "amount", "participants", "invoice_no", "reason", "status"],
   "evidence_requirements": [
-    "R000005费用明细及审批记录",
-    "R004202费用明细及审批记录",
-    "发票FP202500000005使用情况",
-    "确认R004202标注为注入样本的证据",
-    "相关政策条款原文"
+    "Expense detail for R004239 and R004240",
+    "Invoice usage for both invoice numbers",
+    "Policy texts: 01_expense_reimbursement_2025.md, 06_business_entertainment.md, 03_authorization_management.md",
+    "Any other records for E0008 in the surrounding 7-day window"
   ],
   "execution_steps": [
-    {"step": 1, "name": "planning", "artifact": "work/audit_plan.json", "stopping_condition": "scope, rules, fields, and routing defined"},
-    {"step": 2, "name": "policy_verification", "artifact": "policy version check result", "stopping_condition": "applicable policy version and clause confirmed"},
-    {"step": 3, "name": "data_investigation", "artifact": "detailed record analysis", "stopping_condition": "all TRAP-005 records and invoice usage verified"},
-    {"step": 4, "name": "evidence_coverage_check", "artifact": "work/evidence_matrix.json with status=pass", "stopping_condition": "100% coverage achieved"},
-    {"step": 5, "name": "false_positive_review", "artifact": "independent review result", "stopping_condition": "review decision made"},
-    {"step": 6, "name": "audit_report", "artifact": "work/final_result.json", "stopping_condition": "report complete with citations"},
-    {"step": 7, "name": "result_validation", "artifact": "work/validation_report.json with status=pass", "stopping_condition": "validation passed"},
-    {"step": 8, "name": "submission", "artifact": "submission result", "stopping_condition": "submitted and accepted"}
+    {"step": "planning", "description": "Create audit plan and record planning_completed checkpoint"},
+    {"step": "policy_check", "description": "Verify applicable policy versions and clauses"},
+    {"step": "data_collection", "description": "Retrieve expense details, check invoice usage, list nearby records"},
+    {"step": "analysis", "description": "Compare records against duplicate, split, and excessive rules"},
+    {"step": "preliminary_findings", "description": "Form preliminary findings and record investigation_completed checkpoint"},
+    {"step": "evidence_coverage", "description": "Run evidence-coverage-check"},
+    {"step": "false_positive_review", "description": "Run false-positive-review if triggered"},
+    {"step": "reporting", "description": "Run audit-report"},
+    {"step": "validation", "description": "Run result-validator and submit"}
   ],
-  "complexity": {
-    "score": 1,
-    "reasons": [
-      "单一规则（发票重复使用，第十条）",
-      "单一政策文档（01_expense_reimbursement_2025）",
-      "少量记录（2条直接关联记录）",
-      "无聚合、分组或复杂join",
-      "无政策版本冲突",
-      "属于已知记录的单一规则核查"
-    ]
-  },
+  "complexity_score": 2,
+  "complexity_reasons": [
+    "Multiple policies involved (3: expense reimbursement, business entertainment, authorization management)",
+    "Multiple business rules checked (3: duplicate, split, excessive)",
+    "No aggregation/batch processing needed (only 2 known records)",
+    "No policy version ambiguity (all 2025 policies, clear applicability)"
+  ],
   "subagent_plan": {
-    "required": false,
-    "reason": "Complexity 1 - single rule, single policy, two records. Compact mode sufficient."
+    "planned_roles": [],
+    "reason": "Complexity 2 with only 2 known records. Direct policy lookup and record comparison are compact enough for the main agent."
   },
-  "unresolved_items": [
-    "需通过policy-version-check确认2025版政策为唯一适用版本"
-  ]
+  "stopping_conditions": [
+    "All three rules (duplicate, split, excessive) have been checked with evidence",
+    "Evidence matrix shows 100% coverage",
+    "Validation report passes",
+    "Final result submitted successfully"
+  ],
+  "unresolved_items": []
 }

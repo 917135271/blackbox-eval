@@ -1,0 +1,118 @@
+{
+  "checklist": [
+    {
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "候选提交中BUDGET-OVER-D001的关键记录为R000079，工具调用显示R000079的department_id为D001，对应正确",
+      "answer_evidence": "提交回答中写明'BUDGET-OVER-D001（投资银行部）...关键记录R000079'",
+      "trace_evidence": "get_expense_detail('R000079')返回department_id为'D001'",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "候选提交中BUDGET-OVER-D002的关键记录为R002009，工具调用显示R002009的department_id为D002，对应正确",
+      "answer_evidence": "提交回答中写明'BUDGET-OVER-D002（固定收益部）...关键记录R002009'",
+      "trace_evidence": "get_expense_detail('R002009')返回department_id为'D002'",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "候选提交中BUDGET-OVER-D003的关键记录为R003968，工具调用显示R003968的department_id为D003，对应正确",
+      "answer_evidence": "提交回答中写明'BUDGET-OVER-D003（财富管理部）...关键记录R003968'",
+      "trace_evidence": "get_expense_detail('R003968')返回department_id为'D003'",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 1,
+      "reason": "候选提交中BUDGET-OVER-D004的关键记录为R000894，工具调用显示R000894的department_id为D004，对应正确",
+      "answer_evidence": "提交回答中写明'BUDGET-OVER-D004（研究所）...关键记录R000894'",
+      "trace_evidence": "get_expense_detail('R000894')返回department_id为'D004'",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 1,
+      "reason": "候选提交中BUDGET-OVER-D005的关键记录为R003479，工具调用显示R003479的department_id为D005，对应正确",
+      "answer_evidence": "提交回答中写明'BUDGET-OVER-D005（机构业务部）...关键记录R003479'",
+      "trace_evidence": "get_expense_detail('R003479')返回department_id为'D005'",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 1,
+      "reason": "候选提交中BUDGET-OVER-D006的关键记录为R000312，工具调用显示R000312的department_id为D006，对应正确",
+      "answer_evidence": "提交回答中写明'BUDGET-OVER-D006（运营管理部）...关键记录R000312'",
+      "trace_evidence": "get_expense_detail('R000312')返回department_id为'D006'",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "工具调用summarize_department_budgets返回全部10个部门的预算和执行情况，覆盖全年所有部门，非抽样",
+      "answer_evidence": "证据矩阵显示departments_checked为10，回答描述'对全部10个部门按reimburse_date和record_id依次累计'",
+      "trace_evidence": "summarize_department_budgets结果包含10个部门，例如运营管理部(D006)、机构业务部(D005)等",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-grouping",
+      "value": 1,
+      "reason": "累计计算明确按部门进行，summarize_department_budgets已按department_id分组得出每个部门的used_amount",
+      "answer_evidence": "回答描述'对每个部门所有status='approved'记录...逐条累加amount'",
+      "trace_evidence": "summarize_department_budgets返回每个department_id的used_amount，如D001的used_amount为363614.58",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-ordering",
+      "value": 1,
+      "reason": "回答中明确说明了排序规则为reimburse_date ASC, record_id ASC，且关键记录的选择基于此排序，无矛盾证据",
+      "answer_evidence": "回答中写明'按reimburse_date ASC, record_id ASC排序'",
+      "trace_evidence": "get_expense_detail返回的record包含reimburse_date，但工具调用未直接展示排序过程，提交方法描述可信",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-cumulative",
+      "value": 1,
+      "reason": "提交中对每个关键记录给出了前序累计金额、本次金额和突破后累计，数值可复核，如D001前序累计230281.68 + 226.98 = 230508.66",
+      "answer_evidence": "回答中对D001写明了'前序记录累计至230281.68元时尚未超预算，记录R000079金额226.98元，使累计达到230508.66元'",
+      "trace_evidence": "get_expense_detail('R000079')返回amount为226.98，其他记录类似，累计金额可据此验证",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-crossing",
+      "value": 1,
+      "reason": "提交中每个关键记录均说明累计首次超预算且special_approval=0，工具返回的审批记录未显示专项审批，支持该结论",
+      "answer_evidence": "回答中写明'R000079的special_approval=0，无专项审批'，其他记录类似",
+      "trace_evidence": "get_expense_detail('R000079')返回approvals仅有一条部门经理审批，无专项审批记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 1,
+      "reason": "证据矩阵显示over_budget_departments为6，anomalies_found为6，与提交的6项发现完全一致",
+      "answer_evidence": "回答列出6个发现：BUDGET-OVER-D001至D006",
+      "trace_evidence": "summarize_department_budgets返回中usage_rate>1的部门恰好6个",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "提交中明确引用了费用报销办法第十三条，且citations包含该条款",
+      "answer_evidence": "回答制度依据部分提及'《XX证券费用报销管理办法（2025修订版）》（01_expense_reimbursement_2025.md）第十三条规定'",
+      "trace_evidence": "get_policy_doc('01_expense_reimbursement_2025.md')返回的文本包含第十三条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-budget",
+      "value": 1,
+      "reason": "提交中引用了预算管理办法第二条至第四条，citations中包含了这三条",
+      "answer_evidence": "回答制度依据部分提及'《XX证券预算管理办法》（08_budget_management.md）第二条要求...第三条规定...第四条规定'",
+      "trace_evidence": "get_policy_doc('08_budget_management.md')返回的文本包含第二条至第四条",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交完全满足所有检查项，部门与关键记录映射正确，扫描方法覆盖全部部门、按部门累计、排序稳定、累计可复核、首次超预算且无专项审批，部门数量一致，制度依据引用完整且准确",
+  "confidence": 1.0
+}

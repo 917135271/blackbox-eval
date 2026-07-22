@@ -1,122 +1,77 @@
 {
-  "task_id": "TRAP-003",
-  "task_type": "clean_but_suspicious",
-  "question": "请核查TRAP-003涉及的记录是否构成异常,正确时应说明无异常",
-  "audit_object": "TRAP-003关联记录（R000003为核心，含同一员工E0061的邻近培训费记录R003369、R003915）",
-  "audit_period": "2025-03-01至2025-05-31",
-  "expense_types": ["training_fee"],
-  "organization_scope": "D008合规风控部",
-  "requested_deliverable": "判定是否存在异常，若无异常则明确输出'无异常'",
-  
+  "task_scope": {
+    "task_id": "TRAP-003",
+    "audit_object": "Records R004236 and R004237",
+    "expense_types": ["to be determined by data"],
+    "business_period": "to be determined by data",
+    "organization_scope": "to be determined by data",
+    "requested_deliverable": "Determine if R004236 and R004237 constitute split reimbursement within 7 days"
+  },
+  "audit_period": "based on expense dates of R004236 and R004237",
   "policy_questions": [
     {
-      "id": "PQ-01",
-      "question": "R000003培训费3209.78元是否超过培训费管理办法每人每期3500元标准？",
-      "policy": "05_training_expense.md 第二条",
-      "boundary": "金额≤3500"
-    },
-    {
-      "id": "PQ-02",
-      "question": "R000003金额3209.78元触发的AR-02审批档位是否按规定获得必要审批？",
-      "policy": "03_authorization_management.md 附件二",
-      "boundary": "AR-02 3000≤x<10000 需部门经理并经财务复核"
-    },
-    {
-      "id": "PQ-03",
-      "question": "R000003与同员工E0061的邻近培训费记录是否构成拆分报销规避审批？",
-      "policy": "01_expense_reimbursement_2025.md 第十一条",
-      "boundary": "同一员工同一费用类型7天内≥2笔且合计达较高审批线"
-    },
-    {
-      "id": "PQ-04",
-      "question": "发票FP202500000003是否被重复使用？",
-      "policy": "01_expense_reimbursement_2025.md 第十条",
-      "boundary": "同一发票最多报销1次"
-    },
-    {
-      "id": "PQ-05",
-      "question": "R000003报销是否在60天时限内？",
-      "policy": "01_expense_reimbursement_2025.md 第七条",
-      "boundary": "费用发生后60天内提交"
-    },
-    {
-      "id": "PQ-06",
-      "question": "D008合规风控部预算是否超支？",
-      "policy": "01_expense_reimbursement_2025.md 第十三条",
-      "boundary": "预算使用不超过1.0倍"
+      "id": "PQ1",
+      "question": "What is the policy rule on split reimbursement (拆分报销)? What is the 7-day rule and amount threshold?",
+      "boundaries": {
+        "dates": "expense_date of two records within 7 days",
+        "amounts": "combined amount threshold if any",
+        "conditions": "same employee, same expense type, same vendor, within 7 days"
+      }
     }
   ],
-
   "data_questions": [
     {
-      "id": "DQ-01",
-      "question": "获取R000003完整详情及审批链",
-      "tables": ["reimbursement_records", "approvals"],
-      "fields": ["record_id", "amount", "expense_date", "reimburse_date", "expense_type", "employee_id", "department_id", "status", "invoice_no", "approval_role"]
+      "id": "DQ1",
+      "question": "What are the details of R004236 and R004237 (employee, expense_date, amount, expense_type, vendor, status)?",
+      "required_tables": ["expense_detail"],
+      "required_fields": ["record_id", "employee_id", "expense_date", "amount", "expense_type", "invoice_no", "status"]
     },
     {
-      "id": "DQ-02",
-      "question": "查询员工E0061在2025年3月-4月的全部培训费记录以排查拆分",
-      "tables": ["reimbursement_records"],
-      "fields": ["record_id", "expense_date", "amount", "reason", "invoice_no"]
+      "id": "DQ2",
+      "question": "What is the date difference between the two records' expense dates?",
+      "required_fields": ["expense_date"]
     },
     {
-      "id": "DQ-03",
-      "question": "验证发票FP202500000003使用次数",
-      "tables": ["invoices"],
-      "fields": ["invoice_no", "usage_count"]
-    },
-    {
-      "id": "DQ-04",
-      "question": "获取D008部门预算和已使用额度",
-      "tables": ["department_budgets"],
-      "fields": ["annual_budget", "used_amount", "remaining_amount"]
+      "id": "DQ3",
+      "question": "Are both records from the same employee?",
+      "required_fields": ["employee_id"]
     }
   ],
-
-  "required_fields": ["record_id", "amount", "expense_date", "reimburse_date", "expense_type", "employee_id", "department_id", "status", "invoice_no", "approval_role", "annual_budget", "used_amount", "usage_rate"],
-
-  "evidence_requirements": {
-    "training_standard_check": "05_training_expense.md第二条 - 培训费≤3500元",
-    "approval_chain_check": "03_authorization_management.md附件二AR-02 - 部门经理+财务复核",
-    "splitting_check": "01_expense_reimbursement_2025.md第十一条 - 7天内同类费用合并判断",
-    "duplicate_invoice_check": "01_expense_reimbursement_2025.md第十条",
-    "timeliness_check": "01_expense_reimbursement_2025.md第七条",
-    "budget_check": "01_expense_reimbursement_2025.md第十三条"
-  },
-
-  "execution_steps": [
-    {"step": "policy-version-check", "description": "确认适用2025版制度，2022版已废止", "status": "pending"},
-    {"step": "batch-expense-analysis", "description": "全面核查R000003及关联记录的合规性", "status": "pending"},
-    {"step": "evidence-coverage-check", "description": "确认所有证据覆盖完整", "status": "pending"},
-    {"step": "false-positive-review", "description": "对clean_but_suspicious场景做独立复核", "status": "pending"},
-    {"step": "audit-report", "description": "生成审计报告", "status": "pending"},
-    {"step": "result-validator", "description": "校验并提交", "status": "pending"}
+  "required_data_fields": ["record_id", "employee_id", "expense_date", "amount", "expense_type", "invoice_no", "vendor_name", "status", "department_id"],
+  "evidence_requirements": [
+    "Expense details for R004236 and R004237",
+    "Policy clause on split reimbursement / 7-day rule",
+    "Date difference calculation",
+    "Amount total calculation"
   ],
-
+  "execution_steps": [
+    {"step": "planning", "status": "completed", "description": "Create audit plan and checkpoint"},
+    {"step": "policy_check", "status": "pending", "description": "Search policy for split reimbursement / 7-day rule"},
+    {"step": "data_retrieval", "status": "pending", "description": "Retrieve expense details for R004236 and R004237"},
+    {"step": "analysis", "status": "pending", "description": "Calculate date interval and check conditions for split reimbursement"},
+    {"step": "evidence_coverage", "status": "pending", "description": "Run evidence-coverage-check"},
+    {"step": "reporting", "status": "pending", "description": "Run audit-report and result-validator"},
+    {"step": "submission", "status": "pending", "description": "Validate and submit final result"}
+  ],
   "complexity": {
-    "score": 2,
+    "score": 0,
     "reasons": [
-      "涉及多制度条款交叉核查（3份政策）",
-      "需做7天窗口拆分排查（日期边界）",
-      "no-anomaly trap场景",
-      "阈值边界判断（3000元AR分界线）"
+      "Single known-record task (R004236, R004237) with one rule (split reimbursement within 7 days)",
+      "No policy version ambiguity",
+      "No aggregation, grouping, or batch filtering",
+      "Simple date comparison and amount sum",
+      "Directly related records only"
     ]
   },
-
   "subagent_plan": {
-    "enabled": false,
-    "reason": "Complexity 2, main agent can handle directly. Single-record focus with straightforward policy checks.",
-    "role": null,
-    "reason_code": null
+    "required": false,
+    "reason": "Complexity 0-1; no subagent needed"
   },
-
   "stopping_conditions": [
-    "所有6个policy_questions均得到明确答案",
-    "evidence_coverage达到100%",
-    "证据矩阵状态为pass",
-    "验证报告状态为pass"
+    "Both records retrieved",
+    "Policy rule on split reimbursement identified",
+    "Date interval calculated",
+    "Determination made: anomaly or no anomaly"
   ],
-
   "unresolved_items": []
 }

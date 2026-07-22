@@ -1,0 +1,55 @@
+{
+  "status": "pass",
+  "coverage_percent": 100.0,
+  "evidence_rows": [
+    {
+      "anomaly_id": "AN-RA-CASE-002-001",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"}
+      ],
+      "facts": [
+        "R004209（2025-02-26，3,400元）、R004210（2025-02-28，3,400元）、R004211（2025-03-02，3,400元）均为E0008的差旅住宿费用，同一员工、同一费用类型",
+        "三笔报销均在7天内：R004209至R004210间隔2天，R004210至R004211间隔2天，R004209至R004211间隔4天，均≤7天",
+        "三笔合计金额10,200元，达到AR-03审批线（≥10,000元），高于单笔AR-02（3,000-10,000元），构成较高审批线",
+        "三笔均为同一事项（项目现场住宿费）、同一供应商（安程酒店管理有限公司），呈现连续拆分特征"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "AN-RA-CASE-002-002",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "citations": [
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "R004209金额3,400元属于AR-02档位（3,000-10,000），必要审批角色为'部门经理,并经财务复核'",
+        "R004210金额3,400元属于AR-02档位，必要审批角色为'部门经理,并经财务复核'",
+        "R004211金额3,400元属于AR-02档位，必要审批角色为'部门经理,并经财务复核'",
+        "三笔记录均仅有一条审批记录，角色为'部门经理'，缺少'财务复核'",
+        "三笔记录的审批人均为E0008（报销人杨丹本人），属于自审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004209", "R004210", "R004211"],
+  "submitted_record_ids": ["R004209", "R004210", "R004211"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": null,
+  "reconciled_figures": {
+    "total_amount_combined": 10200.0,
+    "ar02_threshold": 10000.0,
+    "date_span_days": 4,
+    "policy_7day_window": 7,
+    "individual_records": 3,
+    "records_missing_financial_review": 3
+  },
+  "unresolved_items": []
+}

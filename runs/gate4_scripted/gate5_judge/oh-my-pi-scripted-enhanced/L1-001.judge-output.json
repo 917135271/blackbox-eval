@@ -1,0 +1,62 @@
+{
+  "checklist": [
+    {
+      "id": "current-threshold-amount",
+      "value": 1,
+      "reason": "候选答案明确给出10000元",
+      "answer_evidence": "提交答案写有“金额达到10,000元（含）”，明确给出数值10000元",
+      "trace_evidence": "工具get_policy_doc获取03_authorization_management.md，附件二AR-03档位为“大于等于10000元”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-threshold-inclusive",
+      "value": 1,
+      "reason": "候选答案明确说明10000元含本身即进入该档",
+      "answer_evidence": "提交答案写有“10,000元（含）”，表明达到或等于10000元即适用",
+      "trace_evidence": "授权管理办法附件二表格明确“大于等于10000元”，包含10000元本身",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-version",
+      "value": 1,
+      "reason": "候选答案明确识别2025修订版为现行制度",
+      "answer_evidence": "提交答案写明“适用版本为《XX证券费用报销管理办法(2025修订版)》”",
+      "trace_evidence": "list_policy_docs返回2025修订版文档，get_policy_doc获取其内容，显示发文字号为XX证财规〔2025〕甲号",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-expense-rule",
+      "value": 1,
+      "reason": "候选答案引用了费用报销办法第五条",
+      "answer_evidence": "提交答案的citations包含{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第五条\"}",
+      "trace_evidence": "get_policy_doc获取01_expense_reimbursement_2025.md，其中第五条内容为“按《XX证券授权管理办法》附件二执行”，工具调用确证该条款存在",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-authorization",
+      "value": 1,
+      "reason": "候选回答引用了授权管理办法附件二",
+      "answer_evidence": "授权管理办法附件二AR-03档",
+      "trace_evidence": "工具调用获取03_authorization_management.md，包含附件二",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-cross-reference",
+      "value": 0,
+      "reason": "候选回答未说明费用报销办法第五条指向授权管理办法附件二取得审批金额",
+      "answer_evidence": "回答中未提及第五条指向附件二",
+      "trace_evidence": "工具调用获取01_expense_reimbursement_2025.md，第五条指出按附件二执行，但候选回答未利用此关联",
+      "source": "llm_judge"
+    },
+    {
+      "id": "old-value-control",
+      "value": 1,
+      "reason": "候选回答明确排除旧版8000元审批线",
+      "answer_evidence": "旧版2022办法的8000元审批线已于2025年1月1日被废止，不再适用",
+      "trace_evidence": "工具调用获取02_expense_reimbursement_2022_deprecated.md，第四条指出旧审批金额不得作为现行依据",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交准确回答了现行部门总经理审批金额、包含边界、适用版本及制度依据，核查通过；候选回答正确引用了授权管理办法附件二并排除了旧值，但未明确说明费用报销办法第五条指向附件二的交叉引用关系。",
+  "confidence": 1.0
+}

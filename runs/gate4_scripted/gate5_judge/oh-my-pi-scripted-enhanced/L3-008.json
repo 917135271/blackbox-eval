@@ -1,0 +1,284 @@
+{
+  "group": "oh-my-pi-scripted-enhanced",
+  "task_id": "L3-008",
+  "case_family": "policy_and_version",
+  "category": "near_clause_disambiguation",
+  "graded_at": "2026-07-22T01:02:46+08:00",
+  "checklist_passed": 17,
+  "checklist_total": 17,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "travel-dimensions-policy",
+      "value": 1,
+      "reason": "候选答案明确指出差旅住宿适用《XX证券差旅费管理办法》，且工具调用获取了04_travel_expense.md",
+      "answer_evidence": "“差旅住宿适用《XX证券差旅费管理办法》（XX证行规〔2025〕丁号）”",
+      "trace_evidence": "get_policy_doc调用了04_travel_expense.md并返回全文，确认差旅费管理办法",
+      "source": "llm_judge"
+    },
+    {
+      "id": "travel-dimensions-job-level",
+      "value": 1,
+      "reason": "候选答案明确包含员工职级维度，解释为职级乘以城市档位",
+      "answer_evidence": "“差旅住宿标准维度：职级 × 城市档位（4职级 × 3档位），职级包括员工级、经理级等”",
+      "trace_evidence": "search_policy结果中第四条差旅住宿标准表格显示职级分类",
+      "source": "llm_judge"
+    },
+    {
+      "id": "travel-dimensions-city-tier",
+      "value": 1,
+      "reason": "候选答案明确包含城市档位维度",
+      "answer_evidence": "“差旅住宿标准维度：职级 × 城市档位（4职级 × 3档位）”",
+      "trace_evidence": "search_policy结果中第三条提到城市档位包括一类、二类、三类",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-policy",
+      "value": 1,
+      "reason": "候选答案明确培训住宿适用培训费管理办法，且工具调用获取了05_training_expense.md",
+      "answer_evidence": "“培训住宿适用《XX证券培训费管理办法》（XX证人规〔2025〕戊号）”",
+      "trace_evidence": "get_policy_doc调用了05_training_expense.md并返回全文",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-tier-a",
+      "value": 1,
+      "reason": "候选答案明确给出“一类城市：500元”且单位正确。",
+      "answer_evidence": "三、培训住宿标准（元/人/晚）- 一类城市：500元",
+      "trace_evidence": "get_policy_doc返回05_training_expense.md表格显示“一类城市 | 500元”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-tier-b",
+      "value": 1,
+      "reason": "候选答案明确给出“二类城市：420元”且单位正确。",
+      "answer_evidence": "三、培训住宿标准（元/人/晚）- 二类城市：420元",
+      "trace_evidence": "同上文档表格显示“二类城市 | 420元”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-tier-c",
+      "value": 1,
+      "reason": "候选答案明确给出“三类城市：350元”且单位正确。",
+      "answer_evidence": "三、培训住宿标准（元/人/晚）- 三类城市：350元",
+      "trace_evidence": "同上文档表格显示“三类城市 | 350元”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-scenario",
+      "value": 1,
+      "reason": "候选答案在“五、数值对照示例（一类城市）”中明确指定了城市档位“一类城市”和差旅职级“经理级”。",
+      "answer_evidence": "五、数值对照示例（一类城市）经理级差旅住宿标准",
+      "trace_evidence": "get_policy_doc返回04_travel_expense.md包含经理级一类城市650元，05_training_expense.md包含一类城市培训500元，结合形成对照。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-travel-value",
+      "value": 1,
+      "reason": "差旅住宿标准与制度表一致",
+      "answer_evidence": "候选答案中差旅住宿标准表数值员工级450/380/300、经理级650/550/450等与制度第四条表一致",
+      "trace_evidence": "get_policy_doc(04_travel_expense.md)返回的第四条表数值完全一致",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-training-value",
+      "value": 1,
+      "reason": "培训住宿标准与制度表一致",
+      "answer_evidence": "候选答案中培训住宿一类500元、二类420元、三类350元与制度第五条表一致",
+      "trace_evidence": "get_policy_doc(05_training_expense.md)返回的第五条表数值完全一致",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-same-tier",
+      "value": 1,
+      "reason": "数值对照示例使用一类城市，属于同一城市档位",
+      "answer_evidence": "候选答案在数值对照示例中明确选择一类城市，比较经理级差旅650元与培训500元",
+      "trace_evidence": "工具调用中培训住宿标准一类城市500元，差旅住宿标准经理级一类城市650元，同档位",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-mixing-scenario",
+      "value": 1,
+      "reason": "明确区分培训和差旅场景，说明不同费用事项",
+      "answer_evidence": "候选答案指出培训住宿与差旅住宿分属不同制度管辖，场景目的不同，制度互引禁止混用",
+      "trace_evidence": "无需工具痕迹，最终答案已明确区分",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-mixing-dimensions",
+      "value": 1,
+      "reason": "明确区分培训只按城市、差旅按职级和城市",
+      "answer_evidence": "培训住宿标准维度：仅城市档位...不区分职级；差旅住宿标准维度：职级 × 城市档位",
+      "trace_evidence": "get_policy_doc 04_travel_expense.md 第三条、第四条；get_policy_doc 05_training_expense.md 第五条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-mixing-conclusion",
+      "value": 1,
+      "reason": "明确作出不得混用结论",
+      "answer_evidence": "培训住宿标准仅适用于培训期间住宿，不得与差旅住宿标准混用；不能混用的原因部分",
+      "trace_evidence": "get_policy_doc 05_training_expense.md 第六条：不得与差旅住宿标准混用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "comparison-evidence-travel",
+      "value": 1,
+      "reason": "差旅制度及关键条款完整引用",
+      "answer_evidence": "citations 包含 04_travel_expense.md 第三条、第四条、第七条",
+      "trace_evidence": "get_policy_doc 04_travel_expense.md 返回全文，包含第三条、第四条、第七条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "comparison-evidence-training",
+      "value": 1,
+      "reason": "培训制度及关键条款完整引用",
+      "answer_evidence": "citations 包含 05_training_expense.md 第五条、第六条",
+      "trace_evidence": "get_policy_doc 05_training_expense.md 返回全文，包含第五条、第六条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 163.217,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": null,
+    "actual_record_ids": [],
+    "record_metrics": null,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 5,
+    "required_citations": [
+      {
+        "doc_id": "04_travel_expense.md",
+        "clause_no": "第三条、第四条、第七条"
+      },
+      {
+        "doc_id": "05_training_expense.md",
+        "clause_no": "第五条、第六条"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选答案准确识别了两类住宿的适用制度，并明确指出差旅住宿按职级和城市档位区分，培训住宿仅按城市档位，符合所有检查要求。；候选答案完整给出了培训住宿一、二、三类城市标准，并在一类城市下以经理级为例进行了差旅与培训对照，满足所有要求。；所有检查项均满足，数值准确，同档位比较清晰，场景区分明确。；候选回答准确对比了差旅和培训住宿的适用制度、标准维度与数值，明确列出培训住宿标准并给出数值对照，解释了不能混用的原因，引用了正确的制度条款，证据充分。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 16264,
+      "completion_tokens": 5199,
+      "total_tokens": 21463,
+      "prompt_cache_hit_tokens": 3072,
+      "prompt_cache_miss_tokens": 13192
+    },
+    "batch_count": 4,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4048,
+          "completion_tokens": 1342,
+          "total_tokens": 5390,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 857
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 3280
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4077,
+          "completion_tokens": 1498,
+          "total_tokens": 5575,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1028
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 3309
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4064,
+          "completion_tokens": 1136,
+          "total_tokens": 5200,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 737
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 3296
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4075,
+          "completion_tokens": 1223,
+          "total_tokens": 5298,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 759
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 3307
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/oh-my-pi-scripted-enhanced/L3-008"
+}

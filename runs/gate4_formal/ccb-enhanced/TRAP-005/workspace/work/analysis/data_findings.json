@@ -1,0 +1,112 @@
+{
+  "task_id": "TRAP-005",
+  "in_scope_population": {
+    "total_records": 4240,
+    "business_entertainment_total": 675,
+    "target_record_ids": ["R004239", "R004240"],
+    "employee_window_records": 2
+  },
+  "record_details": {
+    "R004239": {
+      "record_no": "BX2025X004239",
+      "employee_id": "E0008",
+      "employee_name": "杨丹",
+      "employee_level": "D1",
+      "department_id": "D008",
+      "department_name": "合规风控部",
+      "expense_date": "2025-10-25",
+      "reimburse_date": "2025-10-29",
+      "expense_type": "business_entertainment",
+      "amount": 540.00,
+      "participants": 3,
+      "per_person": 180.00,
+      "reason": "客户甲产品方案交流招待费",
+      "status": "approved",
+      "invoice_no": "FP2025X0004233",
+      "vendor_name": "嘉禾餐饮服务有限公司",
+      "invoice_date": "2025-10-25",
+      "invoice_amount": 540.00,
+      "invoice_usage_count": 1,
+      "approval_tier": "AR-01",
+      "approval_role": "部门经理",
+      "special_approval": 0
+    },
+    "R004240": {
+      "record_no": "BX2025X004240",
+      "employee_id": "E0008",
+      "employee_name": "杨丹",
+      "employee_level": "D1",
+      "department_id": "D008",
+      "department_name": "合规风控部",
+      "expense_date": "2025-10-26",
+      "reimburse_date": "2025-10-30",
+      "expense_type": "business_entertainment",
+      "amount": 545.00,
+      "participants": 3,
+      "per_person": 181.67,
+      "reason": "客户乙投行业务沟通招待费",
+      "status": "approved",
+      "invoice_no": "FP2025X0004234",
+      "vendor_name": "嘉禾餐饮服务有限公司",
+      "invoice_date": "2025-10-26",
+      "invoice_amount": 545.00,
+      "invoice_usage_count": 1,
+      "approval_tier": "AR-01",
+      "approval_role": "部门经理",
+      "special_approval": 0
+    }
+  },
+  "rule_analysis": {
+    "duplicate_reimbursement": {
+      "rule": "01_expense_reimbursement_2025.md Article 10: 同一发票最多报销1次",
+      "finding": "不构成重复报销",
+      "evidence": {
+        "R004239_invoice": "FP2025X0004233, usage_count=1",
+        "R004240_invoice": "FP2025X0004234, usage_count=1",
+        "are_different": true,
+        "each_used_once": true
+      },
+      "conclusion": "两张发票不同(FP2025X0004233 vs FP2025X0004234),各自仅使用1次,不构成重复报销。"
+    },
+    "split_reimbursement": {
+      "rules": [
+        "06_business_entertainment.md Article 4: 同一客户拜访或同一会议安排不得拆分为多个报销事项",
+        "01_expense_reimbursement_2025.md Article 11: 同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到较高审批线的,应重点核查"
+      ],
+      "finding": "不构成拆分报销",
+      "evidence": {
+        "same_employee": true,
+        "same_expense_type": true,
+        "days_between": 1,
+        "different_clients": true,
+        "different_purposes": true,
+        "combined_amount": 1085.00,
+        "individual_tiers": {"R004239": "AR-01", "R004240": "AR-01"},
+        "combined_tier": "AR-01",
+        "higher_approval_line_reached": false,
+        "approval_threshold_check": "AR-01(0-3000) → 1085 < 3000, 仍然在AR-01档位,不需要更高级别审批"
+      },
+      "conclusion": "Article 4: 不同客户(客户甲vs客户乙)、不同业务目(产品方案交流vs投行业务沟通)、不同日期(10/25 vs 10/26),不属同一客户拜访或同一会议安排。Article 11: 两笔合计1085元,仍在AR-01档位(部门经理审批),未达到更高审批线(AR-02最低3000元),不存在拆分规避审批的动机。"
+    },
+    "excessive_business_entertainment": {
+      "rules": [
+        "06_business_entertainment.md Article 2: 单次活动费用≤5000元",
+        "06_business_entertainment.md Article 3: 人均≤300元"
+      ],
+      "finding": "不构成业务招待费超标准",
+      "evidence": {
+        "R004239_single_event": {"amount": 540, "limit": 5000, "compliant": true},
+        "R004240_single_event": {"amount": 545, "limit": 5000, "compliant": true},
+        "R004239_per_person": {"amount": 180.00, "limit": 300, "compliant": true},
+        "R004240_per_person": {"amount": 181.67, "limit": 300, "compliant": true}
+      },
+      "conclusion": "两笔招待费单次金额(540元/545元)均远低于5000元上限,人均金额(180元/181.67元)均低于300元上限。"
+    }
+  },
+  "overall_conclusion": "无异常",
+  "overall_reason": "R004239和R004240使用不同发票、不同日期招待不同客户进行不同业务沟通,不构成重复报销或拆分报销;单次金额和人均金额均在业务招待费标准之内。表面相似(同一员工、同一供应商、连续日期、相近金额)实际上属于两个独立的合规业务招待活动。",
+  "query_artifacts": ["work/sql/query.sql"],
+  "data_quality_issues": [],
+  "limitations": [],
+  "unresolved_items": []
+}

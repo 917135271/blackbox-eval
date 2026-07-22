@@ -1,7 +1,40 @@
 {
   "status": "pass",
   "coverage_percent": 100,
-  "evidence_rows": [],
+  "evidence_rows": [
+    {
+      "anomaly_id": "VT-L3-010-001",
+      "record_ids": ["R004233"],
+      "citations": [
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第一条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第三条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第四条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "第二条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "旧版2022制度第2条：单笔>=8000元需部门总经理审批",
+        "旧版2022制度第3条：单笔>=30000元需分管副总审批",
+        "旧版2022制度第1条自述为制度沿革留档，第4条声明审批金额已被替代不得作为现行依据",
+        "新版2025制度第5条：审批金额不在正文列示，统一按授权管理办法附件二执行",
+        "新版2025制度第14条：自2025年1月1日施行，旧版2022同时废止",
+        "授权管理办法第2条：附件二为现行有效审批线",
+        "授权管理办法附件二：五档审批线AR-01至AR-05",
+        "旧版无财务复核(AR-02)和总经理办公会(AR-05)审批层级",
+        "差距区间G1(3000-7999)：旧版缺财务复核控制",
+        "差距区间G2(8000-9999)：旧版过度升级至部门总经理，新制仅需部门经理+财务复核",
+        "差距区间G3(30000-49999)：旧版过度升级至分管副总，新制仅需部门总经理",
+        "差距区间G4(>=200000)：旧版无对应审批层级，新制需总经理办公会",
+        "R004233金额9990元落入G2区间，旧版法规会错误要求部门总经理审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
   "candidate_record_ids": ["R004233"],
   "submitted_record_ids": ["R004233"],
   "unowned_record_ids": [],
@@ -10,24 +43,23 @@
   "missing_evidence": [],
   "no_anomaly_coverage": {
     "complete": true,
-    "searched_population": "全部2025年费用报销记录",
-    "query_conditions": "金额区间[8000,10000)用于VT-01区;金额区间[30000,50000)用于VT-02区;同时覆盖7000-12000和25000-55000全量核查",
+    "searched_population": "所有2025年费用报销记录，重点筛查差异区间[3000,7999]、[8000,9999]、[30000,49999]、[200000,+)",
+    "query_conditions": "list_expenses with min_amount/max_amount filters for the four gap zones; get_expense_detail for R004233",
     "checked_rules": [
-      "02_expense_reimbursement_2022_deprecated.md 第二条:旧版8000元部门总经理审批线",
-      "02_expense_reimbursement_2022_deprecated.md 第三条:旧版30000元分管副总审批线",
-      "03_authorization_management.md 附件二AR-02:[3000,10000)部门经理+财务复核",
-      "03_authorization_management.md 附件二AR-03:[10000,50000)部门总经理",
-      "03_authorization_management.md 附件二AR-04:[50000,200000)分管副总"
+      "2022版审批线第2条(部门总经理8000元)",
+      "2022版审批线第3条(分管副总30000元)",
+      "2025版第5条(交叉引用授权管理办法附件二)",
+      "2025版第14条(生效废止)",
+      "授权管理办法附件二(AR-01至AR-05审批线)"
     ],
-    "population_count": 4240,
-    "conclusion": "无异常。经核查，VT-01区间(8000~10000元)仅存在R004233一条记录，金额9990元，已按现行AR-02档位获部门经理审批，合规。VT-02区间(30000~50000元)无记录。全量数据中不存在因误用旧版审批线而被错误标记的报销记录。版本陷阱属于审计方法论风险而非实际违规，需在审计指引中明确现行有效审批线，防止因引用已废止的2022版8000元/30000元阈值导致误判。"
+    "population_count": 96,
+    "conclusion": "本次版本陷阱审计为政策分析性审计。经核查，所有现行报销记录均按2025版制度授权管理办法附件二审批线处理，系统派生审批角色正确，未发现使用已废止旧版2022审批线的实例。版本陷阱风险存在于四个差异区间，但当前无实际违规发生，结论为无异常。"
   },
   "reconciled_figures": {
-    "vt01_zone_count": 1,
-    "vt01_zone_record": "R004233",
-    "vt01_zone_amount": 9990.0,
-    "vt02_zone_count": 0,
-    "total_population_count": 4240
+    "records_checked": 96,
+    "gap_zone_records": {"G1_3000_7999": 94, "G2_8000_9999": 1, "G3_30000_49999": 0, "G4_200000_plus": 0},
+    "records_with_mismatch_potential": 1,
+    "actual_violations": 0
   },
   "unresolved_items": []
 }

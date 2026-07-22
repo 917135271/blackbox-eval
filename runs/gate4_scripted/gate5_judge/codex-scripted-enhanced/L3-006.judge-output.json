@@ -1,0 +1,62 @@
+{
+  "checklist": [
+    {
+      "id": "current-value",
+      "value": 1,
+      "reason": "现行值准确，给出10000元",
+      "answer_evidence": "单笔报销金额大于等于10,000元",
+      "trace_evidence": "授权管理办法附件二AR-03档位：大于等于10000元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-value-amount",
+      "value": 0,
+      "reason": "未在最终答案中明确给出2022版金额8000元",
+      "answer_evidence": "回答未提及8000元",
+      "trace_evidence": "工具调用获取2022版文档第二条有8000元，但未被引用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-value-status",
+      "value": 1,
+      "reason": "明确说明2022版已废止",
+      "answer_evidence": "原...同时废止，2022版为已废止的存档制度",
+      "trace_evidence": "2022版文档第一条和第四条表明废止",
+      "source": "llm_judge"
+    },
+    {
+      "id": "applicable-version",
+      "value": 1,
+      "reason": "选择正确并说明时间适用关系",
+      "answer_evidence": "应采用2025修订版，自2025年1月1日起施行",
+      "trace_evidence": "2025版施行日期及废止2022版",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-version-evidence-current",
+      "value": 1,
+      "reason": "候选明确采用2025修订版并注明施行日期，引用第十四条效力条款。",
+      "answer_evidence": "费用报销审批线应采用《XX证券费用报销管理办法(2025修订版)》(XX证财规〔2025〕甲号)，该办法自2025年1月1日起施行。",
+      "trace_evidence": "tool_trace中get_policy_doc('01_expense_reimbursement_2025.md')获取到2025修订版内容，citations包含第十四条。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-version-evidence-deprecated",
+      "value": 1,
+      "reason": "候选明确说明2022版废止，并引用第一条和第四条作为废止依据。",
+      "answer_evidence": "原《XX证券费用报销管理办法(2022版)》(XX证财规〔2022〕乙号)同时废止。2022版为已废止的存档制度。",
+      "trace_evidence": "tool_trace中get_policy_doc('02_expense_reimbursement_2022_deprecated.md')显示第一条和第四条表明仅作留档、审批金额已被替代。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-version-evidence-amount",
+      "value": 1,
+      "reason": "候选正确引用附件二AR-03档位10000元审批线并说明部门总经理审批。",
+      "answer_evidence": "部门总经理审批线：单笔报销金额大于等于10,000元且小于50,000元，须经部门总经理审批。该金额标准出自《XX证券授权管理办法》(XX证综规〔2025〕丙号)第二条及附件二「费用报销审批权限表」AR-03档位。",
+      "trace_evidence": "tool_trace中get_policy_doc('03_authorization_management.md')获取到附件二，确认AR-03档位为>=10000且<50000，必要审批角色含部门总经理。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选回答正确识别现行版本和废止状态，但遗漏2022版具体金额，导致第2项扣分。；候选提交完整覆盖了三个版本依据检查项，引用正确，证据充分。",
+  "confidence": 1.0
+}

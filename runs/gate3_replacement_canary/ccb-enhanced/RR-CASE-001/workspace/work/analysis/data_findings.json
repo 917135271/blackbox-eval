@@ -1,0 +1,105 @@
+{
+  "task_id": "RR-CASE-001",
+  "in_scope_population": {
+    "total_employee_records": 67,
+    "training_fee_records_2025": 15,
+    "december_2025_training_fee": 5
+  },
+  "candidate_records": [
+    {
+      "record_id": "R001894",
+      "expense_date": "2025-12-08",
+      "amount": 2156.08,
+      "tier": "AR-01",
+      "invoice_id": "INV001894",
+      "special_approval": 0,
+      "in_7day_window": false,
+      "reason_excluded": "距离R000465为10天，不在7天窗口内"
+    },
+    {
+      "record_id": "R000465",
+      "expense_date": "2025-12-18",
+      "amount": 2157.72,
+      "tier": "AR-01",
+      "invoice_id": "INV000465",
+      "special_approval": 0,
+      "in_7day_window": true,
+      "clue_record": true
+    },
+    {
+      "record_id": "R000561",
+      "expense_date": "2025-12-20",
+      "amount": 2917.45,
+      "tier": "AR-01",
+      "invoice_id": "INV000561",
+      "special_approval": 0,
+      "in_7day_window": true
+    },
+    {
+      "record_id": "R000888",
+      "expense_date": "2025-12-23",
+      "amount": 2606.07,
+      "tier": "AR-01",
+      "invoice_id": "INV000888",
+      "special_approval": 0,
+      "in_7day_window": true
+    },
+    {
+      "record_id": "R001354",
+      "expense_date": "2025-12-25",
+      "amount": 2083.49,
+      "tier": "AR-01",
+      "invoice_id": "INV001354",
+      "special_approval": 0,
+      "in_7day_window": true
+    }
+  ],
+  "matched_anomaly_records": ["R000465", "R000561", "R000888", "R001354"],
+  "anomaly_reason": "同一员工(E0041)同一费用类型(training_fee)在7天内出现3笔及以上报销，合计金额超过AR-02审批线(3000元)，涉嫌拆分规避财务复核",
+  "aggregate_results": {
+    "window_1": {
+      "period": "2025-12-18 to 2025-12-24",
+      "records": ["R000465", "R000561", "R000888"],
+      "count": 3,
+      "total_amount": 7681.24,
+      "exceeds_ar02": true
+    },
+    "window_2": {
+      "period": "2025-12-20 to 2025-12-26",
+      "records": ["R000561", "R000888", "R001354"],
+      "count": 3,
+      "total_amount": 7607.01,
+      "exceeds_ar02": true
+    }
+  },
+  "rule_checks": {
+    "article_10_duplicate_invoice": {
+      "result": "pass",
+      "detail": "所有发票号各不相同: FP202500001894, FP202500000465, FP202500000561, FP202500000888, FP202500001354"
+    },
+    "article_11_split_avoidance": {
+      "result": "violation",
+      "detail": "7天窗口内3笔training_fee合计7681.24元超过AR-02线3000元，每笔单独低于AR-01线(3000元)仅需部门经理审批，规避了财务复核"
+    },
+    "article_12_standard_limit": {
+      "result": "pass",
+      "detail": "每笔培训费均低于3500元/人/期标准上限"
+    },
+    "training_fee_per_session": {
+      "result": "pass",
+      "detail": "R000561最高2917.45元 < 3500元上限"
+    }
+  },
+  "completed_checks": [
+    "E0041全部training_fee记录已检索(共15笔)",
+    "2025年12月training_fee聚类(5笔)已核实",
+    "7天窗口聚合计算已通过SQL确认",
+    "审批层级(AR-01)已核实",
+    "发票唯一性已检查",
+    "培训费单项标准已对比"
+  ],
+  "query_artifacts": ["work/sql/query.sql"],
+  "data_quality_issues": [],
+  "limitations": [],
+  "unresolved_items": []
+}

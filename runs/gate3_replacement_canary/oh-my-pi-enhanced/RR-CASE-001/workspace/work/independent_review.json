@@ -1,0 +1,32 @@
+{
+  "decision": "pass",
+  "challenged_findings": [
+    {
+      "anomaly_id": "ANOM-001",
+      "challenge": "R001354距R000465恰好7天,'7天内'边界歧义",
+      "resolution": "即使排除R001354,剩余3笔合计7681.24元仍超AR-02审批线3000元,异常成立"
+    },
+    {
+      "anomaly_id": "ANOM-001",
+      "challenge": "各记录为不同培训课程,是否属于'同类事项'",
+      "resolution": "第十一条明确'同一事项或同类事项',4笔均为training_fee培训费,属同类费用类型,满足规则条件"
+    },
+    {
+      "anomaly_id": "ANOM-001",
+      "challenge": "是否存在特殊审批或豁免",
+      "resolution": "全部记录special_approval=0,无例外适用"
+    },
+    {
+      "anomaly_id": "ANOM-001",
+      "challenge": "是否存在重复发票",
+      "resolution": "4张发票均不相同,不涉及重复报销(第十条);但拆分规避审批(第十一条)独立于重复发票规则"
+    }
+  ],
+  "boundary_checks": {
+    "r001354_7day": "7天内含边界值,排除后剩余3笔仍构成异常",
+    "amount_threshold": "合计9764.73,远超AR-02线3000,非临界值"
+  },
+  "required_changes": [],
+  "rationale": "所有质疑均不推翻初步结论。4笔记录满足第十一条全部条件:同一员工(E0041)、同一费用类型(training_fee)、7天内(≤7天)、合计金额达较高审批线(9764.73≥3000)。无特殊审批豁免,无重复发票混淆。异常确认。",
+  "unresolved_conflicts": []
+}

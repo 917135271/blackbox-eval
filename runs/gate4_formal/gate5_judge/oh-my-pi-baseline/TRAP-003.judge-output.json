@@ -1,39 +1,94 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "clean-conclusion",
-      "score": 30,
-      "reason": "明确判断无异常且无矛盾表述",
-      "answer_evidence": "答案明确写“无异常”，anomaly_ids为空列表",
-      "trace_evidence": "工具轨迹获取R004236和R004237详情，未发现异常"
+      "value": 1,
+      "reason": "候选提交明确判定无异常，anomaly_ids为空，结论无矛盾。",
+      "answer_evidence": "answer: '无异常。'",
+      "trace_evidence": "提交json中anomaly_ids: []",
+      "source": "llm_judge"
     },
     {
-      "id": "case-specific-reason",
-      "score": 25,
-      "reason": "完整说明专属边界：超出7天聚合窗口",
-      "answer_evidence": "回答中说明两笔费用间隔8天，超过第十一条规定的7天拆分核查窗口",
-      "trace_evidence": "调用get_expense_detail获取R004236(expense_date: 2025-10-01)和R004237(expense_date: 2025-10-09)，间隔8天"
+      "id": "case-specific-reason-gap",
+      "value": 1,
+      "reason": "明确说明费用发生日期为2025-10-01和2025-10-09，间隔8天。",
+      "answer_evidence": "answer: '费用发生日期分别为2025-10-01和2025-10-09，间隔8天'",
+      "trace_evidence": "工具get_expense_detail返回：R004236 expense_date '2025-10-01', R004237 expense_date '2025-10-09'",
+      "source": "llm_judge"
     },
     {
-      "id": "reverse-check",
-      "score": 15,
-      "reason": "工具核查了日期间隔、重复发票等边界条件",
-      "answer_evidence": "无（答案未直接列出核查步骤）",
-      "trace_evidence": "轨迹中调用get_expense_detail对比两个记录日期，并调用find_reused_invoices检查重复发票"
+      "id": "case-specific-reason-window",
+      "value": 1,
+      "reason": "明确说明8天超出7天聚合窗口。",
+      "answer_evidence": "answer: '间隔8天，超出7天阈值'",
+      "trace_evidence": "search_policy返回第十一条snippet包含'7天内'",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 0,
+      "reason": "回答未明确给出合计金额10400元，只列出两个5200元单价，未计算合计。",
+      "answer_evidence": "answer: 'R004236（住宿费5200元）... R004237（住宿费5200元）'，无合计10400元表述",
+      "trace_evidence": "get_expense_detail返回两个5200，但无合计计算",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 0,
+      "reason": "回答未明确说明合计金额达到10000元审批线，仅提及附件二较高审批线未给出具体金额。",
+      "answer_evidence": "answer: '合计金额达到《授权管理办法》附件二较高审批线'，未说明10000元",
+      "trace_evidence": "get_policy_doc返回附件二表格包含10000元档位，但候选未提取该数字",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-gap",
+      "value": 0,
+      "reason": "轨迹中仅有原始日期数据，无日期间隔计算过程。",
+      "answer_evidence": "无",
+      "trace_evidence": "get_expense_detail返回R004236 expense_date '2025-10-01'和R004237 expense_date '2025-10-09'，但无计算步骤",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-window",
+      "value": 1,
+      "reason": "轨迹中search_policy结果包含'7天内'，证明7天窗口边界存在。",
+      "answer_evidence": "无",
+      "trace_evidence": "search_policy返回snippet: '同一员工、同一费用类型在7天内出现2笔及以上报销'",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 0,
+      "reason": "轨迹中未对两笔金额进行合计计算，无10400元计算过程。",
+      "answer_evidence": "无",
+      "trace_evidence": "get_expense_detail返回R004236 amount 5200和R004237 amount 5200，但无合计",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 0,
+      "reason": "轨迹中未明确提取或对比10000元审批线，也未论述金额条件满足但时间窗口不满足。",
+      "answer_evidence": "无",
+      "trace_evidence": "get_policy_doc返回附件二表格含10000元档位，但无金额条件满足与否的推理",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "提交准确引用01_expense_reimbursement_2025.md#第十一条。",
+      "answer_evidence": "citations: [{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十一条\"}]",
+      "trace_evidence": "search_policy/get_policy_excerpt确认该条款存在",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 0,
+      "reason": "提交未引用03_authorization_management.md#附件二，citations列表中缺失。",
+      "answer_evidence": "citations中无03_authorization_management.md",
+      "trace_evidence": "轨迹中有get_policy_doc 03_authorization_management.md，但候选未引用",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "提交的R004236和R004237均存在于数据库，且为核心记录"
-    },
-    {
-      "id": "trap-false-positive",
-      "triggered": false,
-      "reason": "结论为无异常，未将合规记录判为异常"
-    }
-  ],
-  "overall_comment": "候选正确识别本题无异常，原因正确（超出7天拆分窗口），且通过工具验证了日期和发票等边界条件，结论可靠。",
-  "confidence": 1.0
+  "overall_comment": "部分检查项未通过：回答未明确合计金额和审批线具体数字，且缺失附件二的制度引用。日期间隔和窗口判断正确。",
+  "confidence": 0.9
 }

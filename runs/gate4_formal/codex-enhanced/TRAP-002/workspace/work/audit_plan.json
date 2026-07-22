@@ -1,63 +1,56 @@
 {
   "task_id": "TRAP-002",
   "task_type": "clean_but_suspicious",
-  "question": "请核查TRAP-002涉及的记录是否构成异常,正确时应说明无异常",
   "scope": {
-    "audit_object": "超期报销注入样本记录 (R004227-R004232)",
-    "expense_types": ["communication"],
-    "business_period": "2025-01-05 to 2025-09-04",
-    "organization_scope": "部门经理 (E0007-E0010) 的通讯费报销",
-    "deliverable": "核查是否存在超期报销违规，结论为无异常或记录异常"
+    "audit_object": "R004234和R004235的重复报销或拆分报销核查",
+    "record_ids": ["R004234", "R004235"],
+    "rules": ["duplicate_reimbursement", "split_reimbursement"],
+    "expense_types": ["office_supplies"],
+    "business_period": "2025-10-20"
   },
   "policy_questions": [
-    {
-      "question": "Article 7 规定的60天报销期限是否被违反？",
-      "boundary": "R004227: 65天, R004228: 72天, R004229: 88天, R004230: 95天, R004231: 120天, R004232: 110天",
-      "policy_doc": "01_expense_reimbursement_2025.md",
-      "clause": "第七条"
-    },
-    {
-      "question": "Article 7中'原则上不得报销'是否允许例外？部门经理自批是否违规？",
-      "boundary": "所有记录均为部门经理自批（AR-01层级），金额均小于3000元",
-      "policy_doc": "01_expense_reimbursement_2025.md, 03_authorization_management.md",
-      "clause": "第七条, 第五条, 附件二"
-    }
+    "重复报销认定规则（第十条）：同一发票是否在不同报销单中重复出现？",
+    "拆分报销认定规则（第十一条）：同一员工、同一费用类型在7天内是否出现2笔及以上报销，且合计金额达到较高审批线？",
+    "授权管理办法附件二中的较高审批线金额阈值是多少？"
   ],
-  "required_fields": ["record_id", "expense_date", "reimburse_date", "amount", "expense_type", "status", "employee_id", "employee_level", "position_role", "approval_chain"],
+  "data_questions": [
+    "R004234和R004235的发票是否相同？",
+    "两笔报销的日期差是否在7天内？",
+    "两笔报销合计金额是否达到较高审批线？"
+  ],
+  "required_fields": ["record_id", "invoice_id", "invoice_no", "employee_id", "expense_date", "expense_type", "amount", "status"],
   "evidence_requirements": [
-    "每个记录的详细信息（已获取）",
-    "审批链详情（已获取）",
-    "政策第七条全文",
-    "授权管理办法附件二"
+    "两笔报销的完整记录详情",
+    "报销管理办法第十条、第十一条全文",
+    "授权管理办法附件二审批权限表"
   ],
   "execution_steps": [
-    {"step": "获取R004227-R004232全部详情", "status": "completed", "artifact": "MCP调用结果"},
-    {"step": "获取政策01和03全文", "status": "completed", "artifact": "MCP调用结果"},
-    {"step": "分析Article 7的'原则上'性质", "status": "pending", "artifact": "policy分析结果"},
-    {"step": "分析自批是否违规", "status": "pending", "artifact": "authorization分析结果"},
-    {"step": "证据覆盖检查", "status": "pending", "artifact": "work/evidence_matrix.json"},
-    {"step": "误报复核", "status": "pending", "artifact": "false_positive_review"},
-    {"step": "生成审计报告", "status": "pending", "artifact": "audit_report"},
-    {"step": "结果校验与提交", "status": "pending", "artifact": "final_result.json"}
+    {"step": "policy_research", "description": "查询费用报销管理办法中重复报销和拆分报销条款", "status": "completed"},
+    {"step": "data_retrieval", "description": "获取R004234和R004235完整详情", "status": "completed"},
+    {"step": "threshold_check", "description": "查询授权管理办法附件二较高审批线", "status": "completed"},
+    {"step": "analysis", "description": "比对发票、计算日期差和合计金额，判定是否触发规则", "status": "in_progress"},
+    {"step": "evidence_coverage", "description": "生成证据矩阵并检查覆盖度", "status": "pending"},
+    {"step": "false_positive_review", "description": "独立复核（如触发条件满足）", "status": "pending"},
+    {"step": "report", "description": "生成审计报告", "status": "pending"},
+    {"step": "validation_and_submission", "description": "验证并提交最终结果", "status": "pending"}
   ],
   "complexity": {
-    "score": 2,
+    "score": 3,
     "reasons": [
-      "单规则任务（Article 7 超期报销）",
-      "涉及批量记录（6条）需要逐条计算延迟天数",
-      "no-anomaly trap类型任务",
-      "需分析'原则上'的政策语义"
+      "涉及两个政策文档（费用报销管理办法+授权管理办法）",
+      "涉及两条业务规则（重复报销+拆分报销）",
+      "涉及阈值判断（7天窗口+较高审批线金额阈值）"
     ]
   },
   "subagent_plan": {
     "use_subagent": false,
-    "reason": "复杂度2，主代理可直接处理6条记录的简单分析"
+    "reason": "复杂度3，但仅涉及两条特定记录的比对，无需批量查询或复杂聚合，主智能体可直接完成"
   },
   "stopping_conditions": [
-    "所有6条记录的延迟天数已核实",
-    "Article 7政策语义已分析完毕",
-    "证据矩阵coverage达到100%",
-    "误报复核通过"
+    "发票比对完成",
+    "日期差计算完成",
+    "合计金额与较高审批线比对完成",
+    "结论明确：有异常或无异常"
   ],
   "unresolved_items": []
 }

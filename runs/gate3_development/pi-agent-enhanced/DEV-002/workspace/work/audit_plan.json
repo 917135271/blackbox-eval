@@ -1,0 +1,43 @@
+{
+  "task_scope": {
+    "task_id": "DEV-002",
+    "type": "policy_qa",
+    "question": "现行培训制度中，内部培训和外部培训的综合费用每日上限分别是多少？",
+    "audit_period": "现行（2025）",
+    "audit_object": "培训费管理办法",
+    "rule_scope": ["培训综合费用每日上限"]
+  },
+  "policy_questions": [
+    {
+      "question": "内部培训综合费用每日上限",
+      "policy_doc": "05_training_expense.md",
+      "clause": "第三条"
+    },
+    {
+      "question": "外部培训综合费用每日上限",
+      "policy_doc": "05_training_expense.md",
+      "clause": "第四条"
+    }
+  ],
+  "data_questions": [],
+  "required_fields": ["policy_clauses", "amount_limits"],
+  "evidence_requirements": ["现行培训制度条款原文"],
+  "execution_steps": [
+    { "step": 1, "action": "规划审计", "artifact": "work/audit_plan.json" },
+    { "step": 2, "action": "查询培训制度全文", "artifact": "policy doc 05_training_expense.md" },
+    { "step": 3, "action": "证据覆盖检查", "artifact": "work/evidence_matrix.json" },
+    { "step": 4, "action": "生成审计报告", "artifact": "work/audit_report (via skill)" },
+    { "step": 5, "action": "结果校验", "artifact": "work/validation_report.json" },
+    { "step": 6, "action": "写入并提交最终结果", "artifact": "work/final_result.json" }
+  ],
+  "complexity": {
+    "score": 0,
+    "reasons": ["单一制度事实查询，无版本争议，无数据聚合，无多规则交叉，无阈值边界"]
+  },
+  "subagent_plan": {
+    "needed": false,
+    "reason": "complexity=0，主智能体直接处理"
+  },
+  "stopping_conditions": ["制度原文已确认", "答案已写入final_result.json", "校验通过并提交成功"],
+  "unresolved_items": []
+}

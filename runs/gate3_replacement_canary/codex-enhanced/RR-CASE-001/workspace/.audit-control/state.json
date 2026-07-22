@@ -1,0 +1,140 @@
+{
+  "budget": {
+    "timeout_seconds": 900
+  },
+  "context": {
+    "checkpoint_count": 3,
+    "compaction_count": 0,
+    "last_checkpoint_stage": "review_ready",
+    "last_usage_percent": 30.0
+  },
+  "event_sequence": 130,
+  "experiment_group": "codex-enhanced",
+  "framework": "codex",
+  "phase": "review_ready",
+  "subagent_calls": {
+    "independent_reviewer": 1,
+    "policy_researcher": 1
+  },
+  "subagent_invocations": {
+    "4ca255e9-3d03-4b06-95de-b74e3b674109": {
+      "artifact_paths": [
+        "work/audit_plan.json"
+      ],
+      "artifacts": [
+        {
+          "path": "work/subagents/policy_researcher/analysis.json",
+          "sha256": "2b5ba865450246c1115dd5eed66be942f56e22bbfdca9c61abcbc454db3e64f8",
+          "size_bytes": 12987
+        },
+        {
+          "path": "work/subagents/policy_researcher/summary.json",
+          "sha256": "2c15072d630b5d8ff43e1f263503fd4b217e90bf38e00c5bbebdf668585d3528",
+          "size_bytes": 1832
+        }
+      ],
+      "authorized_at": 1784723672.273148,
+      "completed_at": 1784723877.2656882,
+      "complexity": 2,
+      "invocation_id": "4ca255e9-3d03-4b06-95de-b74e3b674109",
+      "reason_code": "MULTI_POLICY_VERSION_CHECK",
+      "role": "policy_researcher",
+      "status": "completed",
+      "summary": {
+        "artifact_paths": [
+          "work/subagents/policy_researcher/analysis.json",
+          "work/subagents/policy_researcher/summary.json"
+        ],
+        "citations": [
+          "01_expense_reimbursement_2025.md 第十一条 (7-day split-check)",
+          "01_expense_reimbursement_2025.md 第十二条 (standard cap ≤1.0×)",
+          "01_expense_reimbursement_2025.md 第十四条 (repeals 2022, effective 2025-01-01)",
+          "05_training_expense.md 第二条 (course fee ≤¥3,500/person/session)",
+          "05_training_expense.md 第三条 (internal ≤¥800/day)",
+          "05_training_expense.md 第四条 (external ≤¥1,200/day)",
+          "03_authorization_management.md 附件二 AR-01 (0-3000→Dept Mgr)",
+          "03_authorization_management.md 附件二 AR-02 (3000-10000→Dept Mgr+Financial Review)",
+          "08_budget_management.md 第三条 (budget exhaustion blocks reimbursement)"
+        ],
+        "decision": "needs_more_evidence",
+        "key_findings": [
+          "Article 11 split-check triggered: E0041 12/18-12/25 4 training_fee records total ¥9,764.73 cross AR-01 to AR-02 threshold requiring Dept Mgr+Financial Review",
+          "Daily cap exceeded: all 5 Dec training_fee (¥2,083-¥2,917) exceed internal ¥800/day and external ¥1,200/day per 05_training_expense.md Articles 3-4",
+          "Cumulative ¥11,920.81 exceeds ¥3,500 per-person-per-session cap per Article 2 of 05_training_expense.md",
+          "Historical contrast: repealed 2022 version had no split-check clause; 2025 Article 11 purpose-built for this pattern",
+          "No special_approval flag on any record; all approved at AR-01 only without Financial Review"
+        ],
+        "record_ids": [
+          "R000465",
+          "R000561",
+          "R000888",
+          "R001354",
+          "R001894"
+        ],
+        "unresolved_items": [
+          "Internal vs external training classification per record",
+          "Whether 5 records relate to same training program",
+          "Department budget remaining for D005"
+        ]
+      },
+      "token_budget": 4000,
+      "token_usage": {}
+    },
+    "95bccd46-6891-44f0-b53c-4855fc8619ea": {
+      "artifact_paths": [
+        "work/audit_plan.json",
+        "work/evidence_matrix.json",
+        "work/subagents/policy_researcher/analysis.json"
+      ],
+      "artifacts": [
+        {
+          "path": "work/subagents/independent_reviewer/analysis.json",
+          "sha256": "a395c6587d1b61f5e0de83a7f34884b7b56e76a3cc858022ee37da554df55c21",
+          "size_bytes": 3217
+        }
+      ],
+      "authorized_at": 1784723981.1100857,
+      "completed_at": 1784724181.6076217,
+      "complexity": 2,
+      "invocation_id": "95bccd46-6891-44f0-b53c-4855fc8619ea",
+      "reason_code": "THRESHOLD_BOUNDARY",
+      "role": "independent_reviewer",
+      "status": "completed",
+      "summary": {
+        "artifact_paths": [
+          "work/subagents/independent_reviewer/analysis.json"
+        ],
+        "citations": [
+          "01_expense_reimbursement_2025.md 第十一条"
+        ],
+        "decision": "needs_more_evidence",
+        "key_findings": [
+          "7天窗口修正: 12/18-12/24仅含3笔(R000465+R000561+R000888)合计¥7,681.24非4笔¥9,764.73; R001354(12/25)为第8天超出",
+          "AR-01→AR-02仍触发: 单窗口最大¥7,681.24落入AR-02",
+          "无豁免: 所有记录special_approval=0,无培训费特殊通道",
+          "R001894正确排除于7天窗口(10天间隔),但金额与R000465仅差¥1.64引人关注",
+          "证据薄弱: days字段全空无法验证每日标准,无事项标识,部门预算超155.6%,跨年度审批"
+        ],
+        "record_ids": [
+          "R000465",
+          "R000561",
+          "R000888",
+          "R001354",
+          "R001894"
+        ],
+        "unresolved_items": [
+          "7天窗口语义(固定vs滚动)",
+          "合计金额需修正",
+          "days字段缺失",
+          "部门预算超支独立评估"
+        ]
+      },
+      "token_budget": 4000,
+      "token_usage": {}
+    }
+  },
+  "subagent_rejections": {},
+  "submission_attempts": 1,
+  "submission_status": "accepted",
+  "task_id": "RR-CASE-001"
+}

@@ -2,7 +2,7 @@
 
 任务ID：L3-004
 题型：full_year_rule_audit
-问题：请对全年数据做超预算专项扫描,返回全部异常ID和记录ID集合。
+问题：请对全年数据做超预算专项扫描。按reimburse_date和record_id依次累计部门已批准费用，每个超预算部门形成1项发现，以首次使累计支出超过年度预算且无专项审批的记录作为关键record_id。请返回全部发现ID和关键record_id集合，并说明计算方法和制度依据。
 
 不得调用领域 Skills 或子智能体；使用框架基础工具、业务 MCP 和统一提交工具独立完成。
 OpenClaude运行时只保证Bash、Edit、Read可用；必须使用Edit或Bash中的安全脚本更新预置JSON，禁止调用Write、Grep等未暴露工具。

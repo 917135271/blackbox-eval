@@ -1,0 +1,42 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "DEV-011-001",
+      "record_ids": ["R900019"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"},
+        {"doc_id": "08_budget_management.md", "clause_no": "第三条"},
+        {"doc_id": "08_budget_management.md", "clause_no": "第四条"}
+      ],
+      "facts": [
+        "D902部门年度预算为50,000元",
+        "R900018报销45,000元（2025-01-15）后累计45,000元，未超过预算1.0倍",
+        "R900019报销6,000元（2025-02-15）后累计51,000元，首次超过年度预算1.0倍",
+        "R900019的special_approval=0，无专项审批记录",
+        "R900020有专项审批（special_approval=1），不误报"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900019"],
+  "submitted_record_ids": ["R900019"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true
+  },
+  "reconciled_figures": {
+    "department_budget": 50000,
+    "cumulative_after_R900018": 45000,
+    "cumulative_after_R900019": 51000,
+    "budget_usage_rate": 1.02,
+    "first_over_budget_record": "R900019"
+  },
+  "unresolved_items": []
+}

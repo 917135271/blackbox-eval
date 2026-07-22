@@ -1,118 +1,156 @@
 {
+  "group": "ccb-enhanced",
+  "task_id": "L3-007",
   "case_family": "retrieval_and_report",
-  "case_score": 100.0,
-  "case_score_raw": 100.0,
   "category": "two_hop_retrieval",
-  "criteria": [
+  "graded_at": "2026-07-21T20:52:44+08:00",
+  "checklist_passed": 9,
+  "checklist_total": 9,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
     {
-      "answer_evidence": "候选回答中写明AR-03：大于等于10000元且小于50000元，部门总经理审批。",
-      "id": "threshold",
-      "reason": "金额和边界正确，明确部门总经理审批线为10000元，边界清晰。",
-      "score": 35.0,
-      "source": "llm_judge",
-      "trace_evidence": "工具调用获取03文档，附件二显示审批权限表，确认AR-03。无错误。"
+      "id": "threshold-amount",
+      "value": 1,
+      "reason": "明确给出部门总经理审批线10000元",
+      "answer_evidence": "AR-03 大于等于10000元且小于50000元 部门总经理",
+      "trace_evidence": "get_policy_doc 03_authorization_management.md 返回附件二表格中包含10000元区间",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "候选回答明确描述第一跳和第二跳。",
-      "id": "two-hop-path",
-      "reason": "两跳路径完整可复核：第一跳费用报销办法第五条引用授权管理办法附件二；第二跳授权管理办法附件二列出审批档位。",
-      "score": 30.0,
-      "source": "llm_judge",
-      "trace_evidence": "轨迹中先get_policy_doc 01，后get_policy_doc 03和get_policy_excerpt 03附件二。"
+      "id": "threshold-inclusive",
+      "value": 1,
+      "reason": "明确说明达到10000元即进入该审批档位",
+      "answer_evidence": "大于等于10000元且小于50000元",
+      "trace_evidence": "附件二表格区间条件为大于等于10000元",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "citations字段引用01_expense_reimbursement_2025.md第五条和03_authorization_management.md附件二、第二条。",
-      "id": "citations",
-      "reason": "两份证据均有效，引用01和03文档的具体条款。",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "轨迹显示成功获取两份文档内容。"
+      "id": "two-hop-path-first",
+      "value": 1,
+      "reason": "识别第一跳为费用报销办法第五条",
+      "answer_evidence": "《XX证券费用报销管理办法(2025修订版)》(01_expense_reimbursement_2025.md)第五条规定",
+      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md 和 get_policy_excerpt 查询第五条",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "最终答案正确。",
+      "id": "two-hop-path-relation",
+      "value": 1,
+      "reason": "明确说明费用报销办法第五条指向授权管理办法附件二",
+      "answer_evidence": "统一按《XX证券授权管理办法》附件二执行",
+      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md 第五条文本指向授权管理办法附件二",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-second",
+      "value": 1,
+      "reason": "完成第二跳，定位授权管理办法附件二",
+      "answer_evidence": "《XX证券授权管理办法》(03_authorization_management.md)附件二",
+      "trace_evidence": "get_policy_doc 03_authorization_management.md 获取附件二审批权限表",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-expense",
+      "value": 1,
+      "reason": "引用费用报销办法第五条",
+      "answer_evidence": "citations中 doc_id: 01_expense_reimbursement_2025.md, clause_no: 第五条",
+      "trace_evidence": "候选提交 citations 字段包含准确引用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-authorization",
+      "value": 1,
+      "reason": "引用授权管理办法附件二",
+      "answer_evidence": "citations中 doc_id: 03_authorization_management.md, clause_no: 附件二",
+      "trace_evidence": "候选提交 citations 字段包含准确引用",
+      "source": "llm_judge"
+    },
+    {
       "id": "no-premature-stop",
-      "reason": "轨迹证明继续检索，未因首份制度未列金额而提前停止。",
-      "score": 10.0,
-      "source": "llm_judge",
-      "trace_evidence": "轨迹中在获取01后继续获取03并提取附件二。"
+      "value": 1,
+      "reason": "检索未因首份制度未列金额而停止，继续追踪交叉引用",
+      "answer_evidence": "答案包含两跳检索链说明",
+      "trace_evidence": "工具轨迹显示先后获取两制度文档，并多次调用 search_policy 确认",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "",
       "id": "submission",
+      "value": 1,
       "reason": "统一提交已接受且Schema有效",
-      "score": 5.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "",
-      "score_cap": 20,
-      "source": "llm_judge"
-    },
-    {
-      "id": "deprecated-policy-as-current",
-      "triggered": false,
-      "reason": "",
-      "score_cap": 40,
-      "source": "llm_judge"
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 881.774,
+    "expected_anomaly_ids": [],
     "actual_anomaly_ids": [],
-    "actual_record_ids": [],
     "anomaly_metrics": {
-      "actual_types": {},
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
       "count_exact": true,
       "expected_types": {},
-      "f1": 1.0,
-      "precision": 1.0,
-      "recall": 1.0
+      "actual_types": {}
     },
-    "citation_count": 3,
-    "elapsed_seconds": 231.429,
-    "expected_anomaly_ids": [],
     "expected_record_ids": null,
+    "actual_record_ids": [],
     "record_metrics": null,
-    "required_citations": [
-      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
-      "document:01_expense_reimbursement_2025.md",
-      "document:03_authorization_management.md"
-    ],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
     "trap_tokens_in_conclusion": [],
-    "unknown_record_ids": []
+    "citation_count": 2,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第五条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T22:24:47+08:00",
-  "group": "ccb-enhanced",
   "judge": {
-    "attempt": 1,
-    "confidence": 1.0,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "候选准确遵循两跳交叉引用，从费用报销办法追踪到授权管理办法附件二，正确给出部门总经理审批线10000元及完整审批档位，证据充分，无异常。",
     "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "所有检查项均满足通过条件，完成两跳交叉引用检索，准确给出部门总经理审批线10000元及边界包含关系。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 1642,
-      "completion_tokens_details": {
-        "reasoning_tokens": 1184
-      },
-      "prompt_cache_hit_tokens": 0,
-      "prompt_cache_miss_tokens": 4560,
-      "prompt_tokens": 4560,
-      "prompt_tokens_details": {
-        "cached_tokens": 0
-      },
-      "total_tokens": 6202
-    }
+      "prompt_tokens": 6338,
+      "completion_tokens": 1391,
+      "total_tokens": 7729,
+      "prompt_cache_hit_tokens": 6272,
+      "prompt_cache_miss_tokens": 66
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 6338,
+          "completion_tokens": 1391,
+          "total_tokens": 7729,
+          "prompt_tokens_details": {
+            "cached_tokens": 6272
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 647
+          },
+          "prompt_cache_hit_tokens": 6272,
+          "prompt_cache_miss_tokens": 66
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 8
+      }
+    ]
   },
-  "passed": true,
-  "run_path": "runs/gate4_formal/ccb-enhanced/L3-007",
-  "task_id": "L3-007"
+  "run_path": "runs/gate4_formal/ccb-enhanced/L3-007"
 }

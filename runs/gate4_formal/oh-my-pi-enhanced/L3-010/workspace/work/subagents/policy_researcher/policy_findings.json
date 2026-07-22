@@ -1,0 +1,227 @@
+{
+  "applicable_policies": [
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "document_number": "XX证财规〔2025〕甲号",
+      "effective_date": "2025-01-01",
+      "expiry_date": null,
+      "validity": "CURRENT",
+      "role": "primary_expense_policy",
+      "notes": "Article 5 delegates all approval thresholds to 03_authorization_management.md Appendix 2 (附件二). Article 14 explicitly repeals 02_expense_reimbursement_2022_deprecated.md."
+    },
+    {
+      "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+      "title": "XX证券费用报销管理办法(2022版)",
+      "document_number": "XX证财规〔2022〕乙号",
+      "effective_date": "2022 (inferred from title)",
+      "expiry_date": "2025-01-01",
+      "validity": "DEPRECATED",
+      "repealed_by": "01_expense_reimbursement_2025.md",
+      "role": "historical_reference_only",
+      "notes": "Article 1: retained for institutional history only. Article 4: thresholds explicitly superseded; must not be used as current approval basis."
+    },
+    {
+      "doc_id": "03_authorization_management.md",
+      "title": "XX证券授权管理办法",
+      "document_number": "XX证综规〔2025〕丙号",
+      "effective_date": "2025-01-01",
+      "expiry_date": null,
+      "validity": "CURRENT",
+      "role": "authoritative_threshold_source",
+      "notes": "Article 2: Appendix 2 (附件二) is the definitive source for expense reimbursement approval thresholds. Article 5: effective 2025-01-01. Appendix 2 contains 5 tiers (AR-01 through AR-05)."
+    }
+  ],
+  "excluded_policies": [],
+  "threshold_comparison": {
+    "description": "Side-by-side comparison of 2022 deprecated thresholds vs 2025 current thresholds (via 03_authorization_management.md 附件二)",
+    "2022_thresholds": [
+      {
+        "clause": "Article 2",
+        "range_lower": 8000,
+        "range_upper": 30000,
+        "range_display": "[8000, 30000)",
+        "approver": "部门总经理 (Department General Manager)"
+      },
+      {
+        "clause": "Article 3",
+        "range_lower": 30000,
+        "range_upper": null,
+        "range_display": "[30000, ∞)",
+        "approver": "分管副总 (VP)"
+      }
+    ],
+    "2025_thresholds": [
+      {
+        "clause": "附件二 AR-01",
+        "range_lower": 0,
+        "range_upper": 3000,
+        "range_display": "[0, 3000)",
+        "approver": "部门经理 (Department Manager)"
+      },
+      {
+        "clause": "附件二 AR-02",
+        "range_lower": 3000,
+        "range_upper": 10000,
+        "range_display": "[3000, 10000)",
+        "approver": "部门经理 + 财务复核 (Department Manager + Financial Review)"
+      },
+      {
+        "clause": "附件二 AR-03",
+        "range_lower": 10000,
+        "range_upper": 50000,
+        "range_display": "[10000, 50000)",
+        "approver": "部门总经理 (Department General Manager)"
+      },
+      {
+        "clause": "附件二 AR-04",
+        "range_lower": 50000,
+        "range_upper": 200000,
+        "range_display": "[50000, 200000)",
+        "approver": "分管副总 (VP)"
+      },
+      {
+        "clause": "附件二 AR-05",
+        "range_lower": 200000,
+        "range_upper": null,
+        "range_display": "[200000, ∞)",
+        "approver": "总经理办公会 (General Manager's Office)"
+      }
+    ]
+  },
+  "version_trap_zones": [
+    {
+      "zone_id": "VTZ-01",
+      "range": "[0, 3000)",
+      "range_cny": "0 to 2,999.99",
+      "2022_approver": "(no explicit threshold — implicitly unregulated or lowest-level approval)",
+      "2025_approver": "部门经理",
+      "risk": "NEW_REQUIREMENT — expenses below 3,000 now require formal department manager approval where none was explicitly required before",
+      "direction": "TIGHTER (new explicit requirement)"
+    },
+    {
+      "zone_id": "VTZ-02",
+      "range": "[3000, 8000)",
+      "range_cny": "3,000 to 7,999.99",
+      "2022_approver": "(no explicit threshold — implicitly unregulated or lowest-level approval)",
+      "2025_approver": "部门经理 + 财务复核",
+      "risk": "NEW_REQUIREMENT — expenses from 3,000 now require department manager approval PLUS financial review that did not exist in 2022",
+      "direction": "TIGHTER (new explicit requirement + financial review)"
+    },
+    {
+      "zone_id": "VTZ-03",
+      "range": "[8000, 10000)",
+      "range_cny": "8,000 to 9,999.99",
+      "2022_approver": "部门总经理",
+      "2025_approver": "部门经理 + 财务复核",
+      "risk": "THRESHOLD_SHIFT — in 2022 these amounts required department general manager; in 2025 they only need department manager + financial review. This is a DOWNGRADE in approver seniority, though financial review adds a control not present in 2022.",
+      "direction": "LOOSER (lower approver rank) but with added financial review control"
+    },
+    {
+      "zone_id": "VTZ-04",
+      "range": "[30000, 50000)",
+      "range_cny": "30,000 to 49,999.99",
+      "2022_approver": "分管副总",
+      "2025_approver": "部门总经理",
+      "risk": "THRESHOLD_SHIFT — VP approval was required in 2022; department general manager suffices in 2025. Significant delegation downward for amounts up to 50,000.",
+      "direction": "LOOSER (VP → department general manager)"
+    },
+    {
+      "zone_id": "VTZ-05",
+      "range": "[200000, ∞)",
+      "range_cny": "200,000 and above",
+      "2022_approver": "分管副总",
+      "2025_approver": "总经理办公会",
+      "risk": "THRESHOLD_SHIFT — 2022 had no upper cap on VP authority; 2025 introduces a new highest tier requiring General Manager's Office collective approval for amounts ≥200,000.",
+      "direction": "TIGHTER (new collective body requirement above 200,000)"
+    }
+  ],
+  "cross_references": {
+    "description": "Cross-reference chain from 2025 expense policy to authorization thresholds",
+    "chain": [
+      {
+        "from_doc": "01_expense_reimbursement_2025.md",
+        "from_clause": "Article 5",
+        "to_doc": "03_authorization_management.md",
+        "to_clause": "附件二 (Appendix 2)",
+        "mechanism": "Direct delegation: '单笔费用报销的审批权限,不在本办法正文列示具体金额,统一按《XX证券授权管理办法》附件二执行' (Approval authority for individual expense reimbursements is not listed in this document; uniformly executed per Authorization Management Policy Appendix 2).",
+        "purpose": "Primary threshold source — system must auto-derive approver roles from Appendix 2"
+      },
+      {
+        "from_doc": "01_expense_reimbursement_2025.md",
+        "from_clause": "Article 11",
+        "to_doc": "03_authorization_management.md",
+        "to_clause": "附件二 higher approval line (较高审批线)",
+        "mechanism": "Anti-splitting rule: aggregate of same employee + same expense type within 7 days reaching the higher approval line triggers investigation for split-claim avoidance.",
+        "purpose": "Fraud detection — uses Appendix 2 tiers as aggregation threshold"
+      },
+      {
+        "from_doc": "01_expense_reimbursement_2025.md",
+        "from_clause": "Article 14",
+        "to_doc": "02_expense_reimbursement_2022_deprecated.md",
+        "to_clause": "(entire document)",
+        "mechanism": "Explicit repeal: '原《XX证券费用报销管理办法(2022版)》同时废止' (Original 2022 edition is simultaneously abolished).",
+        "purpose": "Version supersession — 2022 thresholds are legally void"
+      }
+    ]
+  },
+  "validity_status": {
+    "summary": "Only the 2025 policy suite is currently valid. The 2022 expense policy is explicitly repealed and explicitly marked as not to be used for current approval decisions.",
+    "current_policies": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "status": "CURRENT",
+        "effective": "2025-01-01",
+        "expiry": null
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "status": "CURRENT",
+        "effective": "2025-01-01",
+        "expiry": null
+      }
+    ],
+    "deprecated_policies": [
+      {
+        "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+        "status": "DEPRECATED",
+        "repealed_by": "01_expense_reimbursement_2025.md Article 14",
+        "repeal_date": "2025-01-01",
+        "retention_purpose": "Institutional history / system-of-record archive only"
+      }
+    ]
+  },
+  "decision": "pass",
+  "key_findings": [
+    "The 2025 expense reimbursement policy (01, XX证财规〔2025〕甲号) does not contain its own approval thresholds; Article 5 delegates entirely to the Authorization Management Policy (03, XX证综规〔2025〕丙号) Appendix 2 (附件二).",
+    "The 2025 Authorization Management Policy Appendix 2 defines 5 approval tiers (AR-01 through AR-05) with thresholds at 3,000 / 10,000 / 50,000 / 200,000 CNY — a much more granular scheme than the 2022 version's 2 tiers.",
+    "The 2022 expense policy (02, XX证财规〔2022〕乙号) had only 2 approval thresholds: 8,000 CNY → Department General Manager, 30,000 CNY → VP. It was explicitly repealed by Article 14 of the 2025 policy effective 2025-01-01.",
+    "Five version trap zones were identified where old and new thresholds materially differ: [0-3000), [3000-8000), [8000-10000), [30000-50000), and [200000+). Three zones are tighter in 2025, two are looser.",
+    "The 2022 policy (Article 4) explicitly warns that its thresholds have been superseded and must not be used for current approval decisions.",
+    "The 2025 policy introduces an anti-splitting rule (Article 11) that cross-references Appendix 2's higher approval line — any same-employee, same-type claims within 7 days aggregating to that line trigger split-avoidance investigation.",
+    "All three documents' effective dates align at 2025-01-01: the 2025 expense policy and authorization policy took effect, and the 2022 policy was simultaneously repealed."
+  ],
+  "record_ids": [],
+  "citations": [
+    { "doc_id": "01_expense_reimbursement_2025.md", "clause_no": "Article 5" },
+    { "doc_id": "01_expense_reimbursement_2025.md", "clause_no": "Article 11" },
+    { "doc_id": "01_expense_reimbursement_2025.md", "clause_no": "Article 14" },
+    { "doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "Article 2" },
+    { "doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "Article 3" },
+    { "doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "Article 4" },
+    { "doc_id": "03_authorization_management.md", "clause_no": "Article 2" },
+    { "doc_id": "03_authorization_management.md", "clause_no": "Article 5" },
+    { "doc_id": "03_authorization_management.md", "clause_no": "附件二 AR-01" },
+    { "doc_id": "03_authorization_management.md", "clause_no": "附件二 AR-02" },
+    { "doc_id": "03_authorization_management.md", "clause_no": "附件二 AR-03" },
+    { "doc_id": "03_authorization_management.md", "clause_no": "附件二 AR-04" },
+    { "doc_id": "03_authorization_management.md", "clause_no": "附件二 AR-05" }
+  ],
+  "unresolved_items": [
+    "The 2022 policy does not state its own effective date — the year '2022' is inferred from the document title 'XX证券费用报销管理办法(2022版)' and the document number 'XX证财规〔2022〕乙号'.",
+    "The 2022 policy does not define thresholds below 8,000 CNY — whether there were implicit lower-tier approvals or simply no requirement is not documented."
+  ],
+  "artifact_paths": [
+    "work/subagents/policy_researcher/policy_findings.json"
+  ]
+}

@@ -1,0 +1,217 @@
+{
+  "artifact_paths": [
+    "final_submission.json",
+    "submission_receipt.json",
+    "traces/context_events.jsonl",
+    "traces/events.jsonl",
+    "traces/subagents.jsonl",
+    "traces/tool_calls.jsonl",
+    "work/analysis/data_findings.json",
+    "work/artifact_index.json",
+    "work/audit_plan.json",
+    "work/context_checkpoint.json",
+    "work/decision_log.jsonl",
+    "work/evidence_index.json",
+    "work/evidence_matrix.json",
+    "work/final_result.json",
+    "work/independent_review.json",
+    "work/policy_applicability.json",
+    "work/report_draft.json",
+    "work/sql/query.sql",
+    "work/task_state.json",
+    "work/validation_report.json"
+  ],
+  "compacted": false,
+  "context_usage_percent": 0.0,
+  "created_at": 1784721723.0182369,
+  "estimation_method": "outer_runner_finalization",
+  "retained_state": {
+    "applicable_policies": [
+      "01_expense_reimbursement_2025.md",
+      "02_expense_reimbursement_2022_deprecated.md",
+      "03_authorization_management.md",
+      "04_travel_expense.md"
+    ],
+    "artifact_index": [
+      "final_submission.json",
+      "submission_receipt.json",
+      "traces/context_events.jsonl",
+      "traces/events.jsonl",
+      "traces/subagents.jsonl",
+      "traces/tool_calls.jsonl",
+      "work/analysis/data_findings.json",
+      "work/artifact_index.json",
+      "work/audit_plan.json",
+      "work/context_checkpoint.json",
+      "work/decision_log.jsonl",
+      "work/evidence_index.json",
+      "work/evidence_matrix.json",
+      "work/final_result.json",
+      "work/independent_review.json",
+      "work/policy_applicability.json",
+      "work/report_draft.json",
+      "work/sql/query.sql",
+      "work/task_state.json",
+      "work/validation_report.json"
+    ],
+    "audit_plan": {
+      "audit_scope": {
+        "amount": 9990.0,
+        "business_period": "2025-10",
+        "city_tier": "A",
+        "department_id": "D008",
+        "employee_id": "E0012",
+        "expense_date": "2025-10-03",
+        "expense_type": "travel_lodging",
+        "nights": 10,
+        "record_id": "R004233"
+      },
+      "clue": "R004233",
+      "complexity": {
+        "reasons": [
+          "policy version comparison (2022 vs 2025) +1",
+          "two business rules (expense standard + approval path) +1",
+          "single known record, no aggregation, no multi-policy ambiguity"
+        ],
+        "score": 2
+      },
+      "data_questions": [
+        {
+          "id": "DQ1",
+          "question": "R004233的完整费用明细和审批记录",
+          "source": "get_expense_detail(R004233)",
+          "status": "completed"
+        },
+        {
+          "id": "DQ2",
+          "question": "E0012的员工职级和职位信息",
+          "source": "get_employee(E0012)",
+          "status": "completed"
+        }
+      ],
+      "evidence_requirements": {
+        "approval_path": "授权管理办法附件二审批线与实际审批记录比较",
+        "expense_standard": "住宿标准表(差旅费管理办法第四条)与实报金额比较",
+        "historical_comparison": "2022版审批线与现行审批线的差异分析"
+      },
+      "execution_steps": [
+        {
+          "action": "audit-query-planner",
+          "status": "in_progress",
+          "step": 1
+        },
+        {
+          "action": "policy-version-check",
+          "status": "pending",
+          "step": 2
+        },
+        {
+          "action": "batch-expense-analysis (single record verification)",
+          "status": "pending",
+          "step": 3
+        },
+        {
+          "action": "evidence-coverage-check",
+          "status": "pending",
+          "step": 4
+        },
+        {
+          "action": "false-positive-review (if triggered)",
+          "status": "pending",
+          "step": 5
+        },
+        {
+          "action": "audit-report",
+          "status": "pending",
+          "step": 6
+        },
+        {
+          "action": "result-validator",
+          "status": "pending",
+          "step": 7
+        },
+        {
+          "action": "validate + submit",
+          "status": "pending",
+          "step": 8
+        }
+      ],
+      "policy_questions": [
+        {
+          "expected": "999元/晚 ≤ 1100元/晚",
+          "id": "PQ1",
+          "policy_docs": [
+            "04_travel_expense.md"
+          ],
+          "question": "R004233的住宿费标准是否在现行制度范围内？",
+          "rule": "差旅费管理办法第四条：高管级一类城市住宿标准1100元/晚"
+        },
+        {
+          "expected": "9990元在AR-02区间，审批记录为部门经理",
+          "id": "PQ2",
+          "policy_docs": [
+            "03_authorization_management.md",
+            "01_expense_reimbursement_2025.md"
+          ],
+          "question": "R004233的审批路径是否符合现行授权管理办法附件二？",
+          "rule": "授权管理办法附件二：AR-02(3000-10000元)需部门经理+财务复核"
+        },
+        {
+          "expected": "历史规则会错误要求部门总经理审批，而现行规则下部门经理审批已足够",
+          "id": "PQ3",
+          "policy_docs": [
+            "02_expense_reimbursement_2022_deprecated.md",
+            "03_authorization_management.md"
+          ],
+          "question": "历史制度(2022版)的审批线与现行制度有何差异？继续使用历史审批线会造成什么判断偏差？",
+          "rule": "2022版：≥8000元需部门总经理；现行：AR-02(3000-10000)需部门经理+财务复核"
+        }
+      ],
+      "required_fields": [
+        "record_id",
+        "amount",
+        "nights",
+        "city_tier",
+        "expense_type",
+        "employee_level",
+        "position_role",
+        "approval_tier",
+        "approver_role",
+        "special_approval",
+        "status"
+      ],
+      "stopping_conditions": [
+        "All policy questions answered with citations",
+        "Evidence matrix at 100% coverage with status pass",
+        "Validation report returns valid=true",
+        "submit_audit_result succeeds"
+      ],
+      "subagent_plan": {
+        "reason": "Complexity 2, single-record verification with clear policy references. Compact main-agent execution is sufficient.",
+        "use_subagent": false
+      },
+      "task_id": "PV-CASE-001",
+      "task_type": "policy_data_comparison",
+      "unresolved_items": []
+    },
+    "constraints": [
+      "isolated GATE3 workspace",
+      "formal answer assets prohibited",
+      "outer runner timeout enforced"
+    ],
+    "evidence_status": "pass",
+    "record_ids": [
+      "R004233"
+    ],
+    "remaining_budget": {
+      "elapsed_seconds": 591.26,
+      "remaining_seconds": 308.74,
+      "timeout_seconds": 900
+    },
+    "submission_status": "accepted",
+    "task": "你正在执行GATE3新正式题区分度Canary，该运行只用于冻结前验证，不进入正式排名。当前为领域增强组。\n\n任务ID：PV-CASE-001\n题型：policy_data_comparison\n问题：请以R004233为线索，结合现行制度、历史制度和业务数据，核查该笔费用的审批路径及费用标准适用是否正确。请返回核查涉及的record_id、审计结论、关键计算、现行制度依据，并说明继续使用历史审批线会造成什么判断偏差；如存在异常，再返回发现ID。\n\n遵循已安装的证券费用审计Skills，按需使用Checkpoint、子智能体、证据复核和结果校验。\n\n要求：\n1. 必须查询制度和只读业务库后作答，可以使用Shell、Python、SQLite和当前隔离工作区文件。\n2. 禁止读取 ground_truth、cases.json、Rubric、判卷代码、历史答案、其他任务或候选轨迹，也不得访问无关互联网。\n3. 有异常时，record_ids只包含参与本题违规的记录；无异常时仍保留直接核查或结论覆盖的记录，并在answer中明确写“无异常”。\n4. 必须维护work/final_result.json、work/evidence_matrix.json和work/validation_report.json，先取得validate_audit_result的valid=true，再以result_path=\"work/final_result.json\"调用submit_audit_result。\n5. 不得打印最终JSON代替统一提交。提交成功后只输出GATE3_CANARY_PASS；无法提交时只输出GATE3_CANARY_FAIL。\n",
+    "unresolved_items": []
+  },
+  "stage": "submission_ready",
+  "task_id": "PV-CASE-001"
+}

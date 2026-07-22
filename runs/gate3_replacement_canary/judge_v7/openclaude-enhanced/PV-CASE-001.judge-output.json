@@ -1,0 +1,102 @@
+{
+  "checklist": [
+    {
+      "id": "record-amount",
+      "value": 1,
+      "reason": "候选提交多次明确金额为9990元，工具轨迹中get_expense_detail返回amount为9990.0，双方一致支持。",
+      "answer_evidence": "候选提交：'报销金额9990元属于...AR-02档'，'实际9990÷10=999元/晚'。",
+      "trace_evidence": "工具轨迹get_expense_detail结果：'amount: 9990.0'。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-tier",
+      "value": 1,
+      "reason": "候选提交明确判断9990元属于AR-02档位，工具轨迹中list_approvals返回tier_id为AR-02，均支持AR-02适用。",
+      "answer_evidence": "候选提交：'报销金额9990元属于《授权管理办法》附件二AR-02档（≥3000元且<10000元）'。",
+      "trace_evidence": "工具轨迹list_approvals结果：'tier_id: \"AR-02\"'。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-roles",
+      "value": 1,
+      "reason": "候选提交明确列出AR-02需要的两个审批角色：部门经理和财务复核，未错误加入部门总经理；工具轨迹中制度文档明确记载AR-02的必要审批角色为'部门经理,并经财务复核'。",
+      "answer_evidence": "候选提交：'该档要求的必要审批角色为\"部门经理,并经财务复核\"'。",
+      "trace_evidence": "工具轨迹get_policy_doc(03_authorization_management.md)结果：'| AR-02 | ... | 部门经理,并经财务复核 |'。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "approval-trace",
+      "value": 1,
+      "reason": "工具轨迹中list_approvals直接返回实际审批记录的tier_id为AR-02且审批角色为部门经理且已批准，候选提交也提及该记录，满足核实要求。",
+      "answer_evidence": "候选提交：'仅有一条审批记录（A004233，部门经理E0008杨丹审批）'。",
+      "trace_evidence": "工具轨迹list_approvals结果：'approvals: [{\"tier_id\": \"AR-02\", \"approver_role\": \"部门经理\", \"approval_status\": \"approved\"}]'。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "lodging-calculation",
+      "value": 1,
+      "reason": "职级、城市、晚数、单晚标准和总限额均正确，计算结果无错误。",
+      "answer_evidence": "答案明确写出“X1级/分管副总”、“A类城市住宿10晚”、“按高管级一类城市标准为1100元/晚”、“实际9990÷10=999元/晚”，隐含总限额11000元且计算正确。",
+      "trace_evidence": "调用了get_policy_doc获取04_travel_expense.md，第四条表格证实高管级一类城市标准为1100元/晚。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "lodging-conclusion",
+      "value": 1,
+      "reason": "明确给出未超住宿标准结论且无矛盾表述。",
+      "answer_evidence": "答案中写有“未超标准，费用标准适用正确”。",
+      "trace_evidence": "工具输出显示住宿标准1100元/晚，实际每晚999元，未超限。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-version",
+      "value": 1,
+      "reason": "明确采用2025修订版和现行授权制度，未将2022旧版作为有效依据。",
+      "answer_evidence": "答案中反复引用“现行2025版制度”、“按《授权管理办法》附件二”，并明确表示旧版已废止。",
+      "trace_evidence": "工具调用list_policy_docs列出了01_expense_reimbursement_2025.md和03_authorization_management.md，get_policy_doc获取了这两份现行制度全文。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "legacy-status",
+      "value": 1,
+      "reason": "正确给出旧版8000元审批线并明确其已废止，不得作为现行判断依据。",
+      "answer_evidence": "答案中指出“若按2022旧版制度（已废止），报销金额≥8000元应提交部门总经理审批”。",
+      "trace_evidence": "工具调用get_policy_doc获取02_expense_reimbursement_2022_deprecated.md，第二条写有“单笔报销金额达到8000元的，应提交部门总经理审批”，第四条明确“不得作为现行审批依据”。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "legacy-impact",
+      "value": 1,
+      "reason": "明确说明误用8000元旧线会将9990元（位于8000至10000元区间）错误升级至部门总经理，并联系R004233具体说明。",
+      "answer_evidence": "历史制度偏差说明：若按2022旧版制度...报销金额≥8000元应提交部门总经理审批...将9990元错误升级至部门总经理（AR-03档）...",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-expense",
+      "value": 0,
+      "reason": "提交的citations中仅引用01_expense_reimbursement_2025.md第五条、第十条、第十三条，缺少第十二条（不得超标准）和第十四条（旧版废止）的引用，未覆盖全部要求依据。",
+      "answer_evidence": "citations: [{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第五条\"}, {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十条\"}, {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十三条\"}]，无第十二条、第十四条。",
+      "trace_evidence": "工具轨迹已获取01_expense_reimbursement_2025.md全文，但提交未引用第十二、十四条。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-authorization",
+      "value": 1,
+      "reason": "准确引用授权管理办法附件二，明确AR-02档和10000元审批线。",
+      "answer_evidence": "citations: [{\"doc_id\": \"03_authorization_management.md\", \"clause_no\": \"附件二\"}]，answer中提及AR-02≥3000且<10000元。",
+      "trace_evidence": "工具get_policy_doc获取03_authorization_management.md全文，包含附件二详细表格。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-travel",
+      "value": 1,
+      "reason": "引用差旅办法第四条，准确给出高管级一类城市住宿标准1100元/晚，支持标准核查。",
+      "answer_evidence": "citations: [{\"doc_id\": \"04_travel_expense.md\", \"clause_no\": \"第四条\"}]，answer中陈述“高管级一类城市标准为1100元/晚”。",
+      "trace_evidence": "工具get_policy_doc获取04_travel_expense.md全文，第四条表格包含1100元标准。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "所有四项检查均通过：候选提交正确识别了R004233金额为9990元，判定适用现行AR-02档位，准确列出所需审批角色（部门经理+财务复核），且工具轨迹印证了实际审批记录为AR-02并由部门经理审批。；候选提交在费用标准计算和制度版本识别上均正确，四项检查项全部通过。；候选提交正确说明了历史审批线误判影响，并准确引用了授权管理办法和差旅标准，但未完整引用费用报销办法要求的第十二条和第十四条，导致政策引用项未通过。",
+  "confidence": 0.98
+}

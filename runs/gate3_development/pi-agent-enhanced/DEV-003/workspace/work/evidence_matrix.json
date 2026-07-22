@@ -1,0 +1,38 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-DEV003-001",
+      "record_ids": ["R900001", "R900002"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
+      ],
+      "facts": [
+        "发票FPDEV900001（供应商：开发供应商01，金额480元，日期2025-01-05）被两张报销单同时使用",
+        "R900001（BXDEV900001）：员工E9001，费用日期2025-01-05，金额480元，报销日期2025-01-12",
+        "R900002（BXDEV900002）：员工E9001，费用日期2025-01-06，金额480元，报销日期2025-01-13",
+        "两笔报销均状态为approved，均无特殊审批标记",
+        "同一发票FPDEV900001在不同报销单中重复出现，违反同一发票最多报销1次的规定"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900001", "R900002"],
+  "submitted_record_ids": ["R900001", "R900002"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": false
+  },
+  "reconciled_figures": {
+    "invoice_total": 480,
+    "reimbursed_total": 960,
+    "duplicate_excess": 480
+  },
+  "unresolved_items": []
+}

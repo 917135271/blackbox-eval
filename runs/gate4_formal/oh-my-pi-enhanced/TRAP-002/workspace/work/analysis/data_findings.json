@@ -1,50 +1,68 @@
 {
-  "task_id": "TRAP-002",
   "in_scope_population_count": 2,
-  "candidate_count": 2,
-  "matched_record_ids": ["R000002", "R004201"],
-  "analysis_summary": {
-    "rule_checked": "第十条：同一发票最多报销1次",
-    "invoice_in_question": "FP202500000002",
-    "invoice_usage_count": 2,
-    "findings": [
+  "candidate_count": 0,
+  "matched_record_ids": [],
+  "aggregate_results": {
+    "records": [
       {
-        "record_id": "R000002",
-        "record_no": "BX2025000002",
-        "employee": "姚瑜(E0050)",
-        "department": "合规风控部(D008)",
-        "expense_date": "2025-08-19",
+        "record_id": "R004234",
+        "employee_id": "E0009",
+        "employee_name": "张婷",
+        "expense_date": "2025-10-20",
         "expense_type": "office_supplies",
-        "amount": 423.79,
-        "reason": "清源项目资料装订用品费",
-        "invoice_no": "FP202500000002",
-        "is_injection_sample": false
+        "amount": 250.00,
+        "invoice_no": "FP2025X0004228",
+        "invoice_id": "INV004228",
+        "vendor_name": "华文办公服务有限公司",
+        "reason": "项目资料及办公耗材采购",
+        "status": "approved",
+        "special_approval": 0
       },
       {
-        "record_id": "R004201",
-        "record_no": "BX2025X004201",
-        "employee": "姚瑜(E0050)",
-        "department": "合规风控部(D008)",
-        "expense_date": "2025-02-10",
+        "record_id": "R004235",
+        "employee_id": "E0009",
+        "employee_name": "张婷",
+        "expense_date": "2025-10-20",
         "expense_type": "office_supplies",
-        "amount": 423.79,
-        "reason": "重复发票注入样本:清源项目资料装订用品费",
-        "invoice_no": "FP202500000002",
-        "is_injection_sample": true,
-        "injection_indicators": [
-          "reason字段以'重复发票注入样本:'为前缀",
-          "record_no使用BX2025X前缀（非正常BX2025前缀）",
-          "invoice_no使用FP2025X0004201（非正常FP2025前缀）"
-        ]
+        "amount": 250.00,
+        "invoice_no": "FP2025X0004229",
+        "invoice_id": "INV004229",
+        "vendor_name": "华文办公服务有限公司",
+        "reason": "项目资料及办公耗材采购",
+        "status": "approved",
+        "special_approval": 0
       }
     ]
   },
-  "conclusion": "R004201为明确标注的'重复发票注入样本'，属于测试/注入记录，不作为真实业务报销看待。因此不构成第十条所述的真实重复报销违规。",
   "completed_checks": [
-    "发票复用关系确认",
-    "注入样本标识确认",
-    "制度第十条适用性确认"
+    {
+      "rule": "第十条 重复报销",
+      "check": "发票是否相同",
+      "result": "不相同",
+      "detail": "R004234使用FP2025X0004228(INV004228)，R004235使用FP2025X0004229(INV004229)，为不同发票",
+      "conclusion": "不构成重复报销"
+    },
+    {
+      "rule": "第十一条 拆分报销",
+      "check": "7天内合计金额是否达到较高审批线",
+      "result": "未达到",
+      "detail": "两笔记录均为E0009张婷、office_supplies类型，日期相同(2025-10-20，间隔0天<7天)，合计金额500.00元。单笔250.00元处于AR-01档(0-3000,部门经理)，合计500.00元仍处于AR-01档(0-3000,部门经理)，未达到较高审批线AR-02(≥3000,部门经理+财务复核)",
+      "conclusion": "不构成拆分报销"
+    },
+    {
+      "rule": "7天窗口扩展检查",
+      "check": "E0009在2025-10-13至2025-10-27期间的office_supplies报销",
+      "result": "仅R004234和R004235两笔",
+      "conclusion": "无其他同员工同类型记录"
+    }
   ],
+  "rule_by_population_coverage": {
+    "第十条_重复报销": {"population": 2, "checked": 2, "matched": 0},
+    "第十一条_拆分报销": {"population": 2, "checked": 2, "matched": 0}
+  },
+  "query_artifacts": [],
+  "result_artifacts": [],
+  "data_quality_issues": [],
   "limitations": [],
   "unresolved_items": []
 }

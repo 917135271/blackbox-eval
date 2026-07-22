@@ -7,7 +7,15 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from run_gate4_formal import GROUPS, RUN_ROOT, ROOT, load_tasks, verify_frozen_configuration
+from run_gate4_formal import (
+    GROUPS,
+    RUN_ROOT,
+    ROOT,
+    formal_mount_policy,
+    load_tasks,
+    verify_frozen_configuration,
+)
+from formal_eval_plan import FORMAL_RUN_COUNT, FORMAL_TASK_COUNT, TASK_TIMEOUT_SECONDS
 
 
 OUTPUT_JSON = ROOT / "output" / "gate4_formal_runs.json"
@@ -133,7 +141,7 @@ def inspect_task(group: str, task_id: str) -> dict[str, Any]:
         "elapsed_seconds": result.get("elapsed_seconds"),
         "within_budget": (
             isinstance(result.get("elapsed_seconds"), (int, float))
-            and float(result["elapsed_seconds"]) <= 900
+            and float(result["elapsed_seconds"]) <= TASK_TIMEOUT_SECONDS
         ),
         "final_submission_present": (workspace / "final_submission.json").exists(),
         "terminal_failure_recorded": bool(result.get("timed_out"))
@@ -177,14 +185,13 @@ def build_report() -> dict[str, Any]:
     retry_registry = load_jsonl(registry_path)
     registered_paths = {str(row.get("attempt_path")) for row in retry_registry}
     actual_retry_paths = {path.relative_to(ROOT).as_posix() for path in retry_attempts}
-    source = (ROOT / "runner" / "run_gate4_formal.py").read_text(encoding="utf-8")
-    runtime_source = (ROOT / "runner" / "run_gate3_development.py").read_text(encoding="utf-8")
+    mount_policy = formal_mount_policy()
     security = secret_scan(RUN_ROOT)
     enhanced = [group for group in GROUPS if group.endswith("enhanced")]
     checks = {
         "frozen_configuration_verified": bool(freeze),
-        "fifteen_formal_cases": len(tasks) == 15,
-        "one_hundred_fifty_runs_present": sum(row["present"] for row in rows) == 150,
+        "configured_formal_cases_present": len(tasks) == FORMAL_TASK_COUNT,
+        "all_formal_runs_present": sum(row["present"] for row in rows) == FORMAL_RUN_COUNT,
         "every_task_has_submission_or_terminal_failure": all(
             row["final_submission_present"] or row["terminal_failure_recorded"]
             for row in rows
@@ -208,11 +215,8 @@ def build_report() -> dict[str, Any]:
             row.get("classification") == "infrastructure" and str(row.get("reason", "")).strip()
             for row in retry_registry
         ),
-        "hidden_assets_not_mounted": "runtime.DEV = FORMAL" in source
-        and 'runtime.DEV_DB = ROOT / "data" / "expense.db"' in source
-        and "command += common_volumes(workspace, artifacts)" in runtime_source
-        and 'volume(ROOT / "data" / "ground_truth' not in runtime_source
-        and "volume(FORMAL" not in source,
+        "formal_runtime_mounts_verified": mount_policy["required_present"]
+        and mount_policy["hidden_absent"],
         "secret_not_persisted": security["performed"] and not security["matches"],
     }
     status = "pass" if all(checks.values()) else "fail"
@@ -238,6 +242,7 @@ def build_report() -> dict[str, Any]:
         "retry_attempts": [path.relative_to(ROOT).as_posix() for path in retry_attempts],
         "retry_registry": retry_registry,
         "security": security,
+        "mount_policy": mount_policy,
         "hard_standard_diagnostics": hard_standard_diagnostics,
         "tasks": rows,
     }
@@ -249,18 +254,18 @@ def render_markdown(report: dict[str, Any]) -> str:
         "",
         "## 结论",
         "",
-        f"GATE4 **{'通过' if report['status'] == 'pass' else '未通过'}**。本报告只验证150次正式运行与审计轨迹是否完整，不执行逐题语义判卷；逐题Rubric判卷属于GATE5。",
+        f"GATE4 **{'通过' if report['status'] == 'pass' else '未通过'}**。本报告只验证{FORMAL_RUN_COUNT}次正式运行与审计轨迹是否完整，不执行逐题语义判卷；逐题Rubric判卷属于GATE5。",
         "",
-        "## 十组运行结果",
+        f"## {len(GROUPS)}组运行结果",
         "",
         "| 实验组 | 已运行 | 已提交 | 超时 | 事件完整 | 产物清单 | 可恢复Checkpoint |",
         "| --- | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for group, value in report["groups"].items():
         lines.append(
-            f"| {group} | {value['runs']}/15 | {value['accepted']}/15 | "
-            f"{value['timeouts']} | {value['event_complete']}/15 | "
-            f"{value['artifact_manifest']}/15 | {value['checkpoint_recoverable']}/15 |"
+            f"| {group} | {value['runs']}/{FORMAL_TASK_COUNT} | {value['accepted']}/{FORMAL_TASK_COUNT} | "
+            f"{value['timeouts']} | {value['event_complete']}/{FORMAL_TASK_COUNT} | "
+            f"{value['artifact_manifest']}/{FORMAL_TASK_COUNT} | {value['checkpoint_recoverable']}/{FORMAL_TASK_COUNT} |"
         )
     lines.extend(["", "## 验收项", "", "| 检查 | 结果 |", "| --- | --- |"])
     for name, passed in report["checks"].items():
@@ -271,7 +276,7 @@ def render_markdown(report: dict[str, Any]) -> str:
             "",
             "## 性能诊断",
             "",
-            f"- 成功提交：{diagnostics['accepted_runs']}/150",
+            f"- 成功提交：{diagnostics['accepted_runs']}/{FORMAL_RUN_COUNT}",
             f"- 超时任务：{diagnostics['timeout_runs']}",
             (
                 "- 超过每组1题超时标准的实验组："

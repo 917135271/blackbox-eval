@@ -1,0 +1,82 @@
+{
+  "task_id": "TRAP-005",
+  "task_scope": "核查R004239和R004240是否构成重复报销、拆分报销或业务招待费超标准",
+  "audit_period": "2025-10-25 至 2025-10-26",
+  "target_records": ["R004239", "R004240"],
+  "policy_questions": [
+    {
+      "id": "Q1",
+      "question": "R004239和R004240是否使用同一发票构成重复报销？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十条",
+      "rule": "同一发票最多报销1次"
+    },
+    {
+      "id": "Q2",
+      "question": "R004239和R004240是否构成拆分报销以规避审批权限？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十一条",
+      "rule": "同一员工、同一费用类型在7天内出现2笔及以上报销，且合计金额达到较高审批线"
+    },
+    {
+      "id": "Q3",
+      "question": "R004239和R004240单次金额是否超过5000元？人均是否超过300元？",
+      "policy_doc": "06_business_entertainment.md",
+      "clause": "第二条、第三条",
+      "rule": "单次≤5000元，人均≤300元"
+    },
+    {
+      "id": "Q4",
+      "question": "R004239和R004240是否将同一客户拜访拆分为多个报销事项？",
+      "policy_doc": "06_business_entertainment.md",
+      "clause": "第四条",
+      "rule": "同一客户拜访或同一会议安排不得拆分"
+    }
+  ],
+  "data_questions": [
+    "每笔报销的发票号、金额、日期、参与人数、招待事由（客户）、审批层级",
+    "每张发票的使用次数",
+    "两笔合计金额与审批权限表的比较"
+  ],
+  "required_fields": ["record_id", "invoice_no", "invoice_id", "amount", "expense_date", "participants", "expense_type", "employee_id", "reason", "approval_tier"],
+  "evidence_needs": [
+    "R004239和R004240的完整详情",
+    "FP2025X0004233和FP2025X0004234的发票使用情况",
+    "业务招待费管理办法全文",
+    "费用报销管理办法2025版全文",
+    "授权管理办法附件二审批权限表"
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "查询R004239和R004240详情", "status": "completed"},
+    {"step": 2, "action": "查询发票使用情况", "status": "completed"},
+    {"step": 3, "action": "查询审批链", "status": "completed"},
+    {"step": 4, "action": "查询政策文件", "status": "completed"},
+    {"step": 5, "action": "policy-version-check（如触发）", "status": "pending"},
+    {"step": 6, "action": "batch-expense-analysis（如触发）", "status": "pending"},
+    {"step": 7, "action": "evidence-coverage-check", "status": "pending"},
+    {"step": 8, "action": "false-positive-review（如触发）", "status": "pending"},
+    {"step": 9, "action": "audit-report", "status": "pending"},
+    {"step": 10, "action": "result-validator", "status": "pending"},
+    {"step": 11, "action": "validate_audit_result", "status": "pending"},
+    {"step": 12, "action": "submit_audit_result", "status": "pending"}
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "多业务规则（重复报销、拆分报销、招待费标准三项）",
+      "涉及阈值判断（审批线、人均限额、单次限额）",
+      "涉及多份政策文件（01、03、06）"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "仅涉及两条记录的直接核查，分析简单，主智能体可直接完成"
+  },
+  "stopping_conditions": [
+    "所有四道政策问题均得出明确结论",
+    "证据覆盖率100%",
+    "validation_report状态为pass",
+    "final_result通过validate_audit_result"
+  ],
+  "unresolved_items": []
+}

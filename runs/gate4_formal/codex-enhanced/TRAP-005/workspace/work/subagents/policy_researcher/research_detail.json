@@ -1,0 +1,171 @@
+{
+  "task": "TRAP-005",
+  "role": "policy_researcher",
+  "invocation_id": "e599b55b-f0ed-4cc4-ace0-38ab3b43d7ba",
+  "research_date": "2026-07-21",
+  "business_date": "2025-10-25 to 2025-10-26",
+  "records_under_review": ["R004239", "R004240"],
+  "employee": {
+    "id": "E0008",
+    "name": "杨丹",
+    "level": "D1",
+    "role": "部门经理",
+    "department": "合规风控部(D008)"
+  },
+  "policies_consulted": [
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "effective_date": "2025-01-01",
+      "status": "active",
+      "relationship": "Repeals 02_expense_reimbursement_2022_deprecated.md per Article 14"
+    },
+    {
+      "doc_id": "06_business_entertainment.md",
+      "title": "XX证券业务招待费管理办法",
+      "effective_date": "2025 (exact date not specified in text, header indicates 2025 edition)",
+      "status": "active",
+      "relationship": "Standalone entertainment-specific policy"
+    },
+    {
+      "doc_id": "03_authorization_management.md",
+      "title": "XX证券授权管理办法",
+      "effective_date": "2025-01-01",
+      "status": "active",
+      "relationship": "Referenced by 01_expense_reimbursement_2025.md Article 5 for approval thresholds"
+    }
+  ],
+  "excluded_policies": [
+    {
+      "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+      "title": "XX证券费用报销管理办法(2022版)",
+      "reason": "Repealed by 01_expense_reimbursement_2025.md Article 14, effective 2025-01-01. Business dates 2025-10-25/26 are after repeal date."
+    }
+  ],
+  "findings": {
+    "per_person_limit": {
+      "question": "What are the per-person business entertainment limits for D1-level employees?",
+      "finding": "The per-person limit is 300 CNY, uniform across all employee levels. No level-specific differentiation exists.",
+      "clauses": [
+        {
+          "doc_id": "06_business_entertainment.md",
+          "clause_no": "第三条",
+          "text": "业务招待费用按参与人数核算,人均不得超过300元。",
+          "interpretation": "Per-person cap is 300 CNY for all employees regardless of level (D1 included)."
+        },
+        {
+          "doc_id": "06_business_entertainment.md",
+          "clause_no": "第二条",
+          "text": "业务招待单次活动费用不得超过5000元。",
+          "interpretation": "Per-event cap is 5000 CNY (supplementary to per-person cap)."
+        }
+      ],
+      "application_to_records": {
+        "R004239": {"amount": 540.00, "participants": 3, "per_person": 180.00, "under_limit": true},
+        "R004240": {"amount": 545.00, "participants": 3, "per_person": 181.67, "under_limit": true}
+      }
+    },
+    "duplicate_reimbursement": {
+      "question": "What constitutes duplicate reimbursement?",
+      "finding": "Using the same invoice in multiple reimbursement forms constitutes duplicate reimbursement risk.",
+      "clauses": [
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第十条",
+          "text": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。",
+          "interpretation": "A single invoice may only be reimbursed once. If the same invoice appears in different reimbursement claims, it must be treated as a duplicate reimbursement risk. This applies to R004239 and R004240 if they reference the same invoice number."
+        }
+      ]
+    },
+    "split_reimbursement": {
+      "question": "What constitutes split reimbursement?",
+      "finding": "Two distinct split-prohibition rules apply: (1) the general split rule under the reimbursement policy and (2) the entertainment-specific split rule. Both are relevant to R004239/R004240.",
+      "clauses": [
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第十一条",
+          "text": "不得将同一事项或同类事项拆分为多笔报销以规避审批权限。同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到《授权管理办法》附件二较高审批线的,应重点核查拆分规避审批。",
+          "interpretation": "Split prohibition with two conditions: (a) absolute prohibition against splitting the same/similar matter to circumvent approval; (b) trigger for focus review when same employee + same expense type within 7 days AND combined amount reaches higher approval threshold per 03_authorization_management.md Annex 2. For R004239 + R004240: same employee (E0008), same expense type (business_entertainment), within 7 days (Oct 25-26), combined 1,085 CNY. The 'higher approval threshold' (AR-02 at 3,000 CNY) is NOT reached, so the focus-review trigger in condition (b) is not activated. However, condition (a) — the absolute prohibition — still applies if the two records are for the same customer visit or meeting."
+        },
+        {
+          "doc_id": "06_business_entertainment.md",
+          "clause_no": "第四条",
+          "text": "同一客户拜访或同一会议安排不得拆分为多个报销事项。",
+          "interpretation": "Entertainment-specific absolute prohibition: the same customer visit or meeting arrangement must not be split into multiple reimbursement items — regardless of amounts. If R004239 and R004240 relate to the same customer visit or meeting, this clause is violated even if per-person and per-event limits are individually met."
+        }
+      ],
+      "approval_thresholds_for_split_analysis": {
+        "source": "03_authorization_management.md 附件二",
+        "thresholds": [
+          {"tier": "AR-01", "range": "[0, 3000)", "required_approver": "部门经理"},
+          {"tier": "AR-02", "range": "[3000, 10000)", "required_approver": "部门经理+财务复核"},
+          {"tier": "AR-03", "range": "[10000, 50000)", "required_approver": "部门总经理"},
+          {"tier": "AR-04", "range": "[50000, 200000)", "required_approver": "分管副总"},
+          {"tier": "AR-05", "range": "[200000, ∞)", "required_approver": "总经理办公会"}
+        ],
+        "application": "R004239 (540 CNY) and R004240 (545 CNY) each individually fall in AR-01. Combined total 1,085 CNY also falls in AR-01, below the AR-02 threshold of 3,000 CNY referenced in Article 11."
+      }
+    },
+    "special_approval_exemptions": {
+      "question": "Are there any special approval thresholds or exemptions for business entertainment?",
+      "finding": "No special exemptions or thresholds exist specifically for business entertainment. Standard approval rules from 01_expense_reimbursement_2025.md and 03_authorization_management.md apply.",
+      "clauses": [
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第五条",
+          "text": "单笔费用报销的审批权限,不在本办法正文列示具体金额,统一按《XX证券授权管理办法》附件二执行。费用系统应按附件二自动派生审批角色。",
+          "interpretation": "Approval authority for all expense types (including business entertainment) follows 03_authorization_management.md Annex 2 uniformly. No entertainment-specific override."
+        },
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第十二条",
+          "text": "无专项审批时,报销金额不得超过对应制度标准的1.0倍。",
+          "interpretation": "Without special approval, the reimbursement amount must not exceed 1.0x the applicable policy standard. For business entertainment, the standards are: per-person ≤ 300 CNY (Article 3 of 06), per-event ≤ 5,000 CNY (Article 2 of 06)."
+        },
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第十三条",
+          "text": "部门年度预算不足时不得继续报销。预算使用达到预算额度的1.0倍后,确需发生的费用应履行专项审批。",
+          "interpretation": "Budget exhaustion triggers additional special approval requirement, applicable to all expense types including entertainment."
+        }
+      ]
+    }
+  },
+  "cross_policy_relationships": [
+    {
+      "from_doc": "01_expense_reimbursement_2025.md",
+      "from_clause": "第五条",
+      "to_doc": "03_authorization_management.md",
+      "to_clause": "附件二",
+      "relationship": "reference",
+      "description": "Expense approval thresholds are defined by reference in the authorization management policy annex."
+    },
+    {
+      "from_doc": "01_expense_reimbursement_2025.md",
+      "from_clause": "第十一条",
+      "to_doc": "03_authorization_management.md",
+      "to_clause": "附件二",
+      "relationship": "reference",
+      "description": "Split-reimbursement focus-review trigger uses authorization management annex for 'higher approval threshold' definition."
+    },
+    {
+      "from_doc": "01_expense_reimbursement_2025.md",
+      "from_clause": "第十二条",
+      "to_doc": "06_business_entertainment.md",
+      "to_clause": "第二条, 第三条",
+      "relationship": "reference",
+      "description": "Reimbursement amount must not exceed 1.0x the entertainment policy standards without special approval."
+    },
+    {
+      "from_doc": "01_expense_reimbursement_2025.md",
+      "from_clause": "第十四条",
+      "to_doc": "02_expense_reimbursement_2022_deprecated.md",
+      "relationship": "repeal",
+      "description": "2025 edition explicitly repeals the 2022 edition effective 2025-01-01."
+    }
+  ],
+  "unresolved_items": [
+    "Whether R004239 and R004240 use the same invoice number (needs data-layer verification for duplicate risk per Article 10 of 01_expense_reimbursement_2025.md)",
+    "Whether R004239 and R004240 relate to the same customer visit/meeting (needs data-layer verification for split risk per Article 4 of 06_business_entertainment.md)"
+  ]
+}

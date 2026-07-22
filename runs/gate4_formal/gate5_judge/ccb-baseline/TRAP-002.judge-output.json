@@ -1,46 +1,78 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "clean-conclusion",
-      "score": 15,
-      "reason": "结论与提交记录矛盾：记录R000005与R004202使用同一发票，应为异常，但结论无异常。",
-      "answer_evidence": "candidate_submission.answer: '无异常'，anomaly_ids: []，但record_ids: ['R000005','R004202']",
-      "trace_evidence": "find_reused_invoices显示INV000005对应R000005和R004202，get_expense_detail确认两者invoice_no均为FP202500000005。"
+      "value": 1,
+      "reason": "候选提交明确说明“不构成重复报销或拆分报销，无异常”，无矛盾表述。",
+      "answer_evidence": "“经核查，R004234与R004235不构成重复报销或拆分报销，无异常。”",
+      "trace_evidence": "无异常结论源于工具调用的数据核查，轨迹中无异常发现。",
+      "source": "llm_judge"
     },
     {
-      "id": "record-scope",
-      "score": 0,
-      "reason": "未核查预期记录R004234和R004235，提交了无关记录R000005和R004202。",
-      "answer_evidence": "record_ids: ['R000005','R004202']",
-      "trace_evidence": "工具调用未涉及R004234或R004235，get_expense_detail仅对R000005,R004202等。"
+      "id": "case-specific-reason-invoice",
+      "value": 1,
+      "reason": "候选准确指出R004234和R004235使用不同发票。",
+      "answer_evidence": "“R004234使用发票FP2025X0004228，R004235使用发票FP2025X0004229，两张发票不同”",
+      "trace_evidence": "find_invoice_usage对FP2025X0004228和FP2025X0004229分别返回不同发票且usage_count均为1。",
+      "source": "llm_judge"
     },
     {
-      "id": "case-specific-reason",
-      "score": 0,
-      "reason": "未说明本题合规原因different invoices and total below approval line。",
-      "answer_evidence": "answer仅'无异常'，无原因说明。",
-      "trace_evidence": "无相关说明。"
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "候选正确计算7天内合计金额为500元。",
+      "answer_evidence": "“合计金额为500元”",
+      "trace_evidence": "get_expense_detail显示两笔金额均为250元，日期均为2025-10-20，两笔相加得500。",
+      "source": "llm_judge"
     },
     {
-      "id": "reverse-check",
-      "score": 0,
-      "reason": "未对R004234,R004235进行阈值、发票或日期核查。",
-      "answer_evidence": "无",
-      "trace_evidence": "工具调用集中于无关记录，未查询R004234,R004235。"
+      "id": "case-specific-reason-threshold",
+      "value": 0,
+      "reason": "候选未说明500元未达到10000元审批线，仅提及3000元；未满足预期要求。",
+      "answer_evidence": "“未达到《授权管理办法》附件二中AR-02档位的较高审批线3000元”",
+      "trace_evidence": "无任何工具输出或计算过程将500元与10000元比较。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-invoice",
+      "value": 1,
+      "reason": "工具轨迹独立验证了两条记录发票不同，与结论一致。",
+      "answer_evidence": "无，此为轨迹核验项。",
+      "trace_evidence": "find_invoice_usage分别查询FP2025X0004228和FP2025X0004229，返回不同record_id和发票号。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "工具轨迹独立验证了7天内合计500元，与结论一致。",
+      "answer_evidence": "无，此为轨迹核验项。",
+      "trace_evidence": "get_expense_detail均返回amount:250, expense_date:2025-10-20，合计500。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 0,
+      "reason": "工具轨迹未体现500元与10000元审批线的比较，无法证明该比较。",
+      "answer_evidence": "无，此为轨迹核验项。",
+      "trace_evidence": "轨迹获取了附件二，包含3000、10000等档位，但无将500与10000比较的步骤。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用了《费用报销管理办法》第十条、第十一条。",
+      "answer_evidence": "citations中包含{\"doc_id\":\"01_expense_reimbursement_2025.md\",\"clause_no\":\"第十条\"}和{\"doc_id\":\"01_expense_reimbursement_2025.md\",\"clause_no\":\"第十一条\"}。",
+      "trace_evidence": "search_policy返回了第十条和第十一条的内容，get_policy_doc也获取了完整文档。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "准确引用了《授权管理办法》附件二。",
+      "answer_evidence": "citations中包含{\"doc_id\":\"03_authorization_management.md\",\"clause_no\":\"附件二\"}。",
+      "trace_evidence": "get_policy_doc获取了03_authorization_management.md，其中包含附件二审批权限表。",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": true,
-      "reason": "提交的record_ids R000005和R004202与本题无关，支撑核心结论。"
-    },
-    {
-      "id": "trap-false-positive",
-      "triggered": false,
-      "reason": "未将合规记录判为异常。"
-    }
-  ],
-  "overall_comment": "候选错误识别TRAP-002记录，基于无关记录得出无异常结论，结论与提交证据矛盾。总分受fabricated-record-id约束上限20分。",
-  "confidence": 0.2
+  "overall_comment": "候选结论和大部分推理正确，但未按预期明确说明500元未达到10000元审批线，仅比较了3000元；轨迹也未体现该比较，因此相关两项扣分。",
+  "confidence": 0.9
 }

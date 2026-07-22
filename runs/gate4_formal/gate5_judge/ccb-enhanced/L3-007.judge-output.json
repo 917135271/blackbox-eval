@@ -1,35 +1,70 @@
 {
-  "criteria": [
+  "checklist": [
     {
-      "id": "threshold",
-      "score": 35,
-      "reason": "金额和边界正确，明确部门总经理审批线为10000元，边界清晰。",
-      "answer_evidence": "候选回答中写明AR-03：大于等于10000元且小于50000元，部门总经理审批。",
-      "trace_evidence": "工具调用获取03文档，附件二显示审批权限表，确认AR-03。无错误。"
+      "id": "threshold-amount",
+      "value": 1,
+      "reason": "明确给出部门总经理审批线10000元",
+      "answer_evidence": "AR-03 大于等于10000元且小于50000元 部门总经理",
+      "trace_evidence": "get_policy_doc 03_authorization_management.md 返回附件二表格中包含10000元区间",
+      "source": "llm_judge"
     },
     {
-      "id": "two-hop-path",
-      "score": 30,
-      "reason": "两跳路径完整可复核：第一跳费用报销办法第五条引用授权管理办法附件二；第二跳授权管理办法附件二列出审批档位。",
-      "answer_evidence": "候选回答明确描述第一跳和第二跳。",
-      "trace_evidence": "轨迹中先get_policy_doc 01，后get_policy_doc 03和get_policy_excerpt 03附件二。"
+      "id": "threshold-inclusive",
+      "value": 1,
+      "reason": "明确说明达到10000元即进入该审批档位",
+      "answer_evidence": "大于等于10000元且小于50000元",
+      "trace_evidence": "附件二表格区间条件为大于等于10000元",
+      "source": "llm_judge"
     },
     {
-      "id": "citations",
-      "score": 20,
-      "reason": "两份证据均有效，引用01和03文档的具体条款。",
-      "answer_evidence": "citations字段引用01_expense_reimbursement_2025.md第五条和03_authorization_management.md附件二、第二条。",
-      "trace_evidence": "轨迹显示成功获取两份文档内容。"
+      "id": "two-hop-path-first",
+      "value": 1,
+      "reason": "识别第一跳为费用报销办法第五条",
+      "answer_evidence": "《XX证券费用报销管理办法(2025修订版)》(01_expense_reimbursement_2025.md)第五条规定",
+      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md 和 get_policy_excerpt 查询第五条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-relation",
+      "value": 1,
+      "reason": "明确说明费用报销办法第五条指向授权管理办法附件二",
+      "answer_evidence": "统一按《XX证券授权管理办法》附件二执行",
+      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md 第五条文本指向授权管理办法附件二",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-second",
+      "value": 1,
+      "reason": "完成第二跳，定位授权管理办法附件二",
+      "answer_evidence": "《XX证券授权管理办法》(03_authorization_management.md)附件二",
+      "trace_evidence": "get_policy_doc 03_authorization_management.md 获取附件二审批权限表",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-expense",
+      "value": 1,
+      "reason": "引用费用报销办法第五条",
+      "answer_evidence": "citations中 doc_id: 01_expense_reimbursement_2025.md, clause_no: 第五条",
+      "trace_evidence": "候选提交 citations 字段包含准确引用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-authorization",
+      "value": 1,
+      "reason": "引用授权管理办法附件二",
+      "answer_evidence": "citations中 doc_id: 03_authorization_management.md, clause_no: 附件二",
+      "trace_evidence": "候选提交 citations 字段包含准确引用",
+      "source": "llm_judge"
     },
     {
       "id": "no-premature-stop",
-      "score": 10,
-      "reason": "轨迹证明继续检索，未因首份制度未列金额而提前停止。",
-      "answer_evidence": "最终答案正确。",
-      "trace_evidence": "轨迹中在获取01后继续获取03并提取附件二。"
+      "value": 1,
+      "reason": "检索未因首份制度未列金额而停止，继续追踪交叉引用",
+      "answer_evidence": "答案包含两跳检索链说明",
+      "trace_evidence": "工具轨迹显示先后获取两制度文档，并多次调用 search_policy 确认",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [],
-  "overall_comment": "候选准确遵循两跳交叉引用，从费用报销办法追踪到授权管理办法附件二，正确给出部门总经理审批线10000元及完整审批档位，证据充分，无异常。",
+  "overall_comment": "所有检查项均满足通过条件，完成两跳交叉引用检索，准确给出部门总经理审批线10000元及边界包含关系。",
   "confidence": 1.0
 }

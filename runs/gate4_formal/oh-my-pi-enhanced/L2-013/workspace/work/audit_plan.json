@@ -1,85 +1,82 @@
 {
   "task_id": "L2-013",
-  "task_type": "policy_data_comparison",
-  "question": "结合制度和业务数据,核查以R004223为线索的超标准异常,返回异常ID和记录ID集合",
-  "clue_record_id": "R004223",
-  "scope": {
-    "audit_object": "以R004223为线索的超标准异常",
-    "expense_types": ["training_fee"],
-    "business_period": "2025-05-18",
-    "organization_scope": "E0009 (张婷), D009 (财务管理部)",
-    "requested_deliverable": "异常ID和记录ID集合"
+  "task_scope": {
+    "audit_object": "R004223训练课程费超标核查",
+    "clue_record": "R004223",
+    "expense_type": "training_fee",
+    "audit_period": "2025年",
+    "organization_scope": "全公司",
+    "deliverable": "发现ID和record_id集合，说明费用类型、金额、适用标准和制度依据"
   },
   "policy_questions": [
     {
-      "question": "培训课程费标准是多少？",
+      "question": "培训课程费标准限额是多少？",
       "policy_doc": "05_training_expense.md",
       "clause": "第二条",
-      "expected_value": "每人每期不超过3500元"
+      "boundary": "每人每期不超过3500元"
     },
     {
-      "question": "无专项审批时超标准报销如何处理？",
+      "question": "超额报销是否允许？",
       "policy_doc": "01_expense_reimbursement_2025.md",
       "clause": "第十二条",
-      "expected_value": "无专项审批时不得超过对应制度标准的1.0倍"
+      "boundary": "无专项审批时,报销金额不得超过对应制度标准的1.0倍"
     },
     {
-      "question": "2025版和2022版制度哪个适用？",
-      "policy_doc": "01_expense_reimbursement_2025.md",
-      "clause": "第十四条",
-      "expected_value": "2025版自2025-01-01施行,2022版废止"
+      "question": "R004223金额对应的审批层级和必要审批角色？",
+      "policy_doc": "03_authorization_management.md",
+      "clause": "附件二",
+      "boundary": "AR-02: >=3000且<10000, 部门经理+财务复核"
     }
   ],
   "data_questions": [
     {
-      "question": "R004223的金额是否超过培训课程费标准¥3,500？",
-      "record_id": "R004223",
-      "amount": 3700.0,
-      "standard": 3500.0,
-      "exceeds": true
+      "question": "R004223金额是否超过培训课程费标准？",
+      "fields": ["amount", "expense_type", "special_approval"],
+      "finding": "3700 > 3500, special_approval=0, 超标"
     },
     {
-      "question": "R004223是否有特殊审批？",
-      "record_id": "R004223",
-      "special_approval": 0,
-      "has_exemption": false
+      "question": "是否存在其他training_fee记录超标？",
+      "fields": ["record_id", "amount", "expense_type"],
+      "finding": "全库仅R004223一条training_fee记录超过3500元"
     }
   ],
-  "required_tables": ["reimbursement_records", "invoices", "employees", "departments", "approvals"],
-  "required_fields": ["record_id", "amount", "expense_type", "expense_date", "special_approval", "employee_id", "department_id"],
-  "evidence_needed": [
-    "R004223 expense detail (amount, type, date, special_approval)",
-    "Training fee policy Article 2 standard",
-    "General reimbursement policy Article 12",
-    "Policy applicability (2025 vs 2022)"
+  "evidence_requirements": [
+    "R004223详情: amount=3700, expense_type=training_fee, special_approval=0",
+    "培训费管理办法第二条: 3500元/人/期上限",
+    "费用报销管理办法第十二条: 无专项审批不得超过标准1.0倍",
+    "全库training_fee记录扫描确认R004223是唯一超标记录"
   ],
   "execution_steps": [
-    "1. Read training fee policy and general reimbursement policy",
-    "2. Verify 2025 policy applies (effective 2025-01-01, expense 2025-05-18)",
-    "3. Compare R004223 amount (¥3,700) against training course fee standard (¥3,500)",
-    "4. Check special_approval status (0 = no exemption)",
-    "5. Run evidence-coverage-check",
-    "6. Run audit-report",
-    "7. Validate and submit"
+    "1. 读取培训费管理办法(05),确认标准限额",
+    "2. 读取费用报销管理办法(01),确认超额规则",
+    "3. 读取授权管理办法(03),确认审批层级",
+    "4. 查询expense.db中所有training_fee>3500的记录",
+    "5. 确认R004223特殊审批状态和审批链",
+    "6. 形成初步发现",
+    "7. 证据覆盖检查",
+    "8. 虚假阳性复核",
+    "9. 审计报告",
+    "10. 结果验证与提交"
   ],
   "complexity": {
-    "score": 1,
+    "score": 2,
     "reasons": [
-      "Known-record clue task with directly related records",
-      "Straightforward policy comparison (¥3,700 vs ¥3,500)",
-      "Single applicable policy version (2025, no ambiguity)",
-      "Two business rules (training standard + no-special-approval rule)"
+      "单规则线索任务(培训课程费标准)",
+      "批量过滤查询training_fee记录",
+      "阈值比较(3500元)",
+      "一个审批相关问题",
+      "无需多政策版本或跨期分析"
     ]
   },
   "subagent_plan": {
     "use_subagent": false,
-    "reason": "Complexity 0-1, compact mode sufficient"
+    "reason": "复杂度2,单规则任务,数据量可控,主智能体直接处理"
   },
   "stopping_conditions": [
-    "R004223 verified against training fee standard",
-    "Policy applicability confirmed",
-    "Evidence matrix complete at 100%",
-    "Validation passes"
+    "所有training_fee记录已扫描完成",
+    "R004223与标准对比已完成",
+    "证据矩阵覆盖率100%",
+    "验证报告通过"
   ],
   "unresolved_items": []
 }

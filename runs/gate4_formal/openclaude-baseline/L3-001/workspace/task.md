@@ -2,7 +2,7 @@
 
 任务ID：L3-001
 题型：full_year_rule_audit
-问题：请对全年数据做重复报销专项扫描,返回全部异常ID和记录ID集合。
+问题：请对全年数据做重复报销专项扫描，按重复发票组生成稳定的发现ID，返回全部发现ID和关联record_id集合，并说明全量扫描方法和制度依据。
 
 不得调用领域 Skills 或子智能体；使用框架基础工具、业务 MCP 和统一提交工具独立完成。
 OpenClaude运行时只保证Bash、Edit、Read可用；必须使用Edit或Bash中的安全脚本更新预置JSON，禁止调用Write、Grep等未暴露工具。

@@ -1,0 +1,59 @@
+{
+  "status": "pass",
+  "coverage_percent": 100.0,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-001",
+      "record_ids": ["R000028", "R004204"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
+      ],
+      "facts": [
+        "发票FP202500000028(XX供应商1999,金额165.58元,开票日期2025-03-09)被两次用于报销:R000028(expense_date 2025-03-09)和R004204(expense_date 2025-05-10)",
+        "两次报销均为同一员工E0036(张林),费用类型均为communication,理由均为'北辰项目沟通通讯费',金额均为165.58元",
+        "invoice_usage_count为2,确认同一发票在不同报销单中重复出现"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "record_ids": ["R000028", "R002127"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "E0036(张林)在2025年3月产生两笔通讯费用:R000028(2025-03-09,165.58元)和R002127(2025-03-17,283.94元)",
+        "两笔合计金额为449.52元,超过制度第三条规定的每人每月300元上限",
+        "两笔记录均已approved,均无special_approval标识"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R000028", "R002127", "R004204"],
+  "submitted_record_ids": ["R000028", "R002127", "R004204"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第七条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"},
+    {"doc_id": "07_office_communication.md", "clause_no": "第四条"}
+  ],
+  "missing_evidence": [],
+  "no_anomaly_coverage": null,
+  "reconciled_figures": {
+    "R000028_amount": 165.58,
+    "R002127_amount": 283.94,
+    "R004204_amount": 165.58,
+    "march_2025_total": 449.52,
+    "monthly_cap": 300.0,
+    "excess": 149.52,
+    "invoice_fp202500000028_usage_count": 2
+  },
+  "unresolved_items": []
+}

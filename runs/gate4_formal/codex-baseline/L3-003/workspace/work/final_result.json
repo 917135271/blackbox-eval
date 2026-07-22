@@ -1,77 +1,10 @@
 {
-  "anomaly_ids": [
-    "DUP_001",
-    "DUP_002",
-    "DUP_003",
-    "DUP_004",
-    "DUP_005",
-    "DUP_006",
-    "OVER_001",
-    "OVER_002",
-    "OVER_003",
-    "SPLIT_001",
-    "SPLIT_002",
-    "SPLIT_003",
-    "SPLIT_004",
-    "SPLIT_005",
-    "SPLIT_006"
-  ],
-  "record_ids": [
-    "R000002",
-    "R000005",
-    "R000020",
-    "R000028",
-    "R000037",
-    "R000055",
-    "R004201",
-    "R004202",
-    "R004203",
-    "R004204",
-    "R004205",
-    "R004206",
-    "R004207",
-    "R004208",
-    "R004209",
-    "R004210",
-    "R004211",
-    "R004212",
-    "R004213",
-    "R004214",
-    "R004215",
-    "R004216",
-    "R004217",
-    "R004218",
-    "R004219",
-    "R004220",
-    "R004221",
-    "R004222",
-    "R004223"
-  ],
-  "answer": "全年超标准专项扫描发现三类共15项异常：1)重复报销6项(DUP_001至DUP_006)，同一发票在不同报销单中重复使用，违反《费用报销管理办法》第十条；2)超制度标准3项(OVER_001至OVER_003)，办公用品650元超600元月限额、通讯费330元超300元月限额、培训费3700元超3500元标准，违反相应制度标准及《费用报销管理办法》第十二条；3)拆分逃避审批6项(SPLIT_001至SPLIT_006)，同一员工同一费用类型7天内多笔报销合计达到AR-03审批线，违反《费用报销管理办法》第十一条。",
+  "anomaly_ids": ["OFFICE-SUPPLIES-OVER-LIMIT", "COMM-OVER-LIMIT"],
+  "record_ids": ["R004221", "R004222"],
+  "answer": "对2025年全年办公用品(office_supplies)和通讯费用(communication)进行逐笔单笔超月度上限扫描。\n\n【制度依据】\n- 《XX证券办公与通讯费用管理办法》(07_office_communication.md)第二条：员工个人办公用品报销每人每月不超过600元。\n- 同办法第三条：员工通讯费用报销每人每月不超过300元。\n- 《XX证券费用报销管理办法(2025修订版)》(01_expense_reimbursement_2025.md)第十二条：无专项审批时，报销金额不得超过对应制度标准的1.0倍。\n\n【计算口径】\n- 办公用品(office_supplies)：单笔金额与月度上限600元比较，超过600元即判定为超标准。\n- 通讯费用(communication)：单笔金额与月度上限300元比较，超过300元即判定为超标准。\n- 扫描范围：2025年全年全部office_supplies(694笔)和communication(640笔)记录，逐笔比对，不涉及多笔月度累计。\n- 排除条件：special_approval=1的记录视为有专项审批，但本次扫描中未发现此类记录。\n\n【全量扫描方法】\n1. 通过list_expenses按expense_type=office_supplies和expense_type=communication分别查询全年全部记录。\n2. 使用min_amount参数过滤：office_supplies用min_amount=600.01，communication用min_amount=300.01。\n3. 对命中的候选记录逐一调用get_expense_detail确认special_approval字段和审批状态。\n4. 确认结果：办公用品中R004221（650元>600元）和通讯费用中R004222（330元>300元）均无专项审批(special_approval=0)，确认为超标准异常。\n\n【发现】\n发现2项超标准异常：\n- OFFICE-SUPPLIES-OVER-LIMIT: R004221，李丽娟(E0007)，信息技术部，2025-01-24，办公用品650元，超出月度上限600元。\n- COMM-OVER-LIMIT: R004222，杨丹(E0008)，合规风控部，2025-03-20，通讯费用330元，超出月度上限300元。",
   "citations": [
-    {
-      "doc_id": "01_expense_reimbursement_2025.md",
-      "clause_no": "第十条"
-    },
-    {
-      "doc_id": "01_expense_reimbursement_2025.md",
-      "clause_no": "第十一条"
-    },
-    {
-      "doc_id": "01_expense_reimbursement_2025.md",
-      "clause_no": "第十二条"
-    },
-    {
-      "doc_id": "05_training_expense.md",
-      "clause_no": "第二条"
-    },
-    {
-      "doc_id": "07_office_communication.md",
-      "clause_no": "第二条"
-    },
-    {
-      "doc_id": "07_office_communication.md",
-      "clause_no": "第三条"
-    }
+    {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+    {"doc_id": "07_office_communication.md", "clause_no": "第三条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
   ]
 }

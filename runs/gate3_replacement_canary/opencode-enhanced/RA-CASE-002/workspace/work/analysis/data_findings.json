@@ -1,0 +1,44 @@
+{
+  "task_id": "RA-CASE-002",
+  "in_scope_population_count": 5,
+  "candidate_count": 5,
+  "matched_record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+  "aggregate_results": {
+    "group1_r004209_r004210_r004211": {
+      "records": ["R004209", "R004210", "R004211"],
+      "date_range": "2025-02-26 to 2025-03-02",
+      "max_days_diff": 4,
+      "individual_amounts": [3400.0, 3400.0, 3400.0],
+      "combined_amount": 10200.0,
+      "ar03_threshold": 10000.0,
+      "threshold_exceeded": true,
+      "expected_tier": "AR-03"
+    },
+    "group2_r004219_r004220": {
+      "records": ["R004219", "R004220"],
+      "date_range": "2025-11-27 to 2025-12-01",
+      "max_days_diff": 4,
+      "individual_amounts": [5200.0, 5200.0],
+      "combined_amount": 10400.0,
+      "ar03_threshold": 10000.0,
+      "threshold_exceeded": true,
+      "expected_tier": "AR-03"
+    }
+  },
+  "approval_gap_analysis": {
+    "R004209": {"total_approvals": 1, "dept_mgr": 1, "finance_review": 0},
+    "R004210": {"total_approvals": 1, "dept_mgr": 1, "finance_review": 0},
+    "R004211": {"total_approvals": 1, "dept_mgr": 1, "finance_review": 0},
+    "R004219": {"total_approvals": 1, "dept_mgr": 1, "finance_review": 0},
+    "R004220": {"total_approvals": 1, "dept_mgr": 1, "finance_review": 0}
+  },
+  "rule_by_population_coverage": [
+    {"rule": "AR-02 finance review requirement", "population": 5, "matched": 5, "status": "complete"},
+    {"rule": "7-day split claim (Article 11)", "population": 5, "groups_found": 2, "status": "complete"}
+  ],
+  "completed_checks": ["approval_role_check", "seven_day_split_check", "invoice_duplicate_check"],
+  "query_paths": ["work/sql/query.sql"],
+  "data_quality_issues": [],
+  "limitations": [],
+  "unresolved_items": ["D1职级与住宿标准档次的具体映射关系未在制度中明确定义"]
+}

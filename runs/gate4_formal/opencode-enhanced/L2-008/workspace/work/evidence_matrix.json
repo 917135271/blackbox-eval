@@ -3,18 +3,18 @@
   "coverage_percent": 100,
   "evidence_rows": [
     {
-      "anomaly_id": "SPLIT-001",
+      "anomaly_id": "ANO-001",
       "record_ids": ["R004212", "R004213"],
       "citations": [
         {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
         {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
       ],
       "facts": [
-        "R004212: 员工E0009张婷,费用类型travel_lodging,金额5100元,费用日期2025-04-10,审批档位AR-02",
-        "R004213: 员工E0009张婷,费用类型travel_lodging,金额5100元,费用日期2025-04-15,审批档位AR-02",
-        "两笔记录间隔5天,在7天窗口内,同一员工E0009、同一费用类型travel_lodging,合计金额10200元",
-        "授权管理办法附件二AR-02:3000~10000元需部门经理审批;AR-03:10000~50000元需部门总经理审批",
-        "单笔5100元属于AR-02,合计10200元达到AR-03较高审批线,拆分后规避了部门总经理审批"
+        "R004212: E0009(张婷)于2025-04-10报销travel_lodging 5100.00元,审批档位AR-02,由本人(部门经理)自审批",
+        "R004213: E0009(张婷)于2025-04-15报销travel_lodging 5100.00元,审批档位AR-02,由本人(部门经理)自审批",
+        "两笔记录为同一员工(E0009)、同一费用类型(travel_lodging)、同一事由(项目现场住宿费)、同一供应商(安程酒店管理有限公司)",
+        "日期间隔5天(R004212: 2025-04-10, R004213: 2025-04-15),在7天窗口内",
+        "合计金额10200.00元,达到AR-03审批线(≥10000元),需部门总经理审批;拆分为两笔5100元后每笔仅需AR-02(部门经理+财务复核)"
       ],
       "fact_supported": true,
       "rule_supported": true,
@@ -28,6 +28,14 @@
   "unused_citations": [],
   "missing_evidence": [],
   "no_anomaly_coverage": {},
-  "reconciled_figures": {},
+  "reconciled_figures": {
+    "total_amount": 10200.0,
+    "record_count": 2,
+    "date_window_start": "2025-04-10",
+    "date_window_end": "2025-04-15",
+    "days_between": 5,
+    "individual_amounts": [5100.0, 5100.0],
+    "ar_threshold": 10000.0
+  },
   "unresolved_items": []
 }

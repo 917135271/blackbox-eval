@@ -1,96 +1,76 @@
 {
   "task_id": "L3-004",
   "task_type": "full_year_rule_audit",
-  "question": "请对全年数据做超预算专项扫描,返回全部异常ID和记录ID集合。",
   "audit_scope": {
-    "audit_object": "部门年度预算超支",
-    "period": "2025-01-01 至 2025-12-31",
-    "organization_scope": "全部10个部门",
-    "expense_types": "全部费用类型",
-    "status": "approved",
-    "deliverable": "全部超预算异常ID和参与超支的记录ID集合"
+    "rule": "超预算专项扫描 — 部门累计已批准费用超过年度预算且无专项审批",
+    "expense_types": "all",
+    "period": "full year (all records with approved status)",
+    "departments": "all",
+    "status": "approved"
   },
   "policy_questions": [
     {
-      "question": "部门年度预算控制规则",
-      "policies": ["08_budget_management.md", "01_expense_reimbursement_2025.md"],
-      "clauses": [
-        {"doc_id": "08_budget_management.md", "clause_no": "第二条"},
-        {"doc_id": "08_budget_management.md", "clause_no": "第三条"},
-        {"doc_id": "08_budget_management.md", "clause_no": "第四条"},
-        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"}
-      ],
-      "rule": "部门年度累计费用达到预算额度1.0倍后不得继续报销，超预算需专项审批"
+      "id": "PQ1",
+      "question": "部门年度预算额度及超预算控制规则是什么？",
+      "policy_docs": ["08_budget_management.md"],
+      "key_clauses": ["第二条", "第三条", "第四条"]
     },
     {
-      "question": "政策版本适用性",
-      "policies": ["01_expense_reimbursement_2025.md", "02_expense_reimbursement_2022_deprecated.md"],
-      "conclusion": "2025版自2025年1月1日施行，2022版已废止。全年数据适用2025版。"
+      "id": "PQ2",
+      "question": "超预算专项审批的适用条件和豁免规则是什么？",
+      "policy_docs": ["01_expense_reimbursement_2025.md"],
+      "key_clauses": ["第十三条", "第十二条"]
     }
   ],
   "data_questions": [
     {
-      "question": "各部门年度预算额度与实际累计支出",
-      "tables": ["departments", "reimbursement_records"],
-      "method": "按department_id分组汇总，比较used_amount与annual_budget"
+      "id": "DQ1",
+      "question": "各已批准报销记录按reimburse_date和record_id排序后的累计金额何时超过部门年度预算？",
+      "tables": ["reimbursement_records", "departments"],
+      "fields": ["record_id", "department_id", "amount", "reimburse_date", "special_approval", "annual_budget"]
     },
     {
-      "question": "超预算部门的累计支出时间线和跨越预算阈值的记录",
-      "method": "按department_id和expense_date排序，计算累计余额，定位首次超过预算的时点及之后记录"
-    },
-    {
-      "question": "专项审批豁免",
-      "method": "对超预算记录逐一检查special_approval字段"
+      "id": "DQ2",
+      "question": "超预算触发记录中哪些无专项审批？",
+      "fields": ["special_approval"]
     }
   ],
-  "required_fields": ["record_id", "employee_id", "department_id", "expense_date", "amount", "special_approval", "status"],
   "evidence_requirements": [
-    "每个超预算部门的预算额度、累计支出、超支金额",
-    "每个异常记录的超支时点、金额",
-    "专项审批状态检查",
-    "政策条款引用"
+    "各超预算部门的年度预算金额",
+    "各超预算部门所有已批准报销记录的排序累计",
+    "关键记录（首次超预算且无专项审批）的详细信息",
+    "关键记录无专项审批的证明"
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "planning", "description": "制定审计计划并记录planning_completed检查点"},
+    {"step": 2, "action": "policy_research", "description": "确认预算管理和专项审批的制度依据"},
+    {"step": 3, "action": "data_analysis", "description": "授权data_analyst子智能体执行累计超预算计算"},
+    {"step": 4, "action": "investigation", "description": "确认关键记录无专项审批状态并形成初步发现"},
+    {"step": 5, "action": "evidence_coverage_check", "description": "检查证据覆盖率100%"},
+    {"step": 6, "action": "false_positive_review", "description": "复核阈值边界和豁免条件"},
+    {"step": 7, "action": "audit_report", "description": "生成审计报告"},
+    {"step": 8, "action": "result_validation", "description": "校验并提交最终结果"}
   ],
   "complexity": {
-    "score": 4,
+    "score": 3,
     "reasons": [
-      "两个政策共同构成预算控制依据 (+1)",
-      "需要部门聚合、累计计算、多表联查 (+1)",
-      "涉及阈值判断与专项审批豁免 (+1)",
-      "全年全部门综合审计 (+1)"
+      "aggregation and batch filtering: cumulative sum across departments",
+      "threshold: annual budget threshold at 1.0x",
+      "exemption: special approval exemption"
     ]
   },
-  "execution_steps": [
-    {"step": 1, "action": "规划与记录checkpoint", "status": "done"},
-    {"step": 2, "action": "政策版本检查（紧凑模式）", "status": "pending"},
-    {"step": 3, "action": "授权并启动data_analyst子智能体执行批量分析", "status": "pending"},
-    {"step": 4, "action": "登记子智能体结果", "status": "pending"},
-    {"step": 5, "action": "证据覆盖检查", "status": "pending"},
-    {"step": 6, "action": "独立复核（false-positive-review含independent_reviewer）", "status": "pending"},
-    {"step": 7, "action": "审计报告", "status": "pending"},
-    {"step": 8, "action": "结果校验与提交", "status": "pending"}
-  ],
   "subagent_plan": {
-    "policy_researcher": {
-      "needed": false,
-      "reason": "仅2025版政策适用，无版本歧义"
-    },
-    "data_analyst": {
-      "needed": true,
-      "role": "data_analyst",
-      "reason_code": "AGGREGATION_REQUIRED",
-      "reason": "需要按部门聚合、累计计算、跨越阈值定位、专项审批检查"
-    },
-    "independent_reviewer": {
-      "needed": true,
-      "reason_code": "COMPREHENSIVE_AUDIT",
-      "reason": "全部门综合审计需要独立复核"
+    "role": "data_analyst",
+    "reason_code": "AGGREGATION_REQUIRED",
+    "context": {
+      "task": "对全部已批准(approved)报销记录，按部门分组，按reimburse_date升序、record_id升序排序，累计金额。对每个部门，找出累计金额首次超过该部门年度预算的记录。如果该记录有special_approval=true，则跳过并继续找下一个无专项审批的记录。每个超预算部门形成一项发现，以首次使累计支出超过年度预算且无专项审批的记录作为关键record_id。",
+      "departments_overview": "D001(预算230395.17,已用363614.58), D002(预算107785.42,已用164928.12), D003(预算109772.07,已用174150.67), D004(预算264890.39,已用408832.95), D005(预算278540.94,已用433442.76), D006(预算340961.75,已用530241.29)"
     }
   },
   "stopping_conditions": [
-    "所有部门预算与累计支出已对照完毕",
-    "所有跨越预算阈值的记录已定位",
-    "专项审批豁免已逐一核实",
-    "证据覆盖率达100%",
-    "校验通过valid=true"
-  ]
+    "evidence_coverage_check status: pass and coverage_percent: 100",
+    "validation_report status: pass",
+    "validate_audit_result returns valid=true"
+  ],
+  "unresolved_items": []
 }

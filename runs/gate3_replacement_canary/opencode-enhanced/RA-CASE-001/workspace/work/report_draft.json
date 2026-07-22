@@ -1,0 +1,60 @@
+{
+  "audit_scope": {
+    "clue_record": "R000028",
+    "employee_id": "E0036",
+    "employee_name": "张林",
+    "department_id": "D010",
+    "department_name": "人力资源部",
+    "expense_type": "communication",
+    "audit_period": "2025-03至2025-05",
+    "applicable_policies": [
+      "01_expense_reimbursement_2025.md",
+      "07_office_communication.md"
+    ]
+  },
+  "verified_facts": [
+    "R000028：E0036（张林）通讯费报销，金额165.58元，费用日期2025-03-09，发票FP202500000028，供应商XX供应商1999，事由\"北辰项目沟通通讯费\"，状态approved，审批人E0010（部门经理）",
+    "R004204：E0036（张林）通讯费报销，金额165.58元，费用日期2025-05-10，发票FP202500000028，供应商XX供应商1999，事由\"北辰项目沟通通讯费\"，状态approved，审批人E0010（部门经理）",
+    "R002127：E0036（张林）通讯费报销，金额283.94元，费用日期2025-03-17，发票FP202500002127，事由\"客户服务电话通讯费\"，状态approved",
+    "发票FP202500000028被R000028和R004204两次使用，构成重复报销",
+    "E0036在2025年3月通讯费合计：165.58+283.94=449.52元，超过月度限额300元",
+    "R000028费用发生日至报销日间隔57天，未超过60天期限，无异常"
+  ],
+  "applicable_policies": {
+    "01_expense_reimbursement_2025.md": {
+      "第十条": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的，应认定为重复报销风险。",
+      "第七条": "员工应在费用发生后60天内提交报销申请；超过期限的，原则上不得报销。"
+    },
+    "07_office_communication.md": {
+      "第三条": "员工通讯费用报销按月控制，每人每月不超过300元。"
+    }
+  },
+  "findings": [
+    {
+      "anomaly_id": "ANOM-001",
+      "type": "发票重复报销",
+      "rule": "01_expense_reimbursement_2025.md 第十条 同一发票最多报销1次",
+      "record_ids": ["R000028", "R004204"],
+      "description": "发票FP202500000028（165.58元）被同一员工E0036在R000028（2025-03-09）和R004204（2025-05-10）中重复报销，两次均为approved状态",
+      "impact": "重复报销造成公司资金损失165.58元",
+      "recommendation": "追回R004204重复报销款或作废其中一笔"
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "type": "月度限额超标",
+      "rule": "07_office_communication.md 第三条 每人每月不超过300元",
+      "record_ids": ["R000028", "R002127"],
+      "description": "E0036在2025年3月通讯费合计449.52元（R000028:165.58 + R002127:283.94），超过月度限额300元，超标149.52元",
+      "impact": "月度限额超标149.52元，审批控制失效",
+      "recommendation": "核实超标原因，如无正当理由应差额追回或补充审批"
+    }
+  ],
+  "anomaly_ids": ["ANOM-001", "ANOM-002"],
+  "record_ids": ["R000028", "R004204", "R002127"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"},
+    {"doc_id": "07_office_communication.md", "clause_no": "第三条"}
+  ],
+  "answer": "以R000028为线索核查发现两项异常：\n1. 发票重复报销（ANOM-001）：发票FP202500000028被R000028和R004204重复使用，违反01_expense_reimbursement_2025.md第十条\"同一发票最多报销1次\"的规定。\n2. 月度限额超标（ANOM-002）：E0036在2025年3月通讯费合计449.52元（R000028:165.58元 + R002127:283.94元），超过07_office_communication.md第三条规定的月度限额300元。\nR000028的报销期限为57天，未超过60天规定期限（第七条）。",
+  "limitations": []
+}

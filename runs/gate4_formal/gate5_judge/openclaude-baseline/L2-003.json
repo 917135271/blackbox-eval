@@ -1,138 +1,181 @@
 {
+  "group": "openclaude-baseline",
+  "task_id": "L2-003",
   "case_family": "record_audit",
-  "case_score": 100.0,
-  "case_score_raw": 100.0,
   "category": "policy_data_comparison",
-  "criteria": [
+  "graded_at": "2026-07-21T20:56:16+08:00",
+  "checklist_passed": 10,
+  "checklist_total": 10,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
     {
-      "answer_evidence": "answer中明确认为构成重复报销异常。",
       "id": "audit-conclusion",
-      "reason": "结论明确为重复报销，异常类型正确，与预期一致。",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "find_invoice_usage确认同一发票在两个记录中使用，search_policy找到第十条禁止同一发票重复报销。"
-    },
-    {
-      "answer_evidence": "",
-      "id": "anomaly-id",
-      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
-      "score": 15.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    },
-    {
-      "answer_evidence": "",
-      "id": "record-set",
-      "reason": "record_ids集合F1=1.000",
-      "score": 25.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    },
-    {
-      "answer_evidence": "citations中clause_no: \"第十条\"，doc_id: \"01_expense_reimbursement_2025.md\"。",
-      "id": "policy-basis",
-      "reason": "引用了费用报销管理办法第十条，即规则6.1对应条款，有效支持结论。",
-      "score": 15.0,
-      "source": "llm_judge",
-      "trace_evidence": "search_policy返回了包含第十条内容的片段，get_policy_doc获取了完整制度。"
-    },
-    {
-      "answer_evidence": "answer中详细说明了发票号、金额、两个记录ID及重复事实。",
-      "id": "case-reasoning",
-      "reason": "推理完整，指出同一发票FP202500000020金额669.5元在R000020和R004203中重复使用，数值一致。",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "get_expense_detail for R000020和R004203都显示金额669.5元，find_invoice_usage显示两笔记录。"
-    },
-    {
-      "answer_evidence": "",
-      "id": "submission",
-      "reason": "统一提交已接受且Schema有效",
-      "score": 5.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "所有record_ids均在工具返回中存在，无虚构或无关记录。",
-      "score_cap": 20,
+      "value": 1,
+      "reason": "候选回答明确认定存在重复报销异常，并指出构成重复报销违规，无矛盾表述。",
+      "answer_evidence": "存在发票重复报销异常。...构成重复报销违规。",
+      "trace_evidence": "工具调用结果确认发票FP202500000020被两条记录使用。",
       "source": "llm_judge"
+    },
+    {
+      "id": "anomaly-type-count-rule-type",
+      "value": 1,
+      "reason": "发现规则类型完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "anomaly-type-count-count",
+      "value": 1,
+      "reason": "发现数量完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r000020",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r004203",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "policy-basis",
+      "value": 1,
+      "reason": "回答引用了01_expense_reimbursement_2025.md第十条，并说明了其适用性，条款直接支持重复报销认定。",
+      "answer_evidence": "依据《XX证券费用报销管理办法(2025修订版)》第十条“同一发票最多报销1次。...应认定为重复报销风险”",
+      "trace_evidence": "search_policy和get_policy_excerpt返回了第十条内容。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-same-invoice",
+      "value": 1,
+      "reason": "回答明确指出发票FP202500000020被R000020和R004203重复使用，明确识别同一发票。",
+      "answer_evidence": "发票FP202500000020...被员工E0028杜丹...在两条报销记录中重复使用：R000020...和R004203...",
+      "trace_evidence": "find_invoice_usage返回两条记录共用同一发票。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "回答声明两笔报销金额均为669.50元，与工具获取的记录一致。",
+      "answer_evidence": "两笔均为差旅住宿费、金额相同（669.50元）",
+      "trace_evidence": "get_expense_detail(R000020/R004203)均返回amount=669.5。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 107.972,
+    "expected_anomaly_ids": [
+      "DUP-001"
+    ],
     "actual_anomaly_ids": [
-      "L2-003-DUP-001"
+      "ANO-L2-003-001"
+    ],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {
+        "DUP": 1
+      },
+      "actual_types": {
+        "DUP": 1
+      }
+    },
+    "expected_record_ids": [
+      "R000020",
+      "R004203"
     ],
     "actual_record_ids": [
       "R000020",
       "R004203"
     ],
-    "anomaly_metrics": {
-      "actual_types": {
-        "DUP": 1
-      },
-      "count_exact": true,
-      "expected_types": {
-        "DUP": 1
-      },
-      "f1": 1.0,
-      "precision": 1.0,
-      "recall": 1.0
-    },
-    "citation_count": 1,
-    "elapsed_seconds": 94.563,
-    "expected_anomaly_ids": [
-      "DUP-003"
-    ],
-    "expected_record_ids": [
-      "R000020",
-      "R004203"
-    ],
     "record_metrics": {
-      "exact": true,
-      "extra_count": 0,
-      "f1": 1.0,
-      "missing_count": 0,
       "precision": 1.0,
-      "recall": 1.0
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
     },
-    "required_citations": [
-      "clause:费用报销管理办法-6.1"
-    ],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
     "trap_tokens_in_conclusion": [],
-    "unknown_record_ids": []
+    "citation_count": 1,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T22:26:56+08:00",
-  "group": "openclaude-baseline",
   "judge": {
-    "attempt": 1,
-    "confidence": 1.0,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "候选准确识别了重复报销异常，引用了正确的制度条款，推理事实清晰完整。",
     "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "所有检查项均满足：结论明确、制度依据充分、事实推理清晰。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 1560,
-      "completion_tokens_details": {
-        "reasoning_tokens": 1139
-      },
-      "prompt_cache_hit_tokens": 896,
-      "prompt_cache_miss_tokens": 2629,
-      "prompt_tokens": 3525,
-      "prompt_tokens_details": {
-        "cached_tokens": 896
-      },
-      "total_tokens": 5085
-    }
+      "prompt_tokens": 4164,
+      "completion_tokens": 923,
+      "total_tokens": 5087,
+      "prompt_cache_hit_tokens": 4096,
+      "prompt_cache_miss_tokens": 68
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4164,
+          "completion_tokens": 923,
+          "total_tokens": 5087,
+          "prompt_tokens_details": {
+            "cached_tokens": 4096
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 500
+          },
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 68
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      }
+    ]
   },
-  "passed": true,
-  "run_path": "runs/gate4_formal/openclaude-baseline/L2-003",
-  "task_id": "L2-003"
+  "run_path": "runs/gate4_formal/openclaude-baseline/L2-003"
 }

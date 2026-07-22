@@ -6,14 +6,104 @@
     "checkpoint_count": 4,
     "compaction_count": 0,
     "last_checkpoint_stage": "validation_ready",
-    "last_usage_percent": 55.0
+    "last_usage_percent": 30.0
   },
-  "event_sequence": 64,
+  "event_sequence": 70,
   "experiment_group": "oh-my-pi-enhanced",
   "framework": "oh-my-pi",
   "phase": "validation_ready",
-  "subagent_calls": {},
-  "subagent_invocations": {},
+  "subagent_calls": {
+    "independent_reviewer": 1
+  },
+  "subagent_invocations": {
+    "114eb63d-611c-4501-8731-1245750f6acf": {
+      "artifact_paths": [
+        "work/audit_plan.json",
+        "work/policy_applicability.json",
+        "work/analysis/data_findings.json",
+        "work/evidence_matrix.json"
+      ],
+      "artifacts": [
+        {
+          "path": "work/subagents/independent_reviewer/review_findings.json",
+          "sha256": "dfbce31f2e2dece9619228a4ba9a17eeb8635046c8043748464ec0a04d9fc5d5",
+          "size_bytes": 5240
+        }
+      ],
+      "authorized_at": 1784621428.6084073,
+      "completed_at": 1784621600.9390867,
+      "complexity": 3,
+      "invocation_id": "114eb63d-611c-4501-8731-1245750f6acf",
+      "reason_code": "NO_ANOMALY_RECHECK",
+      "role": "independent_reviewer",
+      "status": "completed",
+      "summary": {
+        "artifact_paths": [
+          "work/subagents/independent_reviewer/review_findings.json"
+        ],
+        "citations": [
+          {
+            "clause_no": "第十条",
+            "doc_id": "01_expense_reimbursement_2025.md"
+          },
+          {
+            "clause_no": "第十一条",
+            "doc_id": "01_expense_reimbursement_2025.md"
+          },
+          {
+            "clause_no": "第三条",
+            "doc_id": "01_expense_reimbursement_2025.md"
+          },
+          {
+            "clause_no": "第五条",
+            "doc_id": "01_expense_reimbursement_2025.md"
+          },
+          {
+            "clause_no": "第七条",
+            "doc_id": "01_expense_reimbursement_2025.md"
+          },
+          {
+            "clause_no": "第二条",
+            "doc_id": "06_business_entertainment.md"
+          },
+          {
+            "clause_no": "第三条",
+            "doc_id": "06_business_entertainment.md"
+          },
+          {
+            "clause_no": "第四条",
+            "doc_id": "06_business_entertainment.md"
+          },
+          {
+            "clause_no": "附件二",
+            "doc_id": "03_authorization_management.md"
+          }
+        ],
+        "decision": "pass",
+        "key_findings": [
+          "RULE 1 (重复报销,第十条): CONFIRMED PASS. Distinct invoices, each used once.",
+          "RULE 2 (拆分报销-7日+审批线,第十一条): CONFIRMED PASS. Combined 1085 < AR-02 3000, no approval circumvention.",
+          "RULE 3 (拆分报销-同一客户,招待第四条): CONFIRMED PASS. Different clients (甲 vs 乙), different purposes.",
+          "RULE 4 (单次上限,招待第二条): CONFIRMED PASS. Both well under 5000.",
+          "RULE 5 (人均上限,招待第三条): CONFIRMED PASS. 180 and 181.67, both under 300.",
+          "RULE 6 (SELF-APPROVAL): Control weakness noted but no policy violation — no rule prohibits self-approval when the department manager is the derived approver.",
+          "RULE 7 (预算): D008 budget at 77.8%, not exceeded.",
+          "RULE 8 (时限): Both within 60 days."
+        ],
+        "record_ids": [
+          "R004239",
+          "R004240"
+        ],
+        "unresolved_items": [
+          "Self-approval control gap: E0008 approved own expenses; no policy prohibits this but Article 3 implies separation.",
+          "Factual verification: client identities and participant counts are self-reported; suspicious pattern cannot be independently verified."
+        ]
+      },
+      "token_budget": 4000,
+      "token_usage": {}
+    }
+  },
+  "subagent_rejections": {},
   "submission_attempts": 1,
   "submission_status": "accepted",
   "task_id": "TRAP-005"

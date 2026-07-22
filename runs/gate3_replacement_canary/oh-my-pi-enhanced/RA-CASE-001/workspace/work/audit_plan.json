@@ -1,0 +1,119 @@
+{
+  "task_id": "RA-CASE-001",
+  "task_type": "policy_data_comparison",
+  "scope": {
+    "clue_record": "R000028",
+    "employee_id": "E0036",
+    "department_id": "D010",
+    "expense_type": "communication",
+    "audit_period": "2025-01-01 to 2025-12-31",
+    "description": "以R000028为线索核查通讯费用记录的合规性"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "E0036在2025年3月的通讯费合计是否超过月度300元上限？",
+      "policy_docs": ["07_office_communication.md"],
+      "clause": "第三条",
+      "rule": "员工通讯费用报销按月控制,每人每月不超过300元"
+    },
+    {
+      "id": "PQ-02",
+      "question": "发票FP202500000028是否被重复使用？",
+      "policy_docs": ["01_expense_reimbursement_2025.md"],
+      "clause": "第十条",
+      "rule": "同一发票最多报销1次"
+    },
+    {
+      "id": "PQ-03",
+      "question": "R000028的审批链是否符合授权管理办法附件二的审批线要求？",
+      "policy_docs": ["03_authorization_management.md"],
+      "clause": "附件二",
+      "rule": "AR-01: 0-3000元,部门经理审批"
+    },
+    {
+      "id": "PQ-04",
+      "question": "R000028的报销延迟(57天)是否在60天期限内？",
+      "policy_docs": ["01_expense_reimbursement_2025.md"],
+      "clause": "第七条",
+      "rule": "员工应在费用发生后60天内提交报销申请"
+    },
+    {
+      "id": "PQ-05",
+      "question": "E0036在2025年3月的两笔通讯费是否构成拆分规避审批？",
+      "policy_docs": ["01_expense_reimbursement_2025.md"],
+      "clause": "第十一条",
+      "rule": "同一员工、同一费用类型在7天内出现2笔及以上报销且合计金额达到较高审批线的应核查"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-01",
+      "question": "E0036在2025年3月所有通讯费记录及金额合计",
+      "tables": ["reimbursement_records"],
+      "fields": ["record_id", "expense_date", "amount", "expense_type"]
+    },
+    {
+      "id": "DQ-02",
+      "question": "发票FP202500000028的所有使用记录",
+      "tables": ["invoices", "reimbursement_records"],
+      "fields": ["invoice_no", "record_id", "employee_id", "amount"]
+    },
+    {
+      "id": "DQ-03",
+      "question": "R000028的审批链",
+      "tables": ["approvals"],
+      "fields": ["tier_id", "approver_role", "approval_status"]
+    }
+  ],
+  "evidence_requirements": [
+    "R000028完整记录及审批链",
+    "E0036所有通讯费记录(用于月度汇总)",
+    "FP202500000028使用记录",
+    "R004204及R002127完整记录",
+    "D010部门预算状态",
+    "政策条款原文摘录"
+  ],
+  "execution_steps": [
+    {"step": "planning", "status": "completed", "artifact": "work/audit_plan.json"},
+    {"step": "policy_version_check", "status": "pending", "note": "通讯费政策(doc 07)为2025现行版本,无历史版本歧义;报销政策(doc 01)为2025修订版"},
+    {"step": "batch_expense_analysis", "status": "completed_inline", "note": "已完成E0036通讯费全量查询、发票使用查询、部门预算查询"},
+    {"step": "evidence_coverage_check", "status": "pending"},
+    {"step": "false_positive_review", "status": "pending"},
+    {"step": "audit_report", "status": "pending"},
+    {"step": "result_validation", "status": "pending"},
+    {"step": "submission", "status": "pending"}
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "多政策交叉: doc 01 + doc 03 + doc 07",
+      "需要月度聚合分析(March 2025通讯费合计)",
+      "两条业务规则: 月度上限 + 发票重复使用",
+      "涉及阈值判断: 300元月度上限"
+    ]
+  },
+  "subagent_plan": {
+    "selected": false,
+    "reason": "数据量小(E0036共9条通讯费记录),批量分析已内联完成,无需子智能体"
+  },
+  "stopping_conditions": [
+    "evidence_coverage_check通过(100%覆盖率)",
+    "false_positive_review决策已解决",
+    "validation_report valid=true",
+    "submit_audit_result成功"
+  ],
+  "preliminary_findings": [
+    {
+      "anomaly": "invoice_reuse",
+      "description": "发票FP202500000028被R000028和R004204重复使用,违反第十条同一发票最多报销1次",
+      "records": ["R000028", "R004204"]
+    },
+    {
+      "anomaly": "monthly_cap_exceeded",
+      "description": "E0036在2025年3月通讯费合计449.52元(R000028:165.58 + R002127:283.94),超过300元月度上限",
+      "records": ["R000028", "R002127"]
+    }
+  ],
+  "unresolved_items": []
+}

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import os
@@ -16,25 +17,29 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from formal_eval_plan import (  # noqa: E402
+    GROUPS,
+    JUDGE_AUDIT_REPEAT_COUNT,
+    JUDGE_AUDIT_SAMPLE_RATE,
+    JUDGE_AUDIT_SELECTION_SEED,
+    JUDGE_AUDIT_TIEBREAKER,
+    JUDGE_MAX_TOKENS,
+    JUDGE_RETRIES,
+    JUDGE_TIMEOUT_SECONDS,
+    MODEL_BASE_URL,
+    MODEL_NAME,
+)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 RUN_ROOT = ROOT / "runs" / "gate4_formal"
 CASES_PATH = ROOT / "data" / "formal_case_rubric" / "cases.json"
-DB_PATH = ROOT / "data" / "expense.db"
-GRADE_ROOT = RUN_ROOT / "gate5_judge"
-GRADES_PATH = RUN_ROOT / "gate5_grades.jsonl"
-GROUPS = (
-    "ccb-baseline",
-    "ccb-enhanced",
-    "codex-baseline",
-    "codex-enhanced",
-    "openclaude-baseline",
-    "openclaude-enhanced",
-    "opencode-baseline",
-    "opencode-enhanced",
-    "oh-my-pi-baseline",
-    "oh-my-pi-enhanced",
-)
+DB_PATH = ROOT / "data" / "formal_case_rubric" / "expense_formal.db"
+GRADE_ROOT = RUN_ROOT / "gate5_judge_v7"
+GRADES_PATH = RUN_ROOT / "gate5_grades_v7.jsonl"
+JUDGE_CHECKLIST_BATCH_SIZE = 4
 TYPE_ALIASES = {
     "DUP": ("DUP", "REUSE", "REPEAT", "重复"),
     "SPLIT": ("SPLIT", "SPL", "拆分"),
@@ -42,15 +47,6 @@ TYPE_ALIASES = {
     "BUDGET": ("BUDGET", "BUD", "OVER_BUDGET", "OVERBUDGET", "超预算"),
     "OVERDUE": ("OVERDUE", "LATE", "DELAY", "TIM", "超期"),
 }
-POLICY_REFERENCE_GUIDANCE = {
-    "费用报销管理办法-6.1": "这是评测规则编号，不是正文第六条第一款；对应现行费用报销管理办法第十条（同一发票最多报销1次）。",
-    "费用报销管理办法-6.2": "这是评测规则编号，不是正文第六条第二款；对应现行费用报销管理办法第十一条（7天内拆分规避审批）。",
-    "费用报销管理办法-6.3": "这是评测规则编号，不是正文第六条第三款；对应现行费用报销管理办法第十二条，并结合费用类型对应的差旅、培训、招待、办公通讯标准。",
-    "费用报销管理办法-6.4": "这是评测规则编号，不是正文第六条第四款；对应现行费用报销管理办法第七条（60天报销期限）。",
-    "预算管理办法-4.1": "这是评测规则编号，不是正文第四条第一款；对应现行费用报销管理办法第十三条和预算管理办法第三条。",
-}
-
-
 def load_json(path: Path, default: Any = None) -> Any:
     if not path.exists():
         return default
@@ -205,7 +201,15 @@ def deterministic_diagnostics(
     actual_records = [str(item) for item in submission.get("record_ids", [])]
     answer = str(submission.get("answer", ""))
     expected_anomalies = [str(item) for item in expected.get("expected_anomaly_ids", [])]
+    if not expected_anomalies:
+        expected_anomalies = [
+            f"{rule_type}-{index + 1:03d}"
+            for rule_type, count in (expected.get("expected_findings_by_type") or {}).items()
+            for index in range(int(count))
+        ]
     expected_records = [str(item) for item in expected.get("expected_record_ids", [])]
+    excluded_records = {str(item) for item in expected.get("excluded_record_ids", [])}
+    excluded_records_in_submission = sorted(excluded_records & set(actual_records))
     unknown_records = sorted(set(actual_records) - existing_record_ids)
     anomaly = anomaly_metrics(expected_anomalies, actual_anomalies, answer)
     record = set_metrics(expected_records, actual_records) if "expected_record_ids" in expected else None
@@ -227,6 +231,8 @@ def deterministic_diagnostics(
         "expected_record_ids": expected_records if "expected_record_ids" in expected else None,
         "actual_record_ids": actual_records,
         "record_metrics": record,
+        "excluded_record_ids": sorted(excluded_records),
+        "excluded_record_ids_in_submission": excluded_records_in_submission,
         "unknown_record_ids": unknown_records,
         "trap_false_positive": trap_false_positive,
         "trap_tokens_in_conclusion": trap_tokens,
@@ -240,42 +246,146 @@ def deterministic_criterion(
     diagnostics: dict[str, Any],
 ) -> dict[str, Any] | None:
     criterion_id = criterion["id"]
-    weight = float(criterion["weight"])
     if criterion["evaluation_mode"] != "deterministic":
         return None
-    if criterion_id == "submission":
-        ratio = 1.0 if diagnostics["submission_accepted"] and diagnostics["schema_valid"] else 0.0
-        reason = "统一提交已接受且Schema有效" if ratio else "未形成被接受的统一提交"
-    elif criterion_id in {"anomaly-id", "all-anomaly-ids"}:
-        ratio = float(diagnostics["anomaly_metrics"]["f1"])
+    deterministic_rule = criterion.get("deterministic_rule")
+    if deterministic_rule == "expected-record-present":
+        passed = str(criterion["expected"]) in diagnostics["actual_record_ids"]
+        reason = "期望record_id已提交" if passed else "期望record_id缺失"
+    elif deterministic_rule == "no-unexpected-records":
+        allowed = {str(item) for item in criterion["expected"]}
+        extra = sorted(set(diagnostics["actual_record_ids"]) - allowed)
+        passed = not extra
+        reason = "没有范围外record_id" if passed else f"存在范围外record_id：{extra}"
+    elif deterministic_rule == "anomaly-rule-type-exact":
+        metrics = diagnostics["anomaly_metrics"]
+        passed = set(metrics["actual_types"]) == {str(criterion["expected"])}
+        reason = "发现规则类型完全匹配" if passed else "发现规则类型不匹配"
+    elif deterministic_rule == "anomaly-count-exact":
+        passed = len(diagnostics["actual_anomaly_ids"]) == int(criterion["expected"])
+        reason = "发现数量完全匹配" if passed else "发现数量不匹配"
+    elif deterministic_rule == "anomaly-type-count-exact":
+        expected = criterion["expected"]
+        rule_type = str(expected["rule_type"])
+        expected_count = int(expected["count"])
+        actual_count = int(diagnostics["anomaly_metrics"]["actual_types"].get(rule_type, 0))
+        passed = actual_count == expected_count
         reason = (
-            "按异常类型和数量规范化后的F1="
-            f"{ratio:.3f}；不因候选未猜中隐藏内部编号而扣分"
+            f"{rule_type}类发现数量完全匹配"
+            if passed
+            else f"{rule_type}类发现数量应为{expected_count}，实际为{actual_count}"
+        )
+    elif deterministic_rule == "no-anomaly-ids":
+        passed = not diagnostics["actual_anomaly_ids"]
+        reason = "未提交异常ID" if passed else "提交了异常ID"
+    elif deterministic_rule == "record-ids-unique":
+        actual_records = diagnostics["actual_record_ids"]
+        passed = len(actual_records) == len(set(actual_records))
+        reason = "record_ids没有重复项" if passed else "record_ids存在重复项"
+    elif deterministic_rule in {"record-recall-at-least", "record-precision-at-least"}:
+        metric_name = deterministic_rule.removeprefix("record-").removesuffix("-at-least")
+        threshold = float(criterion["expected"])
+        metrics = diagnostics.get("record_metrics") or {}
+        actual = float(metrics.get(metric_name, 0.0))
+        passed = actual + 1e-9 >= threshold
+        reason = f"record_id{metric_name}={actual:.3f}，阈值={threshold:.3f}"
+    elif deterministic_rule in {"anomaly-recall-at-least", "anomaly-precision-at-least"}:
+        metric_name = deterministic_rule.removeprefix("anomaly-").removesuffix("-at-least")
+        threshold = float(criterion["expected"])
+        actual = float(diagnostics["anomaly_metrics"].get(metric_name, 0.0))
+        passed = actual + 1e-9 >= threshold
+        reason = f"异常发现{metric_name}={actual:.3f}，阈值={threshold:.3f}"
+    elif deterministic_rule == "excluded-records-absent":
+        excluded = {str(item) for item in criterion["expected"]}
+        included = sorted(excluded & set(diagnostics["actual_record_ids"]))
+        passed = not included
+        reason = "未包含合规边界记录" if passed else f"误报合规边界记录：{included}"
+    elif criterion_id == "submission":
+        passed = bool(diagnostics["submission_accepted"] and diagnostics["schema_valid"])
+        reason = "统一提交已接受且Schema有效" if passed else "未形成被接受的统一提交"
+    elif criterion_id in {"anomaly-id", "all-anomaly-ids", "anomaly-type-count", "finding-type-count"}:
+        exact = float(diagnostics["anomaly_metrics"]["f1"]) == 1.0
+        passed = exact
+        reason = (
+            "异常类型和数量完全匹配；不要求猜测隐藏内部编号"
+            if passed
+            else "异常类型或数量未完全匹配"
         )
     elif criterion_id in {"record-set", "all-record-ids", "record-scope"}:
         metrics = diagnostics.get("record_metrics")
-        ratio = float(metrics["f1"]) if metrics else 0.0
-        reason = f"record_ids集合F1={ratio:.3f}"
+        passed = bool(metrics and metrics.get("exact"))
+        reason = "record_ids集合完全匹配" if passed else "record_ids集合不完全匹配"
     elif criterion_id == "no-unsupported-output":
-        ratio = 1.0 if not diagnostics["actual_anomaly_ids"] else 0.0
-        reason = "未提交实质异常" if ratio else "无异常题提交了实质异常"
-    elif criterion_id == "trap-control":
-        ratio = 1.0 if not diagnostics["trap_tokens_in_conclusion"] else 0.0
+        record_metrics = diagnostics.get("record_metrics") or {}
+        passed = not diagnostics["actual_anomaly_ids"] and bool(record_metrics.get("exact"))
         reason = (
-            "未将TRAP记录计为异常"
-            if ratio
-            else f"结论包含TRAP项：{diagnostics['trap_tokens_in_conclusion']}"
+            "未提交实质异常，且record_ids仅包含题目要求核查的记录"
+            if passed
+            else "提交了实质异常，或record_ids包含缺失/多余记录"
+        )
+    elif criterion_id == "trap-control":
+        included = diagnostics.get("excluded_record_ids_in_submission", [])
+        passed = not included and not diagnostics["trap_tokens_in_conclusion"]
+        reason = (
+            "未将合规边界记录计入异常"
+            if passed
+            else f"误报合规边界记录：{included}"
         )
     else:
         return None
+    value = 1 if passed else 0
     return {
         "id": criterion_id,
-        "score": round(weight * ratio, 3),
+        "value": value,
         "reason": reason,
         "answer_evidence": "",
         "trace_evidence": "规则程序计算",
         "source": "rule",
     }
+
+
+def evaluate_critical_failures(
+    case: dict[str, Any],
+    diagnostics: dict[str, Any],
+) -> tuple[list[dict[str, Any]], float | None]:
+    triggered: list[dict[str, Any]] = []
+    for definition in case["rubric"].get("critical_failures", []):
+        rule = str(definition["deterministic_rule"])
+        hit = False
+        detail = ""
+        if rule == "unexpected-anomaly-reported":
+            hit = bool(diagnostics["actual_anomaly_ids"])
+            detail = f"实际提交异常数={len(diagnostics['actual_anomaly_ids'])}"
+        elif rule == "record-precision-below":
+            threshold = float(definition["expected"])
+            actual = float((diagnostics.get("record_metrics") or {}).get("precision", 0.0))
+            hit = actual + 1e-9 < threshold
+            detail = f"record_id precision={actual:.3f}，下限={threshold:.3f}"
+        elif rule == "anomaly-precision-below":
+            threshold = float(definition["expected"])
+            actual = float(diagnostics["anomaly_metrics"].get("precision", 0.0))
+            hit = actual + 1e-9 < threshold
+            detail = f"异常发现precision={actual:.3f}，下限={threshold:.3f}"
+        else:
+            raise ValueError(f"unsupported critical failure rule: {rule}")
+        if hit:
+            triggered.append(
+                {
+                    "id": definition["id"],
+                    "check": definition["check"],
+                    "score_cap": float(definition["score_cap"]),
+                    "reason": detail,
+                }
+            )
+    score_cap = min((item["score_cap"] for item in triggered), default=None)
+    return triggered, score_cap
+
+
+def checklist_pass_rate(checklist: list[dict[str, Any]]) -> tuple[int, int, float]:
+    passed_count = sum(int(item.get("value", 0)) for item in checklist)
+    total_count = len(checklist)
+    pass_rate = round(100 * passed_count / total_count, 3) if total_count else 0.0
+    return passed_count, total_count, pass_rate
 
 
 def build_judge_messages(
@@ -287,14 +397,14 @@ def build_judge_messages(
     diagnostics: dict[str, Any],
     tool_summary: dict[str, Any],
 ) -> list[dict[str, str]]:
-    system = """你是证券费用审计评测的严格判卷员。你必须只依据给定的冻结Rubric、候选最终提交和轨迹摘要逐项评分。
+    system = """你是证券费用审计评测的严格判卷员。你必须只依据给定的冻结二元Checklist、候选最终提交和轨迹摘要逐项判断。
 要求：
-1. 每个评分点得分范围为0到该项weight，可给小数；严格遵守full/partial/zero锚点。
+1. 每个检查项只能返回value=0或value=1。满足pass_condition记1，否则记0；禁止部分分、小数分和折中分。
 2. 不得因文风、篇幅或候选异常ID命名不同而扣分，只评价事实、范围、制度、证据和推理。
 3. 工具调用过并不自动代表结论正确；候选自写的evidence_matrix也不能替代事实核验。
-4. 对关键错误逐项判断。数据库不存在record_id由规则诊断确定；“无关记录”“部分扫描冒充完整”“废止制度作为现行依据”等结合答案和轨迹判断。
-5. answer_evidence和trace_evidence必须简短引用可核查内容，不得输出思维链。
-6. 部分客观评分点是规则程序判为未满分后提交复核的。你可以维持规则扣分，也可以依据题意和证据推翻规则负判；你的得分为最终得分。
+4. answer_evidence和trace_evidence必须简短引用可核查内容，不得输出思维链。
+5. 如果检查项的evidence_sources不包含final_answer，仅凭最终答案复述事实不得判1，必须存在对应工具轨迹或工作产物。
+6. 所有确定性集合、数量和阈值项目均由规则程序最终裁决，不会提交给你复核。
 只输出一个JSON对象，不要Markdown。"""
     payload = {
         "case": {
@@ -302,9 +412,7 @@ def build_judge_messages(
             "prompt": case["prompt"],
             "case_family": case["case_family"],
             "expected_output": case["expected_output"],
-            "criteria_to_score": criteria_to_score,
-            "critical_failures": case["rubric"]["critical_failures"],
-            "policy_reference_guidance": POLICY_REFERENCE_GUIDANCE,
+            "checklist_to_judge": criteria_to_score,
         },
         "candidate_submission": submission,
         "candidate_evidence_matrix": evidence_matrix,
@@ -312,20 +420,13 @@ def build_judge_messages(
         "rule_diagnostics": diagnostics,
         "tool_trace_summary": tool_summary,
         "required_output": {
-            "criteria": [
+            "checklist": [
                 {
-                    "id": "criterion id",
-                    "score": "0..criterion weight",
+                    "id": "check item id",
+                    "value": "0 or 1",
                     "reason": "Chinese concise reason",
                     "answer_evidence": "Chinese concise evidence",
                     "trace_evidence": "Chinese concise evidence",
-                }
-            ],
-            "critical_failures": [
-                {
-                    "id": "critical failure id",
-                    "triggered": False,
-                    "reason": "Chinese concise reason",
                 }
             ],
             "overall_comment": "Chinese concise summary",
@@ -338,12 +439,12 @@ def build_judge_messages(
 
 class DeepSeekJudge:
     def __init__(self) -> None:
-        self.base_url = os.environ.get("LLM_BASE_URL", "https://api.deepseek.com").rstrip("/")
-        self.model = os.environ.get("LLM_MODEL_NAME", "deepseek-v4-pro")
+        self.base_url = os.environ.get("LLM_BASE_URL", MODEL_BASE_URL).rstrip("/")
+        self.model = os.environ.get("LLM_MODEL_NAME", MODEL_NAME)
         self.api_key = os.environ.get("LLM_API_KEY") or os.environ.get("DEEPSEEK_API_KEY")
-        self.timeout = 180
-        self.max_tokens = 8192
-        self.retries = 4
+        self.timeout = JUDGE_TIMEOUT_SECONDS
+        self.max_tokens = JUDGE_MAX_TOKENS
+        self.retries = JUDGE_RETRIES
         if not self.api_key:
             user_key = os.environ.get("LLM_API_KEY_USER")
             if user_key:
@@ -360,8 +461,10 @@ class DeepSeekJudge:
             "response_format": {"type": "json_object"},
         }
         error: Exception | None = None
+        request_max_tokens = self.max_tokens
         for attempt in range(1, self.retries + 1):
             try:
+                payload["max_tokens"] = request_max_tokens
                 request = urllib.request.Request(
                     f"{self.base_url}/chat/completions",
                     data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
@@ -376,7 +479,12 @@ class DeepSeekJudge:
                 choices = raw_response.get("choices") or []
                 content = ((choices[0].get("message") or {}).get("content") if choices else None)
                 if not content:
-                    raise RuntimeError("judge response has empty content")
+                    finish_reason = choices[0].get("finish_reason") if choices else None
+                    if finish_reason == "length" and request_max_tokens < 8192:
+                        request_max_tokens = 8192
+                    raise RuntimeError(
+                        f"judge response has empty content (finish_reason={finish_reason})"
+                    )
                 parsed = json.loads(content)
                 if not isinstance(parsed, dict):
                     raise ValueError("judge JSON root must be object")
@@ -385,6 +493,7 @@ class DeepSeekJudge:
                     "usage": raw_response.get("usage", {}),
                     "finish_reason": choices[0].get("finish_reason"),
                     "attempt": attempt,
+                    "max_tokens": request_max_tokens,
                 }
             except (OSError, ValueError, json.JSONDecodeError, urllib.error.HTTPError) as exc:
                 error = exc
@@ -399,7 +508,7 @@ def validate_judge_output(
     criteria_to_score: list[dict[str, Any]] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], float, str]:
     source_criteria = (
-        case["rubric"]["criteria"]
+        case["rubric"]["checklist"]
         if criteria_to_score is None
         else criteria_to_score
     )
@@ -407,7 +516,9 @@ def validate_judge_output(
         item["id"]: item
         for item in source_criteria
     }
-    rows = parsed.get("criteria")
+    rows = parsed.get("checklist")
+    if not isinstance(rows, list):
+        rows = parsed.get("criteria")
     if not isinstance(rows, list):
         rows = parsed.get("scores")
     if not isinstance(rows, list) and isinstance(parsed.get("criteria_scores"), dict):
@@ -416,6 +527,12 @@ def validate_judge_output(
             for criterion_id, value in parsed["criteria_scores"].items()
             if isinstance(value, dict)
         ]
+    if (
+        not isinstance(rows, list)
+        and len(expected_criteria) == 1
+        and (parsed.get("id") or parsed.get("criterion_id")) in expected_criteria
+    ):
+        rows = [parsed]
     if not isinstance(rows, list):
         direct_rows = []
         for criterion_id in expected_criteria:
@@ -424,7 +541,7 @@ def validate_judge_output(
                 direct_rows.append({"id": criterion_id, **value})
         rows = direct_rows
     if not isinstance(rows, list):
-        raise ValueError("judge criteria must be a list")
+        raise ValueError("judge checklist must be a list")
     normalized: list[dict[str, Any]] = []
     seen: set[str] = set()
     for row in rows:
@@ -435,12 +552,16 @@ def validate_judge_output(
         criterion_id = str(row["id"])
         if criterion_id in seen:
             continue
-        weight = float(expected_criteria[criterion_id]["weight"])
-        score = max(0.0, min(weight, float(row.get("score", 0))))
+        raw_value = row.get("value")
+        if isinstance(raw_value, bool):
+            raw_value = int(raw_value)
+        if raw_value not in (0, 1):
+            raise ValueError(f"judge checklist value must be 0 or 1: {criterion_id}")
+        value = int(raw_value)
         normalized.append(
             {
                 "id": criterion_id,
-                "score": round(score, 3),
+                "value": value,
                 "reason": clip(
                     row.get("reason")
                     or row.get("explanation")
@@ -456,88 +577,135 @@ def validate_judge_output(
     missing = set(expected_criteria) - seen
     if missing:
         raise ValueError(f"judge missing criteria: {sorted(missing)}")
-    critical_rows = parsed.get("critical_failures", [])
-    if not isinstance(critical_rows, list):
-        critical_rows = []
-    critical_by_id = {
-        str(row.get("id")): row
-        for row in critical_rows
-        if isinstance(row, dict)
-    }
-    normalized_critical = []
-    for item in case["rubric"]["critical_failures"]:
-        judge_row = critical_by_id.get(item["id"], {})
-        normalized_critical.append(
-            {
-                "id": item["id"],
-                "triggered": bool(judge_row.get("triggered")),
-                "reason": clip(
-                    judge_row.get("reason") or judge_row.get("description"),
-                    800,
-                ),
-                "score_cap": item["score_cap"],
-                "source": "llm_judge",
-            }
-        )
     confidence = max(0.0, min(1.0, float(parsed.get("confidence", 0.8))))
     comment = parsed.get("overall_comment") or parsed.get("summary") or ""
-    return normalized, normalized_critical, confidence, clip(comment, 1200)
+    return normalized, [], confidence, clip(comment, 1200)
 
 
-def machine_critical_failures(
+def judge_criteria_batch(
+    judge: DeepSeekJudge,
     case: dict[str, Any],
+    criteria_batch: list[dict[str, Any]],
+    submission: dict[str, Any],
+    evidence_matrix: dict[str, Any],
+    validation_report: dict[str, Any],
     diagnostics: dict[str, Any],
-) -> list[dict[str, Any]]:
-    definitions = {item["id"]: item for item in case["rubric"]["critical_failures"]}
-    triggered: dict[str, str] = {}
-    if diagnostics["unknown_record_ids"]:
-        triggered["fabricated-record-id"] = (
-            "提交数据库中不存在的record_id: "
-            + ", ".join(diagnostics["unknown_record_ids"][:10])
-        )
-    record_metrics = diagnostics.get("record_metrics")
-    actual_records = diagnostics.get("actual_record_ids", [])
-    if (
-        isinstance(record_metrics, dict)
-        and actual_records
-        and (
-            float(record_metrics.get("precision", 0)) == 0
-            or (
-                float(record_metrics.get("precision", 0)) < 0.1
-                and int(record_metrics.get("extra_count", 0)) >= 10
+    tool_summary: dict[str, Any],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], float, str, list[dict[str, Any]]]:
+    messages = build_judge_messages(
+        case,
+        criteria_batch,
+        submission,
+        evidence_matrix,
+        validation_report,
+        diagnostics,
+        tool_summary,
+    )
+    validation_error: Exception | None = None
+    for shape_attempt in range(1, 4):
+        try:
+            parsed, metadata = judge.complete(messages)
+            rows, critical, confidence, comment = validate_judge_output(
+                case,
+                parsed,
+                criteria_batch,
             )
-        )
-    ):
-        triggered["fabricated-record-id"] = (
-            "提交记录与本题目标集合完全错位，或存在大规模无关记录范围膨胀"
-        )
-    if diagnostics["trap_false_positive"]:
-        triggered["trap-false-positive"] = "无异常/陷阱题提交了实质异常ID"
-    if diagnostics["trap_tokens_in_conclusion"]:
-        triggered["trap-included-as-anomaly"] = (
-            "结论包含TRAP项: " + ", ".join(diagnostics["trap_tokens_in_conclusion"])
-        )
-    return [
-        {
-            "id": failure_id,
-            "triggered": True,
-            "reason": reason,
-            "score_cap": definitions[failure_id]["score_cap"],
-            "source": "rule",
-        }
-        for failure_id, reason in triggered.items()
-        if failure_id in definitions
-    ]
+            metadata["shape_attempt"] = shape_attempt
+            metadata["criteria_count"] = len(criteria_batch)
+            return rows, critical, confidence, comment, [metadata]
+        except (TypeError, ValueError, RuntimeError) as exc:
+            validation_error = exc
+            if shape_attempt < 3:
+                expected_ids = [item["id"] for item in criteria_batch]
+                messages = [
+                    *messages,
+                    {
+                        "role": "user",
+                        "content": (
+                            "上一次输出未通过结构校验。请只重新输出本批次结果，"
+                            f"并且必须逐项包含以下全部ID且不得改名：{expected_ids}。"
+                            f"校验错误：{exc}"
+                        ),
+                    },
+                ]
+                time.sleep(shape_attempt * 2)
+
+    if len(criteria_batch) == 1:
+        raise RuntimeError(f"judge output validation failed: {validation_error}")
+
+    midpoint = len(criteria_batch) // 2
+    left = judge_criteria_batch(
+        judge,
+        case,
+        criteria_batch[:midpoint],
+        submission,
+        evidence_matrix,
+        validation_report,
+        diagnostics,
+        tool_summary,
+    )
+    right = judge_criteria_batch(
+        judge,
+        case,
+        criteria_batch[midpoint:],
+        submission,
+        evidence_matrix,
+        validation_report,
+        diagnostics,
+        tool_summary,
+    )
+    confidence = (
+        left[2] * midpoint + right[2] * (len(criteria_batch) - midpoint)
+    ) / len(criteria_batch)
+    comment = clip("；".join(item for item in (left[3], right[3]) if item), 1200)
+    return (
+        left[0] + right[0],
+        left[1] + right[1],
+        confidence,
+        comment,
+        left[4] + right[4],
+    )
 
 
-def merge_critical_failures(
-    machine: list[dict[str, Any]],
-    judge: list[dict[str, Any]],
-) -> list[dict[str, Any]]:
-    merged = {item["id"]: item for item in machine}
-    for item in judge:
-        merged[item["id"]] = item
-    return list(merged.values())
+def selected_for_consistency_audit(group: str, task_id: str, criterion_id: str) -> bool:
+    material = f"{JUDGE_AUDIT_SELECTION_SEED}:{group}:{task_id}:{criterion_id}".encode()
+    bucket = int.from_bytes(hashlib.sha256(material).digest()[:8], "big") / 2**64
+    return bucket < JUDGE_AUDIT_SAMPLE_RATE
+
+
+def merge_consistency_votes(
+    initial_rows: list[dict[str, Any]],
+    repeated_runs: list[list[dict[str, Any]]],
+) -> tuple[dict[str, Any], dict[str, int], list[str]]:
+    initial_by_id = {row["id"]: row for row in initial_rows}
+    repeated_by_run = [{row["id"]: row for row in rows} for rows in repeated_runs]
+    disagreements: list[str] = []
+    majority_values: dict[str, int] = {}
+    tied_ids: list[str] = []
+    audited_ids = sorted(repeated_by_run[0]) if repeated_by_run else []
+    agreements = 0
+    for criterion_id in audited_ids:
+        values = [int(initial_by_id[criterion_id]["value"])] + [
+            int(run[criterion_id]["value"]) for run in repeated_by_run
+        ]
+        if len(set(values)) == 1:
+            agreements += 1
+        else:
+            disagreements.append(criterion_id)
+        ones = sum(values)
+        zeros = len(values) - ones
+        if ones == zeros:
+            tied_ids.append(criterion_id)
+        else:
+            majority_values[criterion_id] = 1 if ones > zeros else 0
+    metadata = {
+        "sampled_count": len(audited_ids),
+        "agreement_count": agreements,
+        "agreement_rate": round(agreements / len(audited_ids), 6) if audited_ids else None,
+        "disagreement_ids": disagreements,
+        "tied_ids": tied_ids,
+    }
+    return metadata, majority_values, tied_ids
 
 
 def grade_one(
@@ -545,6 +713,8 @@ def grade_one(
     case: dict[str, Any],
     group: str,
     existing_record_ids: set[str],
+    dataset_id: str,
+    rubric_version: str,
 ) -> dict[str, Any]:
     task_id = case["id"]
     base = RUN_ROOT / group / task_id
@@ -563,19 +733,13 @@ def grade_one(
     )
     deterministic_rows = [
         row
-        for criterion in case["rubric"]["criteria"]
+        for criterion in case["rubric"]["checklist"]
         if (row := deterministic_criterion(criterion, diagnostics)) is not None
     ]
-    deterministic_by_id = {row["id"]: row for row in deterministic_rows}
     criteria_to_score = [
         criterion
-        for criterion in case["rubric"]["criteria"]
+        for criterion in case["rubric"]["checklist"]
         if criterion["evaluation_mode"] != "deterministic"
-        or (
-            criterion["id"] in deterministic_by_id
-            and float(deterministic_by_id[criterion["id"]]["score"])
-            < float(criterion["weight"])
-        )
     ]
     missing_submission = receipt.get("status") != "accepted" or not submission
     judge_meta: dict[str, Any] = {}
@@ -583,7 +747,7 @@ def grade_one(
         llm_rows = [
             {
                 "id": criterion["id"],
-                "score": 0.0,
+                "value": 0,
                 "reason": "任务未形成被接受的最终提交",
                 "answer_evidence": "",
                 "trace_evidence": "run_result/submission_receipt",
@@ -596,57 +760,150 @@ def grade_one(
         comment = "未提交任务，Rubric得分为0。"
     else:
         tool_summary = summarize_tools(workspace / "traces" / "tool_calls.jsonl")
-        messages = build_judge_messages(
-            case,
-            criteria_to_score,
-            submission,
-            evidence_matrix,
-            validation_report,
-            diagnostics,
-            tool_summary,
-        )
-        validation_error: Exception | None = None
-        for shape_attempt in range(1, 4):
-            try:
-                parsed, judge_meta = judge.complete(messages)
-                llm_rows, judge_critical, confidence, comment = validate_judge_output(
+        llm_rows = []
+        judge_critical = []
+        batch_confidences: list[float] = []
+        batch_comments: list[str] = []
+        batch_metadata: list[dict[str, Any]] = []
+        total_usage: Counter[str] = Counter()
+
+        for start in range(0, len(criteria_to_score), JUDGE_CHECKLIST_BATCH_SIZE):
+            criteria_batch = criteria_to_score[start : start + JUDGE_CHECKLIST_BATCH_SIZE]
+            rows, critical, batch_confidence, batch_comment, metadata_rows = judge_criteria_batch(
+                judge,
+                case,
+                criteria_batch,
+                submission,
+                evidence_matrix,
+                validation_report,
+                diagnostics,
+                tool_summary,
+            )
+
+            llm_rows.extend(rows)
+            judge_critical.extend(critical)
+            batch_confidences.append(batch_confidence)
+            if batch_comment:
+                batch_comments.append(batch_comment)
+            batch_metadata.extend(metadata_rows)
+            for metadata in metadata_rows:
+                for name, value in metadata.get("usage", {}).items():
+                    if isinstance(value, (int, float)):
+                        total_usage[name] += value
+
+        audit_criteria = [
+            criterion
+            for criterion in criteria_to_score
+            if selected_for_consistency_audit(group, task_id, criterion["id"])
+        ]
+        repeated_runs: list[list[dict[str, Any]]] = []
+        audit_metadata: list[dict[str, Any]] = []
+        for _repeat in range(1, JUDGE_AUDIT_REPEAT_COUNT):
+            repeated_rows: list[dict[str, Any]] = []
+            for start in range(0, len(audit_criteria), JUDGE_CHECKLIST_BATCH_SIZE):
+                criteria_batch = audit_criteria[start : start + JUDGE_CHECKLIST_BATCH_SIZE]
+                rows, _critical, _confidence, _comment, metadata_rows = judge_criteria_batch(
+                    judge,
                     case,
-                    parsed,
-                    criteria_to_score,
+                    criteria_batch,
+                    submission,
+                    evidence_matrix,
+                    validation_report,
+                    diagnostics,
+                    tool_summary,
                 )
-                judge_meta["shape_attempt"] = shape_attempt
-                break
-            except (TypeError, ValueError, RuntimeError) as exc:
-                validation_error = exc
-                if shape_attempt < 3:
-                    time.sleep(shape_attempt * 2)
-        else:
-            raise RuntimeError(f"judge output validation failed: {validation_error}")
+                repeated_rows.extend(rows)
+                audit_metadata.extend(metadata_rows)
+                for metadata in metadata_rows:
+                    for name, value in metadata.get("usage", {}).items():
+                        if isinstance(value, (int, float)):
+                            total_usage[name] += value
+            repeated_runs.append(repeated_rows)
+
+        consistency, majority_values, tied_ids = merge_consistency_votes(
+            llm_rows,
+            repeated_runs,
+        )
+        tiebreak_rows: list[dict[str, Any]] = []
+        if tied_ids and JUDGE_AUDIT_TIEBREAKER:
+            definitions_by_id = {criterion["id"]: criterion for criterion in audit_criteria}
+            tied_criteria = [definitions_by_id[criterion_id] for criterion_id in tied_ids]
+            for start in range(0, len(tied_criteria), JUDGE_CHECKLIST_BATCH_SIZE):
+                criteria_batch = tied_criteria[start : start + JUDGE_CHECKLIST_BATCH_SIZE]
+                rows, _critical, _confidence, _comment, metadata_rows = judge_criteria_batch(
+                    judge,
+                    case,
+                    criteria_batch,
+                    submission,
+                    evidence_matrix,
+                    validation_report,
+                    diagnostics,
+                    tool_summary,
+                )
+                tiebreak_rows.extend(rows)
+                audit_metadata.extend(metadata_rows)
+                for metadata in metadata_rows:
+                    for name, value in metadata.get("usage", {}).items():
+                        if isinstance(value, (int, float)):
+                            total_usage[name] += value
+            majority_values.update({row["id"]: int(row["value"]) for row in tiebreak_rows})
+        rows_by_id = {row["id"]: row for row in llm_rows}
+        repeated_by_id = {
+            row["id"]: row
+            for repeated in repeated_runs
+            for row in repeated
+        }
+        tiebreak_by_id = {row["id"]: row for row in tiebreak_rows}
+        for criterion_id, value in majority_values.items():
+            selected = tiebreak_by_id.get(criterion_id) or repeated_by_id.get(criterion_id)
+            if selected is not None and int(rows_by_id[criterion_id]["value"]) != value:
+                rows_by_id[criterion_id] = {
+                    **selected,
+                    "value": value,
+                    "source": "llm_judge_consensus",
+                }
+        llm_rows = [rows_by_id[row["id"]] for row in llm_rows]
+        consistency["tiebreak_count"] = len(tiebreak_rows)
+        consistency["repeat_count"] = JUDGE_AUDIT_REPEAT_COUNT
+        consistency["batches"] = audit_metadata
+
+        confidence = (
+            sum(batch_confidences) / len(batch_confidences)
+            if batch_confidences
+            else 1.0
+        )
+        comment = clip("；".join(batch_comments), 1200)
+        judge_meta = {
+            "model": judge.model,
+            "usage": dict(total_usage),
+            "batch_count": len(batch_metadata),
+            "batches": batch_metadata,
+            "consistency_audit": consistency,
+        }
+        parsed = {
+            "checklist": llm_rows,
+            "overall_comment": comment,
+            "confidence": confidence,
+        }
     criteria_by_id = {row["id"]: row for row in deterministic_rows}
     criteria_by_id.update({row["id"]: row for row in llm_rows})
-    criteria = [criteria_by_id[item["id"]] for item in case["rubric"]["criteria"]]
-    raw_score = round(sum(float(item["score"]) for item in criteria), 3)
-    critical = merge_critical_failures(
-        machine_critical_failures(case, diagnostics),
-        judge_critical,
-    )
-    active_caps = [
-        int(item["score_cap"])
-        for item in critical
-        if item.get("triggered")
-    ]
-    final_score = min([raw_score, *active_caps]) if active_caps else raw_score
+    criteria = [criteria_by_id[item["id"]] for item in case["rubric"]["checklist"]]
+    passed_count, total_count, final_score = checklist_pass_rate(criteria)
+    critical_failures, score_cap = evaluate_critical_failures(case, diagnostics)
     result = {
         "group": group,
+        "dataset_id": dataset_id,
+        "rubric_version": rubric_version,
         "task_id": task_id,
         "case_family": case["case_family"],
         "category": case["category"],
         "graded_at": datetime.now().astimezone().isoformat(timespec="seconds"),
-        "case_score_raw": raw_score,
-        "case_score": round(final_score, 3),
-        "passed": final_score >= float(case["rubric"]["pass_score"]),
-        "criteria": criteria,
-        "critical_failures": critical,
+        "checklist_passed": passed_count,
+        "checklist_total": total_count,
+        "checklist_pass_rate": final_score,
+        "checklist": criteria,
+        "critical_failures": critical_failures,
+        "score_cap": score_cap,
         "diagnostics": diagnostics,
         "judge": {
             "status": "not_required" if missing_submission else "ok",
@@ -696,7 +953,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--reset", action="store_true")
     parser.add_argument("--only-errors", action="store_true")
     parser.add_argument("--reapply-rules", action="store_true")
-    parser.add_argument("--rejudge-rule-failures", action="store_true")
     return parser.parse_args()
 
 
@@ -707,19 +963,18 @@ def reapply_rules(
     updated = []
     for row in rows:
         case = cases[row["task_id"]]
-        machine = machine_critical_failures(case, row.get("diagnostics", {}))
         raw_judge_path = (
             GRADE_ROOT
             / row["group"]
             / f"{row['task_id']}.judge-output.json"
         )
-        judge_critical: list[dict[str, Any]] = []
         if raw_judge_path.exists():
             raw_judge = load_json(raw_judge_path, {}) or {}
             judge_criteria_ids = {
                 str(item.get("id") or item.get("criterion_id"))
                 for item in (
-                    raw_judge.get("criteria")
+                    raw_judge.get("checklist")
+                    or raw_judge.get("criteria")
                     or raw_judge.get("scores")
                     or []
                 )
@@ -729,35 +984,33 @@ def reapply_rules(
                 judge_criteria_ids |= set(raw_judge["criteria_scores"])
             judge_criteria_ids |= {
                 item["id"]
-                for item in case["rubric"]["criteria"]
+                for item in case["rubric"]["checklist"]
                 if isinstance(raw_judge.get(item["id"]), dict)
             }
             criteria_to_score = [
                 item
-                for item in case["rubric"]["criteria"]
+                for item in case["rubric"]["checklist"]
                 if item["id"] in judge_criteria_ids
             ]
-            _, judge_critical, _, _ = validate_judge_output(
+            validate_judge_output(
                 case,
                 raw_judge,
                 criteria_to_score,
             )
-        row["critical_failures"] = merge_critical_failures(
-            machine,
-            judge_critical,
+        passed_count, total_count, pass_rate = checklist_pass_rate(row.get("checklist", []))
+        row.pop("case_score_raw", None)
+        critical_failures, score_cap = evaluate_critical_failures(
+            case,
+            row.get("diagnostics", {}),
         )
-        raw_score = round(
-            sum(float(item.get("score", 0)) for item in row.get("criteria", [])),
-            3,
-        )
-        caps = [
-            int(item["score_cap"])
-            for item in row["critical_failures"]
-            if item.get("triggered")
-        ]
-        row["case_score_raw"] = raw_score
-        row["case_score"] = round(min([raw_score, *caps]) if caps else raw_score, 3)
-        row["passed"] = row["case_score"] >= float(case["rubric"]["pass_score"])
+        row["critical_failures"] = critical_failures
+        row["score_cap"] = score_cap
+        row["checklist_passed"] = passed_count
+        row["checklist_total"] = total_count
+        row["checklist_pass_rate"] = pass_rate
+        row.pop("case_score", None)
+        row.pop("passed", None)
+        row.pop("required_check_failures", None)
         destination = GRADE_ROOT / row["group"] / f"{row['task_id']}.json"
         destination.write_text(
             json.dumps(row, ensure_ascii=False, indent=2),
@@ -780,8 +1033,11 @@ def main() -> int:
     cases = {case["id"]: case for case in dataset["cases"]}
     if args.reapply_rules:
         rows = list(load_existing_grades().values())
-        if len(rows) != len(GROUPS) * len(cases):
-            raise RuntimeError(f"expected 150 existing grades, found {len(rows)}")
+        expected_grade_count = len(GROUPS) * len(cases)
+        if len(rows) != expected_grade_count:
+            raise RuntimeError(
+                f"expected {expected_grade_count} existing grades, found {len(rows)}"
+            )
         reapply_rules(cases, rows)
         print(f"Reapplied deterministic caps to {len(rows)} grades.")
         return 0
@@ -797,26 +1053,7 @@ def main() -> int:
             if task_id not in selected_tasks:
                 continue
             old = existing.get((group, task_id))
-            if old and args.rejudge_rule_failures:
-                criteria_by_id = {
-                    item["id"]: item
-                    for item in old.get("criteria", [])
-                }
-                has_rule_failure = any(
-                    item.get("source") == "rule"
-                    and float(item.get("score", 0))
-                    < float(
-                        next(
-                            criterion["weight"]
-                            for criterion in cases[task_id]["rubric"]["criteria"]
-                            if criterion["id"] == item["id"]
-                        )
-                    )
-                    for item in criteria_by_id.values()
-                )
-                if not has_rule_failure:
-                    continue
-            elif old and not args.only_errors and not args.reset:
+            if old and not args.only_errors and not args.reset:
                 continue
             if old and args.only_errors and old.get("judge", {}).get("status") != "error":
                 continue
@@ -831,7 +1068,15 @@ def main() -> int:
     errors: list[dict[str, Any]] = []
     with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
         future_map = {
-            pool.submit(grade_one, judge, cases[task_id], group, record_ids): (group, task_id)
+            pool.submit(
+                grade_one,
+                judge,
+                cases[task_id],
+                group,
+                record_ids,
+                str(dataset["dataset_id"]),
+                str(dataset["rubric_version"]),
+            ): (group, task_id)
             for group, task_id in pending
         }
         for future in as_completed(future_map):
@@ -844,15 +1089,16 @@ def main() -> int:
                     "task_id": task_id,
                     "case_family": cases[task_id]["case_family"],
                     "graded_at": datetime.now().astimezone().isoformat(timespec="seconds"),
-                    "case_score": 0.0,
-                    "passed": False,
+                    "checklist_passed": 0,
+                    "checklist_total": len(cases[task_id]["rubric"]["checklist"]),
+                    "checklist_pass_rate": 0.0,
                     "judge": {"status": "error", "error": clip(exc, 2000)},
                 }
                 errors.append(result)
                 print(f"ERROR {group}/{task_id}: {exc}", file=sys.stderr, flush=True)
             else:
                 print(
-                    f"OK {group}/{task_id} score={result['case_score']:.1f}",
+                    f"OK {group}/{task_id} checklist_hit_rate={result['checklist_pass_rate']:.1f}",
                     flush=True,
                 )
             completed[(group, task_id)] = result

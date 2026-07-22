@@ -3,31 +3,29 @@
   "errors": [],
   "warnings": [],
   "field_checks": {
-    "anomaly_ids_non_empty_strings": true,
-    "record_ids_match_pattern": true,
-    "record_ids_unique": true,
-    "anomaly_ids_unique": true,
-    "answer_non_empty": true,
-    "citations_unique": true,
-    "no_extra_fields": true
+    "anomaly_ids": {"valid": true, "type": "array", "empty_ok": true},
+    "record_ids": {"valid": true, "type": "array", "empty_ok": true},
+    "answer": {"valid": true, "non_empty": true, "contains_wuanomaly": true},
+    "citations": {"valid": true, "count": 5, "all_have_doc_id_and_clause_no": true}
   },
   "id_checks": {
-    "all_submitted_in_evidence": true,
-    "all_evidence_rows_have_ids": true,
-    "no_unowned_records": true,
-    "citations_match_policies": true
+    "anomaly_ids": {"count": 0, "consistent_with_evidence": true},
+    "record_ids": {"count": 0, "consistent_with_no_anomaly": true},
+    "citation_doc_ids": {"all_in_corpus": true, "docs": ["04_travel_expense.md", "05_training_expense.md"]}
   },
   "evidence_checks": {
-    "evidence_status_pass": true,
-    "coverage_100_percent": true,
-    "evidence_matrix_exists": true,
-    "independent_review_complete": true
+    "evidence_status": "pass",
+    "coverage_percent": 100,
+    "no_anomaly_coverage_complete": true,
+    "evidence_consistent_with_result": true
   },
   "answer_consistency_checks": {
-    "anomaly_count_matches": true,
-    "record_count_matches": true,
-    "boundary_values_stated": true,
-    "threshold_stated": true
+    "no_anomaly_stated": true,
+    "comparison_complete": true,
+    "training_tiers_listed": true,
+    "numerical_example_present": true,
+    "mixing_prohibition_explained": true,
+    "citations_match_answer": true
   },
   "repair_count": 0,
   "repairable_fields": [],

@@ -23,6 +23,17 @@ from audit_control_core import (  # noqa: E402
 )
 
 
+ROUTING_RULES_PATH = CORE_ROOT / "routing" / "routing_rules.json"
+ROUTING_RULES = json.loads(ROUTING_RULES_PATH.read_text(encoding="utf-8"))
+ROLE_REASON_CODES = {
+    role: list(config.get("allowed_reason_codes", []))
+    for role, config in ROUTING_RULES.get("roles", {}).items()
+}
+ALL_REASON_CODES = sorted(
+    {reason for reasons in ROLE_REASON_CODES.values() for reason in reasons}
+)
+
+
 def _env_path(name: str, default: Path | None = None) -> Path:
     raw = os.environ.get(name)
     if raw:
@@ -113,7 +124,7 @@ def authorize_audit_subagent(
     return authorize_subagent(
         work_dir=_env_path("AUDIT_WORK_DIR"),
         task_id=_task_id(),
-        routing_rules_path=CORE_ROOT / "routing" / "routing_rules.json",
+        routing_rules_path=ROUTING_RULES_PATH,
         role=role,
         reason_code=reason_code,
         complexity=complexity,
@@ -278,33 +289,30 @@ TOOL_SCHEMAS = [
         "inputSchema": {
             "type": "object",
             "additionalProperties": False,
-            "required": [],
+            "required": ["role", "reason_code", "complexity"],
+            "anyOf": [
+                {"required": ["context"]},
+                {"required": ["question"]},
+                {"required": ["task_description"]},
+            ],
             "properties": {
                 "role": {
                     "type": "string",
                     "enum": ["policy_researcher", "data_analyst", "independent_reviewer"],
                     "description": "Native subagent role to authorize.",
                 },
-                "agent_role": {"type": "string", "description": "Alias for role."},
-                "subagent_type": {"type": "string", "description": "Alias for role."},
-                "reason_code": {"type": "string", "description": "Fixed routing reason code."},
-                "reason": {"type": "string", "description": "Alias for reason_code."},
+                "reason_code": {
+                    "type": "string",
+                    "enum": ALL_REASON_CODES,
+                    "description": (
+                        "Fixed routing reason code. Match the code to the selected role; "
+                        f"role mapping: {json.dumps(ROLE_REASON_CODES, ensure_ascii=False, sort_keys=True)}"
+                    ),
+                },
                 "complexity": {"type": "integer", "minimum": 0, "maximum": 6, "description": "Planner complexity score."},
                 "context": {"type": "object", "description": "Minimal role-specific task context."},
                 "question": {"type": "string", "description": "Question added to context."},
-                "task_summary": {"type": "string", "description": "Compact task summary added to context."},
                 "task_description": {"type": "string", "description": "Bounded role task added to context."},
-                "task": {"type": "string", "description": "Alias for task_description."},
-                "prompt": {"type": "string", "description": "Alias for task_description."},
-                "allowed_tools": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "description": "Compatibility hint; locked routing rules remain authoritative.",
-                },
-                "budget": {
-                    "description": "Compatibility hint; locked role budget remains authoritative.",
-                    "oneOf": [{"type": "string"}, {"type": "integer"}],
-                },
                 "artifact_paths": {
                     "type": "array",
                     "items": {"type": "string"},

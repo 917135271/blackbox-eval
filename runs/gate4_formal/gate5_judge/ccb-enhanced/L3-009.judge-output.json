@@ -1,32 +1,254 @@
 {
-  "overall-count": {
-    "score": 0,
-    "reason": "报告声称发现379项异常，未提及预期数量30个异常和5个陷阱，异常总量明显错误。",
-    "answer_evidence": "‘共发现379项异常’",
-    "trace_evidence": "无"
-  },
-  "five-rule-coverage": {
-    "score": 20,
-    "reason": "报告明确覆盖了重复报销、拆分报销、超标准、超预算、超期报销五类规则。",
-    "answer_evidence": "报告分节‘一、重复报销（R1）’‘二、拆分报销规避审批（R2）’‘三、超标准报销（R3）’‘四、超预算报销（R4）’‘五、超期报销（R5）’",
-    "trace_evidence": "无"
-  },
-  "representative-ids": {
-    "score": 25,
-    "reason": "每类规则均提供了至少一个异常ID，并在evidence_matrix中给出了对应记录证据。",
-    "answer_evidence": "R1-DUP-FP202500000002等；R2-SPLIT-E0007-travel_lodging-2025-01-10等；R3-TRAVEL-R004225等；R4-BUDGET-D001等；R5-LATE-R004227等",
-    "trace_evidence": "无"
-  },
-  "policy-coverage": {
-    "score": 15,
-    "reason": "引用了费用报销管理办法第十条、第十一条、第十二条、第七条及预算管理办法第二、三条，涵盖了费用类和预算类制度。",
-    "answer_evidence": "citations列表包含‘01_expense_reimbursement_2025.md’与‘08_budget_management.md’条款",
-    "trace_evidence": "无"
-  },
-  "report-shape": {
-    "score": 2,
-    "reason": "报告包含事实、规则和判断，但未明确阐述影响，建议较简略，结构不够完整。",
-    "answer_evidence": "结论部分有‘建议加强预算控制和审批流程监控’，缺少影响分析",
-    "trace_evidence": "无"
-  }
+  "checklist": [
+    {
+      "id": "overall-count-total",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "candidate_submission.anomaly_ids contains 111 entries (DUP:6, SPL:87, STD:6, BUD:6, OVD:6), expected 30.",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "overall-count-type-split",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "candidate_submission.anomaly_ids includes 87 SPL entries, expected 6.",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "overall-count-type-overdue",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "candidate_submission.anomaly_ids includes 6 OVD entries, matching expected 6.",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r000079",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "R000079 is not present in candidate_submission.record_ids.",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r002009",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "R002009 is not present in candidate_submission.record_ids.",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r003968",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "R003968 is not present in candidate_submission.record_ids.",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r000894",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "R000894 is not present in candidate_submission.record_ids.",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r003479",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "R003479 is not present in candidate_submission.record_ids.",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r000312",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "R000312 is not present in candidate_submission.record_ids.",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-no-extra",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "candidate_submission.record_ids contains many records beyond the expected list (e.g., R000003, R000070, etc.).",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-dup",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "DUP-001 example with R000002 and R004201; both record_ids are present in candidate_submission.record_ids.",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-split",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "SPL-001 example with R004207 and R004208; both record_ids are present in candidate_submission.record_ids.",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-overstd",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "STD-001 example with R004221; R004221 is present in candidate_submission.record_ids.",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-budget",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "BUD-001 example cites R001388, but R001388 is not present in candidate_submission.record_ids.",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-overdue",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "OVD-001 example with R004231; R004231 is present in candidate_submission.record_ids.",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-coverage-expense",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "candidate_submission.citations include clauses from 01_expense_reimbursement_2025.md covering all five rule types (Article 7, 10, 11, 12, 13).",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-coverage-special",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "超标准部分引用04_travel_expense.md第四条、第六条，06_business_entertainment.md第三条，05_training_expense.md第二条，07_office_communication.md第二条、第三条",
+      "trace_evidence": "citations包含这些条款",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-coverage-budget",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "超预算部分引用08_budget_management.md第三条",
+      "trace_evidence": "citations包含08_budget_management.md第三条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004233",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids列表中未包含R004233",
+      "trace_evidence": "list中没有R004233",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004234",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids列表中未包含R004234",
+      "trace_evidence": "list中没有R004234",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004235",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids列表中未包含R004235",
+      "trace_evidence": "list中没有R004235",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004236",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids列表中未包含R004236",
+      "trace_evidence": "list中没有R004236",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004237",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids列表中未包含R004237",
+      "trace_evidence": "list中没有R004237",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004238",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids列表中未包含R004238",
+      "trace_evidence": "list中没有R004238",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004239",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids列表中未包含R004239",
+      "trace_evidence": "list中没有R004239",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004240",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids列表中未包含R004240",
+      "trace_evidence": "list中没有R004240",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-fact",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "报告包含具体事实，如重复报销示例DUP-001员工姚瑜办公用品423.79元",
+      "trace_evidence": "answer中列出多个具体事实记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-rule",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "报告引用《费用报销管理办法》第十条至第十三条等规则",
+      "trace_evidence": "citations列出多个制度条款",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-judgment",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "报告明确判定各项异常，如“共发现6组重复发票”",
+      "trace_evidence": "answer中各类异常均有判断结论",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-impact",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "报告说明影响，如“重复报销导致费用虚增合计2432.18元”",
+      "trace_evidence": "answer中每类异常后均有影响描述",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-recommendation",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "报告提出建议，如“加强发票查验与系统去重控制”",
+      "trace_evidence": "answer中每类异常后均有建议",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "",
+  "confidence": 0.8
 }

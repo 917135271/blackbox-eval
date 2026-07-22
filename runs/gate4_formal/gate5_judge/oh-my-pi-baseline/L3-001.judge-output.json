@@ -1,28 +1,94 @@
 {
-  "criteria": [
+  "checklist": [
     {
-      "id": "full-scan-method",
-      "score": 15,
-      "reason": "对全年数据执行了完整的重复发票查询，范围覆盖全部记录，工具调用和结果统计均证明全量扫描。",
-      "answer_evidence": "提交的异常ID和记录ID集合完整覆盖了所有重复报销案例，共6项异常，12条记录。",
-      "trace_evidence": "调用find_reused_invoices(min_usage_count=2)获取所有重复使用的发票列表，返回6张发票及其关联记录；随后逐一调用get_expense_detail验证每条记录，确认全部合规。"
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "提交中L3-001-DUP-001明确列出R000002和R004201属于同一发现",
+      "answer_evidence": "L3-001-DUP-001: 涉及R000002和R004201",
+      "trace_evidence": "find_reused_invoices返回INV000002的记录集包含R000002, R004201",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "提交中L3-001-DUP-002明确列出R000005和R004202属于同一发现",
+      "answer_evidence": "L3-001-DUP-002: 涉及R000005和R004202",
+      "trace_evidence": "find_reused_invoices返回INV000005的记录集包含R000005, R004202",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "提交中L3-001-DUP-003明确列出R000020和R004203属于同一发现",
+      "answer_evidence": "L3-001-DUP-003: 涉及R000020和R004203",
+      "trace_evidence": "find_reused_invoices返回INV000020的记录集包含R000020, R004203",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 1,
+      "reason": "提交中L3-001-DUP-004明确列出R000028和R004204属于同一发现",
+      "answer_evidence": "L3-001-DUP-004: 涉及R000028和R004204",
+      "trace_evidence": "find_reused_invoices返回INV000028的记录集包含R000028, R004204",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 1,
+      "reason": "提交中L3-001-DUP-005明确列出R000037和R004205属于同一发现",
+      "answer_evidence": "L3-001-DUP-005: 涉及R000037和R004205",
+      "trace_evidence": "find_reused_invoices返回INV000037的记录集包含R000037, R004205",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 1,
+      "reason": "提交中L3-001-DUP-006明确列出R000055和R004206属于同一发现",
+      "answer_evidence": "L3-001-DUP-006: 涉及R000055和R004206",
+      "trace_evidence": "find_reused_invoices返回INV000055的记录集包含R000055, R004206",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "find_reused_invoices无日期过滤，覆盖全年全部记录",
+      "answer_evidence": "全量扫描方法描述为对全年发票使用记录进行交叉匹配",
+      "trace_evidence": "find_reused_invoices调用无日期参数，page_size=50返回全部重复发票",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-invoice-key",
+      "value": 1,
+      "reason": "工具默认按invoice_id分组，且提交中每组对应一个发票号",
+      "answer_evidence": "每项发现均注明发票号，如FP202500000002",
+      "trace_evidence": "find_reused_invoices结果中包含invoice_id和usage_count，以invoice_id为键",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-grouping",
+      "value": 1,
+      "reason": "6组重复发票对应6项发现，每组仅一项发现",
+      "answer_evidence": "发现列表：L3-001-DUP-001至006，共6项",
+      "trace_evidence": "find_reused_invoices返回6个发票对象，每个包含一个record_ids列表",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 1,
+      "reason": "工具返回6组重复发票，提交6项发现，数量一致",
+      "answer_evidence": "发现6组重复报销异常",
+      "trace_evidence": "find_reused_invoices返回6个发票，has_next为false；rule_diagnostics中anomaly_metrics.count_exact为true",
+      "source": "llm_judge"
     },
     {
       "id": "policy-basis",
-      "score": 10,
-      "reason": "明确引用了《XX证券费用报销管理办法(2025修订版)》第十条，并将规则落实到查询条件中。",
-      "answer_evidence": "答案中写明‘违反《XX证券费用报销管理办法(2025修订版)》第十条“同一发票最多报销1次”的规定’，并在证据矩阵中为每项异常提供第十条引用。",
-      "trace_evidence": "search_policy搜索“重复报销 重复提交 同一发票 多次报销”获取第十条原文；find_reused_invoices使用min_usage_count=2精确对应同一发票被报销超过一次的条件。"
-    },
-    {
-      "id": "false-positive-control",
-      "score": 15,
-      "reason": "提交结果无任何误报，所有记录ID与预期完全一致，未混入其他规则异常或TRAP记录。",
-      "answer_evidence": "候选提交的record_ids集合与预期record_ids完全匹配，无多余或缺失项；anomaly_ids虽采用自定义命名但一对一对应。",
-      "trace_evidence": "find_reused_invoices返回的发票及其record_ids经后续逐条核实，仅输出重复报销记录，未引入无关数据。"
+      "value": 1,
+      "reason": "引用第十条，且查询条件min_usage_count=2对应“同一发票最多报销1次”",
+      "answer_evidence": "制度依据：《XX证券费用报销管理办法(2025修订版)》第十条",
+      "trace_evidence": "get_policy_excerpt返回第十条原文；find_reused_invoices的min_usage_count=2正是检测重复使用",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [],
-  "overall_comment": "候选准确完成了全年重复报销专项扫描，方法、制度依据和误报控制均符合要求，结果无误。",
+  "overall_comment": "所有检查项通过：记录分组完全匹配，全量扫描覆盖全年，以发票号为键，分组与发现数一致，制度依据明确且与查询条件对应。",
   "confidence": 1.0
 }

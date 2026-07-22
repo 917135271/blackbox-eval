@@ -1,0 +1,118 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-L3-003-01",
+      "record_ids": ["R004225"],
+      "citations": [
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R004225: 员工E0007(李丽娟)，职级D1(部门负责人级)，在A类城市(一类)住宿1晚，金额900元，单晚900元 > 部门负责人级A类城市标准850元/晚",
+        "special_approval=0，无专项审批豁免",
+        "全量扫描883条travel_lodging记录(排除special_approval=1和nights=0)，仅此1条超标准"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-L3-003-02",
+      "record_ids": ["R004226"],
+      "citations": [
+        {"doc_id": "04_travel_expense.md", "clause_no": "第六条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R004226: 员工E0008(杨丹)，C类城市(三类)市内交通1日，金额92元，单日92元 > C类城市标准80元/日",
+        "special_approval=0，无专项审批豁免",
+        "全量扫描770条local_transport记录(排除special_approval=1和days=0)，仅此1条超标准"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-L3-003-03",
+      "record_ids": ["R004224"],
+      "citations": [
+        {"doc_id": "06_business_entertainment.md", "clause_no": "第三条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R004224: 员工E0010(闭想)，业务招待费700元，参与人数2人，人均350元 > 人均300元标准",
+        "单次金额700元未超过5000元上限，但人均超标",
+        "special_approval=0，无专项审批豁免",
+        "全量扫描675条business_entertainment记录(排除special_approval=1和participants=0)，仅此1条超标准"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-L3-003-04",
+      "record_ids": ["R004223"],
+      "citations": [
+        {"doc_id": "05_training_expense.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R004223: 员工E0009(张婷)，培训费3700元 > 课程费每人每期3500元标准",
+        "special_approval=0，无专项审批豁免",
+        "全量扫描578条training_fee记录(排除special_approval=1)，仅此1条超过课程费上限",
+        "注意：数据库缺少days/nights/city_tier/sub_type字段，无法检查住宿标准和每日综合费用标准"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-L3-003-05",
+      "record_ids": ["R004221"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R004221: 员工E0007(李丽娟)，办公用品650元 > 每人每月600元上限（单笔自身超限）",
+        "special_approval=0，无专项审批豁免",
+        "全量扫描694条office_supplies记录(排除special_approval=1)，仅此1条超标准"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-L3-003-06",
+      "record_ids": ["R004222"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第三条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R004222: 员工E0008(杨丹)，通讯费用330元 > 每人每月300元上限（单笔自身超限）",
+        "special_approval=0，无专项审批豁免",
+        "全量扫描640条communication记录(排除special_approval=1)，仅此1条超标准"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004221","R004222","R004223","R004224","R004225","R004226"],
+  "submitted_record_ids": ["R004221","R004222","R004223","R004224","R004225","R004226"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "total_violations": 6,
+    "total_record_ids": 6,
+    "rules_checked": 6,
+    "population_scanned": 4240
+  },
+  "unresolved_items": []
+}

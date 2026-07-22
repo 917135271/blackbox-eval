@@ -1,0 +1,57 @@
+{
+  "task_id": "L2-013",
+  "task_type": "policy_data_comparison",
+  "clue_record": "R004223",
+  "audit_scope": {
+    "expense_type": "training_fee",
+    "rule": "培训课程费按人次控制，每人每期不超过3500元",
+    "policy_doc": "05_training_expense.md",
+    "policy_clause": "第二条",
+    "standard_limit": 3500,
+    "supporting_policy": "01_expense_reimbursement_2025.md",
+    "supporting_clause": "第十二条（无专项审批时报销金额不得超过制度标准的1.0倍）",
+    "period": "2025年度（当前制度有效期）"
+  },
+  "policy_questions": [
+    "培训课程费每人每期的标准上限是多少？",
+    "超标准报销是否需要专项审批？",
+    "如何判断专项审批条件？"
+  ],
+  "data_questions": [
+    "R004223的培训费金额是否超过3500元标准？",
+    "2025年度所有training_fee记录中哪些超过3500元标准？",
+    "超标准记录是否有专项审批（special_approval）？"
+  ],
+  "required_fields": ["record_id", "employee_id", "amount", "expense_type", "expense_date", "special_approval", "department_id"],
+  "evidence_needs": [
+    "R004223详细记录",
+    "所有training_fee且amount>3500的记录",
+    "05_training_expense.md第二条",
+    "01_expense_reimbursement_2025.md第十二条"
+  ],
+  "execution_steps": [
+    "1. 查询R004223详情（已完成）",
+    "2. 查询所有training_fee超标准（>3500）记录",
+    "3. 检查超标准记录是否有special_approval",
+    "4. 对超标准且无专项审批的记录标记为异常",
+    "5. 运行evidence-coverage-check",
+    "6. 运行false-positive-review",
+    "7. 生成audit-report",
+    "8. 运行result-validator",
+    "9. 提交结果"
+  ],
+  "complexity": 2,
+  "complexity_reasons": [
+    "单规则（培训费标准3500元）",
+    "需要批量筛选（aggregation/filtering）",
+    "涉及阈值判断（>3500）",
+    "无政策版本冲突",
+    "单一制度文档"
+  ],
+  "subagent_plan": null,
+  "stopping_conditions": [
+    "所有training_fee超标准记录已核实",
+    "special_approval状态已确认",
+    "制度依据已引用"
+  ]
+}

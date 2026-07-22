@@ -1,0 +1,137 @@
+{
+  "task_id": "L3-003",
+  "task_type": "full_year_rule_audit",
+  "audit_scope": {
+    "period": "2025年全年（2025-01-01 至 2025-12-31）",
+    "organization": "XX证券各部门、分支机构及全体员工",
+    "expense_types": ["差旅住宿费", "市内交通包干", "业务招待费", "培训费", "办公用品", "通讯费用"],
+    "rule_focus": "单笔或单次即可确认的超标准专项扫描",
+    "special_note": "办公用品和通讯费用只识别单笔自身已超过月度上限的明确异常，不评价多笔记录的月度累计超限"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "差旅住宿费单晚标准是什么？按职级和城市档位分别列出阈值。",
+      "policy_doc": "04_travel_expense.md",
+      "clauses": ["第四条"],
+      "thresholds": "员工级: 一类450/二类380/三类300; 经理级: 一类650/二类550/三类450; 部门负责人级: 一类850/二类700/三类600; 高管级: 一类1100/二类900/三类750 (元/人/晚)"
+    },
+    {
+      "id": "PQ-02",
+      "question": "市内交通包干每日标准是什么？",
+      "policy_doc": "04_travel_expense.md",
+      "clauses": ["第六条"],
+      "thresholds": "一类城市每日120元, 二类城市每日100元, 三类城市每日80元"
+    },
+    {
+      "id": "PQ-03",
+      "question": "业务招待费单次和人均标准是什么？",
+      "policy_doc": "06_business_entertainment.md",
+      "clauses": ["第二条", "第三条"],
+      "thresholds": "单次活动不超过5000元; 人均不超过300元"
+    },
+    {
+      "id": "PQ-04",
+      "question": "培训费标准是什么？",
+      "policy_doc": "05_training_expense.md",
+      "clauses": ["第二条", "第三条", "第四条", "第五条"],
+      "thresholds": "课程费每人每期≤3500元; 内部培训综合费每日≤800元; 外部培训综合费每日≤1200元; 培训住宿: 一类500/二类420/三类350元/人/晚"
+    },
+    {
+      "id": "PQ-05",
+      "question": "办公用品月度上限是多少？",
+      "policy_doc": "07_office_communication.md",
+      "clauses": ["第二条"],
+      "thresholds": "每人每月不超过600元（单笔自身超限）"
+    },
+    {
+      "id": "PQ-06",
+      "question": "通讯费用月度上限是多少？",
+      "policy_doc": "07_office_communication.md",
+      "clauses": ["第三条"],
+      "thresholds": "每人每月不超过300元（单笔自身超限）"
+    },
+    {
+      "id": "PQ-07",
+      "question": "超标准报销的通用规则是什么？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clauses": ["第十二条"],
+      "thresholds": "无专项审批时,报销金额不得超过对应制度标准的1.0倍"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-01",
+      "question": "全年所有差旅住宿费记录，单晚金额是否超过对应职级+城市档位的标准？",
+      "tables": ["expenses", "employees", "invoices"],
+      "fields": ["record_id", "employee_id", "amount", "expense_type", "expense_date", "city_tier", "employee_level", "nights", "special_approval"]
+    },
+    {
+      "id": "DQ-02",
+      "question": "全年所有市内交通包干记录，单日金额是否超过对应城市档位标准？",
+      "tables": ["expenses", "invoices"],
+      "fields": ["record_id", "employee_id", "amount", "expense_type", "city_tier", "days", "special_approval"]
+    },
+    {
+      "id": "DQ-03",
+      "question": "全年所有业务招待费记录，单次或人均是否超过标准？",
+      "tables": ["expenses", "invoices"],
+      "fields": ["record_id", "employee_id", "amount", "expense_type", "participants", "special_approval"]
+    },
+    {
+      "id": "DQ-04",
+      "question": "全年所有培训费记录，是否超过对应标准？",
+      "tables": ["expenses", "invoices"],
+      "fields": ["record_id", "employee_id", "amount", "expense_type", "training_type", "city_tier", "nights", "days", "special_approval"]
+    },
+    {
+      "id": "DQ-05",
+      "question": "全年所有办公用品记录，单笔是否超过600元月度上限？",
+      "tables": ["expenses"],
+      "fields": ["record_id", "employee_id", "amount", "expense_type", "expense_date", "special_approval"]
+    },
+    {
+      "id": "DQ-06",
+      "question": "全年所有通讯费用记录，单笔是否超过300元月度上限？",
+      "tables": ["expenses"],
+      "fields": ["record_id", "employee_id", "amount", "expense_type", "expense_date", "special_approval"]
+    }
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "Write audit plan", "output": "work/audit_plan.json"},
+    {"step": 2, "action": "Policy version check (compact)", "output": "work/policy_applicability.json"},
+    {"step": 3, "action": "Batch expense analysis - full year scan", "output": "work/analysis/data_findings.json"},
+    {"step": 4, "action": "Evidence coverage check", "output": "work/evidence_matrix.json"},
+    {"step": 5, "action": "False positive review", "output": "work/independent_review.json"},
+    {"step": 6, "action": "Audit report", "output": "work/report_draft.json"},
+    {"step": 7, "action": "Result validator", "output": "work/validation_report.json"},
+    {"step": 8, "action": "Submit", "output": "work/final_result.json"}
+  ],
+  "complexity": {
+    "score": 4,
+    "reasons": [
+      "多制度: 涉及差旅、招待、培训、办公通讯等多个独立制度文档",
+      "多规则: 每种费用类型有不同阈值和判断维度",
+      "批量全量扫描: 需要对全年数据进行完整扫描和条件过滤",
+      "多阈值边界: 住宿按职级×城市档位、交通按城市档位、招待按单次和人均等",
+      "综合审计报告: 需对各费用类型分别说明计算口径和全量扫描方法"
+    ]
+  },
+  "subagent_plan": {
+    "data_analyst": {
+      "enabled": true,
+      "reason_code": "MULTI_RECORD_SCOPE",
+      "role": "data_analyst",
+      "context": "对XX证券2025年全年报销数据进行超标准专项扫描。扫描规则：\n1. 差旅住宿费(expense_type=lodging): 按employee_level和city_tier对照标准表，单晚金额(amount/nights)超过标准且无special_approval的为异常\n2. 市内交通包干(expense_type=local_transport): 按city_tier对照标准表，单日金额(amount/days)超过标准且无special_approval的为异常\n3. 业务招待费(expense_type=entertainment): 单次超过5000元，或人均(amount/participants)超过300元，且无special_approval的为异常\n4. 培训费(expense_type=training): 课程费每人每期超3500元，或内部培训每日超800元，或外部培训每日超1200元，或培训住宿超对应城市标准，且无special_approval\n5. 办公用品(expense_type=office_supplies): 单笔金额超过600元且无special_approval的为异常（不累计月度）\n6. 通讯费用(expense_type=communication): 单笔金额超过300元且无special_approval的为异常（不累计月度）\n\n注意：special_approval=true的记录应排除（已获豁免）。请通过SQLite数据库直接查询，保存SQL到work/sql/query.sql，结果保存到work/analysis/。",
+      "requested_token_budget": 8000,
+      "artifact_paths": ["work/sql/", "work/analysis/"]
+    }
+  },
+  "stopping_conditions": [
+    "所有费用类型的全量扫描完成且结果已记录",
+    "每个发现的record_id已通过get_expense_detail验证",
+    "证据矩阵coverage_percent达到100%",
+    "validation_report状态为pass"
+  ],
+  "unresolved_items": []
+}

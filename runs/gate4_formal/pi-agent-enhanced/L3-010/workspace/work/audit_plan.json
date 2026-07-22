@@ -1,0 +1,76 @@
+{
+  "task_id": "L3-010",
+  "task_type": "audit_report",
+  "task_question": "请专门写一段版本陷阱审计说明，列明新旧审批线及其效力状态，说明现行金额的交叉引用依据、使用旧版可能造成的误判，并提出版本校验措施。",
+  "audit_scope": {
+    "object": "版本陷阱审计 — 费用报销审批金额阈值的版本效力分析",
+    "policies_in_scope": [
+      "01_expense_reimbursement_2025.md (现行有效，2025-01-01起施行)",
+      "02_expense_reimbursement_2022_deprecated.md (已废止，仅作制度沿革留档)",
+      "03_authorization_management.md (现行有效，附件二为现行审批线依据)"
+    ],
+    "business_period": "2022版至2025版过渡期及现行期间",
+    "key_issues": [
+      "旧版(2022)审批线：8000元→部门总经理，30000元→分管副总",
+      "新版(2025)审批线：通过交叉引用授权管理办法附件二，分五档",
+      "新旧版本存在金额区间错位：旧版8000触发部门总经理，新版10000才触发",
+      "交叉引用机制：2025版第五条委托授权管理办法附件二"
+    ]
+  },
+  "policy_questions": [
+    "旧版2022审批线的具体金额及效力状态",
+    "新版2025现行审批线的具体金额及交叉引用路径",
+    "授权管理办法附件二的五档审批线明细",
+    "2025版废止2022版的明确条款",
+    "新旧审批线差异造成的潜在误判场景"
+  ],
+  "data_questions": [
+    "数据库中是否存在金额在旧版触发但新版不触发区间的记录（如8000-10000区间）",
+    "审批链是否按现行授权管理办法附件二正确派生",
+    "是否存在依据旧版审批线执行的审批记录"
+  ],
+  "required_fields": [
+    "record_id, amount, expense_type, expense_date, status",
+    "approval tier_id, approver_role, approval_status",
+    "employee_id, department_id"
+  ],
+  "evidence_requirements": [
+    "2022版条款原文（第二条、第三条、第四条）",
+    "2025版条款原文（第五条、第十四条）",
+    "授权管理办法附件二完整表格",
+    "边界区间记录的数据证据"
+  ],
+  "execution_steps": [
+    "1. 完成政策文档读取与分析",
+    "2. 运行policy-version-check，确认版本效力",
+    "3. 查询数据库中边界区间记录",
+    "4. 编写版本陷阱审计说明",
+    "5. 运行evidence-coverage-check",
+    "6. 运行audit-report生成报告",
+    "7. 运行result-validator校验",
+    "8. 调用validate_audit_result → submit_audit_result"
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "政策版本、生效日期、废止关系 (+1)",
+      "两个以上政策制度 (+1)",
+      "多个审批线阈值 (+1)",
+      "属于政策版本歧义/陷阱类任务，校准为3"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "政策文档已在主智能体中完整读取，数据分析范围有限（边界区间查询），无需原生子智能体"
+  },
+  "stopping_conditions": [
+    "所有政策条款已读取并引用",
+    "新旧审批线对比清晰列出",
+    "交叉引用路径完整说明",
+    "版本校验措施已提出",
+    "evidence_coverage_check通过",
+    "validation_report通过",
+    "submit_audit_result成功"
+  ],
+  "unresolved_items": []
+}

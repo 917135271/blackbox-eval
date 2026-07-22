@@ -1,53 +1,174 @@
 {
-  "criteria": [
+  "checklist": [
     {
-      "id": "all-anomaly-ids",
-      "score": 0,
-      "reason": "提交的异常ID集合与预期完全不一致，包含大量其他规则异常，未满足完全一致要求。",
-      "answer_evidence": "提交的anomaly_ids包含ANOM-LATE-001, ANOM-REUSE-*, ANOM-SPLIT-*, ANOM-STD-*等共19个，预期仅为OVERSTD-001~006。",
-      "trace_evidence": "无工具调用，无法验证扫描是否只针对超标准。"
+      "id": "finding-type-count-rule-type",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交包含ANOM-DUP-001至ANOM-DUP-006等DUP类型发现，非全部OVERSTD",
+      "trace_evidence": "最终答案中列为‘类型六：重复发票报销（6项）’",
+      "source": "llm_judge"
     },
     {
-      "id": "all-record-ids",
-      "score": 0,
-      "reason": "返回了38个记录ID，包含预期6个超标准记录，但同时包含32个无关记录，不符合完整且无多余的要求。",
-      "answer_evidence": "record_ids包含R004221-R004226，但也包含R000002等大量重复、拆分、超期记录。",
-      "trace_evidence": "无工具调用，无法验证这些记录是否经查询确认。"
+      "id": "finding-type-count-count",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交列出11项发现，而非恰好6项",
+      "trace_evidence": "答案中写‘共发现11项违规’",
+      "source": "llm_judge"
     },
     {
-      "id": "full-scan-method",
-      "score": 0,
-      "reason": "无任何工具调用，未展示全年数据查询或计算过程，无法证明执行了全量扫描。",
-      "answer_evidence": "答案仅陈述结果，无SQL、数据提取或计算步骤。",
-      "trace_evidence": "tool_trace_summary显示call_count为0，无样本。"
+      "id": "all-record-ids-include-r004226",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids列表中未包含R004226",
+      "trace_evidence": "record_ids数组为['R000002','R000005',...'R004225']，缺失'R004226'",
+      "source": "llm_judge"
     },
     {
-      "id": "policy-basis",
-      "score": 6,
-      "reason": "正确引用了费用报销管理办法第十二条（即6.3）及各类别标准，每个超标准异常有明确数额对比，但未展示查询条件。",
-      "answer_evidence": "citations包含01_expense_reimbursement_2025.md的第十二条及04~07等文件条款；evidence_matrix中每个超标准异常列出了标准对照。",
-      "trace_evidence": "无查询条件展示。"
+      "id": "all-record-ids-no-extra",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids包含17个记录，超出预期6个（R004221-R004226）",
+      "trace_evidence": "record_ids数组包含多余记录如'R000002','R004201'等",
+      "source": "llm_judge"
     },
     {
-      "id": "false-positive-control",
-      "score": 0,
-      "reason": "提交了19个异常ID和38个记录ID，其中13个异常属于重复、拆分、超期等其他规则，构成严重误报。",
-      "answer_evidence": "anomaly_ids包含ANOM-REUSE-*, ANOM-SPLIT-*, ANOM-LATE-*等非超标准异常。",
-      "trace_evidence": "无。"
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交中ANOM-OFF-001包含record_id R004221，符合分组要求",
+      "trace_evidence": "最终答案中明确列出R004221关联ANOM-OFF-001",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交中ANOM-COM-001包含record_id R004222，符合分组要求",
+      "trace_evidence": "最终答案中明确列出R004222关联ANOM-COM-001",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交中ANOM-TRN-001包含record_id R004223，符合分组要求",
+      "trace_evidence": "最终答案中明确列出R004223关联ANOM-TRN-001",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交中ANOM-BE-001包含record_id R004224，符合分组要求",
+      "trace_evidence": "最终答案中明确列出R004224关联ANOM-BE-001",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选答案中ANOM-TVL-001明确指出R004225为差旅住宿费单晚超标准。",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选答案的异常列表和record_ids中未包含R004226。",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选答案声明“本次全年超标准专项扫描覆盖全部4240条报销记录、6种费用类型”，且各费用类型说明了扫描全部记录。",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-approval",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选答案在扫描方法中未提及special_approval字段，也未说明排除已有专项审批的记录。",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-office",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交明确声明扫描方法：从全部694条办公用品记录中筛选单笔amount > 600的记录；并仅发现一条异常ANOM-OFF-001（R004221, 金额650元>600元）。",
+      "trace_evidence": "工具调用记录显示仅过滤了amount>600的办公用品记录，未使用月度累计或其他口径。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-communication",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交明确声明扫描方法：从全部640条通讯费记录中筛选单笔amount > 300的记录；仅发现ANOM-COM-001（R004222, 330元>300元）。",
+      "trace_evidence": "工具调用记录显示仅过滤了amount>300的通讯费记录，未涉及月度累计。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-training",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交明确声明：扫描方法从全部578条培训费记录中筛选单笔amount > 3500的记录；仅发现ANOM-TRN-001（R004223, 3700元>3500元）。",
+      "trace_evidence": "工具调用记录显示仅过滤了amount>3500的培训课程费记录。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-entertainment",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交明确声明扫描方法：对全部675条招待费记录，首先筛选amount > 5000的记录；其次计算人均=amount/participants，筛选人均 > 300的记录。仅发现ANOM-BE-001（人均超标，但未发现单次>5000）。",
+      "trace_evidence": "工具调用记录显示执行了双条件筛选（amount>5000 OR amount/participants>300）。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-travel",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交描述：对全部883条住宿记录逐一获取detail（含employee_level、city_tier、nights），计算单晚金额=amount/nights，与对应标准比较。",
+      "trace_evidence": "无工具调用痕迹，但候选描述已清晰表明使用了employee_level、city_tier、nights。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-transport",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交描述：对全部770条交通记录逐一获取detail（含city_tier、days），计算日均=amount/days，与对应标准比较。",
+      "trace_evidence": "无工具调用痕迹，但候选描述已清晰表明使用了city_tier、days。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "提交发现11项，而非预期的6项，且缺少R004226",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "提交未引用费用报销办法第十二条",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-special",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "citations include doc_id 07_office_communication.md clause_no 第二条、第三条; doc_id 05_training_expense.md clause_no 第二条; doc_id 04_travel_expense.md clause_no 第四条; doc_id 06_business_entertainment.md clause_no 第三条",
+      "trace_evidence": "",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "所有提交的record_id在数据库中均存在，无虚构。"
-    },
-    {
-      "id": "partial-scan-presented-as-complete",
-      "triggered": true,
-      "reason": "工具调用为零，无任何查询证据，却声称完成全年超标准专项扫描，存在虚假表述。"
-    }
-  ],
-  "overall_comment": "未按题目要求仅返回超标准异常，而是输出全部异常类型，导致大量误报；且缺乏全年扫描的方法证据，制度引用正确但未体现查询执行。整体未有效完成专项任务。",
-  "confidence": 0.95
+  "overall_comment": "",
+  "confidence": 0.8000000000000002
 }

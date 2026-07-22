@@ -1,0 +1,89 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "FIND-001",
+      "record_ids": ["R000028", "R004204"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
+      ],
+      "facts": [
+        "发票FP202500000028(金额165.58元,供应商XX供应商1999,开票日期2025-03-09)被员工张林(E0036,人力资源部D010)在两次独立报销中使用",
+        "R000028(BX2025000028): 费用日期2025-03-09, 报销日期2025-05-05, 通讯费165.58元, 事由'北辰项目沟通通讯费', 状态approved",
+        "R004204(BX2025X004204): 费用日期2025-05-10, 报销日期2025-05-18, 通讯费165.58元, 事由'北辰项目沟通通讯费', 状态approved",
+        "两笔报销的发票号、金额(165.58元)、供应商(XX供应商1999)、费用类型(communication)和事由完全一致",
+        "find_invoice_usage确认FP202500000028的usage_count=2, find_reused_invoices全局列表确认INV000028在6张复用发票中"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "FIND-002",
+      "record_ids": ["R000028", "R002127"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "员工张林(E0036,人力资源部D010,级别E1)在2025年3月发生两笔通讯费报销",
+        "R000028(BX2025000028): 165.58元, 费用日期2025-03-09, 发票FP202500000028",
+        "R002127(BX2025002127): 283.94元, 费用日期2025-03-17, 发票FP202500002127(供应商XX供应商5090)",
+        "两笔合计: 165.58 + 283.94 = 449.52元, 超过通讯费管理办法第三条规定的每人每月300元上限",
+        "SQLite全量查询E0036的2025年3月费用记录, 仅此两笔通讯费, 无其他遗漏"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R000028", "R004204", "R002127"],
+  "submitted_record_ids": ["R000028", "R004204", "R002127"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true,
+    "negative_checks": [
+      {
+        "rule": "第七条(60天报销时限)",
+        "result": "无异常",
+        "detail": "R000028: 57天; R004204: 8天; R002127: 41天; 均在60天内"
+      },
+      {
+        "rule": "第十一条(7天拆分报销)",
+        "result": "无异常",
+        "detail": "R000028(3月9日)与R002127(3月17日)间隔8天, 不触发7天窗口; R000028与R004204间隔62天"
+      },
+      {
+        "rule": "第十二条(标准上限1.0倍)",
+        "result": "无异常",
+        "detail": "通讯费三笔单笔均未超过300元, 无special_approval标记"
+      },
+      {
+        "rule": "预算管理办法第三条(预算1.0倍)",
+        "result": "无异常",
+        "detail": "D010年度预算164,500元, 已使用139,536.39元, 使用率84.82%, 未触及1.0倍上限"
+      },
+      {
+        "rule": "授权管理办法附件二(审批层级)",
+        "result": "无异常",
+        "detail": "三笔均为AR-01(部门经理E0010审批), 金额均<3000元, 审批层级正确"
+      }
+    ],
+    "searched_population": "E0036在2025年全部费用记录(SQLite全表扫描, 共59条)",
+    "query_conditions": "employee_id='E0036', expense_type='communication', 月度分组",
+    "checked_rules": ["第十条", "第三条", "第七条", "第十一条", "第十二条", "预算第三条", "授权附件二"],
+    "population_count": 3,
+    "conclusion": "在R000028直接相关的范围内, 60天时限、7天拆分、标准上限、预算、审批层级五项反向检查均无异常"
+  },
+  "reconciled_figures": {
+    "FIND-001_invoice_amount": {"reported": 165.58, "source": "R000028.amount = R004204.amount = FP202500000028.amount", "match": true},
+    "FIND-001_invoice_no": {"reported": "FP202500000028", "source": "find_invoice_usage + find_reused_invoices", "match": true},
+    "FIND-002_march_total": {"reported": 449.52, "source": "165.58(R000028) + 283.94(R002127)", "match": true},
+    "FIND-002_cap": {"reported": 300, "source": "07_office_communication.md 第三条", "match": true},
+    "E0036_march_communication_count": {"reported": 2, "source": "SQLite全量查询E0036 2025年3月通讯费", "match": true}
+  },
+  "unresolved_items": []
+}

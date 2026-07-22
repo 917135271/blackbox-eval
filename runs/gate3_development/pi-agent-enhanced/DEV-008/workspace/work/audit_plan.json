@@ -1,0 +1,87 @@
+{
+  "task_id": "DEV-008",
+  "task_type": "batch_analysis",
+  "question": "扫描开发库中的超期报销，返回全部异常记录，并对年末补充提交记录进行核对。",
+  "audit_scope": {
+    "object": "超期报销（overdue reimbursement）",
+    "expense_types": "全部类型",
+    "business_period": "全部记录",
+    "organization_scope": "全部门",
+    "deliverable": "全部异常记录ID、年末补充提交核对结果"
+  },
+  "policy_questions": [
+    {
+      "rule": "Article 7 - 60天报销期限",
+      "policy": "XX证券费用报销管理办法(2025修订版)",
+      "clause": "第七条 员工应在费用发生后60天内提交报销申请;超过期限的,原则上不得报销。",
+      "boundary": "reimburse_date - expense_date > 60天 → 超期"
+    },
+    {
+      "rule": "Article 9 - 年末补充提交例外",
+      "policy": "XX证券费用报销管理办法(2025修订版)",
+      "clause": "第九条 会计年度末发生的费用,最迟可在财政年度结束后15天内补充提交,逾期按超期报销处理。",
+      "boundary": "expense_date在会计年度末(12月) 且 reimburse_date ≤ 次年1月15日 → 不算超期"
+    }
+  ],
+  "policy_applicability": {
+    "applicable_policy": "01_expense_reimbursement_2025.md",
+    "effective_date": "2025-01-01",
+    "excluded_policy": "02_expense_reimbursement_2022_deprecated.md",
+    "exclusion_reason": "已被2025版废止"
+  },
+  "data_questions": [
+    {
+      "question": "找出所有 reimburse_date - expense_date > 60天 的记录",
+      "tables": ["expense_records"],
+      "fields": ["record_id", "employee_id", "expense_date", "reimburse_date", "expense_type", "amount", "status", "special_approval"],
+      "method": "SQL JULIANDAY(reimburse_date) - JULIANDAY(expense_date) > 60"
+    },
+    {
+      "question": "从超期记录中排除年末补充提交（expense_date在12月 且 reimburse_date ≤ 次年1月15日）",
+      "method": "Python过滤：对超期记录，若 expense_date 月份=12 且 reimburse_date ≤ 次年1月15日，则排除"
+    },
+    {
+      "question": "核对年末补充提交记录：确认所有年末补充提交记录都满足条件",
+      "method": "列出所有expense_date在12月且reimburse_date > expense_date+60但 ≤ 次年1月15日的记录，确认合规"
+    }
+  ],
+  "evidence_needs": [
+    "每个异常记录的详细信息（expense_date, reimburse_date, 延迟天数）",
+    "排除的年末补充提交记录详情",
+    "年末补充提交核对清单"
+  ],
+  "execution_steps": [
+    "1. audit-query-planner → work/audit_plan.json",
+    "2. policy-version-check（精简模式，主智能体完成）→ 确认2025版适用",
+    "3. authorize_audit_subagent(data_analyst) → 授权子智能体执行批量数据分析",
+    "4. invoke native subagent → 执行SQL/Python分析，识别超期记录",
+    "5. complete_audit_subagent → 登记子智能体摘要",
+    "6. 主智能体复核年末排除逻辑",
+    "7. false-positive-review → 复核边界案例",
+    "8. evidence-coverage-check → 确认覆盖率",
+    "9. audit-report → 生成报告",
+    "10. result-validator → 校验",
+    "11. validate_audit_result → 预检",
+    "12. submit_audit_result → 提交"
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "aggregation/grouping/joins/batch filtering: 需要批量扫描所有记录计算延迟天数",
+      "two business rules: 60天规则 + 年末例外规则",
+      "thresholds/dates/exemptions: 60天阈值、12月边界、1月15日截止"
+    ]
+  },
+  "subagent_plan": {
+    "role": "data_analyst",
+    "reason_code": "DATE_AMOUNT_BOUNDARY",
+    "task": "在expense.db中执行SQL查询，找出所有 reimburse_date - expense_date > 60天 的记录，输出完整列表。同时输出所有 expense_date在12月 且 reimburse_date在次年1月15日前的记录作为年末补充提交核对清单。"
+  },
+  "stopping_conditions": [
+    "所有超期记录已识别并去重",
+    "年末补充提交记录已核对",
+    "evidence_coverage_check pass且coverage=100%",
+    "validation_report pass"
+  ],
+  "unresolved_items": []
+}

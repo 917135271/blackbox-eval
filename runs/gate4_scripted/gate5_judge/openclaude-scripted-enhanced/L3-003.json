@@ -1,0 +1,451 @@
+{
+  "group": "openclaude-scripted-enhanced",
+  "task_id": "L3-003",
+  "case_family": "full_year_audit",
+  "category": "full_year_rule_audit",
+  "graded_at": "2026-07-22T00:59:15+08:00",
+  "checklist_passed": 16,
+  "checklist_total": 27,
+  "checklist_pass_rate": 59.259,
+  "checklist": [
+    {
+      "id": "finding-type-count-rule-type",
+      "value": 1,
+      "reason": "发现规则类型完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "finding-type-count-count",
+      "value": 0,
+      "reason": "提交发现数量为3，不是6",
+      "answer_evidence": "提交 anomaly_ids 仅3条（ANO-L3-003-001, ANO-L3-003-002, ANO-L3-003-003），数量为3",
+      "trace_evidence": "工具调用显示候选只报告了3个异常ID，未达到6个",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004221",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r004222",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r004223",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r004224",
+      "value": 0,
+      "reason": "提交记录不包含R004224",
+      "answer_evidence": "提交 record_ids 为 ['R004221','R004222','R004223']，不含 R004224",
+      "trace_evidence": "候选提交和工具调用中均未出现 R004224",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004225",
+      "value": 0,
+      "reason": "提交记录不包含R004225",
+      "answer_evidence": "提交 record_ids 不含 R004225",
+      "trace_evidence": "无任何关于 R004225 的记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004226",
+      "value": 0,
+      "reason": "提交记录不包含R004226",
+      "answer_evidence": "提交 record_ids 不含 R004226",
+      "trace_evidence": "无任何关于 R004226 的记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "候选提交明确将R004221关联到异常ANO-L3-003-001",
+      "answer_evidence": "ANO-L3-003-001对应的记录包含R004221",
+      "trace_evidence": "工具调用list_expenses office_supplies min_amount=600.01返回R004221，金额650",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "候选提交明确将R004222关联到异常ANO-L3-003-002",
+      "answer_evidence": "ANO-L3-003-002对应的记录包含R004222",
+      "trace_evidence": "工具调用list_expenses communication min_amount=300.01返回R004222，金额330",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "候选提交明确将R004223关联到异常ANO-L3-003-003",
+      "answer_evidence": "ANO-L3-003-003对应的记录包含R004223",
+      "trace_evidence": "工具调用list_expenses training_fee min_amount=3500.01返回R004223，金额3700",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 0,
+      "reason": "候选提交中未发现包含R004224的任何异常，缺失该记录",
+      "answer_evidence": "候选answer未提及R004224，candidate_record_ids中无此记录",
+      "trace_evidence": "工具调用未显示针对R004224的异常检测，候选扫描报告未包含该记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 0,
+      "reason": "候选提交未包含R004225，未形成对应发现分组",
+      "answer_evidence": "候选回答仅列出R004221、R004222、R004223，无R004225",
+      "trace_evidence": "工具调用中未出现R004225的get_expense_detail或list_expenses返回",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 0,
+      "reason": "候选提交未包含R004226，未形成对应发现分组",
+      "answer_evidence": "候选回答仅列出R004221、R004222、R004223，无R004226",
+      "trace_evidence": "工具调用中未出现R004226的get_expense_detail或list_expenses返回",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "通过summarize_expenses获取总记录数，再用list_expenses按金额阈值过滤，覆盖全年数据",
+      "answer_evidence": "候选描述了对各费用类型全量扫描方法，如‘对expense_type='office_supplies'的694条记录，筛选amount>600的单笔记录’",
+      "trace_evidence": "工具调用summarize_expenses和list_expenses（如office_supplies min_amount=600.01）无日期限制，返回全年记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-approval",
+      "value": 0,
+      "reason": "工具调用中未显示对special_approval字段的检查，无法证明排除了有专项审批的记录",
+      "answer_evidence": "候选在evidence_matrix中声称‘无special_approval’，但无工具验证",
+      "trace_evidence": "list_expenses和get_expense_detail返回结果中均无special_approval字段，候选未引入相关检查",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-office",
+      "value": 1,
+      "reason": "办公用品检查方法正确，仅当单笔金额超过600元时计入异常，答案明确说明并命中R004221。",
+      "answer_evidence": "候选答案：“对expense_type='office_supplies'的694条记录，筛选amount>600的单笔记录，命中1条”，异常记录R004221金额650元。",
+      "trace_evidence": "工具调用list_expenses: expense_type=office_supplies, min_amount=600.01，返回记录R004221金额650元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-communication",
+      "value": 1,
+      "reason": "通讯费用检查方法正确，仅当单笔金额超过300元时计入异常，答案明确说明并命中R004222。",
+      "answer_evidence": "候选答案：“对expense_type='communication'的640条记录，筛选amount>300的单笔记录，命中1条”，异常记录R004222金额330元。",
+      "trace_evidence": "工具调用list_expenses: expense_type=communication, min_amount=300.01，返回记录R004222金额330元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-training",
+      "value": 1,
+      "reason": "培训课程费检查方法正确，仅当单次金额超过3500元时计入异常，答案明确说明并命中R004223。",
+      "answer_evidence": "候选答案：“对expense_type='training_fee'的578条记录，筛选amount>3500的单笔记录，命中1条”，异常记录R004223金额3700元。",
+      "trace_evidence": "工具调用list_expenses: expense_type=training_fee, min_amount=3500.01，返回记录R004223金额3700元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-entertainment",
+      "value": 0,
+      "reason": "业务招待费只核查了单次5000元标准，未按人均300元标准核查，不符合同时核查两个标准的要求。",
+      "answer_evidence": "候选答案：“筛选amount>5000的单笔记录，命中0条”，无任何人均300元相关检查说明。",
+      "trace_evidence": "工具追踪：仅调用list_expenses with business_entertainment min_amount=5000.01，未调用get_expense_detail获取招待记录详情以计算人均费用，无attendee_count相关操作。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-travel",
+      "value": 1,
+      "reason": "候选提交描述了使用职级、城市档位和住宿晚数计算每夜间费率",
+      "answer_evidence": "对883条记录中amount>1100的130条，逐条获取详情（city_tier/nights/employee_level）计算每夜间费率",
+      "trace_evidence": "trace中调用了get_expense_detail（如R004233）获取city_tier、employee_level、days字段",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-transport",
+      "value": 1,
+      "reason": "候选提交描述了使用城市档位和出差天数计算日均费率",
+      "answer_evidence": "对770条记录中amount>120的317条，逐条获取详情（city_tier/days）计算日均费率",
+      "trace_evidence": "trace中调用了get_expense_detail（如R001201）获取city_tier、days字段",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 0,
+      "reason": "候选提交仅发现3条异常，与预期的6条不一致，中间统计不可能为6",
+      "answer_evidence": "候选提交列出ANO-L3-003-001至003共3条发现",
+      "trace_evidence": "trace中list_expenses和get_expense_detail未产生6条统计，最终提交为3条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 0,
+      "reason": "候选提交未引用01_expense_reimbursement_2025.md的第十二条",
+      "answer_evidence": "候选提交的citations和正文未提及该条款",
+      "trace_evidence": "trace中虽读取了01_expense_reimbursement_2025.md但最终未引用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-special",
+      "value": 1,
+      "reason": "候选提交在回答中针对每种费用类型明确引用了对应的专项制度及条款，查询条件与制度标准一致。",
+      "answer_evidence": "办公用品：引用《办公与通讯费用管理办法》第二条（600元）；通讯费：第三条（300元）；培训费：《培训费管理办法》第二条（3500元）；业务招待费：《业务招待费管理办法》第二条（5000元）；差旅住宿费：《差旅费管理办法》第四条；市内交通费：第六条。",
+      "trace_evidence": "工具调用获取了07_office_communication.md（第二条、第三条）、05_training_expense.md（第二条）、04_travel_expense.md（第四条、第六条）和06_business_entertainment.md（第二条），并与查询条件对应。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 318.78,
+    "expected_anomaly_ids": [
+      "OVERSTD-001",
+      "OVERSTD-002",
+      "OVERSTD-003",
+      "OVERSTD-004",
+      "OVERSTD-005",
+      "OVERSTD-006"
+    ],
+    "actual_anomaly_ids": [
+      "ANO-L3-003-001",
+      "ANO-L3-003-002",
+      "ANO-L3-003-003"
+    ],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.666667,
+      "count_exact": false,
+      "expected_types": {
+        "OVERSTD": 6
+      },
+      "actual_types": {
+        "OVERSTD": 3
+      }
+    },
+    "expected_record_ids": [
+      "R004221",
+      "R004222",
+      "R004223",
+      "R004224",
+      "R004225",
+      "R004226"
+    ],
+    "actual_record_ids": [
+      "R004221",
+      "R004222",
+      "R004223"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.666667,
+      "exact": false,
+      "missing_count": 3,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 3,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十二条"
+      },
+      {
+        "doc_id": "04_travel_expense.md",
+        "clause_no": "第三条至第六条"
+      },
+      {
+        "doc_id": "05_training_expense.md",
+        "clause_no": "第二条至第五条"
+      },
+      {
+        "doc_id": "06_business_entertainment.md",
+        "clause_no": "第二条、第三条"
+      },
+      {
+        "doc_id": "07_office_communication.md",
+        "clause_no": "第二条、第三条"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 0.975,
+    "overall_comment": "候选仅提交了3项异常，缺少R004224、R004225、R004226，所有检查项均不满足。；前三项记录正确映射，但R004224未被识别，导致该检查项不通过。；候选执行了全量扫描，但遗漏R004224-R004226三条记录，且未有效排除专项审批记录。检查项中仅全量扫描覆盖度符合要求。；办公用品、通讯费用和培训费的单笔超标检查满足要求，但业务招待费缺少人均300元标准核查，因此未完全满足checklist。；候选提交正确描述了差旅住宿和市内交通的扫描方法，但发现数量不足，且缺少总则引用。；候选提交完整引用了各费用类型对应的专项标准，满足检查项要求。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 70236,
+      "completion_tokens": 9646,
+      "total_tokens": 79882,
+      "prompt_cache_hit_tokens": 5760,
+      "prompt_cache_miss_tokens": 64476
+    },
+    "batch_count": 6,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 11760,
+          "completion_tokens": 688,
+          "total_tokens": 12448,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 337
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 10736
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 11782,
+          "completion_tokens": 1509,
+          "total_tokens": 13291,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1114
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 10758
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 11766,
+          "completion_tokens": 2201,
+          "total_tokens": 13967,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1694
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 10742
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 11757,
+          "completion_tokens": 1866,
+          "total_tokens": 13623,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1280
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 10733
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 11761,
+          "completion_tokens": 1793,
+          "total_tokens": 13554,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1320
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 10737
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 11410,
+          "completion_tokens": 1589,
+          "total_tokens": 12999,
+          "prompt_tokens_details": {
+            "cached_tokens": 640
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1352
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 10770
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 1
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/openclaude-scripted-enhanced/L3-003"
+}

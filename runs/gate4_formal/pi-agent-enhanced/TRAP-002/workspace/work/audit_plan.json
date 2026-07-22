@@ -1,0 +1,75 @@
+{
+  "task_id": "TRAP-002",
+  "task_type": "clean_but_suspicious",
+  "task_question": "请核查R004234和R004235是否构成重复报销或拆分报销。必须核对发票是否相同及7天内合计金额；若不构成异常，请明确说明无异常、原因和制度依据。",
+  "audit_scope": {
+    "record_ids": ["R004234", "R004235"],
+    "employee_id": "E0009",
+    "department_id": "D009",
+    "expense_type": "office_supplies",
+    "audit_period": "2025-10-13 to 2025-10-27 (7-day window around expense_date 2025-10-20)"
+  },
+  "policy_questions": [
+    {
+      "rule": "重复报销 (Duplicate Reimbursement)",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十条",
+      "question": "R004234和R004235是否使用了同一张发票？"
+    },
+    {
+      "rule": "拆分报销 (Split Reimbursement)",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十一条",
+      "question": "R004234和R004235是否由同一员工、同一费用类型在7天内发生2笔及以上报销，且合计金额达到《授权管理办法》附件二较高审批线（≥3000元）？"
+    },
+    {
+      "rule": "办公用品月度控制",
+      "policy_doc": "07_office_communication.md",
+      "clause": "第二条",
+      "question": "E0009在2025年10月的办公用品报销合计是否超过600元月度上限？"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "R004234和R004235各自使用哪张发票？",
+      "method": "get_expense_detail",
+      "records": ["R004234", "R004235"]
+    },
+    {
+      "question": "E0009在2025-10-13至2025-10-27期间是否有其他office_supplies报销？",
+      "method": "list_expenses",
+      "filters": {"employee_id": "E0009", "expense_type": "office_supplies", "date_from": "2025-10-13", "date_to": "2025-10-27"}
+    }
+  ],
+  "complexity": 2,
+  "complexity_reasons": [
+    "Two business rules: duplicate (Art.10) and split (Art.11)",
+    "Date boundary: 7-day window check",
+    "Amount threshold: higher approval line (≥3000)",
+    "Cross-reference to authorization management policy"
+  ],
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "Narrow scope (2 records), straightforward rules, no policy version ambiguity. Main agent is sufficient."
+  },
+  "execution_steps": [
+    "1. Get expense details for R004234 and R004235",
+    "2. Verify invoice identity (same or different)",
+    "3. Check 7-day window for same employee/type records",
+    "4. Compare total against higher approval line (3000)",
+    "5. Check monthly office supplies cap (600)",
+    "6. Policy-version-check (confirm 2025 policy applies)",
+    "7. Form conclusion",
+    "8. Evidence-coverage-check",
+    "9. False-positive-review (triggered: clean_but_suspicious + no-anomaly conclusion)",
+    "10. Audit-report",
+    "11. Result-validator",
+    "12. Validate and submit"
+  ],
+  "stopping_conditions": [
+    "Invoice identity confirmed (same/different)",
+    "7-day total calculated and compared to threshold",
+    "Conclusion clear: anomaly or no anomaly"
+  ],
+  "unresolved_items": []
+}

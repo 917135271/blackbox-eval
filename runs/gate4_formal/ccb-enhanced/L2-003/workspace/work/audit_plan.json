@@ -1,62 +1,74 @@
 {
   "task_id": "L2-003",
-  "task_question": "结合制度和业务数据,核查以R000020为线索的重复报销异常,返回异常ID和记录ID集合。",
-  "scope": {
+  "task_type": "policy_data_comparison",
+  "audit_scope": {
+    "question": "结合制度和业务数据，核查以R000020为线索的重复报销异常，返回发现ID和record_id集合，并说明关键业务事实和制度依据。",
     "clue_record": "R000020",
-    "rule": "Article 10 - 同一发票最多报销1次",
-    "expense_types": ["travel_lodging"],
+    "rule": "Article 10 (同一发票最多报销1次 — 重复报销风险)",
+    "expense_type": "travel_lodging",
     "period": "2025-01-01 to 2025-12-31",
-    "organization": "财务管理部 (D009)"
+    "organization": "E0028 (杜丹), D009 (财务管理部)"
   },
-  "audit_period": "2025-01-01 to 2025-12-31",
   "policy_questions": [
     {
-      "question": "Which policy version applies to R000020 (expense_date 2025-01-05) and R004203 (expense_date 2025-04-10)?",
-      "applicable_policy": "01_expense_reimbursement_2025.md",
-      "clause": "第十条 (Article 10)",
-      "clause_text": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。"
+      "id": "PQ-1",
+      "question": "Article 10 of 2025 Expense Reimbursement Policy: 同一发票是否在不同报销单中重复出现？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十条 同一发票最多报销1次。发现同一发票在不同报销单中重复出现的，应认定为重复报销风险。",
+      "boundaries": "Invoice FP202500000020 must appear in at most 1 reimbursement record."
+    },
+    {
+      "id": "PQ-2",
+      "question": "Article 11 splitting check: 同一员工、同一费用类型在7天内是否出现2笔及以上报销？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十一条...同一员工、同一费用类型在7天内出现2笔及以上报销，且合计金额达到较高审批线的，应重点核查拆分规避审批。",
+      "note": "R000020 (2025-01-05) and R004203 (2025-04-10) are 95 days apart — NOT within 7 days. Article 11 does NOT apply."
     }
   ],
   "data_questions": [
     {
-      "question": "Is invoice FP202500000020 used in multiple expense records?",
-      "findings": "INV000020 appears in R000020 and R004203, usage_count=2",
-      "evidence_source": "find_reused_invoices + get_expense_detail"
+      "id": "DQ-1",
+      "question": "How many records use invoice FP202500000020?",
+      "result": "2 records: R000020 and R004203, both by employee E0028 (杜丹)"
     }
   ],
-  "required_fields": ["record_id", "invoice_no", "invoice_id", "expense_date", "amount", "status", "employee_id", "department_id"],
+  "required_fields": [
+    "record_id", "record_no", "employee_id", "employee_name", "department_id",
+    "expense_date", "reimburse_date", "expense_type", "amount",
+    "invoice_id", "invoice_no", "invoice_date", "invoice_amount",
+    "status", "reason", "approvals"
+  ],
   "evidence_requirements": [
-    "Policy document: 01_expense_reimbursement_2025.md, Article 10",
-    "Record R000020 detail from get_expense_detail",
-    "Record R004203 detail from get_expense_detail",
-    "Reused invoice list from find_reused_invoices confirming INV000020 usage_count=2"
+    "Invoice usage report for FP202500000020 showing both records",
+    "Full record details for R000020 and R004203",
+    "Policy text for Article 10 of 2025 Expense Reimbursement Policy"
   ],
   "execution_steps": [
-    {"step": "planning", "status": "completed", "artifact": "work/audit_plan.json"},
-    {"step": "policy_version_check", "status": "pending", "trigger": "policy_version_applicability"},
-    {"step": "data_analysis", "status": "completed", "findings": "Same invoice FP202500000020 in R000020 and R004203"},
-    {"step": "evidence_coverage_check", "status": "pending"},
-    {"step": "false_positive_review", "status": "pending", "trigger": "duplicate_invoice_exception_check"},
-    {"step": "audit_report", "status": "pending"},
-    {"step": "result_validation", "status": "pending"},
-    {"step": "submission", "status": "pending"}
+    "1. [DONE] Query R000020 detail",
+    "2. [DONE] Search policy for duplicate reimbursement clauses",
+    "3. [DONE] Get full 2025 Expense Reimbursement Policy",
+    "4. [DONE] Find invoice FP202500000020 usage → found 2 records (R000020, R004203)",
+    "5. [DONE] Get R004203 detail",
+    "6. [PENDING] Run policy-version-check (confirm 2025 policy applies)",
+    "7. [PENDING] Run batch-expense-analysis (verify no additional related records)",
+    "8. [PENDING] Run evidence-coverage-check",
+    "9. [PENDING] Run false-positive-review (check for exemptions/exceptions)",
+    "10. [PENDING] Run audit-report",
+    "11. [PENDING] Run result-validator",
+    "12. [PENDING] Validate and submit"
   ],
   "complexity": {
-    "score": 2,
+    "score": 1,
     "reasons": [
-      "Single rule (Article 10 - duplicate invoice)",
-      "Involves reused invoice batch lookup across records",
-      "Requires date-boundary check for policy applicability"
-    ]
+      "Single rule (Article 10 — same invoice duplicate)",
+      "No policy version ambiguity (both records in 2025, under 2025 policy)",
+      "Simple lookup (invoice usage count = 2)",
+      "No aggregation or complex joins needed",
+      "Article 11 not applicable (95 days apart)",
+      "No thresholds, exemptions, or exceptions in scope"
+    ],
+    "subagent_plan": "None — complexity 1 task handled in main agent"
   },
-  "subagent_plan": {
-    "required": false,
-    "reason": "Direct evidence available; complexity 2 with single-rule, single-policy scope. Both records already retrieved. No professional subagent needed."
-  },
-  "stopping_conditions": [
-    "All records using invoice INV000020 identified and verified",
-    "Policy applicability confirmed for both records",
-    "No valid exemptions or exceptions found for the duplicate usage"
-  ],
+  "stopping_condition": "Evidence matrix passes (100% coverage), validation passes, submission accepted",
   "unresolved_items": []
 }

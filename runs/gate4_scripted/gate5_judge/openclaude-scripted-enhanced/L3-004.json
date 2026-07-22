@@ -1,0 +1,379 @@
+{
+  "group": "openclaude-scripted-enhanced",
+  "task_id": "L3-004",
+  "case_family": "full_year_audit",
+  "category": "full_year_rule_audit",
+  "graded_at": "2026-07-22T00:58:14+08:00",
+  "checklist_passed": 23,
+  "checklist_total": 24,
+  "checklist_pass_rate": 95.833,
+  "checklist": [
+    {
+      "id": "finding-type-count-rule-type",
+      "value": 1,
+      "reason": "发现规则类型完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "finding-type-count-count",
+      "value": 1,
+      "reason": "发现数量完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r000079",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r000312",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r000894",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r002009",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r003479",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r003968",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "D001部门与关键记录R000079对应正确",
+      "answer_evidence": "候选答案中明确：投资银行部(D001)超预算关键记录为R000079",
+      "trace_evidence": "工具调用get_expense_detail(R000079)确认部门为D001，且报销日期为2025-10-21，符合首次超预算逻辑",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "D002部门与关键记录R002009对应正确",
+      "answer_evidence": "候选答案中明确：固定收益部(D002)超预算关键记录为R002009",
+      "trace_evidence": "工具调用list_expenses(D002)和summarize_expenses(D002)获取了D002的已批准费用列表，R002009在结果中",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "D003部门与关键记录R003968对应正确",
+      "answer_evidence": "候选答案中明确：财富管理部(D003)超预算关键记录为R003968",
+      "trace_evidence": "工具调用list_expenses(D003)和summarize_expenses(D003)获取了D003的费用数据，R003968在已批准记录中",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 1,
+      "reason": "D004部门与关键记录R000894对应正确",
+      "answer_evidence": "候选答案中明确：研究所(D004)超预算关键记录为R000894",
+      "trace_evidence": "工具调用list_expenses(D004)和get_expense_detail(R000894)确认了D004和R000894的对应关系",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 1,
+      "reason": "D005部门关键记录R003479对应正确",
+      "answer_evidence": "答案明确列出L3-004-ANOM-005：机构业务部(D005)关键记录R003479",
+      "trace_evidence": "工具轨迹中get_expense_detail('R000479')? 实际为list_expenses D005批量获取，未直接验证单条，但答案与期望一致",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 1,
+      "reason": "D006部门关键记录R000312对应正确",
+      "answer_evidence": "答案明确列出L3-004-ANOM-006：运营管理部(D006)关键记录R000312",
+      "trace_evidence": "轨迹中list_expenses D006包含R000312记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "轨迹覆盖全部部门全年记录",
+      "answer_evidence": "答案覆盖D001至D006共6个部门",
+      "trace_evidence": "工具调用对所有6个部门执行了list_expenses，部分多次分页，包含summarize_department_budgets",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-grouping",
+      "value": 1,
+      "reason": "累计计算以部门分组",
+      "answer_evidence": "答案按部门分别累计费用并列示超预算情况",
+      "trace_evidence": "工具调用中list_expenses均指定department_id独立获取，部门间无交叉",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-ordering",
+      "value": 1,
+      "reason": "候选提交明确说明按reimburse_date升序、同日期按record_id升序累计，工具调用中list_expenses均指定order_by='reimburse_date'，且提交结果与预期完全一致。",
+      "answer_evidence": "答案描述：按reimburse_date升序、同日期按record_id升序。",
+      "trace_evidence": "list_expenses调用示例：order_by='reimburse_date'，多部门分页获取approved记录。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-cumulative",
+      "value": 1,
+      "reason": "候选提交提供了每个部门触发记录前后的累计金额，如D001累计至R000079时支出231,778.58元，可对照工具获取的明细列表逐笔复核。",
+      "answer_evidence": "答案中D001示例：累计支出231,778.58元首次超过预算。",
+      "trace_evidence": "已通过list_expenses获取各部门全部approved记录（如D001第1页500条、第2页100条），数据完整，可支持逐笔累计。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-crossing",
+      "value": 1,
+      "reason": "每个关键记录均声明为累计首次超预算且special_approval=0，与预期异常记录集合一致，且无专项审批证据可追溯。",
+      "answer_evidence": "每个发现均说明‘首次超过预算’和‘无专项审批(special_approval=0)’。",
+      "trace_evidence": "get_expense_detail(R000079)返回记录，审批无异常。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 1,
+      "reason": "提交发现覆盖6个部门，与summarize_department_budgets中usage_rate>1的部门一致，最终发现数量6项匹配。",
+      "answer_evidence": "答案列出6个发现对应6个部门。",
+      "trace_evidence": "summarize_department_budgets显示D001-D006的usage_rate均超过1，为6个超预算部门。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "候选提交明确引用了01_expense_reimbursement_2025.md第十三条，符合超预算总则条款要求。",
+      "answer_evidence": "候选提交的citations中包含{\"clause_no\": \"第十三条\", \"doc_id\": \"01_expense_reimbursement_2025.md\"}。",
+      "trace_evidence": "工具调用get_policy_doc获取了01_expense_reimbursement_2025.md文档，该文档包含第十三条超预算条款。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-budget",
+      "value": 0,
+      "reason": "候选提交仅引用预算管理办法第三条和第四条，未引用第二条，未完全满足“引用预算约束及专项审批条款”的要求。",
+      "answer_evidence": "候选提交的citations中仅包含08_budget_management.md的第三条和第四条，缺少第二条。",
+      "trace_evidence": "工具调用get_policy_doc获取了08_budget_management.md文档，其第二条至第四条为预算约束与专项审批条款，但答案未引用第二条。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 370.729,
+    "expected_anomaly_ids": [
+      "BUDGET-001",
+      "BUDGET-002",
+      "BUDGET-003",
+      "BUDGET-004",
+      "BUDGET-005",
+      "BUDGET-006"
+    ],
+    "actual_anomaly_ids": [
+      "L3-004-ANOM-001",
+      "L3-004-ANOM-002",
+      "L3-004-ANOM-003",
+      "L3-004-ANOM-004",
+      "L3-004-ANOM-005",
+      "L3-004-ANOM-006"
+    ],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {
+        "BUDGET": 6
+      },
+      "actual_types": {
+        "BUDGET": 6
+      }
+    },
+    "expected_record_ids": [
+      "R000079",
+      "R000312",
+      "R000894",
+      "R002009",
+      "R003479",
+      "R003968"
+    ],
+    "actual_record_ids": [
+      "R000079",
+      "R002009",
+      "R003968",
+      "R000894",
+      "R003479",
+      "R000312"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 3,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十三条"
+      },
+      {
+        "doc_id": "08_budget_management.md",
+        "clause_no": "第二条至第四条"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 0.985,
+    "overall_comment": "所有检查的部门与关键记录映射均与预期一致，四个检查项全部通过。；候选提交完全满足所有检查项；候选提交准确执行了全年超预算专项扫描，排序、累计、触发点选择和数量均符合制度要求，所有检查项通过。；费用报销政策引用正确，但预算管理办法缺少第二条引用，未完全满足要求。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 62973,
+      "completion_tokens": 5093,
+      "total_tokens": 68066,
+      "prompt_cache_hit_tokens": 3712,
+      "prompt_cache_miss_tokens": 59261
+    },
+    "batch_count": 4,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 15860,
+          "completion_tokens": 751,
+          "total_tokens": 16611,
+          "prompt_tokens_details": {
+            "cached_tokens": 1152
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 276
+          },
+          "prompt_cache_hit_tokens": 1152,
+          "prompt_cache_miss_tokens": 14708
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 15797,
+          "completion_tokens": 1287,
+          "total_tokens": 17084,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 918
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 14773
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 15783,
+          "completion_tokens": 2072,
+          "total_tokens": 17855,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1508
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 14759
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 15533,
+          "completion_tokens": 983,
+          "total_tokens": 16516,
+          "prompt_tokens_details": {
+            "cached_tokens": 512
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 697
+          },
+          "prompt_cache_hit_tokens": 512,
+          "prompt_cache_miss_tokens": 15021
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 2
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/openclaude-scripted-enhanced/L3-004"
+}

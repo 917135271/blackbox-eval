@@ -1,63 +1,23 @@
 {
-  "task_scope": {
-    "audit_object": "重复报销风险扫描 - 同一发票在多个报销记录中出现",
-    "expense_types": "全部",
-    "period": "2025-01-01 至 2025-12-31",
-    "organization_scope": "全部部门",
-    "applicable_policy": "XX证券费用报销管理办法(2025修订版)",
-    "applicable_clause": "第十条",
-    "rule_text": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的，应认定为重复报销风险。"
+  "task_id": "L3-001",
+  "question": "全年重复报销专项扫描",
+  "complexity": 1,
+  "scope": {
+    "rule": "第十条 同一发票最多报销1次",
+    "period": "2025-01-01至2025-12-31",
+    "method": "全量扫描find_reused_invoices(min_usage_count=2)，逐组核实发票号、金额、员工一致性"
   },
-  "policy_questions": [
-    {
-      "question": "2025修订版第十条是否对特定费用类型有豁免？",
-      "status": "resolved",
-      "answer": "规则明确：同一发票最多报销1次，无例外说明"
-    }
+  "steps": [
+    {"step": "查询制度依据", "status": "completed"},
+    {"step": "全量扫描重复发票", "status": "completed"},
+    {"step": "逐组核实记录详情", "status": "completed"},
+    {"step": "policy-version-check", "status": "pending"},
+    {"step": "evidence-coverage-check", "status": "pending"},
+    {"step": "false-positive-review", "status": "pending"},
+    {"step": "audit-report", "status": "pending"},
+    {"step": "result-validator", "status": "pending"},
+    {"step": "validate_audit_result提交", "status": "pending"}
   ],
-  "data_questions": [
-    {
-      "question": "2025年全年共有多少条报销记录？",
-      "status": "pending"
-    },
-    {
-      "question": "哪些invoice_no在≥2条报销记录中出现？",
-      "status": "pending"
-    },
-    {
-      "question": "重复发票的关联记录详情是什么？",
-      "status": "pending"
-    }
-  ],
-  "required_fields": ["record_id", "invoice_no", "expense_date", "amount", "employee_id", "department_id", "expense_type", "status", "special_approval"],
-  "evidence_requirements": [
-    "全量2025年报销记录的invoice_no分组统计",
-    "每条重复发票的所有关联record详情",
-    "政策第十条原文确认"
-  ],
-  "execution_steps": [
-    {"step": "确认政策条款", "status": "pending"},
-    {"step": "遍历2025年全部报销记录获取invoice_no", "status": "pending"},
-    {"step": "按invoice_no分组，筛选出现≥2次的发票", "status": "pending"},
-    {"step": "获取重复发票的所有关联record完整详情", "status": "pending"},
-    {"step": "保存结果并生成摘要", "status": "pending"}
-  ],
-  "complexity": 2,
-  "complexity_reasons": [
-    "单规则任务(第十条)",
-    "全量分组统计(约4240条记录)",
-    "需按invoice_no分组聚合",
-    "无多政策版本问题"
-  ],
-  "subagent_plan": {
-    "role": "data_analyst",
-    "reason_code": "MULTI_RECORD_SCOPE",
-    "note": "主智能体已将任务委派给data_analyst角色，本角色直接执行数据分析"
-  },
-  "stopping_conditions": [
-    "已遍历2025年全年全部报销记录",
-    "已对每个重复发票获取所有关联记录详情",
-    "已生成duplicate_invoices.json和summary.json"
-  ],
-  "unresolved_items": []
+  "subagent_required": false,
+  "reason_no_subagent": "复杂度1，单规则扫描，无需子智能体"
 }

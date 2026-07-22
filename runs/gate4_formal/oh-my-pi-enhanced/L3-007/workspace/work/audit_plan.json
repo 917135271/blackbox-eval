@@ -2,87 +2,55 @@
   "task_id": "L3-007",
   "task_type": "two_hop_retrieval",
   "question": "报销办法没有直接列审批金额时,请通过交叉引用找到单笔费用审批档位。",
-  "audit_object": "单笔费用审批档位（通过政策交叉引用检索）",
-  "audit_period": "2025年度",
-  "organization_scope": "XX证券全部门",
+  "audit_scope": {
+    "object": "单笔费用报销审批档位",
+    "expense_types": ["all"],
+    "business_period": "2025-01-01 to present",
+    "organization_scope": "XX证券全部门",
+    "deliverable": "通过交叉引用找到费用报销审批权限表,并核查系统中审批角色是否符合档位要求"
+  },
   "policy_questions": [
-    {
-      "id": "Q1",
-      "question": "2025年费用报销办法中审批金额是否直接列示？如未列示，引用了哪个制度的哪个部分？",
-      "policy_docs": ["01_expense_reimbursement_2025.md"],
-      "target_clauses": ["第五条"]
-    },
-    {
-      "id": "Q2",
-      "question": "被引用的《XX证券授权管理办法》附件二中单笔费用审批档位（含金额区间和审批角色）是什么？",
-      "policy_docs": ["03_authorization_management.md"],
-      "target_clauses": ["附件二"]
-    }
+    "01_expense_reimbursement_2025.md第五条是否未直接列示审批金额?",
+    "01_expense_reimbursement_2025.md第五条引用了哪个制度的哪个附件?",
+    "03_authorization_management.md附件二列示了哪些审批档位和金额区间?",
+    "01_expense_reimbursement_2025.md第十一条的拆分规避审批规则如何引用附件二的较高审批线?"
   ],
-  "data_questions": [],
-  "required_fields": [],
+  "data_questions": [
+    "已审批记录中,AR-02档位(≥3000且<10000元)的记录是否缺失'财务复核'审批?",
+    "AR-03及以上档位(≥10000元)的记录是否存在?"
+  ],
+  "required_fields": [
+    "record_id", "amount", "tier_id", "approver_role",
+    "employee_id", "expense_type", "expense_date", "status"
+  ],
   "evidence_requirements": [
-    "01_expense_reimbursement_2025.md 第五条原文",
-    "03_authorization_management.md 附件二原文",
-    "交叉引用路径完整性验证"
+    "01_expense_reimbursement_2025.md 第五条全文",
+    "03_authorization_management.md 附件二审批权限表全文",
+    "AR-02档位记录列表及对应审批链"
   ],
   "execution_steps": [
-    {
-      "step": 1,
-      "name": "policy_version_check",
-      "description": "确认2025版报销办法为现行有效制度，2022版已废止；确认授权管理办法现行有效",
-      "output": "work/policy_applicability.json"
-    },
-    {
-      "step": 2,
-      "name": "cross_reference_verification",
-      "description": "验证报销办法第五条→授权管理办法附件二的交叉引用路径",
-      "output": "引用路径确认"
-    },
-    {
-      "step": 3,
-      "name": "evidence_coverage_check",
-      "description": "构建无异常证据矩阵，验证政策引用完整性",
-      "output": "work/evidence_matrix.json"
-    },
-    {
-      "step": 4,
-      "name": "audit_report",
-      "description": "撰写审计报告，给出交叉引用得到的审批档位",
-      "output": "work/report_draft.json"
-    },
-    {
-      "step": 5,
-      "name": "result_validation",
-      "description": "校验最终结果格式和内容",
-      "output": "work/validation_report.json"
-    },
-    {
-      "step": 6,
-      "name": "submission",
-      "description": "提交最终审计结果",
-      "output": "work/final_result.json"
-    }
+    "1. 读取01_expense_reimbursement_2025.md第五条确认交叉引用路径",
+    "2. 读取03_authorization_management.md附件二获取审批档位表",
+    "3. SQLite批量查询AR-02档位记录",
+    "4. 逐条核查AR-02记录是否缺失财务复核审批",
+    "5. 证据覆盖检查",
+    "6. 审计报告和提交"
   ],
   "complexity": {
-    "score": 1,
+    "score": 2,
     "reasons": [
-      "纯政策事实检索，无数据分析需求",
-      "仅涉及两条制度的直接交叉引用",
-      "无聚合、分组、批处理或异常检测"
+      "涉及两份政策文件交叉引用(01和03)",
+      "涉及审批金额档位阈值判断"
     ]
   },
   "subagent_plan": {
-    "policy_researcher": false,
-    "data_analyst": false,
-    "independent_reviewer": false,
-    "reason": "复杂度1，保持主智能体紧凑模式执行"
+    "needed": false,
+    "reason": "政策交叉引用直接明确(第五条→附件二),数据分析为简单金额区间过滤,无需专业子智能体"
   },
   "stopping_conditions": [
-    "交叉引用路径验证完成",
-    "审批档位信息完整获取",
-    "证据矩阵覆盖率100%",
-    "结果校验通过"
+    "所有AR-02档位记录的审批链已核查完毕",
+    "证据矩阵覆盖率达到100%",
+    "validation_report通过"
   ],
   "unresolved_items": []
 }

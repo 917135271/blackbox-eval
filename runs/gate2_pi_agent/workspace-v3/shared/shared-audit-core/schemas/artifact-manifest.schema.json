@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "artifact-manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "artifacts"],
+  "properties": {
+    "task_id": {"type": "string", "minLength": 1},
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256", "size_bytes", "owner"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "size_bytes": {"type": "integer", "minimum": 0},
+          "owner": {"type": "string", "minLength": 1},
+          "invocation_id": {"type": "string"}
+        }
+      }
+    }
+  }
+}

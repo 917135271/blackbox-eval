@@ -3,30 +3,36 @@
   "errors": [],
   "warnings": [],
   "field_checks": {
-    "anomaly_ids_present": true,
-    "record_ids_present": true,
-    "answer_present": true,
-    "citations_present": true,
-    "anomaly_ids_format": "all string, non-empty, unique",
-    "record_ids_format": "all match R000000 pattern, unique"
+    "anomaly_ids": {"present": true, "type": "array", "non_empty": true, "all_strings": true, "unique": true},
+    "record_ids": {"present": true, "type": "array", "non_empty": true, "all_match_pattern": true, "unique": true},
+    "answer": {"present": true, "type": "string", "non_empty": true},
+    "citations": {"present": true, "type": "array", "non_empty": true, "all_have_doc_id_and_clause": true},
+    "no_extra_fields": true
   },
   "id_checks": {
-    "anomaly_id_count": 359,
-    "record_id_count": 812,
-    "anomaly_ids_unique": true,
-    "record_ids_unique": true,
-    "all_record_ids_in_evidence": true
+    "record_ids_in_db": {"R004221": true, "R004222": true, "R004223": true, "R004225": true, "R004226": true},
+    "anomaly_ids_non_empty": true,
+    "anomaly_ids_match_evidence_rows": true,
+    "doc_ids_in_corpus": true
   },
   "evidence_checks": {
+    "status": "pass",
     "coverage_percent": 100,
-    "all_anomalies_have_evidence": true,
-    "all_records_accounted": true
+    "rows_match_anomalies": true,
+    "submitted_matches_final": true,
+    "no_unowned": true,
+    "no_unused": true,
+    "no_missing": true
   },
   "answer_consistency_checks": {
-    "answer_matches_findings": true,
-    "cited_clauses_match_policies": true
+    "mentions_all_anomaly_ids": true,
+    "mentions_all_record_ids": true,
+    "thresholds_stated": true,
+    "no_anomaly_stated_for_business_entertainment": true,
+    "methodology_described": true,
+    "policy_basis_described": true
   },
-  "repair_count": 0,
+  "repair_count": 1,
   "repairable_fields": [],
   "submission_allowed": true
 }

@@ -1,0 +1,317 @@
+{
+  "group": "pi-agent-scripted-enhanced",
+  "task_id": "L3-010",
+  "case_family": "retrieval_and_report",
+  "category": "audit_report",
+  "graded_at": "2026-07-22T01:08:10+08:00",
+  "checklist_passed": 11,
+  "checklist_total": 11,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "current-threshold-version",
+      "value": 1,
+      "reason": "明确说明2025修订版为现行版本",
+      "answer_evidence": "【新版】《XX证券费用报销管理办法(2025修订版)》...效力状态：自2025年1月1日起施行，现行有效。",
+      "trace_evidence": "工具调用获取了01_expense_reimbursement_2025.md，确认2025修订版存在。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-threshold-amount",
+      "value": 1,
+      "reason": "明确给出部门总经理审批线10000元",
+      "answer_evidence": "AR-03 | [10000, 50000) | 部门总经理",
+      "trace_evidence": "工具调用获取03_authorization_management.md附件二，其中AR-03区间为[10000,50000)",
+      "source": "llm_judge"
+    },
+    {
+      "id": "old-threshold-status-amount",
+      "value": 1,
+      "reason": "明确给出旧版金额8000元",
+      "answer_evidence": "单笔报销金额>=8000元 -> 部门总经理审批",
+      "trace_evidence": "工具调用获取02_expense_reimbursement_2022_deprecated.md，其第二条明确8000元需部门总经理审批。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "old-threshold-status-status",
+      "value": 1,
+      "reason": "明确说明旧版已废止",
+      "answer_evidence": "效力状态：已于2025年1月1日废止，被2025修订版替代，不得作为现行审批依据。",
+      "trace_evidence": "02_expense_reimbursement_2022_deprecated.md第一条明确‘仅作为制度沿革留档’，第四条声明‘审批金额已被后续制度替代，不得作为现行审批依据’。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "cross-reference-expense",
+      "value": 1,
+      "reason": "候选答案明确引用费用报销办法第五条。",
+      "answer_evidence": "“2025修订版费用报销管理办法第五条明确规定：单笔费用报销的审批权限不在本办法正文列示具体金额”",
+      "trace_evidence": "工具get_policy_doc返回01_expense_reimbursement_2025.md，其中第五条内容相同。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "cross-reference-relation",
+      "value": 1,
+      "reason": "候选答案正确说明第五条将审批金额授权给附件二。",
+      "answer_evidence": "“统一按《XX证券授权管理办法》附件二执行。费用系统应按附件二自动派生审批角色。”",
+      "trace_evidence": "工具get_policy_doc返回01_expense_reimbursement_2025.md第五条和03_authorization_management.md附件二。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "cross-reference-authorization",
+      "value": 1,
+      "reason": "候选答案引用附件二中的现行金额（AR-01至AR-05档位及审批角色）。",
+      "answer_evidence": "“费用报销审批权限表(AR-01至AR-05)”并列出具体金额区间。",
+      "trace_evidence": "工具get_policy_doc返回03_authorization_management.md附件二，包含各档位金额与审批角色。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "risk-explanation-risk",
+      "value": 1,
+      "reason": "候选答案具体说明了使用8000元旧线会扩大升级审批范围并造成误判。",
+      "answer_evidence": "“8000元<=金额<10000元，旧版认为需部门总经理，新版AR-02仍是部门经理+财务复核，误以为部门经理单签不足需追加部门总经理。”",
+      "trace_evidence": "工具list_records_missing_approval发现3000-10000区间记录缺失财务复核，印证旧线陷阱。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "risk-explanation-control",
+      "value": 1,
+      "reason": "候选答案明确列出了6项可执行的版本校验措施，如制度生效日期校验、交叉引用链完整性检查、审批角色派生验证等。",
+      "answer_evidence": "四、版本校验措施：1.制度生效日期校验；2.交叉引用链完整性检查；3.审批角色派生验证；4.阈值边界专项抽样；5.版本废止标记检查；6.定期制度一致性审计。",
+      "trace_evidence": "工具调用获取了新旧制度文档，识别了审批线差异，并在最终答案中提出6条措施。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape",
+      "value": 1,
+      "reason": "候选答案以审计说明形式提交，结构完整，包含新旧审批线、效力状态、交叉引用依据、误判说明和校验建议，表达一致无矛盾。",
+      "answer_evidence": "候选答案标题为“版本陷阱审计说明”，分四部分阐述新旧审批线、交叉引用、误判和校验措施，信息完整且一致。",
+      "trace_evidence": "答案本身即为提交字段，无额外轨迹。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 460.818,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [
+      "VT-001"
+    ],
+    "anomaly_metrics": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "count_exact": false,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": null,
+    "actual_record_ids": [
+      "R004233",
+      "R004207",
+      "R004208",
+      "R004217",
+      "R004218",
+      "R004219",
+      "R004220",
+      "R004236",
+      "R004237",
+      "R004212",
+      "R004213",
+      "R004223",
+      "R004214",
+      "R004215",
+      "R004216",
+      "R004209",
+      "R004210",
+      "R004211",
+      "R003850",
+      "R000712",
+      "R002489",
+      "R000003",
+      "R002871",
+      "R001909",
+      "R001842",
+      "R003140",
+      "R002637",
+      "R000468",
+      "R001937",
+      "R002369",
+      "R000297",
+      "R003872",
+      "R003498",
+      "R002844",
+      "R002590",
+      "R003947",
+      "R002839",
+      "R001442",
+      "R001486",
+      "R000102",
+      "R003735",
+      "R002853",
+      "R000194",
+      "R002474",
+      "R001342",
+      "R000152",
+      "R000241",
+      "R001666",
+      "R001917",
+      "R001468",
+      "R002564",
+      "R003401",
+      "R001490",
+      "R001020",
+      "R002639",
+      "R002239",
+      "R001447",
+      "R001986",
+      "R000217",
+      "R003064",
+      "R001195",
+      "R003543",
+      "R004096",
+      "R001252",
+      "R001718",
+      "R003275",
+      "R004114",
+      "R000801",
+      "R000470",
+      "R002751",
+      "R003366",
+      "R002040",
+      "R001210",
+      "R002725",
+      "R002235",
+      "R000753",
+      "R001886",
+      "R001160",
+      "R001310",
+      "R003201",
+      "R000508",
+      "R003263",
+      "R000876",
+      "R003011",
+      "R003656",
+      "R000588",
+      "R000549",
+      "R003432",
+      "R001280",
+      "R001219",
+      "R001560",
+      "R004181",
+      "R001503",
+      "R001990",
+      "R003869"
+    ],
+    "record_metrics": null,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 8,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第五条、第十四条"
+      },
+      {
+        "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+        "clause_no": "第一条、第二条、第四条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 0.9833333333333334,
+    "overall_comment": "所有检查项均满足要求，候选答案准确识别现行版本、金额，并明确旧版废止。；候选提交完全满足所有检查项，清晰识别版本陷阱并给出具体误判说明和校验措施。；审计说明完整，覆盖新旧审批线、效力状态、交叉引用依据、误判说明和可执行的版本校验措施，表达一致，符合要求。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 28277,
+      "completion_tokens": 2768,
+      "total_tokens": 31045,
+      "prompt_cache_hit_tokens": 2176,
+      "prompt_cache_miss_tokens": 26101
+    },
+    "batch_count": 3,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 9487,
+          "completion_tokens": 755,
+          "total_tokens": 10242,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 293
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 8719
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 9493,
+          "completion_tokens": 1179,
+          "total_tokens": 10672,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 677
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 8725
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 9297,
+          "completion_tokens": 834,
+          "total_tokens": 10131,
+          "prompt_tokens_details": {
+            "cached_tokens": 640
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 509
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 8657
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 2
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/pi-agent-scripted-enhanced/L3-010"
+}

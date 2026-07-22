@@ -1,0 +1,213 @@
+{
+  "group": "openclaude-scripted-enhanced",
+  "task_id": "L2-013",
+  "case_family": "record_audit",
+  "category": "policy_data_comparison",
+  "graded_at": "2026-07-22T00:56:59+08:00",
+  "checklist_passed": 11,
+  "checklist_total": 11,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "候选答案明确认定超标准，无矛盾表述",
+      "answer_evidence": "R004223...报销金额3700元，超出...标准，超出200元",
+      "trace_evidence": "无需",
+      "source": "llm_judge"
+    },
+    {
+      "id": "anomaly-type-count-rule-type",
+      "value": 1,
+      "reason": "发现规则类型完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "anomaly-type-count-count",
+      "value": 1,
+      "reason": "发现数量完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r004223",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "明确引用费用报销办法第十二条",
+      "answer_evidence": "违反《XX证券费用报销管理办法（2025修订版）》（01_expense_reimbursement_2025.md）第十二条",
+      "trace_evidence": "get_policy_excerpt工具获取了第十二条内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-training",
+      "value": 1,
+      "reason": "明确引用培训费管理办法第二条且指明3500元标准",
+      "answer_evidence": "《XX证券培训费管理办法》（05_training_expense.md）第二条规定的“培训课程费按人次控制，每人每期不超过3500元”",
+      "trace_evidence": "get_policy_doc获取了第二条内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-type",
+      "value": 1,
+      "reason": "答案正确识别费用类型为培训课程费，即training_fee",
+      "answer_evidence": "培训课程费... expenses_type为training_fee",
+      "trace_evidence": "get_expense_detail返回expense_type为training_fee",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "候选答案明确说明报销金额为3700元，与工具调用返回的amount=3700.0一致，识别正确。",
+      "answer_evidence": "候选答案中：'R004223（员工E0009张婷，财务管理部，培训课程费）报销金额3700元'。",
+      "trace_evidence": "工具get_expense_detail返回记录：'amount': 3700.0。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-limit",
+      "value": 1,
+      "reason": "候选答案明确指出培训课程费标准为3500元，并判断本笔3700元超标200元，比较正确。",
+      "answer_evidence": "候选答案中：'超出《XX证券培训费管理办法》（05_training_expense.md）第二条规定的“培训课程费按人次控制，每人每期不超过3500元”的标准，超出200元'。",
+      "trace_evidence": "工具get_policy_doc返回05_training_expense.md第二条：'培训课程费按人次控制,每人每期不超过3500元'；工具get_expense_detail返回金额3700元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 158.517,
+    "expected_anomaly_ids": [
+      "OVERSTD-001"
+    ],
+    "actual_anomaly_ids": [
+      "ANM-L2-013-001"
+    ],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {
+        "OVERSTD": 1
+      },
+      "actual_types": {
+        "OVERSTD": 1
+      }
+    },
+    "expected_record_ids": [
+      "R004223"
+    ],
+    "actual_record_ids": [
+      "R004223"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 2,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十二条"
+      },
+      {
+        "doc_id": "05_training_expense.md",
+        "clause_no": "第二条"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选答案完全满足所有检查项：明确超标准结论，正确引用了费用报销办法第十二条和培训费管理办法第二条，准确识别了费用类型。；候选提交对报销金额和适用标准的识别及超标判断均正确，符合所有检查项要求。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 10793,
+      "completion_tokens": 1804,
+      "total_tokens": 12597,
+      "prompt_cache_hit_tokens": 1280,
+      "prompt_cache_miss_tokens": 9513
+    },
+    "batch_count": 2,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 5493,
+          "completion_tokens": 1298,
+          "total_tokens": 6791,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 983
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 4725
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 5300,
+          "completion_tokens": 506,
+          "total_tokens": 5806,
+          "prompt_tokens_details": {
+            "cached_tokens": 512
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 202
+          },
+          "prompt_cache_hit_tokens": 512,
+          "prompt_cache_miss_tokens": 4788
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 2
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/openclaude-scripted-enhanced/L2-013"
+}

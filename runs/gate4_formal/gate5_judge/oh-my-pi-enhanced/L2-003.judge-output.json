@@ -1,34 +1,38 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "audit-conclusion",
-      "score": 20,
-      "reason": "结论正确，明确识别重复报销",
-      "answer_evidence": "发票FP202500000020同时用于R000020和R004203两笔报销记录...违反第十条",
-      "trace_evidence": "find_invoice_usage返回FP202500000020在R000020和R004203中，均为travel_lodging、669.5元"
+      "value": 1,
+      "reason": "answer明确认定构成重复报销，表述为“构成重复报销异常”，无矛盾。",
+      "answer_evidence": "构成重复报销异常。",
+      "trace_evidence": "",
+      "source": "llm_judge"
     },
     {
       "id": "policy-basis",
-      "score": 15,
-      "reason": "正确引用第十条，条款有效",
-      "answer_evidence": "违反《XX证券费用报销管理办法(2025修订版)》第十条'同一发票最多报销1次'的规定",
-      "trace_evidence": "search_policy/get_policy_excerpt返回第十条内容"
+      "value": 1,
+      "reason": "引用了01_expense_reimbursement_2025.md第十条，条款有效且直接支持结论。",
+      "answer_evidence": "违反《XX证券费用报销管理办法(2025修订版)》（XX证财规〔2025〕甲号）第十条“同一发票最多报销1次”的规定。",
+      "trace_evidence": "get_policy_excerpt返回第十条原文：“同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。”",
+      "source": "llm_judge"
     },
     {
-      "id": "case-reasoning",
-      "score": 20,
-      "reason": "完整说明同一发票金额669.5元重复使用",
-      "answer_evidence": "发票FP202500000020...金额各¥669.50...重复报销",
-      "trace_evidence": "get_expense_detail返回R000020和R004203的amount均为669.5"
-    }
-  ],
-  "critical_failures": [
+      "id": "case-reasoning-same-invoice",
+      "value": 1,
+      "reason": "明确识别同一发票被重复使用，指出发票号FP202500000020在两条记录中出现。",
+      "answer_evidence": "发票FP202500000020（INV000020）在同一员工E0028（杜丹）的两条报销记录R000020和R004203中被重复使用。",
+      "trace_evidence": "list_invoices显示发票FP202500000020的usage_count为2，record_ids为['R000020', 'R004203']；find_invoice_usage同样返回两条记录。",
+      "source": "llm_judge"
+    },
     {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "未发现捏造记录"
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "明确说明两条记录的金额均为669.50元，与数据一致。",
+      "answer_evidence": "金额均为669.50元。",
+      "trace_evidence": "get_expense_detail(R000020)和get_expense_detail(R004203)均显示金额为669.5。",
+      "source": "llm_judge"
     }
   ],
-  "overall_comment": "异常结论正确，制度依据充分，推理完整，无关键错误。",
+  "overall_comment": "候选提交正确识别了重复报销异常，引用了制度第十条，并明确指出同一发票和金额，全部检查项通过。",
   "confidence": 1.0
 }

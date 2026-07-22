@@ -1,0 +1,74 @@
+{
+  "task_scope": {
+    "task_id": "RR-CASE-001",
+    "clue_record": "R000465",
+    "audit_object": "员工E0041(邓柳)培训费相邻日期同类费用记录",
+    "expense_types": ["training_fee"],
+    "business_period": "2025-12-08 至 2025-12-25 (R000465相邻7天窗口)",
+    "organization_scope": "员工E0041, 部门D005(机构业务部)",
+    "deliverable": "制度版本风险审计说明,含record_ids、异常判断、历史制度差异、关键计算、制度依据和可执行控制"
+  },
+  "policy_questions": [
+    {
+      "question": "2025版制度第十一条拆分报销规则如何适用于R000465相邻记录?",
+      "rule": "同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到较高审批线",
+      "boundaries": "7天窗口, AR-02审批线(≥3000元)"
+    },
+    {
+      "question": "2022版制度是否包含拆分报销规则?",
+      "rule": "2022版仅规定单笔审批线(8000/30000),无7天拆分规则"
+    },
+    {
+      "question": "附件二审批权限表中'较高审批线'的具体阈值?",
+      "rule": "AR-01:<3000(部门经理), AR-02:3000-10000(部门经理+财务复核)"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "E0041在R000465相邻7天内有多少笔training_fee记录?",
+      "method": "list_expenses按employee_id+expense_type过滤,计算日期差"
+    },
+    {
+      "question": "各记录是否使用不同发票(排除重复报销)?",
+      "method": "比对invoice_no/invoice_id"
+    },
+    {
+      "question": "合计金额是否达到AR-02较高审批线?",
+      "method": "Python求和后与3000比较"
+    }
+  ],
+  "required_fields": ["record_id", "employee_id", "expense_date", "expense_type", "amount", "invoice_no", "special_approval", "status", "approvals"],
+  "evidence_requirements": [
+    "R000465及相邻7天内所有E0041 training_fee记录详情",
+    "各记录审批链",
+    "2025版制度第十一条全文",
+    "2022版制度全文(证明无拆分规则)",
+    "附件二审批权限表"
+  ],
+  "execution_steps": [
+    "1. 审计计划 (当前)",
+    "2. 制度版本检查: 2025版Art.11 vs 2022版无拆分规则",
+    "3. 批量数据分析: 7天窗口计算,合计金额与审批线比较",
+    "4. 证据覆盖检查",
+    "5. 误报复核 (边界日期R001354的7天判定)",
+    "6. 审计报告",
+    "7. 结果校验",
+    "8. 统一提交"
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "制度版本差异(2022 vs 2025): +1",
+      "聚合/分组/日期窗口计算: +1",
+      "阈值边界(7天/3000元): +1"
+    ],
+    "subagent_plan": "compact模式,不委派子智能体。范围窄(一员工一规则),主智能体可直接完成"
+  },
+  "stopping_conditions": [
+    "所有7天内记录已获取并验证",
+    "制度差异已明确对比",
+    "合计金额与审批线比较完成",
+    "证据矩阵100%覆盖",
+    "validate_audit_result返回valid=true"
+  ]
+}

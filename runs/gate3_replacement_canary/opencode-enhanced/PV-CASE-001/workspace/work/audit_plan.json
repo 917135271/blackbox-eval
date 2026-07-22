@@ -1,0 +1,93 @@
+{
+  "task_id": "PV-CASE-001",
+  "task_type": "policy_data_comparison",
+  "clue_record": "R004233",
+  "scope": {
+    "rules": [
+      "审批路径核查 (Approval path verification)",
+      "费用标准适用核查 (Expense standards applicability)"
+    ],
+    "record_ids": ["R004233"],
+    "audit_period": "2025-10-03 (expense date)",
+    "organization_scope": "D008 合规风控部",
+    "expense_types": ["travel_lodging"]
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "2025现行制度下R004233的审批路径是否正确？是否缺少必需的审批角色？",
+      "policies": ["01_expense_reimbursement_2025.md", "03_authorization_management.md"],
+      "key_clauses": [
+        "01_expense_reimbursement_2025.md 第五条 (审批权限按授权管理办法附件二)",
+        "03_authorization_management.md 附件二 (AR-02: 3000至<10000 需部门经理并经财务复核)"
+      ]
+    },
+    {
+      "id": "PQ-02",
+      "question": "R004233的住宿费用标准是否符合现行差旅费管理办法？",
+      "policies": ["04_travel_expense.md", "01_expense_reimbursement_2025.md"],
+      "key_clauses": [
+        "04_travel_expense.md 第四条 (住宿标准表, 高管级一类城市1100元/晚)",
+        "01_expense_reimbursement_2025.md 第十二条 (无专项审批时不得超标准1.0倍)"
+      ]
+    },
+    {
+      "id": "PQ-03",
+      "question": "若继续使用已废止的2022版历史审批线(8000元→部门总经理)判断该笔费用，会造成什么偏差？",
+      "policies": ["02_expense_reimbursement_2022_deprecated.md", "01_expense_reimbursement_2025.md"],
+      "key_clauses": [
+        "02_expense_reimbursement_2022_deprecated.md 第二条/第四条",
+        "01_expense_reimbursement_2025.md 第十四条 (2022版废止)"
+      ]
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-01",
+      "question": "R004233的审批记录中是否存在财务复核？",
+      "source": "expense_query_list_approvals + expense_query_list_records_missing_approval",
+      "finding": "仅AR-02/部门经理审批，缺少财务复核"
+    },
+    {
+      "id": "DQ-02",
+      "question": "R004233的住宿费是否超出标准？",
+      "source": "get_expense_detail + 04_travel_expense.md",
+      "finding": "999元/晚 < 1100元/晚，未超标"
+    }
+  ],
+  "complexity": 4,
+  "complexity_reasons": [
+    "政策版本、生效日期与废止关系 (2022 deprecated vs 2025 current)",
+    "两项及以上政策 (费用报销管理办法 + 授权管理办法 + 差旅费管理办法)",
+    "两项及以上业务规则 (审批路径规则 + 费用标准规则)",
+    "阈值、标准边界 (审批金额档位AR-02/AR-03边界, 住宿标准上限)"
+  ],
+  "subagent_plan": {
+    "policy_researcher": {
+      "role": "policy_researcher",
+      "reason_code": "MULTI_POLICY_VERSION_CHECK",
+      "context": {
+        "question": "分析R004233涉及的现行制度(2025)与历史制度(2022)的审批线差异，以及费用标准适用",
+        "task_description": "1. 确认2025现行审批权限表(附件二)对9990元的适用档位; 2. 确认2022已废止制度的审批线; 3. 确认差旅住宿标准对分管副总(高管级)在一类城市的适用标准; 4. 分析继续使用历史审批线会造成什么判断偏差"
+      },
+      "artifact_paths": ["work/audit_plan.json"],
+      "requested_token_budget": 6000
+    }
+  },
+  "execution_steps": [
+    {"step": 1, "action": "policy_researcher子智能体: 解析现行与历史制度差异", "status": "pending"},
+    {"step": 2, "action": "主智能体: 查询R004233详细数据(已完成)", "status": "completed"},
+    {"step": 3, "action": "主智能体: 核查审批路径完整性(缺失财务复核)", "status": "pending"},
+    {"step": 4, "action": "主智能体: 核查费用标准适用(住宿标准对比)", "status": "pending"},
+    {"step": 5, "action": "evidence-coverage-check", "status": "pending"},
+    {"step": 6, "action": "false-positive-review", "status": "pending"},
+    {"step": 7, "action": "audit-report", "status": "pending"},
+    {"step": 8, "action": "result-validator", "status": "pending"},
+    {"step": 9, "action": "validate_audit_result + submit_audit_result", "status": "pending"}
+  ],
+  "stopping_conditions": [
+    "审批路径判断明确：AR-02需财务复核而实际缺失",
+    "费用标准判断明确：999/晚在1100/晚以内",
+    "历史制度对比明确：2022版已废止，其8000线不再适用"
+  ]
+}

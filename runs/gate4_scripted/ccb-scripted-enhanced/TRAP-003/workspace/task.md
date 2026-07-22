@@ -1,0 +1,17 @@
+你正在执行GATE4脚本化领域增强对比组。
+
+任务ID：TRAP-003
+题型：clean_but_suspicious
+问题：请核查R004236和R004237是否构成7天内拆分报销。必须按费用发生日期计算间隔并核对合计金额；若不构成异常，请明确说明无异常、原因和制度依据。
+
+先读取work/scripted_workflow.json，只使用其中列出的必要Skills。不要自行维护audit_plan、Task Memory、Checkpoint、生成后的evidence_matrix或validation_report，这些由外部脚本处理。子智能体角色只是可选授权，不是必调步骤；简单任务留在主智能体完成。
+
+
+要求：
+1. 必须查询制度和只读业务库后判断，可以使用Shell、Python、SQLite和当前工作区临时文件。
+2. 禁止读取ground_truth、cases.json、Rubric、判卷代码、历史答案、其他任务或候选轨迹，也不得访问无关互联网。
+3. 只回答题目要求的规则和范围。异常record_ids只包含参与违规的记录；无异常时保留直接核查或结论覆盖的记录并明确写“无异常”。
+4. 把anomaly_ids、record_ids、answer、citations四个语义字段写入预置的work/final_result.json。存在异常时，citations必须写明制度文件名和具体条款；推荐使用doc_id、clause_no对象，脚本也可将答案中已明确写出的“制度文件名+条款”归一化为对象，但不会推断未写出的依据。
+5. 同时填写预置的work/evidence_input.json。存在异常时，每个anomaly_id只写其实际对应的record_ids、citations和已核实facts；无异常时写明searched_population、query_conditions、checked_rules、population_count、conclusion并将complete设为true。脚本只检查和转换，不会替你生成业务证据。随后以空参数调用audit_control.validate_audit_result；valid=true后，再以空参数调用audit_control.submit_audit_result。不要把长中文答案嵌入MCP参数。
+6. 生成后的证据矩阵、验证报告、任务状态快照和阶段Checkpoint由脚本自动生成；不要调用checkpoint_audit_context，也不要执行已下沉的evidence-coverage-check或result-validator流程。
+7. 提交成功后只输出GATE4_TASK_PASS；无法提交时只输出GATE4_TASK_FAIL。

@@ -1,0 +1,76 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-001",
+      "record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+      "citations": [
+        {"doc_id": "03_authorization_management.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第三条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "R004209金额3400元属于AR-02档位(3000-9999)，审批记录仅有部门经理(E0008)审批，缺失财务复核",
+        "R004210金额3400元属于AR-02档位，审批记录仅有部门经理(E0008)审批，缺失财务复核",
+        "R004211金额3400元属于AR-02档位，审批记录仅有部门经理(E0008)审批，缺失财务复核",
+        "R004219金额5200元属于AR-02档位，审批记录仅有部门经理(E0008)审批，缺失财务复核",
+        "R004220金额5200元属于AR-02档位，审批记录仅有部门经理(E0008)审批，缺失财务复核",
+        "附件二AR-02明确规定3000元及以上至10000元以下需部门经理+财务复核双角色审批",
+        "费用报销管理办法第三条要求经办人真实性承诺、部门负责人业务审核、财务复核和授权审批相结合",
+        "授权管理办法第三条规定各部门应按系统派生结果提交审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"}
+      ],
+      "facts": [
+        "R004209(2025-02-26)、R004210(2025-02-28)、R004211(2025-03-02)为同一员工E0008、同一费用类型travel_lodging",
+        "三笔记录均在7天窗口内(最大间隔4天)",
+        "三笔合计金额10200元，达到AR-03审批线(10000元以上)即附件二较高审批线",
+        "若未拆分应按AR-03档位(部门总经理)审批，但三笔均按AR-02自行审批规避了更高级别审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-003",
+      "record_ids": ["R004219", "R004220"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"}
+      ],
+      "facts": [
+        "R004219(2025-11-27)、R004220(2025-12-01)为同一员工E0008、同一费用类型travel_lodging",
+        "两笔记录均在7天窗口内(间隔4天)",
+        "两笔合计金额10400元，达到AR-03审批线(10000元以上)即附件二较高审批线",
+        "若未拆分应按AR-03档位(部门总经理)审批，但两笔均按AR-02自行审批规避了更高级别审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+  "submitted_record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": null,
+  "reconciled_figures": {
+    "group1_combined_amount": 10200.0,
+    "group2_combined_amount": 10400.0,
+    "total_records": 5,
+    "all_approved_status": true,
+    "all_ar02_tier": true,
+    "all_missing_finance_review": true
+  },
+  "unresolved_items": []
+}

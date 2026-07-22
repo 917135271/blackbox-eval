@@ -1,0 +1,93 @@
+{
+  "task_id": "L2-008",
+  "in_scope_population_count": 2,
+  "candidate_count": 2,
+  "matched_record_ids": [
+    "R004212",
+    "R004213"
+  ],
+  "date_window": {
+    "start": "2025-04-10",
+    "end": "2025-04-15",
+    "span_days": 5
+  },
+  "aggregates": {
+    "total_amount": 10200.0,
+    "individual_amounts": [
+      5100.0,
+      5100.0
+    ],
+    "individual_tiers": [
+      "AR-02",
+      "AR-02"
+    ],
+    "combined_tier": "AR-03",
+    "individual_approver": "部门经理,并经财务复核",
+    "combined_approver": "部门总经理"
+  },
+  "records": [
+    {
+      "record_id": "R004212",
+      "employee_id": "E0009",
+      "employee_name": "张婷",
+      "employee_level": "D1",
+      "expense_date": "2025-04-10",
+      "expense_type": "travel_lodging",
+      "amount": 5100.0,
+      "nights": 7,
+      "city_tier": "A",
+      "special_approval": 0,
+      "invoice_no": "FP2025X0004206",
+      "vendor_name": "安程酒店管理有限公司",
+      "tier_id": "AR-02",
+      "standard_total": 4550,
+      "per_night_actual": 728.57,
+      "per_night_standard": 650
+    },
+    {
+      "record_id": "R004213",
+      "employee_id": "E0009",
+      "employee_name": "张婷",
+      "employee_level": "D1",
+      "expense_date": "2025-04-15",
+      "expense_type": "travel_lodging",
+      "amount": 5100.0,
+      "nights": 7,
+      "city_tier": "A",
+      "special_approval": 0,
+      "invoice_no": "FP2025X0004207",
+      "vendor_name": "安程酒店管理有限公司",
+      "tier_id": "AR-02",
+      "standard_total": 4550,
+      "per_night_actual": 728.57,
+      "per_night_standard": 650
+    }
+  ],
+  "rule_by_population": {
+    "article_11_split": {
+      "condition": "Same employee, same expense type, within 7 days, >=2 records, combined amount reaches higher approval tier",
+      "met": true,
+      "evidence": "2 records, 5 days apart, combined 10200.0 exceeds AR-02 threshold (10000), falls in AR-03 requiring 部门总经理",
+      "matched_ids": [
+        "R004212",
+        "R004213"
+      ]
+    }
+  },
+  "completed_checks": [
+    "7-day window aggregation",
+    "Approval tier comparison",
+    "Travel standard check",
+    "Invoice uniqueness verified",
+    "Vendor analysis"
+  ],
+  "query_artifacts": [
+    "work/sql/query.sql"
+  ],
+  "result_artifacts": [
+    "work/analysis/data_findings.json"
+  ],
+  "data_quality_issues": [],
+  "limitations": [],
+  "unresolved_items": []
+}

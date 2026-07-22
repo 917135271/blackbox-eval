@@ -1,0 +1,134 @@
+{
+  "checklist": [
+    {
+      "id": "same-employee-type",
+      "value": 1,
+      "reason": "候选提交明确指出四条记录属于E0041且费用类型均为training_fee。工具轨迹显示get_expense_detail返回的记录中employee_id均为E0041，expense_type均为training_fee。",
+      "answer_evidence": "答案中写明“以R000465（员工E0041邓柳，机构业务部D005，培训费...”及记录集群明细均显示员工E0041、培训费。",
+      "trace_evidence": "工具get_expense_detail返回的record中employee_id为E0041，expense_type为training_fee；list_expenses筛选条件为E0041和training_fee。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "window-dates",
+      "value": 1,
+      "reason": "候选提交正确识别费用日期从2025-12-18至2025-12-25，并指出首尾相隔7天。",
+      "answer_evidence": "答案中写道“2025年12月18日至25日共7天内”及“7天窗口起止：2025-12-18至2025-12-25”。",
+      "trace_evidence": "工具get_expense_detail中R000465的expense_date为2025-12-18，R001354为2025-12-25。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "amount-list",
+      "value": 1,
+      "reason": "候选提交列出的四笔金额与预期完全一致。",
+      "answer_evidence": "答案中记录R000465金额2157.72，R000561金额2917.45，R000888金额2606.07，R001354金额2083.49。",
+      "trace_evidence": "工具get_expense_detail中每条记录的amount字段分别为2157.72、2917.45、2606.07、2083.49。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "amount-sum",
+      "value": 1,
+      "reason": "候选提交正确计算合计金额为9764.73元。",
+      "answer_evidence": "答案中写道“合计¥9,764.73”并给出计算过程。",
+      "trace_evidence": "无直接计算工具调用，但金额列表来自工具，手工计算验证正确。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-threshold",
+      "value": 0,
+      "reason": "未明确采用现行10000元较高审批线，而是将AR-02的3000元线作为审批线，且结论错误",
+      "answer_evidence": "回答中仅提到AR-02档位（¥3,000-¥9,999），未提及10000元线，且结论为构成异常",
+      "trace_evidence": "工具获取的01_expense_reimbursement_2025.md第十一条中较高审批线应为10000元，但候选未引用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-conclusion",
+      "value": 0,
+      "reason": "明确给出拆分异常结论，与预期无拆分异常相反",
+      "answer_evidence": "一、调查范围与结论摘要中明确“按现行2025制度判定：构成异常（拆分规避审批）”",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "legacy-threshold",
+      "value": 1,
+      "reason": "正确识别旧审批线为8000元并给出历史版本来源",
+      "answer_evidence": "四、历史2022制度下的不同结论：“《XX证券费用报销管理办法(2022版)》仅设单笔审批线（¥8,000需部门总经理，¥30,000需分管副总）”",
+      "trace_evidence": "get_policy_doc返回02_expense_reimbursement_2022_deprecated.md第二条：单笔报销金额达到8000元的，应提交部门总经理审批",
+      "source": "llm_judge"
+    },
+    {
+      "id": "legacy-status",
+      "value": 1,
+      "reason": "明确说明2022版已废止并指出不得作为现行依据",
+      "answer_evidence": "四、历史2022制度下的不同结论：“已废止的2022制度”并以此判断不同结论",
+      "trace_evidence": "02_expense_reimbursement_2022_deprecated.md第四条：本办法的审批金额已被后续制度替代，不得作为现行审批依据",
+      "source": "llm_judge"
+    },
+    {
+      "id": "legacy-impact",
+      "value": 0,
+      "reason": "候选未将合计金额9764.73元与旧制度8000元线直接比较，也未说明误用旧线会错误报告为拆分报销。其描述为旧制度下不构成异常，而非误报方向。",
+      "answer_evidence": "第四段：\"若按已废止的2022制度判断不构成异常\"",
+      "trace_evidence": "无相关比较或误报说明",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-standard",
+      "value": 1,
+      "reason": "候选明确说明各笔培训费均未超过每人每期3500元上限，并逐笔与标准比较。",
+      "answer_evidence": "\"各笔均未超培训费每人每期¥3,500上限\"，四笔金额分别为2157.72、2917.45、2606.07、2083.49，均小于3500。",
+      "trace_evidence": "get_policy_doc(05_training_expense.md) 返回第二条\"每人每期不超过3500元\"；get_expense_detail 确认各笔金额。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "distinct-invoices",
+      "value": 1,
+      "reason": "候选指出四条记录使用不同供应商发票，发票号互不相同，排除重复报销。",
+      "answer_evidence": "\"发票一对一使用无重复\"，并列出FP202500000465、FP202500000561、FP202500000888、FP202500001354。",
+      "trace_evidence": "find_invoice_usage 对每个发票调用，均返回 usage_count=1，且fp均不同。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-expense",
+      "value": 0,
+      "reason": "候选仅引用《费用报销管理办法》第十一条，未引用第十二条和第十四条，缺少拆分核查、超标准及旧版废止依据的完整覆盖。",
+      "answer_evidence": "citations 仅含一条：{\"doc_id\":\"01_expense_reimbursement_2025.md\",\"clause_no\":\"第十一条\"}。",
+      "trace_evidence": "get_policy_doc(01_expense_reimbursement_2025.md) 获取全文，但候选未提取第十二、十四条引用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-authorization",
+      "value": 0,
+      "reason": "未准确引用10000元现行审批线出处。候选提交仅提及AR-01和AR-02档位，未引用附件二中AR-03（10000元以上）作为较高审批线，不符合pass_condition。",
+      "answer_evidence": "制度依据部分引用“《XX证券授权管理办法》（XX证综规〔2025〕丙号）附件二：AR-01(¥0-¥2,999部门经理)、AR-02(¥3,000-¥9,999部门经理+财务复核)”，未出现10000元审批线。",
+      "trace_evidence": "get_policy_doc('03_authorization_management.md')返回附件二包含AR-03（≥10000元），但候选答案未使用该信息。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-training",
+      "value": 1,
+      "reason": "准确引用培训费管理办法第二条，并明确提及3500元课程费标准。",
+      "answer_evidence": "制度依据部分列出“《XX证券培训费管理办法》（XX证人规〔2025〕戊号）第二条：每人每期¥3,500上限”，摘要中也说明“各笔均未超培训费每人每期¥3,500上限”。",
+      "trace_evidence": "工具调用get_policy_doc('05_training_expense.md')返回文档内容包含“第二条 培训课程费按人次控制,每人每期不超过3500元”。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "version-control",
+      "value": 0,
+      "reason": "可执行控制建议仅针对拆分规避的审批控制，未提出校验制度生效日期、废止状态和交叉引用目标的措施，属于泛泛建议，不满足三个要素覆盖要求。",
+      "answer_evidence": "可执行控制建议中四项内容均为‘系统控制’‘事后审计’‘业务控制’‘审批控制’，无一项涉及版本生效日期、废止状态或交叉引用目标校验。",
+      "trace_evidence": "最终答案的‘七、可执行控制建议’部分无相关要素，工具轨迹也未体现版本控制类操作。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "independent-investigation",
+      "value": 1,
+      "reason": "工具轨迹显示使用list_expenses按员工和费用类型查询所有记录，并对候选记录及相邻记录逐个调用get_expense_detail和find_invoice_usage，完成同员工、同费用类型、日期窗口和发票核查，且R001894因日期超出窗口被排除，证明独立调查充分。",
+      "answer_evidence": "答案中列出四笔记录及其发票号，并说明R001894超出7天窗口不纳入集群，表明基于独立查询结果。",
+      "trace_evidence": "工具调用样本包含list_expenses(employee_id='E0041', expense_type='training_fee')返回多条记录，随后对R000465、R000561、R000888、R001354及R001894分别调用get_expense_detail和find_invoice_usage检查详细信息与发票。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交在所有检查项上均正确：准确识别员工和费用类型，正确界定日期窗口，金额列表及合计与工具轨迹一致。；候选提交错误判定拆分规避审批异常，未采用现行10000元线，但正确识别旧8000元线及其废止状态。；候选错误地将该四记录组合认定为异常，且遗漏了制度中第十二条、第十四条的引用，致两项关键检查未通过。；候选提交在独立调查和培训费标准引用上表现合格，但未能准确引用10000元审批线出处，且可执行控制建议未覆盖制度版本控制要素，导致政策授权和版本控制两项未通过。结论虽误报异常，但检查项按规则判定。",
+  "confidence": 0.85
+}

@@ -1,0 +1,37 @@
+{
+  "task_id": "RR-CASE-001",
+  "clue_record_id": "R000465",
+  "clue_summary": {
+    "employee_id": "E0041",
+    "employee_name": "邓柳",
+    "department_id": "D005",
+    "expense_date": "2025-12-18",
+    "expense_type": "training_fee",
+    "amount": 2157.72,
+    "status": "approved"
+  },
+  "scope": {
+    "employee_id": "E0041",
+    "expense_type": "training_fee",
+    "date_anchor": "2025-12-18",
+    "adjacent_window_days": 7,
+    "rule_question": "同一员工相邻日期同类费用是否存在拆分报销或违规"
+  },
+  "complexity": 2,
+  "subagent_plan": {
+    "policy_researcher": {
+      "reason_code": "MULTI_POLICY_VERSION_CHECK",
+      "task": "解析training_fee相关现行和历史制度条款，识别相邻日期同类费用规则"
+    }
+  },
+  "required_data": [
+    "R000465详情及审批链",
+    "E0041所有training_fee记录",
+    "training_fee相关现行制度",
+    "training_fee历史制度版本"
+  ],
+  "stopping_conditions": [
+    "证据覆盖率达到100%",
+    "验证报告valid=true"
+  ]
+}

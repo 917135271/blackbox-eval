@@ -1,0 +1,78 @@
+{
+  "task": {
+    "task_id": "DEV-004",
+    "type": "single_anomaly",
+    "question": "以R900003为线索核查是否存在拆分报销，返回构成同一异常的全部记录。",
+    "clue_record": "R900003"
+  },
+  "scope": {
+    "audit_period": "2025-02-03 ± 7 days (2025-01-27 ~ 2025-02-10)",
+    "employee": "E9001",
+    "expense_type": "travel_transport",
+    "rule": "拆分报销 (split reimbursement)",
+    "exclusions": "Only records needed to prove/disprove the split reimbursement rule for this specific matter"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ1",
+      "question": "What constitutes split reimbursement under current policy?",
+      "policy_docs": ["01_expense_reimbursement_2025.md", "03_authorization_management.md"],
+      "clause": "Article 11 of 01_expense_reimbursement_2025.md: same employee, same expense type, within 7 days, 2+ records, combined amount reaches higher approval tier"
+    },
+    {
+      "id": "PQ2",
+      "question": "What is the applicable approval threshold?",
+      "policy_docs": ["03_authorization_management.md"],
+      "clause": "Appendix II: AR-02 (3000~10000): department manager + finance review; AR-03 (10000~50000): department general manager"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ1",
+      "question": "Are there other travel_transport records for E9001 within 7 days of R900003?",
+      "query": "list_expenses employee_id=E9001 expense_type=travel_transport date_from=2025-01-27 date_to=2025-02-10"
+    },
+    {
+      "id": "DQ2",
+      "question": "Do the records share the same matter/reason?",
+      "query": "get_expense_detail for each found record"
+    }
+  ],
+  "evidence_needed": [
+    "Policy: Article 11 of 01_expense_reimbursement_2025.md",
+    "Policy: Appendix II of 03_authorization_management.md",
+    "Records: R900003 and R900004 details",
+    "Combined amount vs individual amounts and approval tiers"
+  ],
+  "execution_steps": [
+    "1. audit-query-planner → audit_plan.json [DONE]",
+    "2. Query records for E9001 travel_transport within 7-day window [DONE]",
+    "3. Get policy clauses on split reimbursement [DONE]",
+    "4. Get authorization approval thresholds [DONE]",
+    "5. batch-expense-analysis for confirmation",
+    "6. evidence-coverage-check",
+    "7. audit-report",
+    "8. result-validator",
+    "9. validate + submit"
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "Single rule (split reimbursement)",
+      "Single clue record with direct lookup, no batch aggregation needed",
+      "Only 2 records found, no complex joins",
+      "No policy version ambiguity (2025 policy clearly applies)",
+      "No subagent required"
+    ]
+  },
+  "subagent_plan": {
+    "planned": false,
+    "reason": "Complexity 1, keep in main agent"
+  },
+  "stopping_conditions": [
+    "All records in the 7-day same-employee/same-type window identified",
+    "Policy clauses confirmed",
+    "Evidence matrix passes at 100% coverage",
+    "Validation report passes"
+  ]
+}

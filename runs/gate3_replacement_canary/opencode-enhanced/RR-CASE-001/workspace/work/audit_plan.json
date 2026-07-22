@@ -1,0 +1,95 @@
+{
+  "task_id": "RR-CASE-001",
+  "task_type": "audit_report",
+  "clue_record": "R000465",
+  "scope": {
+    "employee": "E0041 邓柳",
+    "department": "D005 机构业务部",
+    "expense_type": "training_fee",
+    "time_window": "2025-12-18 ± 7 days, plus any record within 7-day transitive closure of R000465",
+    "audit_period": "2025-12-18 to 2025-12-25"
+  },
+  "policy_questions": [
+    {
+      "id": "Q1",
+      "description": "Do R000465 and adjacent same-employee same-type records within 7 days trigger Article 11 split-circumvention check?",
+      "rule": "01_expense_reimbursement_2025.md Article 11",
+      "boundaries": ["7-day window", "same employee E0041", "same type training_fee", "AR tier thresholds from 03_authorization_management.md Attachment 2"]
+    },
+    {
+      "id": "Q2",
+      "description": "Does each individual record comply with training fee standard (3500/person/class)?",
+      "rule": "05_training_expense.md Article 2",
+      "boundaries": ["per person per class ≤ 3500"]
+    },
+    {
+      "id": "Q3",
+      "description": "Are there any reused invoices or duplicate claims?",
+      "rule": "01_expense_reimbursement_2025.md Article 10",
+      "boundaries": ["unique invoice per claim"]
+    },
+    {
+      "id": "Q4",
+      "description": "Historical comparison: would 2022 deprecated policy yield a different conclusion for the same records?",
+      "rule": "02_expense_reimbursement_2022_deprecated.md Articles 2-3",
+      "boundaries": ["8000 threshold → 部门总经理", "30000 threshold → 分管副总"]
+    }
+  ],
+  "data_questions": [
+    "All training_fee records for E0041 (list_expenses, done)",
+    "Full detail for each record in the 7-day cluster (get_expense_detail, done)",
+    "Invoice usage info for each invoice in the cluster (find_invoice_usage)",
+    "Department budget for D005 (get_department_budget, done)"
+  ],
+  "required_fields": ["record_id", "employee_id", "expense_date", "expense_type", "amount", "invoice_no", "vendor_name", "approval_tier", "approval_role", "status"],
+  "evidence_requirements": [
+    "Policy text for Article 11 (2025)",
+    "Policy text for Attachment 2 approval tiers",
+    "Policy text for 2022 deprecated thresholds",
+    "Record details with dates and amounts",
+    "Invoice uniqueness verification",
+    "7-day gap calculations"
+  ],
+  "execution_steps": [
+    {"step": 1, "name": "planning", "artifact": "work/audit_plan.json", "status": "in_progress"},
+    {"step": 2, "name": "invoice_verification", "artifact": "work/invoice_check.json", "status": "pending"},
+    {"step": 3, "name": "policy_version_check", "artifact": "work/policy_check.json", "status": "pending"},
+    {"step": 4, "name": "batch_expense_analysis", "artifact": "work/batch_analysis.json", "status": "pending"},
+    {"step": 5, "name": "findings_formation", "artifact": "work/findings.json", "status": "pending"},
+    {"step": 6, "name": "evidence_coverage", "artifact": "work/evidence_matrix.json", "status": "pending"},
+    {"step": 7, "name": "false_positive_review", "artifact": "work/fp_review.json", "status": "pending"},
+    {"step": 8, "name": "audit_report", "artifact": "work/final_result.json", "status": "pending"},
+    {"step": 9, "name": "result_validation", "artifact": "work/validation_report.json", "status": "pending"},
+    {"step": 10, "name": "submission", "artifact": null, "status": "pending"}
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "One primary rule (Article 11 split-circumvention) with batch grouping and 7-day date boundary",
+      "Policy version comparison (2022 vs 2025)",
+      "Multiple supporting policies (authorization tiers, training standard)",
+      "Aggregation of 4 records within 7-day sliding window"
+    ]
+  },
+  "subagent_plan": {
+    "policy_researcher": {
+      "needed": true,
+      "role": "policy_researcher",
+      "reason_code": "MULTI_POLICY_VERSION_CHECK",
+      "task": "Compare 2022 deprecated policy and 2025 current policy for the split-circumvention clause and approval thresholds. Determine if the same record cluster (E0041, training_fee, Dec 18-25 2025, total 9764.73) would trigger different conclusions under each version."
+    },
+    "independent_reviewer": {
+      "needed": true,
+      "reason_code": "THRESHOLD_BOUNDARY",
+      "task": "Review the 7-day boundary, AR tier threshold application, and whether the records truly constitute 'split to circumvent' or are legitimate separate training events."
+    }
+  },
+  "stopping_conditions": [
+    "All 4+ cluster records verified for invoice uniqueness",
+    "7-day gap calculations confirmed",
+    "Policy comparison complete",
+    "Evidence matrix at 100% coverage",
+    "Validation report passes"
+  ],
+  "unresolved_items": []
+}

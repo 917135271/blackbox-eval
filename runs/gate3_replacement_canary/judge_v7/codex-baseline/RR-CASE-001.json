@@ -1,0 +1,423 @@
+{
+  "group": "codex-baseline",
+  "dataset_id": "securities-expense-audit-formal-15-v9",
+  "rubric_version": "atomic-binary-checklist-v7",
+  "task_id": "RR-CASE-001",
+  "case_family": "retrieval_and_report",
+  "category": "audit_report",
+  "graded_at": "2026-07-22T21:13:41+08:00",
+  "checklist_passed": 14,
+  "checklist_total": 23,
+  "checklist_pass_rate": 60.87,
+  "checklist": [
+    {
+      "id": "no-anomaly",
+      "value": 0,
+      "reason": "提交了异常ID",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-r000465",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-r000561",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-r000888",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-r001354",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "same-employee-type",
+      "value": 1,
+      "reason": "候选提交明确认定四条记录均属于员工E0041且费用类型为training_fee，与轨迹信息一致。",
+      "answer_evidence": "answer中“员工E0041（邓柳，机构业务部）在2025年12月同一费用类型（training_fee）的相邻日期报销记录”",
+      "trace_evidence": "get_expense_detail调用返回各记录employee_id为E0041，expense_type为training_fee。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "window-dates",
+      "value": 1,
+      "reason": "候选提交正确识别费用日期从2025-12-18至2025-12-25，并指出窗口为7天。",
+      "answer_evidence": "answer中列出“R000465（2025-12-18）...R001354（2025-12-25）”，并称“四条记录在7天窗口内”。",
+      "trace_evidence": "get_expense_detail返回各记录expense_date为2025-12-18、12-20、12-23、12-25，首尾相隔7天。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "amount-list",
+      "value": 1,
+      "reason": "候选提交完整列出四笔金额，与工具返回数据一致。",
+      "answer_evidence": "answer中“R000465（2025-12-18, 2157.72元）、R000561（2025-12-20, 2917.45元）、R000888（2025-12-23, 2606.07元）、R001354（2025-12-25, 2083.49元）”。",
+      "trace_evidence": "get_expense_detail调用返回各记录金额与上述数值完全匹配。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "amount-sum",
+      "value": 1,
+      "reason": "候选提交计算的合计金额9764.73元正确。",
+      "answer_evidence": "answer中“2157.72 + 2917.45 + 2606.07 + 2083.49 = 9764.73元”。",
+      "trace_evidence": "未直接提供合计计算，但金额列表与工具返回一致，可验证加总正确。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-threshold",
+      "value": 0,
+      "reason": "候选未采用10000元较高审批线，而是错误地使用3000元线判定异常，虽提及AR-02范围但未在聚合判断中正确运用10000元线",
+      "answer_evidence": "附件二：AR-02为≥3000且<10000元... 任意两笔组合...均超AR-02审批线3000元",
+      "trace_evidence": "工具get_policy_doc 03_authorization_management.md显示AR-02区间为3000-10000，但候选错误解读为较高审批线即3000元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-conclusion",
+      "value": 0,
+      "reason": "候选给出异常结论，未满足无拆分明确定且无矛盾的要求",
+      "answer_evidence": "确认存在'拆分规避审批'异常... 构成《XX证券费用报销管理办法(2025修订版)》第十一条所述...违规行为",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "legacy-threshold",
+      "value": 1,
+      "reason": "候选正确给出旧制度8000元审批线及来源",
+      "answer_evidence": "《XX证券费用报销管理办法(2022版)》仅设单笔报销金额阈值（第二条：8000元提交部门总经理审批）",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "legacy-status",
+      "value": 0,
+      "reason": "候选未明确声明旧线已废止，不得作为现行依据",
+      "answer_evidence": "在2022旧制度下...不会被认定为异常，也不触发任何聚合审查。这说明2025版引入...是制度进步",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "legacy-impact",
+      "value": 0,
+      "reason": "未将9764.73元与8000元比较，仅说明旧制度下不被认定异常，未说明误用旧线会错误报告为拆分报销",
+      "answer_evidence": "在2022旧制度下，上述四笔单笔金额均远低于8000元，仅需部门经理审批，不会被认定为异常，也不触发任何聚合审查",
+      "trace_evidence": "无相关工具调用涉及8000元比较",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-standard",
+      "value": 0,
+      "reason": "未说明四笔课程费分别未超过3500元每人每期标准，未做逐笔比较",
+      "answer_evidence": "回答中无任何培训费标准内容",
+      "trace_evidence": "工具调用了培训费政策，但未用于最终结论",
+      "source": "llm_judge"
+    },
+    {
+      "id": "distinct-invoices",
+      "value": 1,
+      "reason": "明确列出四张不同发票并说明均仅使用一次，排除重复报销",
+      "answer_evidence": "四笔发票均仅使用一次（FP202500000465、FP202500000561、FP202500000888、FP202500001354），无发票重复使用",
+      "trace_evidence": "find_invoice_usage四次返回usage_count均为1",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-expense",
+      "value": 0,
+      "reason": "引用覆盖拆分核查、超标准和旧版废止依据；但缺失要求引用的第十二条和第十四条",
+      "answer_evidence": "引用01_expense_reimbursement_2025.md第十一条、第十条，缺少第十二条、第十四条",
+      "trace_evidence": "get_policy_doc返回全文含第十二条、第十四条，但最终提交未引用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-authorization",
+      "value": 1,
+      "reason": "候选提交在答案中明确引用了附件二并提到了10000元审批线。",
+      "answer_evidence": "答案中写明“《XX证券授权管理办法》附件二：AR-01为≥0且<3000元（部门经理），AR-02为≥3000且<10000元（部门经理+财务复核）”。",
+      "trace_evidence": "工具轨迹中有get_policy_doc和get_policy_excerpt调用了03_authorization_management.md，获取了附件二的详细内容。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-training",
+      "value": 0,
+      "reason": "候选提交未引用培训费办法第二条，也未提及3500元课程费标准。",
+      "answer_evidence": "答案全文未出现“培训费办法”或“3500元”字样。",
+      "trace_evidence": "工具轨迹中虽有get_policy_excerpt调用05_training_expense.md，但候选在最终答案中未引用该条款。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "version-control",
+      "value": 0,
+      "reason": "可执行控制建议未覆盖校验生效日期、废止状态和交叉引用目标三个要素。",
+      "answer_evidence": "第五部分控制建议仅涉及聚合检测、预警、审计和宣贯，未提及制度生效日期、废止状态或交叉引用校验。",
+      "trace_evidence": "无需。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "independent-investigation",
+      "value": 1,
+      "reason": "工具轨迹显示完成了同员工、同类型、日期窗口内所有记录及发票的独立核查。",
+      "answer_evidence": "无需；工具轨迹足以证明。",
+      "trace_evidence": "list_expenses按E0041和training_fee列出所有记录，包括R000465等；get_expense_detail逐一获取了窗口内记录详情；find_invoice_usage核查了四张发票的使用次数。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "substantive-false-positive",
+      "check": "将无异常案例提交为实质异常",
+      "score_cap": 40.0,
+      "reason": "实际提交异常数=1"
+    }
+  ],
+  "score_cap": 40.0,
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 184.105,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [
+      "ANOM-RR-CASE-001-001"
+    ],
+    "anomaly_metrics": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "count_exact": false,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": [
+      "R000465",
+      "R000561",
+      "R000888",
+      "R001354"
+    ],
+    "actual_record_ids": [
+      "R000465",
+      "R000561",
+      "R000888",
+      "R001354"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 5,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条、第十二条、第十四条"
+      },
+      {
+        "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+        "clause_no": "第一条、第二条、第四条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      },
+      {
+        "doc_id": "05_training_expense.md",
+        "clause_no": "第二条"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "所有检查项均通过，候选提交准确反映了员工、费用类型、日期窗口和金额信息。；候选错误认定拆分异常，未正确应用现行10000元较高审批线，仅明确给出旧线值，但未声明其废止，整体不符合预期。；候选报告错误地认定异常，且遗漏多项必要说明：未进行旧线误报比较、未检查培训费标准、未完整引用制度条款。仅发票互不重复一项正确。；候选完成部分制度引用和调查，但漏引培训费办法且版本控制建议不完整。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 48013,
+      "completion_tokens": 9660,
+      "total_tokens": 57673,
+      "prompt_cache_hit_tokens": 2560,
+      "prompt_cache_miss_tokens": 45453
+    },
+    "batch_count": 4,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 8077,
+          "completion_tokens": 1324,
+          "total_tokens": 9401,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 751
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 8077
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 7984,
+          "completion_tokens": 2541,
+          "total_tokens": 10525,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 2079
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 7984
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 8040,
+          "completion_tokens": 1526,
+          "total_tokens": 9566,
+          "prompt_tokens_details": {
+            "cached_tokens": 640
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1041
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 7400
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 8037,
+          "completion_tokens": 1502,
+          "total_tokens": 9539,
+          "prompt_tokens_details": {
+            "cached_tokens": 640
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1001
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 7397
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      }
+    ],
+    "consistency_audit": {
+      "sampled_count": 6,
+      "agreement_count": 6,
+      "agreement_rate": 1.0,
+      "disagreement_ids": [],
+      "tied_ids": [],
+      "tiebreak_count": 0,
+      "repeat_count": 2,
+      "batches": [
+        {
+          "model": "deepseek-v4-pro",
+          "usage": {
+            "prompt_tokens": 8021,
+            "completion_tokens": 1398,
+            "total_tokens": 9419,
+            "prompt_tokens_details": {
+              "cached_tokens": 640
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 785
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 7381
+          },
+          "finish_reason": "stop",
+          "attempt": 1,
+          "max_tokens": 4096,
+          "shape_attempt": 1,
+          "criteria_count": 4
+        },
+        {
+          "model": "deepseek-v4-pro",
+          "usage": {
+            "prompt_tokens": 7854,
+            "completion_tokens": 1369,
+            "total_tokens": 9223,
+            "prompt_tokens_details": {
+              "cached_tokens": 640
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 1083
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 7214
+          },
+          "finish_reason": "stop",
+          "attempt": 2,
+          "max_tokens": 4096,
+          "shape_attempt": 1,
+          "criteria_count": 2
+        }
+      ]
+    }
+  },
+  "run_path": "runs/gate3_replacement_canary/codex-baseline/RR-CASE-001"
+}

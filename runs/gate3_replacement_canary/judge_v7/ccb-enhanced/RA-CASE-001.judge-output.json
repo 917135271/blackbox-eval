@@ -1,0 +1,54 @@
+{
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "候选答案明确认定发票重复报销，无矛盾表述。",
+      "answer_evidence": "'FIND-001(发票重复报销): 发票FP202500000028...被...在R000028...和R004204...两次报销中使用,违反...第十条'",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "same-invoice",
+      "value": 1,
+      "reason": "候选答案识别同一发票FP202500000028在两条记录中重复使用。",
+      "answer_evidence": "'发票FP202500000028...被...在R000028...和R004204...两次报销中使用'",
+      "trace_evidence": "find_invoice_usage('FP202500000028')返回两条记录R000028和R004204",
+      "source": "llm_judge"
+    },
+    {
+      "id": "same-amount",
+      "value": 1,
+      "reason": "候选答案和工具证据均确认两条记录金额165.58元。",
+      "answer_evidence": "'金额165.58元'",
+      "trace_evidence": "get_expense_detail('R000028')和get_expense_detail('R004204')结果中amount均为165.58",
+      "source": "llm_judge"
+    },
+    {
+      "id": "approved-records",
+      "value": 1,
+      "reason": "工具证据显示R000028和R004204审批状态均为approved。",
+      "answer_evidence": "'状态approved'",
+      "trace_evidence": "get_expense_detail('R000028')和get_expense_detail('R004204')的approvals中approval_status均为'approved'",
+      "source": "llm_judge"
+    },
+    {
+      "id": "invoice-usage-investigation",
+      "value": 1,
+      "reason": "使用了发票反查工具 find_invoice_usage 确认发票 FP202500000028 的完整使用记录，获得 R000028 和 R004204。",
+      "answer_evidence": "答案中明确：“find_invoice_usage确认FP202500000028的usage_count=2, find_reused_invoices全局列表确认INV000028在6张复用发票中”。",
+      "trace_evidence": "工具调用 find_invoice_usage(invoice_no=\"FP202500000028\") 返回记录包含 R000028 和 R004204；find_reused_invoices() 也列出 INV000028 及其 usage_count=2。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis",
+      "value": 1,
+      "reason": "引用了现行制度第十条，且该条款直接支持同一发票最多报销一次的结论。",
+      "answer_evidence": "提交的 citations 中包括 {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十条\"}，并在 FIND-001 中陈述违反第十条规定。",
+      "trace_evidence": "get_policy_doc(\"01_expense_reimbursement_2025.md\") 返回内容明确包含：“第十条 同一发票最多报销1次。”",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "FIND-001对应的四个检查项均满足通过条件，审计结论、发票、金额、审批状态事实明确。；两个检查项均满足：发票反查完整确认了重复使用记录，制度依据准确有效。",
+  "confidence": 1.0
+}

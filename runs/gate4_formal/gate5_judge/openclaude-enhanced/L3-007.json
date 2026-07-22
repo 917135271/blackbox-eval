@@ -1,216 +1,209 @@
 {
+  "group": "openclaude-enhanced",
+  "task_id": "L3-007",
   "case_family": "retrieval_and_report",
-  "case_score": 100.0,
-  "case_score_raw": 100.0,
   "category": "two_hop_retrieval",
-  "criteria": [
+  "graded_at": "2026-07-21T20:59:50+08:00",
+  "checklist_passed": 9,
+  "checklist_total": 9,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
     {
-      "answer_evidence": "AR-03：≥10000元且<50000元 → 部门总经理",
-      "id": "threshold",
-      "reason": "明确给出部门总经理审批线10000元，边界清晰（≥10000元且<50000元）",
-      "score": 35.0,
-      "source": "llm_judge",
-      "trace_evidence": "无"
+      "id": "threshold-amount",
+      "value": 1,
+      "reason": "候选回复明确给出部门总经理审批线10000元，符合要求。",
+      "answer_evidence": "AR-03[10000,50000)需部门总经理",
+      "trace_evidence": "轨迹中get_policy_doc(03_authorization_management.md)展示附件二，包含AR-03档位10000元。",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "第一跳：《XX证券费用报销管理办法(2025修订版)》第五条...第二跳：《XX证券授权管理办法》附件二...",
-      "id": "two-hop-path",
-      "reason": "完整说明第一跳从费用报销管理办法第五条交叉引用，第二跳到授权管理办法附件二",
-      "score": 30.0,
-      "source": "llm_judge",
-      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md → get_policy_doc 03_authorization_management.md"
+      "id": "threshold-inclusive",
+      "value": 1,
+      "reason": "候选回复用区间[10000,50000)说明达到10000元即进入该档位，明确包含边界。",
+      "answer_evidence": "AR-03[10000,50000)需部门总经理",
+      "trace_evidence": "附件二表格明确AR-03档位为大于等于10000元且小于50000元。",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "citations字段包含01_expense_reimbursement_2025.md和03_authorization_management.md",
-      "id": "citations",
-      "reason": "正确引用两份制度（01_expense_reimbursement_2025.md 和 03_authorization_management.md）中的相关条款",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "调用了get_policy_doc 01和get_policy_doc 03"
+      "id": "two-hop-path-first",
+      "value": 1,
+      "reason": "候选回复明确描述第一跳为费用报销办法第五条，并引用条款。",
+      "answer_evidence": "第一跳——XX证券费用报销管理办法(2025修订版)(doc_id:01_expense_reimbursement_2025.md)第五条明确...",
+      "trace_evidence": "get_policy_doc(01_expense_reimbursement_2025.md)返回第五条内容。",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "无",
+      "id": "two-hop-path-relation",
+      "value": 1,
+      "reason": "候选回复明确说明报销办法第五条指向授权管理办法附件二，交叉引用关系清晰。",
+      "answer_evidence": "...统一按《XX证券授权管理办法》附件二执行",
+      "trace_evidence": "get_policy_doc(01_expense_reimbursement_2025.md)第五条提及授权管理办法附件二。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-second",
+      "value": 1,
+      "reason": "候选回复明确描述第二跳为授权管理办法附件二，并展示了审批档位。",
+      "answer_evidence": "第二跳——XX证券授权管理办法(doc_id:03_authorization_management.md)附件二...",
+      "trace_evidence": "get_policy_doc(03_authorization_management.md)返回附件二表格。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-expense",
+      "value": 1,
+      "reason": "候选提交的文献引用中包含费用报销办法第五条。",
+      "answer_evidence": "citations: {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第五条\"}",
+      "trace_evidence": "轨迹中获取了该文档并识别第五条。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-authorization",
+      "value": 1,
+      "reason": "候选提交的文献引用中包含授权管理办法附件二。",
+      "answer_evidence": "citations: {\"doc_id\": \"03_authorization_management.md\", \"clause_no\": \"附件二\"}",
+      "trace_evidence": "轨迹中获取了该文档并识别附件二。",
+      "source": "llm_judge"
+    },
+    {
       "id": "no-premature-stop",
-      "reason": "未因第一份制度中金额缺失而停止，继续检索授权管理办法并查询了异常记录",
-      "score": 10.0,
-      "source": "llm_judge",
-      "trace_evidence": "get_policy_doc 01后继续get_policy_doc 03，并进一步执行list_records_missing_approval"
+      "value": 1,
+      "reason": "轨迹表明在查看首份制度后继续检索了授权管理办法附件二，未提前停止。",
+      "answer_evidence": "答案完成两跳检索，列出附件二档位。",
+      "trace_evidence": "get_policy_doc依次调用01_expense_reimbursement_2025.md和03_authorization_management.md。",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "",
       "id": "submission",
+      "value": 1,
       "reason": "统一提交已接受且Schema有效",
-      "score": 5.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "",
-      "score_cap": 20,
-      "source": "llm_judge"
-    },
-    {
-      "id": "deprecated-policy-as-current",
-      "triggered": false,
-      "reason": "",
-      "score_cap": 40,
-      "source": "llm_judge"
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 286.055,
+    "expected_anomaly_ids": [],
     "actual_anomaly_ids": [
-      "ANOM-L3-007-AR02-MISSING-FINREVIEW"
+      "L3_007_AR02_MISSING_FINANCIAL_REVIEW"
     ],
+    "anomaly_metrics": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "count_exact": false,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": null,
     "actual_record_ids": [
-      "R000003",
-      "R000102",
-      "R000152",
-      "R000194",
-      "R000217",
-      "R000241",
-      "R000297",
-      "R000468",
-      "R000470",
-      "R000508",
-      "R000549",
-      "R000588",
-      "R000712",
-      "R000753",
-      "R000801",
-      "R000876",
-      "R001020",
-      "R001160",
-      "R001195",
-      "R001210",
-      "R001219",
-      "R001252",
-      "R001280",
-      "R001310",
-      "R001342",
-      "R001442",
-      "R001447",
-      "R001468",
-      "R001486",
-      "R001490",
-      "R001503",
-      "R001560",
-      "R001666",
-      "R001718",
-      "R001842",
-      "R001886",
-      "R001909",
-      "R001917",
-      "R001937",
-      "R001986",
-      "R001990",
-      "R002040",
-      "R002235",
-      "R002239",
-      "R002369",
-      "R002474",
-      "R002489",
-      "R002564",
-      "R002590",
-      "R002637",
-      "R002639",
-      "R002725",
-      "R002751",
-      "R002839",
-      "R002844",
-      "R002853",
-      "R002871",
-      "R003011",
-      "R003064",
-      "R003140",
-      "R003201",
-      "R003263",
-      "R003275",
-      "R003366",
-      "R003401",
-      "R003432",
-      "R003498",
-      "R003543",
-      "R003656",
-      "R003735",
-      "R003850",
-      "R003869",
-      "R003872",
-      "R003947",
-      "R004096",
-      "R004114",
-      "R004181",
+      "R004233",
       "R004207",
       "R004208",
-      "R004209",
-      "R004210",
-      "R004211",
-      "R004212",
-      "R004213",
-      "R004214",
-      "R004215",
-      "R004216",
       "R004217",
       "R004218",
       "R004219",
       "R004220",
-      "R004223",
-      "R004233",
       "R004236",
-      "R004237"
+      "R004237",
+      "R004212",
+      "R004213",
+      "R004223",
+      "R004214",
+      "R004215",
+      "R004216",
+      "R004209",
+      "R004210",
+      "R004211",
+      "R003850",
+      "R000712",
+      "R002489",
+      "R000003",
+      "R002871",
+      "R001909",
+      "R001842",
+      "R003140",
+      "R002637",
+      "R000468",
+      "R001937",
+      "R002369",
+      "R000297",
+      "R003872",
+      "R003498",
+      "R002844",
+      "R002590",
+      "R003947",
+      "R002839",
+      "R001442",
+      "R001486",
+      "R000102",
+      "R003735",
+      "R002853",
+      "R000194",
+      "R002474",
+      "R001342",
+      "R000152",
+      "R000241",
+      "R001666",
+      "R001917",
+      "R001468"
     ],
-    "anomaly_metrics": {
-      "actual_types": {},
-      "count_exact": false,
-      "expected_types": {},
-      "f1": 0.0,
-      "precision": 0.0,
-      "recall": 0.0
-    },
-    "citation_count": 3,
-    "elapsed_seconds": 199.094,
-    "expected_anomaly_ids": [],
-    "expected_record_ids": null,
     "record_metrics": null,
-    "required_citations": [
-      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
-      "document:01_expense_reimbursement_2025.md",
-      "document:03_authorization_management.md"
-    ],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
     "trap_tokens_in_conclusion": [],
-    "unknown_record_ids": []
+    "citation_count": 3,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第五条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T22:28:38+08:00",
-  "group": "openclaude-enhanced",
   "judge": {
-    "attempt": 1,
-    "confidence": 1.0,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "候选提交准确找出了审批金额10000元，完整展示了交叉引用路径，提供了双文档证据，且检索过程未提前终止，所有评分点均满分。",
     "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选提交准确执行两跳检索，定位到部门总经理审批线10000元并说明包含边界，引用制度条款完整，检索路径清晰且未提前停止，完全符合检查要求。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 1553,
-      "completion_tokens_details": {
-        "reasoning_tokens": 1082
-      },
-      "prompt_cache_hit_tokens": 1024,
-      "prompt_cache_miss_tokens": 7216,
-      "prompt_tokens": 8240,
-      "prompt_tokens_details": {
-        "cached_tokens": 1024
-      },
-      "total_tokens": 9793
-    }
+      "prompt_tokens": 7702,
+      "completion_tokens": 1970,
+      "total_tokens": 9672,
+      "prompt_cache_hit_tokens": 7680,
+      "prompt_cache_miss_tokens": 22
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 7702,
+          "completion_tokens": 1970,
+          "total_tokens": 9672,
+          "prompt_tokens_details": {
+            "cached_tokens": 7680
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1103
+          },
+          "prompt_cache_hit_tokens": 7680,
+          "prompt_cache_miss_tokens": 22
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 8
+      }
+    ]
   },
-  "passed": true,
-  "run_path": "runs/gate4_formal/openclaude-enhanced/L3-007",
-  "task_id": "L3-007"
+  "run_path": "runs/gate4_formal/openclaude-enhanced/L3-007"
 }

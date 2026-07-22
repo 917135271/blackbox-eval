@@ -1,0 +1,50 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-RRCASE001-001",
+      "record_ids": ["R000465", "R000561", "R000888", "R001354"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"}
+      ],
+      "facts": [
+        "E0041(邓柳)于2025-12-18报销training_fee 2157.72元(R000465)，AR-01审批(部门经理)",
+        "E0041于2025-12-20报销training_fee 2917.45元(R000561)，AR-01审批，与R000465间隔2天",
+        "E0041于2025-12-23报销training_fee 2606.07元(R000888)，AR-01审批，与R000465间隔5天",
+        "E0041于2025-12-25报销training_fee 2083.49元(R001354)，AR-01审批，与R000465间隔7天",
+        "7天窗口(12-18至12-24)内3笔合计7681.24元，超过AR-02审批线3000元",
+        "7天窗口(12-20至12-26)内3笔合计7607.01元，超过AR-02审批线3000元",
+        "AR-02线(3000-10000元)要求部门经理+财务复核，但每笔单独低于3000元仅触发AR-01(部门经理)审批",
+        "发票号各不相同，不涉及重复报销",
+        "每笔培训费均低于3500元/人/期上限"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R001894", "R000465", "R000561", "R000888", "R001354"],
+  "submitted_record_ids": ["R000465", "R000561", "R000888", "R001354"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [
+    {"doc_id": "05_training_expense.md", "clause_no": "第二条"},
+    {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"}
+  ],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": false,
+    "note": "本任务为阳性(存在异常)结果，no_anomaly_coverage不适用"
+  },
+  "reconciled_figures": {
+    "window_dec18_24": {"records": 3, "total": 7681.24, "records_list": ["R000465", "R000561", "R000888"]},
+    "window_dec20_26": {"records": 3, "total": 7607.01, "records_list": ["R000561", "R000888", "R001354"]},
+    "ar02_threshold": 3000,
+    "ar03_threshold": 10000,
+    "individual_max": 2917.45
+  },
+  "unresolved_items": []
+}

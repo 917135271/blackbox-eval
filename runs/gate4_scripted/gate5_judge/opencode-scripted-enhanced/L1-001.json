@@ -1,0 +1,170 @@
+{
+  "group": "opencode-scripted-enhanced",
+  "task_id": "L1-001",
+  "case_family": "policy_and_version",
+  "category": "policy_qa",
+  "graded_at": "2026-07-22T00:58:43+08:00",
+  "checklist_passed": 8,
+  "checklist_total": 8,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "current-threshold-amount",
+      "value": 1,
+      "reason": "答案明确给出10000元审批金额",
+      "answer_evidence": "答案：\"单笔费用报销金额达到10,000元（含）且不足50,000元时，需要部门总经理审批\"",
+      "trace_evidence": "无工具调用，直接来源于答案",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-threshold-inclusive",
+      "value": 1,
+      "reason": "说明10000元本身进入该审批档位",
+      "answer_evidence": "答案：\"达到10,000元（含）\"，明确含10000元",
+      "trace_evidence": "无工具调用，直接来源于答案",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-version",
+      "value": 1,
+      "reason": "明确结论基于2025修订版",
+      "answer_evidence": "答案：\"适用版本为《XX证券费用报销管理办法(2025修订版)》\"",
+      "trace_evidence": "无工具调用，直接来源于答案",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-expense-rule",
+      "value": 1,
+      "reason": "引用费用报销办法第五条",
+      "answer_evidence": "引用列表包含：{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第五条\"}",
+      "trace_evidence": "无工具调用，直接来源于提交的引用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-authorization",
+      "value": 1,
+      "reason": "候选回答明确提及《XX证券授权管理办法》附件二，并在citations中列出附件二。",
+      "answer_evidence": "金额边界见《XX证券授权管理办法》附件二。",
+      "trace_evidence": "citations中包含03_authorization_management.md附件二。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-cross-reference",
+      "value": 1,
+      "reason": "候选回答同时引用费用报销办法第五条和授权管理办法附件二，表明审批金额来源于费用报销办法并指向授权管理办法，构成交叉引用关系。",
+      "answer_evidence": "适用版本为《XX证券费用报销管理办法(2025修订版)》，金额边界见《XX证券授权管理办法》附件二。",
+      "trace_evidence": "citations中同时包含01_expense_reimbursement_2025.md第五条和03_authorization_management.md附件二。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "old-value-control",
+      "value": 1,
+      "reason": "候选回答明确指出旧版8000元审批线已被废止，不再适用，排除了旧值。",
+      "answer_evidence": "旧版8,000元审批线已被废止，不再适用。",
+      "trace_evidence": "citations中包含02_expense_reimbursement_2022_deprecated.md第二条和第四条，支持旧版废止结论。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 100.256,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": null,
+    "actual_record_ids": [],
+    "record_metrics": null,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 6,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第五条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "所有检查项均通过，候选回答满足expected_facts和required_citations。；所有检查项均满足，候选提交正确引用了制度依据，明确了现行审批线和旧版废止。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 3848,
+      "completion_tokens": 2176,
+      "total_tokens": 6024,
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 2440
+    },
+    "batch_count": 2,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 1969,
+          "completion_tokens": 1269,
+          "total_tokens": 3238,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 891
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 1201
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 1879,
+          "completion_tokens": 907,
+          "total_tokens": 2786,
+          "prompt_tokens_details": {
+            "cached_tokens": 640
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 533
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 1239
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 3
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/opencode-scripted-enhanced/L1-001"
+}

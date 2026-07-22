@@ -1,0 +1,58 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [],
+  "candidate_record_ids": ["R004234", "R004235"],
+  "submitted_record_ids": ["R004234", "R004235"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true,
+    "searched_population": "E0009 (张婷) office_supplies records in 2025-10-13 to 2025-10-27 window",
+    "query_conditions": {
+      "employee_id": "E0009",
+      "expense_type": "office_supplies",
+      "date_range": "2025-10-13 to 2025-10-27"
+    },
+    "population_count": 2,
+    "checked_rules": [
+      {
+        "rule": "重复报销 (Duplicate Reimbursement)",
+        "policy": "01_expense_reimbursement_2025.md",
+        "clause": "第十条",
+        "finding": "R004234使用发票FP2025X0004228(INV004228)，R004235使用发票FP2025X0004229(INV004229)，发票不同，不构成重复报销",
+        "status": "cleared"
+      },
+      {
+        "rule": "拆分报销 (Split Reimbursement)",
+        "policy": "01_expense_reimbursement_2025.md",
+        "clause": "第十一条",
+        "finding": "同一员工(E0009)、同一费用类型(office_supplies)、7天内(0天)2笔报销合计500元，未达到附件二较高审批线3000元(AR-02)，不触发拆分规避审批核查条件",
+        "threshold": "3000",
+        "observed": "500",
+        "status": "cleared"
+      },
+      {
+        "rule": "办公用品月度控制",
+        "policy": "07_office_communication.md",
+        "clause": "第二条",
+        "finding": "E0009 2025年10月办公用品报销合计500元，未超过月度上限600元",
+        "threshold": "600",
+        "observed": "500",
+        "status": "cleared"
+      }
+    ],
+    "conclusion": "无异常：R004234与R004235使用不同发票，不构成重复报销；7天内合计500元未达到较高审批线3000元，不构成拆分报销"
+  },
+  "reconciled_figures": {
+    "R004234_amount": 250,
+    "R004235_amount": 250,
+    "total_7day": 500,
+    "higher_approval_line": 3000,
+    "monthly_cap": 600,
+    "days_between": 0
+  },
+  "unresolved_items": []
+}

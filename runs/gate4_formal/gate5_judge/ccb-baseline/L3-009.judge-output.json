@@ -1,57 +1,238 @@
 {
-  "criteria": [
+  "checklist": [
     {
-      "id": "overall-count",
-      "score": 0,
-      "reason": "报告仅列出5个异常，未提30个异常总数及5个陷阱位，数量错误",
-      "answer_evidence": "答案指出“识别出5项关键异常”，并列出ANOM-001至005，未提及30个异常和5个TRAP",
-      "trace_evidence": "工具调用中无统计全量异常操作，未产出30异常结论"
+      "id": "overall-count-total",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "anomaly_ids 总数 85 项，不是 30",
+      "trace_evidence": "DUP-2025-001 至 DUP-2025-006 共 6 项，SPL-2025-001 至 SPL-2025-064 共 64 项，STD-2025-001 至 STD-2025-003 共 3 项，BUD-2025-001 至 BUD-2025-006 共 6 项，OVD-2025-001 至 OVD-2025-006 共 6 项，合计 85 项",
+      "source": "llm_judge"
     },
     {
-      "id": "five-rule-coverage",
-      "score": 20,
-      "reason": "报告明确覆盖重复、拆分、超标准、超预算、超期五类规则",
-      "answer_evidence": "报告章节分别对应超期(ANOM-001)、重复(ANOM-002)、超预算(ANOM-003)、拆分(ANOM-004)、超标准(ANOM-005)"
+      "id": "overall-count-type-split",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "SPLIT 类 anomaly_id 数量 64 项，不是 6",
+      "trace_evidence": "包含 SPL-2025-001 至 SPL-2025-064",
+      "source": "llm_judge"
     },
     {
-      "id": "representative-ids",
-      "score": 25,
-      "reason": "每类规则均提供了至少一个正确异常ID及详细记录证据",
-      "answer_evidence": "超期: R004227等；重复: R000002/R004201等；超预算: R004030等；拆分: R004207-R004220；超标准: R004223",
-      "trace_evidence": "get_expense_detail调用验证了R004201、R004207、R004223等记录，事实与报告一致"
+      "id": "overall-count-type-overstd",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "OVERSTD 类 anomaly_id 数量 3 项，不是 6",
+      "trace_evidence": "包含 STD-2025-001 至 STD-2025-003",
+      "source": "llm_judge"
     },
     {
-      "id": "policy-coverage",
-      "score": 15,
-      "reason": "制度引用准确，费用类引用费用报销管理办法，预算类引用预算管理办法",
-      "answer_evidence": "超期引用第七条，重复引用第十条，超预算引用第十三条及预算管理办法第二、三条，拆分引用第十一条及授权办法附件二，超标引用培训费管理办法第二条",
-      "trace_evidence": "工具获取了01_expense_reimbursement_2025.md、08_budget_management.md、05_training_expense.md等制度文档"
+      "id": "overall-count-type-overdue",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "OVERDUE 类 anomaly_id 数量 6 项",
+      "trace_evidence": "包含 OVD-2025-001 至 OVD-2025-006",
+      "source": "llm_judge"
     },
     {
-      "id": "report-shape",
-      "score": 2.5,
-      "reason": "报告缺少明确的影响分析部分，结构不够完整",
-      "answer_evidence": "报告有制度依据、异常概述、涉及记录和审计结论建议，但未独立说明影响",
-      "trace_evidence": "无"
+      "id": "all-record-ids-include-r004221",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids 包含 R004221",
+      "trace_evidence": "候选 record_ids 列表中有 \"R004221\"",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004222",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids 包含 R004222",
+      "trace_evidence": "候选 record_ids 列表中有 \"R004222\"",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004226",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "record_ids 不包含 R004226",
+      "trace_evidence": "候选 record_ids 列表中没有 R004226",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-no-extra",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "record_ids 存在超出预期范围的记录",
+      "trace_evidence": "预期 record_ids 为 44 条，候选包含大量额外记录如 R000070，R000074 等",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-dup",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "DUP 类给出发现 DUP-2025-001 及 record_ids R000002, R004201",
+      "trace_evidence": "审计摘要中“例如DUP-2025-001：发票FP202500000002（办公用品，423.79元）在记录R000002和R004201中重复出现”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-split",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "SPLIT 类给出发现 SPL-2025-059 及 record_ids R004207, R004208",
+      "trace_evidence": "evidence_matrix 中 SPL-2025-059 记录为 R004207, R004208",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-overstd",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "OVERSTD 类给出发现 STD-2025-001 及 record_id R004223",
+      "trace_evidence": "审计摘要中“STD-2025-001（R004223）：培训费3,700元，超过每人每期3,500元标准”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-budget",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "BUDGET 类给出发现 BUD-2025-001 及 record_id R000079",
+      "trace_evidence": "审计摘要中“BUD-2025-001：投资银行部(D001)...记录R000079使累计支出首次超过预算”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-overdue",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "OVERDUE 类给出发现 OVD-2025-001 及 record_id R004227",
+      "trace_evidence": "审计摘要中“OVD-2025-001（R004227）：...(延迟65天)”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-coverage-expense",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "引用《费用报销管理办法》第七条、第十条、第十一条、第十二条",
+      "trace_evidence": "citations 中包含 doc_id \"01_expense_reimbursement_2025.md\" clause_no 第七条、第十条、第十一条、第十二条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-coverage-special",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "超标准引用《培训费管理办法》第二条、《业务招待费管理办法》第三条、《差旅费管理办法》第四条",
+      "trace_evidence": "citations 中包含 \"04_travel_expense.md\" 第四条, \"05_training_expense.md\" 第二条, \"06_business_entertainment.md\" 第三条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-coverage-budget",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "超预算引用《预算管理办法》第二条至第四条",
+      "trace_evidence": "citations 中包含 \"08_budget_management.md\" 第二条、第三条、第四条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004233",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids列表和答案文字均未包含R004233。",
+      "trace_evidence": "candidate_submission.record_ids不包含R004233; candidate_submission.answer无R004233",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004234",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids列表和答案文字均未包含R004234。",
+      "trace_evidence": "candidate_submission.record_ids不包含R004234; candidate_submission.answer无R004234",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004235",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids列表和答案文字均未包含R004235。",
+      "trace_evidence": "candidate_submission.record_ids不包含R004235; candidate_submission.answer无R004235",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004236",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids列表和答案文字均未包含R004236。",
+      "trace_evidence": "candidate_submission.record_ids不包含R004236; candidate_submission.answer无R004236",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004237",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids列表和答案文字均未包含R004237。",
+      "trace_evidence": "candidate_submission.record_ids不包含R004237; candidate_submission.answer无R004237",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004238",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids列表和答案文字均未包含R004238。",
+      "trace_evidence": "candidate_submission.record_ids不包含R004238; candidate_submission.answer无R004238",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004239",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids列表和答案文字均未包含R004239。",
+      "trace_evidence": "candidate_submission.record_ids不包含R004239; candidate_submission.answer无R004239",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004240",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids列表和答案文字均未包含R004240。",
+      "trace_evidence": "candidate_submission.record_ids不包含R004240; candidate_submission.answer无R004240",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-fact",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "报告“一、审计范围与依据”中明确审计覆盖XX证券2025年全年报销记录，并在异常描述中列出具体发票、金额等事实。",
+      "trace_evidence": "candidate_submission.answer: '本次审计覆盖XX证券2025年1月1日至12月31日全部已审批费用报销记录（共4,240条）'",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-rule",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "报告列举了《费用报销管理办法》第十条、第十一条等制度依据作为规则。",
+      "trace_evidence": "candidate_submission.answer: '违反《费用报销管理办法》第十条同一发票最多报销1次的规定'",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-judgment",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "报告明确将重复、拆分等情形认定为异常，并给出发现数量。",
+      "trace_evidence": "candidate_submission.answer: '本次审计共发现85项费用异常，覆盖五类规则'",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-impact",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "报告指出重复报销造成公司资金损失等影响。",
+      "trace_evidence": "candidate_submission.answer: '同一费用被重复支付，造成公司资金损失'",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-recommendation",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "报告提出在报销系统中增设发票唯一性校验等建议。",
+      "trace_evidence": "candidate_submission.answer: '在报销系统中建立发票号唯一性校验，拦截重复提交'",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "提交的所有record_ids均在工具调用和系统记录中出现，无虚构"
-    },
-    {
-      "id": "partial-scan-presented-as-complete",
-      "triggered": true,
-      "reason": "工具仅对部分记录进行抽样检查（list_expenses仅一页，get_expense_detail仅18次），未实施全量4240条扫描，却声称覆盖全量，且异常总数远低于预期30个，属于部分扫描冒充完整"
-    },
-    {
-      "id": "trap-included-as-anomaly",
-      "triggered": false,
-      "reason": "未将任何TRAP开头的记录计入异常"
-    }
-  ],
-  "overall_comment": "报告准确覆盖五类规则并提供了制度依据与记录证据，但异常总数错误（仅5个而非30个），且因仅进行部分扫描却声称全量，适用50分上限，总体得分50分。",
-  "confidence": 0.85
+  "overall_comment": "",
+  "confidence": 0.8
 }

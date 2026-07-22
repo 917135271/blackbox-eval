@@ -1,0 +1,92 @@
+{
+  "task_id": "L3-001",
+  "scan_method": "全量扫描：通过SQL对全部4240条报销记录的invoice_id进行GROUP BY聚合，筛选usage_count>=2的发票组。同时通过find_reused_invoices API交叉验证。已验证无usage_count>=3的发票。",
+  "population": {
+    "total_expense_records": 4240,
+    "total_invoices": "全量",
+    "scan_date": "2025全年"
+  },
+  "results": [
+    {
+      "anomaly_id": "DUP-FP202500000002",
+      "invoice_no": "FP202500000002",
+      "invoice_amount": 423.79,
+      "expense_type": "office_supplies",
+      "usage_count": 2,
+      "record_ids": ["R000002", "R004201"],
+      "records_detail": [
+        {"record_id": "R000002", "employee_id": "E0050", "expense_date": "2025-08-19", "amount": 423.79, "special_approval": 0},
+        {"record_id": "R004201", "employee_id": "E0050", "expense_date": "2025-02-10", "amount": 423.79, "special_approval": 0}
+      ]
+    },
+    {
+      "anomaly_id": "DUP-FP202500000005",
+      "invoice_no": "FP202500000005",
+      "invoice_amount": 88.83,
+      "expense_type": "local_transport",
+      "usage_count": 2,
+      "record_ids": ["R000005", "R004202"],
+      "records_detail": [
+        {"record_id": "R000005", "employee_id": "E0022", "expense_date": "2025-06-07", "amount": 88.83, "special_approval": 0},
+        {"record_id": "R004202", "employee_id": "E0022", "expense_date": "2025-03-10", "amount": 88.83, "special_approval": 0}
+      ]
+    },
+    {
+      "anomaly_id": "DUP-FP202500000020",
+      "invoice_no": "FP202500000020",
+      "invoice_amount": 669.50,
+      "expense_type": "travel_lodging",
+      "usage_count": 2,
+      "record_ids": ["R000020", "R004203"],
+      "records_detail": [
+        {"record_id": "R000020", "employee_id": "E0028", "expense_date": "2025-01-05", "amount": 669.50, "special_approval": 0},
+        {"record_id": "R004203", "employee_id": "E0028", "expense_date": "2025-04-10", "amount": 669.50, "special_approval": 0}
+      ]
+    },
+    {
+      "anomaly_id": "DUP-FP202500000028",
+      "invoice_no": "FP202500000028",
+      "invoice_amount": 165.58,
+      "expense_type": "communication",
+      "usage_count": 2,
+      "record_ids": ["R000028", "R004204"],
+      "records_detail": [
+        {"record_id": "R000028", "employee_id": "E0036", "expense_date": "2025-03-09", "amount": 165.58, "special_approval": 0},
+        {"record_id": "R004204", "employee_id": "E0036", "expense_date": "2025-05-10", "amount": 165.58, "special_approval": 0}
+      ]
+    },
+    {
+      "anomaly_id": "DUP-FP202500000037",
+      "invoice_no": "FP202500000037",
+      "invoice_amount": 84.72,
+      "expense_type": "local_transport",
+      "usage_count": 2,
+      "record_ids": ["R000037", "R004205"],
+      "records_detail": [
+        {"record_id": "R000037", "employee_id": "E0027", "expense_date": "2025-03-30", "amount": 84.72, "special_approval": 0},
+        {"record_id": "R004205", "employee_id": "E0027", "expense_date": "2025-06-10", "amount": 84.72, "special_approval": 0}
+      ]
+    },
+    {
+      "anomaly_id": "DUP-FP202500000055",
+      "invoice_no": "FP202500000055",
+      "invoice_amount": 999.76,
+      "expense_type": "business_entertainment",
+      "usage_count": 2,
+      "record_ids": ["R000055", "R004206"],
+      "records_detail": [
+        {"record_id": "R000055", "employee_id": "E0020", "expense_date": "2025-04-03", "amount": 999.76, "special_approval": 0},
+        {"record_id": "R004206", "employee_id": "E0020", "expense_date": "2025-07-10", "amount": 999.76, "special_approval": 0}
+      ]
+    }
+  ],
+  "sql_verification": "sqlite3 /benchmark/data/expense.db \"SELECT i.invoice_no, COUNT(e.record_id) as cnt, GROUP_CONCAT(e.record_id) FROM invoices i JOIN expense_records e ON e.invoice_id = i.invoice_id GROUP BY i.invoice_id HAVING cnt >= 2\"",
+  "api_verification": "find_reused_invoices(min_usage_count=2) returned same 6 groups, total=6",
+  "exclusion_checks": [
+    {"check": "special_approval", "result": "全部12条记录special_approval=0，无特殊审批豁免"},
+    {"check": "status", "result": "全部为approved状态，无取消或撤销"}
+  ],
+  "completed_checks": ["全量GROUP BY扫描", "API交叉验证", "usage_count>=3补充查询(结果为空)", "逐条详情核实", "特殊审批排除"],
+  "limitations": [],
+  "unresolved_items": []
+}

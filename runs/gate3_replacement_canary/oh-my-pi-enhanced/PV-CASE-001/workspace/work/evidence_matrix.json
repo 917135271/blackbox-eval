@@ -1,0 +1,39 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "PV-CASE-001-A01",
+      "record_ids": ["R004233"],
+      "citations": [
+        {"doc_id": "03_authorization_management.md", "clause_no": "第二条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第三条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第六条"}
+      ],
+      "facts": [
+        "R004233报销金额9990元，属于AR-02档位（3000≤金额<10000）",
+        "AR-02档位的必要审批角色为'部门经理，并经财务复核'",
+        "R004233当前仅有1条审批记录：A004233，审批角色为'部门经理'（E0008），缺少'财务复核'审批",
+        "list_records_missing_approval(required_role='财务复核')确认R004233在缺失财务复核的记录列表中",
+        "R004233住宿费标准：高管级(X1)/一类城市(A)，标准1100元/人/晚，实际999元/人/晚=9990÷10，未超标"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004233"],
+  "submitted_record_ids": ["R004233"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": null,
+  "reconciled_figures": {
+    "anomaly_count": 1,
+    "record_count": 1,
+    "amount_checked": 9990.0
+  },
+  "unresolved_items": []
+}

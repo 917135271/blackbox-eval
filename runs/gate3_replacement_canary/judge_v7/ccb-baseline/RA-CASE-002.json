@@ -1,0 +1,326 @@
+{
+  "group": "ccb-baseline",
+  "dataset_id": "securities-expense-audit-formal-15-v9",
+  "rubric_version": "atomic-binary-checklist-v7",
+  "task_id": "RA-CASE-002",
+  "case_family": "record_audit",
+  "category": "policy_data_comparison",
+  "graded_at": "2026-07-22T21:12:32+08:00",
+  "checklist_passed": 14,
+  "checklist_total": 17,
+  "checklist_pass_rate": 82.353,
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "候选答案明确将ANOM-003定性为“拆分报销规避审批”，并提供了日期、金额、合计等依据，无矛盾表述。",
+      "answer_evidence": "答案中ANOM-003描述：“拆分报销规避审批——R004209/210/211在7天内分3笔合计¥10,200...通过拆分规避部门总经理审批”。",
+      "trace_evidence": "工具轨迹显示对R004209/210/211逐一获取详情，确认金额和日期；政策检索得到第十一条关于拆分报销的规定。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "anomaly-type",
+      "value": 1,
+      "reason": "发现规则类型完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "anomaly-count",
+      "value": 0,
+      "reason": "发现数量不匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-r004209",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-r004210",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-r004211",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 0,
+      "reason": "存在范围外record_id：['R004219', 'R004220']",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "same-employee-type",
+      "value": 1,
+      "reason": "候选答案在ANOM-003事实中明确“同一员工E0008、同一类型travel_lodging”，且工具轨迹已核实三条记录的员工和费用类型。",
+      "answer_evidence": "证据矩阵ANOM-003行事实：“拆分组A: ...同一员工E0008、同一类型travel_lodging”。",
+      "trace_evidence": "get_expense_detail(R004209/R004210/R004211)返回employee_id均为E0008，expense_type均为travel_lodging。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "window-dates",
+      "value": 1,
+      "reason": "候选提交列出了三笔日期（2025-02-26、2025-02-28、2025-03-02），首尾相隔4天，符合7天窗口。",
+      "answer_evidence": "答案中ANOM-003描述和证据矩阵均列出日期：“R004209(02-26)、R004210(02-28)、R004211(03-02)”。",
+      "trace_evidence": "get_expense_detail调用返回各记录的expense_date字段，确认三个日期。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "amounts",
+      "value": 1,
+      "reason": "候选提交在ANOM-001和ANOM-003中均列明各笔金额为3400元，三笔金额完整准确。",
+      "answer_evidence": "证据矩阵ANOM-001行列出：“R004209: ¥3,400/5晚...”，ANOM-003行合计¥10,200隐含单笔3400。",
+      "trace_evidence": "get_expense_detail调用返回的amount字段均为3400.0，确认金额。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "sum",
+      "value": 1,
+      "reason": "候选提交明确计算R004209/210/211合计10200元，与预期一致",
+      "answer_evidence": "答案中提及“R004209/210/211在7天内分3笔合计¥10,200”",
+      "trace_evidence": "工具调用get_expense_detail返回R004209金额3400，R004210金额3400，R004211金额3400，合计10200",
+      "source": "llm_judge"
+    },
+    {
+      "id": "threshold",
+      "value": 1,
+      "reason": "候选提交明确指出合计达到AR-03(¥10,000)较高审批线",
+      "answer_evidence": "答案中“均达到AR-03(¥10,000)线”",
+      "trace_evidence": "工具调用summarize_expenses等确认合计，search_policy获取附件二审批线10000",
+      "source": "llm_judge"
+    },
+    {
+      "id": "distinct-invoices",
+      "value": 1,
+      "reason": "候选提交未报告DUP异常，仅报告SPLIT，正确区分拆分与重复；工具调用确认三张发票不同",
+      "answer_evidence": "答案中未提及重复发票或DUP异常",
+      "trace_evidence": "工具调用find_reused_invoices未发现R004209/210/211发票重复；find_invoice_usage显示每张发票仅使用一次",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-expense",
+      "value": 1,
+      "reason": "候选提交引用了01_expense_reimbursement_2025.md第十一条，符合拆分核查规则",
+      "answer_evidence": "citations中引用了doc_id 01_expense_reimbursement_2025.md, clause_no 第十一条",
+      "trace_evidence": "工具调用search_policy和get_policy_doc获取了第十一条内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-authorization",
+      "value": 1,
+      "reason": "候选答案明确引用附件二AR-03线¥10,000作为较高审批线",
+      "answer_evidence": "答案中“达到AR-03(¥10,000)线”及citations包含03_authorization_management.md第二条",
+      "trace_evidence": "get_policy_doc(03_authorization_management.md)返回包含附件二审批权限表，AR-03≥10000元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "window-investigation",
+      "value": 0,
+      "reason": "未发现等价的窗口查询工具调用，summarize_expenses仅返回汇总而非记录列表",
+      "answer_evidence": "答案包含R004209/210/211，但未引用窗口查询过程",
+      "trace_evidence": "工具调用summarize_expenses仅输出记录数，无ID列表；get_expense_detail逐个获取记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "critical_failures": [],
+  "score_cap": null,
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 558.632,
+    "expected_anomaly_ids": [
+      "SPLIT-001"
+    ],
+    "actual_anomaly_ids": [
+      "ANOM-001",
+      "ANOM-002",
+      "ANOM-003"
+    ],
+    "anomaly_metrics": {
+      "precision": 0.333333,
+      "recall": 1.0,
+      "f1": 0.5,
+      "count_exact": false,
+      "expected_types": {
+        "SPLIT": 1
+      },
+      "actual_types": {
+        "SPLIT": 3
+      }
+    },
+    "expected_record_ids": [
+      "R004209",
+      "R004210",
+      "R004211"
+    ],
+    "actual_record_ids": [
+      "R004209",
+      "R004210",
+      "R004211",
+      "R004219",
+      "R004220"
+    ],
+    "record_metrics": {
+      "precision": 0.6,
+      "recall": 1.0,
+      "f1": 0.75,
+      "exact": false,
+      "missing_count": 0,
+      "extra_count": 2
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 8,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 0.9666666666666667,
+    "overall_comment": "候选提交满足所有检查项，审计结论明确，员工与费用类型正确，日期窗口和金额均已核实。；所有检查项均通过，候选提交正确计算合计金额、比较审批线、区分拆分与重复，并引用了相关制度。；policy-authorization通过，但window-investigation未满足，因缺失通过员工、费用类型和日期范围的窗口查询证据。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 40276,
+      "completion_tokens": 6225,
+      "total_tokens": 46501,
+      "prompt_cache_hit_tokens": 1536,
+      "prompt_cache_miss_tokens": 38740
+    },
+    "batch_count": 3,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 10226,
+          "completion_tokens": 1767,
+          "total_tokens": 11993,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1171
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 10226
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 10183,
+          "completion_tokens": 1574,
+          "total_tokens": 11757,
+          "prompt_tokens_details": {
+            "cached_tokens": 512
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1096
+          },
+          "prompt_cache_hit_tokens": 512,
+          "prompt_cache_miss_tokens": 9671
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 10000,
+          "completion_tokens": 2359,
+          "total_tokens": 12359,
+          "prompt_tokens_details": {
+            "cached_tokens": 512
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 2085
+          },
+          "prompt_cache_hit_tokens": 512,
+          "prompt_cache_miss_tokens": 9488
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 2
+      }
+    ],
+    "consistency_audit": {
+      "sampled_count": 1,
+      "agreement_count": 1,
+      "agreement_rate": 1.0,
+      "disagreement_ids": [],
+      "tied_ids": [],
+      "tiebreak_count": 0,
+      "repeat_count": 2,
+      "batches": [
+        {
+          "model": "deepseek-v4-pro",
+          "usage": {
+            "prompt_tokens": 9867,
+            "completion_tokens": 525,
+            "total_tokens": 10392,
+            "prompt_tokens_details": {
+              "cached_tokens": 512
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 388
+            },
+            "prompt_cache_hit_tokens": 512,
+            "prompt_cache_miss_tokens": 9355
+          },
+          "finish_reason": "stop",
+          "attempt": 1,
+          "max_tokens": 4096,
+          "shape_attempt": 1,
+          "criteria_count": 1
+        }
+      ]
+    }
+  },
+  "run_path": "runs/gate3_replacement_canary/ccb-baseline/RA-CASE-002"
+}

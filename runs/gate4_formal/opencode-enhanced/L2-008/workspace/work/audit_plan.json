@@ -1,52 +1,85 @@
 {
   "task_id": "L2-008",
   "task_type": "policy_data_comparison",
-  "question": "核查以R004212为线索的拆分报销异常,返回异常ID和记录ID集合",
   "scope": {
+    "audit_object": "记录R004212为线索的拆分报销异常核查",
     "clue_record": "R004212",
-    "rule": "拆分报销 (split reimbursement)",
-    "policy_docs": ["01_expense_reimbursement_2025.md", "03_authorization_management.md"],
-    "clause": "01_expense_reimbursement_2025.md 第十一条",
-    "business_period": "2025-04-03 to 2025-04-17 (7-day window around R004212 expense_date 2025-04-10)",
-    "org_scope": "employee E0009, expense_type travel_lodging"
+    "applicable_rule": "拆分报销 (Article 11 of 01_expense_reimbursement_2025)",
+    "employee_scope": "E0009 (张婷)",
+    "expense_types": ["travel_lodging"],
+    "date_window": "2025-04-03 至 2025-04-22 (R004212日期2025-04-10 ± 7天)",
+    "departments": ["D009"]
   },
   "policy_questions": [
-    "What constitutes split reimbursement under Article 11?",
-    "What are the higher approval tier thresholds from Authorization Management?"
+    {
+      "question": "拆分报销认定条件是什么？",
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause": "第十一条",
+      "fields": ["employee_id", "expense_type", "expense_date", "amount"]
+    },
+    {
+      "question": "AR-02和AR-03审批线金额分别是多少？",
+      "doc_id": "03_authorization_management.md",
+      "clause": "附件二",
+      "fields": ["tier_id", "amount_range", "required_role"]
+    },
+    {
+      "question": "住宿费标准是多少？",
+      "doc_id": "04_travel_expense.md",
+      "clause": "第四条",
+      "fields": ["employee_level", "city_tier", "standard_rate"]
+    },
+    {
+      "question": "同一发票是否重复使用？",
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause": "第十条",
+      "fields": ["invoice_no", "record_id"]
+    }
   ],
   "data_questions": [
-    "Are there other travel_lodging records by E0009 within 7 days of R004212?",
-    "Does the combined amount reach a higher approval tier?"
+    {
+      "question": "E0009在7天窗口内travel_lodging类型的所有报销记录",
+      "tables": ["expenses"],
+      "filters": {
+        "employee_id": "E0009",
+        "expense_type": "travel_lodging",
+        "date_from": "2025-04-03",
+        "date_to": "2025-04-22"
+      }
+    }
   ],
-  "required_fields": ["record_id", "employee_id", "expense_type", "amount", "expense_date", "approval_tier_id"],
-  "evidence_requirements": [
-    "Expense records for E0009 travel_lodging within 2025-04-03 to 2025-04-17",
-    "Policy text for Article 11 of 01_expense_reimbursement_2025.md",
-    "Authorization thresholds from 03_authorization_management.md Annex 2",
-    "Approval records for all involved records"
+  "required_fields": ["record_id", "employee_id", "expense_date", "amount", "expense_type", "reason", "invoice_no", "city_tier", "nights", "employee_level", "approval_tier", "approver_role"],
+  "evidence_needs": [
+    "全部在7天窗口内的E0009 travel_lodging记录",
+    "每笔记录的审批链",
+    "相关政策条款原文",
+    "金额合计与AR-02/AR-03审批线比对"
   ],
   "execution_steps": [
-    "Query R004212 detail and approvals",
-    "Search related records by same employee, same expense_type, within 7-day window",
-    "Calculate combined amount and determine applicable approval tier",
-    "Compare individual tier vs combined tier to identify split avoidance",
-    "Record findings in evidence matrix",
-    "Run evidence-coverage-check",
-    "Run audit-report and result-validator",
-    "Validate and submit"
+    "1. 获取R004212详细信息和审批链",
+    "2. 搜索E0009在7天窗口内同类型记录",
+    "3. 获取所有发现记录的详细信息和审批链",
+    "4. 核对政策条款(第10条发票重复, 第11条拆分, AR审批线, 住宿标准)",
+    "5. 合计金额与AR-03审批线比对",
+    "6. 形成初步发现",
+    "7. 证据覆盖检查",
+    "8. 生成审计报告",
+    "9. 结果校验",
+    "10. 提交"
   ],
-  "complexity": 2,
+  "complexity": 3,
   "complexity_reasons": [
-    "Two policies involved (reimbursement + authorization)",
-    "Aggregation of record amounts required",
-    "Threshold comparison (7-day window, amount tier boundary)",
-    "Single-rule investigation (split reimbursement only)"
+    "多制度交叉引用(01_reimbursement + 03_authorization + 04_travel)",
+    "批次聚合与阈值比对(7天窗口内同员工同类型记录合计)",
+    "制度阈值条件(AR-02与AR-03审批线)和日期边界判定"
   ],
-  "subagent_plan": "none - compact main agent sufficient for single-rule batch investigation",
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "数据范围窄(单一员工单一类型短窗口),主智能体可完成全部调查"
+  },
   "stopping_conditions": [
-    "All travel_lodging records for E0009 within 7-day window identified",
-    "Combined amount compared to authorization thresholds",
-    "Split reimbursement determination made"
-  ],
-  "unresolved_items": []
+    "已穷举E0009在7天窗口内所有travel_lodging记录",
+    "已核对全部相关制度条款",
+    "证据覆盖率达100%"
+  ]
 }

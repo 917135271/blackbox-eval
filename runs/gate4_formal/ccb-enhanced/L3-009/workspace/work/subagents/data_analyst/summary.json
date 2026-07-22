@@ -1,0 +1,43 @@
+{
+  "decision": "PRELIMINARY_FINDINGS",
+  "key_findings": [
+    "OVERDUE (§7): 6 records exceed 60-day submission limit (delays: 65-120 days). All are communication type with BX2025X prefix. Record IDs: R004227, R004228, R004229, R004230, R004231, R004232.",
+    "DUPLICATE (§10): 6 invoice groups confirmed reused: INV000002(R000002,R004201), INV000005(R000005,R004202), INV000020(R000020,R004203), INV000028(R000028,R004204), INV000037(R000037,R004205), INV000055(R000055,R004206). Each pair shares same invoice with different expense dates.",
+    "SPLIT (§11): 87 candidate groups (employee+expense_type within 7 days, >=2 claims, total>=3000). 75 groups are training_fee, 7 travel_lodging, 3 business_entertainment, 2 other. Notable: E0007-E0010 have structured travel_lodging splits with BX2025X prefix in 2-3 day intervals (¥10,200-10,500 totals). Training splits widespread across regular employees.",
+    "OVER-STANDARD (§12): 2 single-transaction records: R004221 office_supplies ¥650 (std=600), R004222 communication ¥330 (std=300). Additionally: R004225 travel_lodging per-night ¥900 vs std ¥850 (D1/A tier), R004226 local_transport per-day ¥92 vs std ¥80, R004224 business_entertainment per-person ¥350 vs std ¥300, R004223 training_fee ¥3700 vs std ¥3500.",
+    "OVER-BUDGET (§13): 6 departments exceed annual budget: D001(157.8%), D002(153.0%), D003(158.6%), D004(154.3%), D005(155.6%), D006(155.5%). 4 departments within budget. Zero special_approval records exist. Budget-crossing triggers: R001388(D001), R000415(D002), R002362(D003), R003179(D004), R000541(D005), R000217(D006)."
+  ],
+  "record_ids": [
+    "OVD: R004227,R004228,R004229,R004230,R004231,R004232",
+    "DUP: R000002,R004201,R000005,R004202,R000020,R004203,R000028,R004204,R000037,R004205,R000055,R004206",
+    "STD: R004221,R004222,R004223,R004224,R004225,R004226",
+    "BUD: R001388,R000415,R002362,R003179,R000541,R000217",
+    "SPL: 87 groups (full list in split_candidates.json)"
+  ],
+  "citations": [
+    "01_expense_reimbursement_2025.md §7 (60-day submission)",
+    "01_expense_reimbursement_2025.md §10 (duplicate invoice prohibition)",
+    "01_expense_reimbursement_2025.md §11 (split claims, AR-02 threshold 3000)",
+    "01_expense_reimbursement_2025.md §12 (over-standard, office_supplies>600, communication>300)",
+    "01_expense_reimbursement_2025.md §13 + Budget §3 (department over-budget)",
+    "03_authorization.md AR-02 threshold=3000",
+    "04_travel_expense.md §4 (lodging standards), §6 (transport standards)",
+    "05_training_expense.md §2 (<=3500/person/course)",
+    "06_business_entertainment_expense.md (<=5000/event, <=300/person)",
+    "07_office_supplies_expense.md §2 (<=600/person/month), §3 (<=300/person/month)"
+  ],
+  "unresolved_items": [
+    "87 split candidate groups need case-by-case review: training_fee splits may be legitimate multi-day courses vs genuine splitting. Main agent should determine which are anomalies.",
+    "BX2025X prefixed records (R004201-R004232) appear as a distinct batch - need clarification on their provenance and whether they should be treated differently.",
+    "Over-standard for non-§12 types (travel_lodging, local_transport, business_entertainment, training) identified but needs main agent to confirm if these fall under §12 scope or their own policy docs.",
+    "Split claims for E0007-E0010 with BX2025X prefix (e.g. R004207-R004208 totaling ¥10,400) appear highly unusual - may need special handling."
+  ],
+  "artifact_paths": [
+    "/workspace/work/subagents/data_analyst/all_records.json",
+    "/workspace/work/subagents/data_analyst/all_findings.json",
+    "/workspace/work/subagents/data_analyst/overdue_records.json",
+    "/workspace/work/subagents/data_analyst/split_candidates.json",
+    "/workspace/work/subagents/data_analyst/detailed_analysis.json",
+    "/workspace/work/subagents/data_analyst/summary.json"
+  ]
+}

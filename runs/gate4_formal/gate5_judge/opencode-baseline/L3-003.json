@@ -1,95 +1,275 @@
 {
+  "group": "opencode-baseline",
+  "task_id": "L3-003",
   "case_family": "full_year_audit",
-  "case_score": 11.0,
-  "case_score_raw": 11.0,
   "category": "full_year_rule_audit",
-  "criteria": [
+  "graded_at": "2026-07-21T21:35:42+08:00",
+  "checklist_passed": 19,
+  "checklist_total": 27,
+  "checklist_pass_rate": 70.37,
+  "checklist": [
     {
-      "answer_evidence": "提交的anomaly_ids包含ANOM-LATE-001, ANOM-REUSE-*, ANOM-SPLIT-*, ANOM-STD-*等共19个，预期仅为OVERSTD-001~006。",
-      "id": "all-anomaly-ids",
-      "reason": "提交的异常ID集合与预期完全不一致，包含大量其他规则异常，未满足完全一致要求。",
-      "score": 0.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用，无法验证扫描是否只针对超标准。"
+      "id": "finding-type-count-rule-type",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交包含ANOM-DUP-001至ANOM-DUP-006等DUP类型发现，非全部OVERSTD",
+      "trace_evidence": "最终答案中列为‘类型六：重复发票报销（6项）’",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "record_ids包含R004221-R004226，但也包含R000002等大量重复、拆分、超期记录。",
-      "id": "all-record-ids",
-      "reason": "返回了38个记录ID，包含预期6个超标准记录，但同时包含32个无关记录，不符合完整且无多余的要求。",
-      "score": 0.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用，无法验证这些记录是否经查询确认。"
+      "id": "finding-type-count-count",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交列出11项发现，而非恰好6项",
+      "trace_evidence": "答案中写‘共发现11项违规’",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "答案仅陈述结果，无SQL、数据提取或计算步骤。",
-      "id": "full-scan-method",
-      "reason": "无任何工具调用，未展示全年数据查询或计算过程，无法证明执行了全量扫描。",
-      "score": 0.0,
-      "source": "llm_judge",
-      "trace_evidence": "tool_trace_summary显示call_count为0，无样本。"
-    },
-    {
-      "answer_evidence": "citations包含01_expense_reimbursement_2025.md的第十二条及04~07等文件条款；evidence_matrix中每个超标准异常列出了标准对照。",
-      "id": "policy-basis",
-      "reason": "正确引用了费用报销管理办法第十二条（即6.3）及各类别标准，每个超标准异常有明确数额对比，但未展示查询条件。",
-      "score": 6.0,
-      "source": "llm_judge",
-      "trace_evidence": "无查询条件展示。"
-    },
-    {
-      "answer_evidence": "anomaly_ids包含ANOM-REUSE-*, ANOM-SPLIT-*, ANOM-LATE-*等非超标准异常。",
-      "id": "false-positive-control",
-      "reason": "提交了19个异常ID和38个记录ID，其中13个异常属于重复、拆分、超期等其他规则，构成严重误报。",
-      "score": 0.0,
-      "source": "llm_judge",
-      "trace_evidence": "无。"
-    },
-    {
+      "id": "all-record-ids-include-r004221",
+      "value": 1,
+      "reason": "期望record_id已提交",
       "answer_evidence": "",
-      "id": "submission",
-      "reason": "统一提交已接受且Schema有效",
-      "score": 5.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    }
-  ],
-  "critical_failures": [
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
     {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "所有提交的record_id在数据库中均存在，无虚构。",
-      "score_cap": 20,
+      "id": "all-record-ids-include-r004222",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r004223",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r004224",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r004225",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r004226",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids列表中未包含R004226",
+      "trace_evidence": "record_ids数组为['R000002','R000005',...'R004225']，缺失'R004226'",
       "source": "llm_judge"
     },
     {
-      "id": "partial-scan-presented-as-complete",
-      "triggered": true,
-      "reason": "工具调用为零，无任何查询证据，却声称完成全年超标准专项扫描，存在虚假表述。",
-      "score_cap": 50,
+      "id": "all-record-ids-no-extra",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids包含17个记录，超出预期6个（R004221-R004226）",
+      "trace_evidence": "record_ids数组包含多余记录如'R000002','R004201'等",
       "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交中ANOM-OFF-001包含record_id R004221，符合分组要求",
+      "trace_evidence": "最终答案中明确列出R004221关联ANOM-OFF-001",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交中ANOM-COM-001包含record_id R004222，符合分组要求",
+      "trace_evidence": "最终答案中明确列出R004222关联ANOM-COM-001",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交中ANOM-TRN-001包含record_id R004223，符合分组要求",
+      "trace_evidence": "最终答案中明确列出R004223关联ANOM-TRN-001",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交中ANOM-BE-001包含record_id R004224，符合分组要求",
+      "trace_evidence": "最终答案中明确列出R004224关联ANOM-BE-001",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选答案中ANOM-TVL-001明确指出R004225为差旅住宿费单晚超标准。",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选答案的异常列表和record_ids中未包含R004226。",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选答案声明“本次全年超标准专项扫描覆盖全部4240条报销记录、6种费用类型”，且各费用类型说明了扫描全部记录。",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-approval",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选答案在扫描方法中未提及special_approval字段，也未说明排除已有专项审批的记录。",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-office",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交明确声明扫描方法：从全部694条办公用品记录中筛选单笔amount > 600的记录；并仅发现一条异常ANOM-OFF-001（R004221, 金额650元>600元）。",
+      "trace_evidence": "工具调用记录显示仅过滤了amount>600的办公用品记录，未使用月度累计或其他口径。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-communication",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交明确声明扫描方法：从全部640条通讯费记录中筛选单笔amount > 300的记录；仅发现ANOM-COM-001（R004222, 330元>300元）。",
+      "trace_evidence": "工具调用记录显示仅过滤了amount>300的通讯费记录，未涉及月度累计。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-training",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交明确声明：扫描方法从全部578条培训费记录中筛选单笔amount > 3500的记录；仅发现ANOM-TRN-001（R004223, 3700元>3500元）。",
+      "trace_evidence": "工具调用记录显示仅过滤了amount>3500的培训课程费记录。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-entertainment",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交明确声明扫描方法：对全部675条招待费记录，首先筛选amount > 5000的记录；其次计算人均=amount/participants，筛选人均 > 300的记录。仅发现ANOM-BE-001（人均超标，但未发现单次>5000）。",
+      "trace_evidence": "工具调用记录显示执行了双条件筛选（amount>5000 OR amount/participants>300）。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-travel",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交描述：对全部883条住宿记录逐一获取detail（含employee_level、city_tier、nights），计算单晚金额=amount/nights，与对应标准比较。",
+      "trace_evidence": "无工具调用痕迹，但候选描述已清晰表明使用了employee_level、city_tier、nights。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-transport",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交描述：对全部770条交通记录逐一获取detail（含city_tier、days），计算日均=amount/days，与对应标准比较。",
+      "trace_evidence": "无工具调用痕迹，但候选描述已清晰表明使用了city_tier、days。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "提交发现11项，而非预期的6项，且缺少R004226",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "提交未引用费用报销办法第十二条",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-special",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "citations include doc_id 07_office_communication.md clause_no 第二条、第三条; doc_id 05_training_expense.md clause_no 第二条; doc_id 04_travel_expense.md clause_no 第四条; doc_id 06_business_entertainment.md clause_no 第三条",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 455.928,
+    "expected_anomaly_ids": [
+      "OVERSTD-001",
+      "OVERSTD-002",
+      "OVERSTD-003",
+      "OVERSTD-004",
+      "OVERSTD-005",
+      "OVERSTD-006"
+    ],
     "actual_anomaly_ids": [
-      "ANOM-LATE-001",
-      "ANOM-REUSE-001",
-      "ANOM-REUSE-002",
-      "ANOM-REUSE-003",
-      "ANOM-REUSE-004",
-      "ANOM-REUSE-005",
-      "ANOM-REUSE-006",
-      "ANOM-SPLIT-001",
-      "ANOM-SPLIT-002",
-      "ANOM-SPLIT-003",
-      "ANOM-SPLIT-004",
-      "ANOM-SPLIT-005",
-      "ANOM-SPLIT-006",
-      "ANOM-STD-COMM",
-      "ANOM-STD-ENTERTAIN",
-      "ANOM-STD-LODGING",
-      "ANOM-STD-OFFICE",
-      "ANOM-STD-TRAINING",
-      "ANOM-STD-TRANSPORT"
+      "ANOM-BE-001",
+      "ANOM-COM-001",
+      "ANOM-DUP-001",
+      "ANOM-DUP-002",
+      "ANOM-DUP-003",
+      "ANOM-DUP-004",
+      "ANOM-DUP-005",
+      "ANOM-DUP-006",
+      "ANOM-OFF-001",
+      "ANOM-TRN-001",
+      "ANOM-TVL-001"
+    ],
+    "anomaly_metrics": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "count_exact": false,
+      "expected_types": {
+        "OVERSTD": 6
+      },
+      "actual_types": {
+        "DUP": 6
+      }
+    },
+    "expected_record_ids": [
+      "R004221",
+      "R004222",
+      "R004223",
+      "R004224",
+      "R004225",
+      "R004226"
     ],
     "actual_record_ids": [
       "R000002",
@@ -104,107 +284,211 @@
       "R004204",
       "R004205",
       "R004206",
-      "R004207",
-      "R004208",
-      "R004209",
-      "R004210",
-      "R004211",
-      "R004212",
-      "R004213",
-      "R004214",
-      "R004215",
-      "R004216",
-      "R004217",
-      "R004218",
-      "R004219",
-      "R004220",
       "R004221",
       "R004222",
       "R004223",
       "R004224",
-      "R004225",
-      "R004226",
-      "R004227",
-      "R004228",
-      "R004229",
-      "R004230",
-      "R004231",
-      "R004232"
-    ],
-    "anomaly_metrics": {
-      "actual_types": {
-        "DUP": 6,
-        "OVERDUE": 1,
-        "OVERSTD": 6,
-        "SPLIT": 6
-      },
-      "count_exact": false,
-      "expected_types": {
-        "OVERSTD": 6
-      },
-      "f1": 0.48,
-      "precision": 0.315789,
-      "recall": 1.0
-    },
-    "citation_count": 10,
-    "elapsed_seconds": 433.981,
-    "expected_anomaly_ids": [
-      "OVERSTD-001",
-      "OVERSTD-002",
-      "OVERSTD-003",
-      "OVERSTD-004",
-      "OVERSTD-005",
-      "OVERSTD-006"
-    ],
-    "expected_record_ids": [
-      "R004221",
-      "R004222",
-      "R004223",
-      "R004224",
-      "R004225",
-      "R004226"
+      "R004225"
     ],
     "record_metrics": {
+      "precision": 0.294118,
+      "recall": 0.833333,
+      "f1": 0.434783,
       "exact": false,
-      "extra_count": 32,
-      "f1": 0.272727,
-      "missing_count": 0,
-      "precision": 0.157895,
-      "recall": 1.0
+      "missing_count": 1,
+      "extra_count": 12
     },
-    "required_citations": [],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
     "trap_tokens_in_conclusion": [],
-    "unknown_record_ids": []
+    "citation_count": 6,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十二条"
+      },
+      {
+        "doc_id": "04_travel_expense.md",
+        "clause_no": "第三条至第六条"
+      },
+      {
+        "doc_id": "05_training_expense.md",
+        "clause_no": "第二条至第五条"
+      },
+      {
+        "doc_id": "06_business_entertainment.md",
+        "clause_no": "第二条、第三条"
+      },
+      {
+        "doc_id": "07_office_communication.md",
+        "clause_no": "第二条、第三条"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T23:27:09+08:00",
-  "group": "opencode-baseline",
   "judge": {
-    "attempt": 1,
-    "confidence": 0.95,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "未按题目要求仅返回超标准异常，而是输出全部异常类型，导致大量误报；且缺乏全年扫描的方法证据，制度引用正确但未体现查询执行。整体未有效完成专项任务。",
-    "shape_attempt": 1,
     "status": "ok",
+    "confidence": 0.8000000000000002,
+    "overall_comment": "",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 3935,
-      "completion_tokens_details": {
-        "reasoning_tokens": 3203
+      "prompt_tokens": 165640,
+      "completion_tokens": 8015,
+      "total_tokens": 173655,
+      "prompt_cache_hit_tokens": 119168,
+      "prompt_cache_miss_tokens": 46472
+    },
+    "batch_count": 7,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 23592,
+          "completion_tokens": 1331,
+          "total_tokens": 24923,
+          "prompt_tokens_details": {
+            "cached_tokens": 23552
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1022
+          },
+          "prompt_cache_hit_tokens": 23552,
+          "prompt_cache_miss_tokens": 40
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 3,
+        "criteria_count": 4
       },
-      "prompt_cache_hit_tokens": 1408,
-      "prompt_cache_miss_tokens": 6692,
-      "prompt_tokens": 8100,
-      "prompt_tokens_details": {
-        "cached_tokens": 1408
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 23595,
+          "completion_tokens": 1004,
+          "total_tokens": 24599,
+          "prompt_tokens_details": {
+            "cached_tokens": 23552
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 721
+          },
+          "prompt_cache_hit_tokens": 23552,
+          "prompt_cache_miss_tokens": 43
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
       },
-      "total_tokens": 12035
-    }
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 23625,
+          "completion_tokens": 2170,
+          "total_tokens": 25795,
+          "prompt_tokens_details": {
+            "cached_tokens": 23552
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1934
+          },
+          "prompt_cache_hit_tokens": 23552,
+          "prompt_cache_miss_tokens": 73
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 23665,
+          "completion_tokens": 1038,
+          "total_tokens": 24703,
+          "prompt_tokens_details": {
+            "cached_tokens": 23552
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 611
+          },
+          "prompt_cache_hit_tokens": 23552,
+          "prompt_cache_miss_tokens": 113
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 23725,
+          "completion_tokens": 498,
+          "total_tokens": 24223,
+          "prompt_tokens_details": {
+            "cached_tokens": 640
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 329
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 23085
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 2
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 23708,
+          "completion_tokens": 1794,
+          "total_tokens": 25502,
+          "prompt_tokens_details": {
+            "cached_tokens": 640
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1699
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 23068
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 2
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 23730,
+          "completion_tokens": 180,
+          "total_tokens": 23910,
+          "prompt_tokens_details": {
+            "cached_tokens": 23680
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 90
+          },
+          "prompt_cache_hit_tokens": 23680,
+          "prompt_cache_miss_tokens": 50
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 3,
+        "criteria_count": 1
+      }
+    ]
   },
-  "passed": false,
-  "run_path": "runs/gate4_formal/opencode-baseline/L3-003",
-  "task_id": "L3-003"
+  "run_path": "runs/gate4_formal/opencode-baseline/L3-003"
 }

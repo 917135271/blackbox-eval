@@ -1,94 +1,86 @@
 {
   "task_id": "L2-008",
   "task_type": "policy_data_comparison",
-  "audit_scope": {
-    "clue_record": "R004212",
-    "rule": "拆分报销 (Split Reimbursement)",
-    "policy_clause": "01_expense_reimbursement_2025.md 第十一条",
-    "employee": "E0009",
+  "question": "结合制度和业务数据，核查以R004212为线索的拆分报销异常，返回发现ID和record_id集合，并说明日期窗口、合计金额和制度依据。",
+  "clue_record": "R004212",
+  "audit_period": {
+    "start": "2025-04-03",
+    "end": "2025-04-17",
+    "basis": "7-day window around R004212 expense_date 2025-04-10 per Article 11"
+  },
+  "scope": {
+    "employee_id": "E0009",
     "expense_type": "travel_lodging",
-    "period": "2025-04-10 to 2025-04-17 (7-day window from clue record)"
+    "rule": "Article 11 of 2025 Reimbursement Policy - Split Reimbursement"
   },
   "policy_questions": [
     {
-      "id": "PQ-01",
-      "question": "Does Article 11 of the 2025 Expense Reimbursement Policy define split reimbursement, and what are the criteria?",
-      "clause": "第十一条",
-      "criteria": [
-        "同一员工 (same employee)",
-        "同一费用类型 (same expense type)",
-        "7天内2笔及以上 (2+ records within 7 days)",
-        "合计金额达到较高审批线 (combined amount reaches higher approval tier)"
-      ]
+      "id": "PQ1",
+      "question": "Does Article 11 of the 2025 Reimbursement Policy apply to these records?",
+      "policy": "01_expense_reimbursement_2025.md",
+      "clause": "Article 11: 同一员工、同一费用类型在7天内出现2笔及以上报销，且合计金额达到《授权管理办法》附件二较高审批线的，应重点核查拆分规避审批。"
     },
     {
-      "id": "PQ-02",
-      "question": "What are the approval tier thresholds per the Authorization Management Policy?",
-      "clause": "附件二",
-      "tiers": {
-        "AR-01": "0-3000: 部门经理",
-        "AR-02": "3000-10000: 部门经理+财务复核",
-        "AR-03": "10000-50000: 部门总经理",
-        "AR-04": "50000-200000: 分管副总",
-        "AR-05": "200000+: 总经理办公会"
-      }
+      "id": "PQ2",
+      "question": "What is the applicable approval tier for the individual records and their combined total?",
+      "policy": "03_authorization_management.md",
+      "clause": "Attachment 2: AR-02 (3,000-10,000): 部门经理+财务复核; AR-03 (10,000-50,000): 部门总经理"
+    },
+    {
+      "id": "PQ3",
+      "question": "Does the travel lodging standard support the finding of split reimbursement?",
+      "policy": "04_travel_expense.md",
+      "clause": "Article 4: 经理级/一类城市: 650元/晚 standard"
     }
   ],
   "data_questions": [
     {
-      "id": "DQ-01",
-      "question": "What are the details of R004212 and R004213 (same employee, same expense type, within 7 days)?",
-      "records": ["R004212", "R004213"],
-      "required_fields": ["record_id", "employee_id", "expense_type", "amount", "expense_date", "approval_tier", "invoice_id"]
-    },
-    {
-      "id": "DQ-02",
-      "question": "Does the combined amount (10200) trigger a higher approval tier than the individual amounts (5100 each)?",
-      "analysis": "5100 x 2 = 10200. Individual: AR-02. Combined: AR-03.",
-      "conclusion": "Split evades 部门总经理 approval"
+      "id": "DQ1",
+      "question": "What are the details of R004212 and all records for E0009 with travel_lodging within the 7-day window?",
+      "tables": ["expenses"],
+      "query": "list_expenses for E0009, travel_lodging"
     }
   ],
+  "required_fields": [
+    "record_id", "employee_id", "employee_name", "expense_date", "reimburse_date",
+    "expense_type", "amount", "reason", "invoice_no", "vendor_name",
+    "city_tier", "nights", "status", "approval_tier", "special_approval"
+  ],
   "evidence_requirements": [
-    "Record details for R004212 and R004213",
-    "Policy text for Article 11 (split reimbursement)",
-    "Authorization table (附件二) thresholds",
-    "Invoice usage verification for both invoices"
+    "R004212 full detail",
+    "R004213 full detail",
+    "2025 Reimbursement Policy Article 11 text",
+    "Authorization Management Attachment 2 thresholds",
+    "Travel Expense Policy standards",
+    "Combined amount calculation and approval tier comparison"
   ],
   "execution_steps": [
-    {"step": 1, "action": "Write audit plan", "output": "work/audit_plan.json", "status": "in_progress"},
-    {"step": 2, "action": "Record planning_completed checkpoint", "output": "checkpoint"},
-    {"step": 3, "action": "Policy-version-check for applicable policy", "output": "policy analysis"},
-    {"step": 4, "action": "Investigation: verify split reimbursement criteria", "output": "evidence"},
-    {"step": 5, "action": "Record investigation_completed checkpoint", "output": "checkpoint"},
-    {"step": 6, "action": "Form preliminary findings", "output": "work/final_result.json draft"},
-    {"step": 7, "action": "Evidence coverage check", "output": "work/evidence_matrix.json"},
-    {"step": 8, "action": "Review-ready checkpoint", "output": "checkpoint"},
-    {"step": 9, "action": "Run audit-report skill", "output": "finalized report"},
-    {"step": 10, "action": "Run result-validator skill", "output": "work/validation_report.json"},
-    {"step": 11, "action": "Validate and submit", "output": "submission"}
+    {"step": 1, "action": "Write audit plan", "artifact": "work/audit_plan.json"},
+    {"step": 2, "action": "Retrieve policy texts and record details", "artifact": "work/evidence_index.json"},
+    {"step": 3, "action": "Run policy-version-check (2025 policy applies)", "artifact": "work/policy_version_check.json"},
+    {"step": 4, "action": "Run batch-expense-analysis (records in 7-day window)", "artifact": "work/batch_analysis.json"},
+    {"step": 5, "action": "Evidence coverage check", "artifact": "work/evidence_matrix.json"},
+    {"step": 6, "action": "Run audit-report", "artifact": "work/final_result.json"},
+    {"step": 7, "action": "Run result-validator", "artifact": "work/validation_report.json"},
+    {"step": 8, "action": "Validate and submit", "artifact": "submission"}
   ],
-  "complexity": {
-    "score": 2,
-    "reasons": [
-      "Two policies involved (expense reimbursement + authorization)",
-      "Threshold comparison required against AR tiers"
-    ]
-  },
+  "complexity": 2,
+  "complexity_reasons": [
+    "Single rule (Article 11) but requires aggregation of amounts across records",
+    "Date boundary analysis (7-day window)",
+    "Threshold comparison (AR-02 vs AR-03)",
+    "Policy-data cross-referencing for travel standard compliance"
+  ],
   "subagent_plan": {
-    "use_subagent": false,
-    "reason": "Single rule, two records, straightforward threshold comparison. Compact mode sufficient."
+    "role": null,
+    "reason": "Only 2 records in scope; straightforward aggregation and policy comparison; compact mode is sufficient"
   },
   "stopping_conditions": [
-    "All split reimbursement criteria are verified or refuted",
-    "Evidence coverage reaches 100%",
-    "Validation report passes",
-    "Submit result receives acceptance"
+    "All records for E0009 travel_lodging in 7-day window identified",
+    "Combined amount calculated and compared to approval tiers",
+    "Policy basis for split determination confirmed",
+    "Evidence matrix passes at 100%",
+    "Validation report passes"
   ],
-  "unresolved_items": [],
-  "preliminary_finding": {
-    "anomaly_type": "split_reimbursement",
-    "anomaly_id": "SPLIT-001",
-    "records": ["R004212", "R004213"],
-    "description": "E0009 split a single lodging expense across two records (R004212 and R004213) within 5 days, both travel_lodging at 5100 each, total 10200 evading AR-03 approval tier"
-  }
+  "unresolved_items": []
 }

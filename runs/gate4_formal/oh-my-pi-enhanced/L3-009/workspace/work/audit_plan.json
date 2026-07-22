@@ -3,130 +3,111 @@
   "task_type": "audit_report",
   "audit_object": "XX证券全年费用报销",
   "audit_period": "2025-01-01 至 2025-12-31",
-  "organization_scope": "全公司所有部门及员工",
-  "expense_types": ["差旅费", "培训费", "业务招待费", "办公用品", "通讯费"],
-  "deliverable": "基于全年数据的异常审计摘要报告，覆盖五类规则并列出关键异常ID",
-
-  "policy_questions": [
+  "organization_scope": "全部部门、全部员工",
+  "expense_types": "全部费用类型",
+  "rules": [
     {
-      "rule_category": "重复报销",
-      "rule_id": "R01",
-      "question": "同一发票是否在不同报销记录中重复出现？",
+      "rule_id": "RULE_DUPLICATE",
+      "rule_name": "重复报销",
       "policy_basis": "01_expense_reimbursement_2025.md 第十条",
-      "threshold": "同一发票最多报销1次",
-      "fields_needed": ["invoice_no", "record_id", "amount", "expense_date", "employee_id"]
+      "counting": "按重复发票组计1项",
+      "criteria": "同一发票出现在不同报销记录中超过1次"
     },
     {
-      "rule_category": "拆分报销规避审批",
-      "rule_id": "R02",
-      "question": "同一员工、同一费用类型在7天内是否有2笔及以上报销，且合计金额达到AR-03（10000元）及以上审批线？",
-      "policy_basis": "01_expense_reimbursement_2025.md 第十一条; 03_authorization_management.md 附件二",
-      "threshold": "7天内≥2笔，合计≥10000元",
-      "fields_needed": ["employee_id", "expense_type", "expense_date", "amount", "record_id"]
+      "rule_id": "RULE_SPLIT",
+      "rule_name": "拆分报销",
+      "policy_basis": "01_expense_reimbursement_2025.md 第十一条",
+      "counting": "同一员工、同一费用类型7天窗口聚合组计1项",
+      "criteria": "同一员工、同一费用类型在7天内出现>=2笔报销，且合计金额达到授权管理办法附件二较高审批线（>=3000元即AR-02）"
     },
     {
-      "rule_category": "超标准报销",
-      "rule_id": "R03",
-      "question": "报销金额是否超过对应制度标准的1.0倍且无专项审批？",
-      "policy_basis": "01_expense_reimbursement_2025.md 第十二条; 04-07各费用管理办法",
-      "sub_rules": [
-        {"type": "差旅住宿", "standard": "按职级+城市档位：员工级300-450元/晚，经理级450-650元/晚，部门负责人级600-850元/晚，高管级750-1100元/晚"},
-        {"type": "培训课程", "standard": "每人每期≤3500元"},
-        {"type": "培训综合", "standard": "内部≤800元/日，外部≤1200元/日"},
-        {"type": "培训住宿", "standard": "按城市档位：350-500元/晚"},
-        {"type": "业务招待", "standard": "单次≤5000元，人均≤300元"},
-        {"type": "办公用品", "standard": "每人每月≤600元"},
-        {"type": "通讯费", "standard": "每人每月≤300元"}
-      ],
-      "fields_needed": ["record_id", "expense_type", "amount", "employee_id", "city_tier", "employee_level", "participants", "days", "nights", "special_approval"]
+      "rule_id": "RULE_OVERSTANDARD",
+      "rule_name": "超标准",
+      "policy_basis": "01_expense_reimbursement_2025.md 第十二条; 04_travel_expense.md 第四条/第六条; 05_training_expense.md 第二条/第三条/第四条/第五条; 06_business_entertainment.md 第二条/第三条; 07_office_communication.md 第二条/第三条",
+      "counting": "单笔记录计1项（不评价办公用品和通讯费用的多笔月度累计）",
+      "criteria": "单笔报销金额超过对应制度标准，且无专项审批"
     },
     {
-      "rule_category": "预算超支",
-      "rule_id": "R04",
-      "question": "部门年度预算是否超支（已使用≥预算额度），且后续报销无专项审批？",
-      "policy_basis": "01_expense_reimbursement_2025.md 第十三条; 08_budget_management.md 第三条",
-      "threshold": "已使用≥预算额度1.0倍",
-      "fields_needed": ["department_id", "record_id", "amount", "expense_date", "special_approval", "budget_amount", "budget_used"]
+      "rule_id": "RULE_OVERBUDGET",
+      "rule_name": "超预算",
+      "policy_basis": "01_expense_reimbursement_2025.md 第十三条; 08_budget_management.md 第三条/第四条",
+      "counting": "按部门计1项，以按reimburse_date和record_id累计时首次使累计支出超过预算且无专项审批的记录作为关键记录",
+      "criteria": "部门年度累计支出超过年度预算，且跨过预算线的记录无专项审批"
     },
     {
-      "rule_category": "超期报销",
-      "rule_id": "R05",
-      "question": "费用发生后是否超过60天才提交报销？",
-      "policy_basis": "01_expense_reimbursement_2025.md 第七条",
-      "threshold": "费用发生后60天内提交",
-      "fields_needed": ["record_id", "expense_date", "reimburse_date", "employee_id"]
+      "rule_id": "RULE_OVERDUE",
+      "rule_name": "超期报销",
+      "policy_basis": "01_expense_reimbursement_2025.md 第七条/第九条",
+      "counting": "按记录计1项",
+      "criteria": "expense_date到reimburse_date间隔超过60天"
     }
   ],
-
+  "policy_questions": [
+    "2025年度适用的费用报销政策版本",
+    "各费用类型的金额标准（差旅住宿/交通、培训、招待、办公、通讯）",
+    "审批权限线定义",
+    "预算管理办法的超预算条件",
+    "超期报销的天数定义和财年末特殊规则"
+  ],
   "data_questions": [
-    "列出全年所有报销记录",
-    "按发票号分组，找出使用次数≥2的发票",
-    "按(员工, 费用类型, 7天窗口)分组，找出合计金额≥10000元的组",
-    "按费用类型和对应标准，逐条检查超标情况",
-    "按部门计算预算累计使用，找出超预算节点",
-    "计算每条记录的提交延迟天数（reimburse_date - expense_date）"
+    "全年所有报销记录的完整数据范围",
+    "重复发票检测：同一invoice_id出现在>=2条记录中",
+    "拆分报销检测：同一员工+同一类型+7天窗口内>=2笔，合计金额达AR-02",
+    "超标准检测：按费用类型的单笔金额与对应标准比较",
+    "超预算检测：按部门累计支出与年度预算比较",
+    "超期检测：expense_date与reimburse_date间隔>60天"
   ],
-
   "required_fields": [
-    "record_id", "employee_id", "department_id", "expense_type", "amount",
-    "expense_date", "reimburse_date", "invoice_no", "city_tier", "employee_level",
-    "participants", "days", "nights", "special_approval", "status",
-    "budget_amount", "budget_used"
+    "record_id", "employee_id", "department_id", "expense_date", "reimburse_date",
+    "expense_type", "amount", "invoice_id", "status", "city_tier", "nights",
+    "days", "participants", "budget_year", "special_approval"
   ],
-
-  "evidence_requirements": [
-    "每条异常必须有对应的数据库记录ID",
-    "每条异常必须有对应的政策条款引用",
-    "证据矩阵覆盖率100%"
+  "evidence_needs": [
+    "每类规则的查询SQL和结果",
+    "政策条款原文引用",
+    "各发现的详细记录信息和违规事实"
   ],
-
   "execution_steps": [
-    {"step": 1, "name": "审计规划", "action": "制定审计计划，确定五类规则和数据范围"},
-    {"step": 2, "name": "政策研究（子智能体）", "action": "确定适用政策版本、条款、标准和豁免条件"},
-    {"step": 3, "name": "数据分析（子智能体）", "action": "全年数据批量分析，按五类规则筛选候选异常"},
-    {"step": 4, "name": "初步发现汇总", "action": "汇总政策研究和数据分析结果，形成初步发现"},
-    {"step": 5, "name": "证据覆盖检查", "action": "逐条核查证据覆盖率和关联性"},
-    {"step": 6, "name": "独立复核（子智能体）", "action": "对初步发现进行假阳性复核"},
-    {"step": 7, "name": "审计报告", "action": "编写异常审计摘要报告"},
-    {"step": 8, "name": "结果校验与提交", "action": "通过result-validator校验后提交"}
+    {"step": 1, "name": "审计规划", "description": "定义范围、规则、数据需求、复杂度评分和子智能体路由", "output": "work/audit_plan.json"},
+    {"step": 2, "name": "制度版本确认", "description": "确认2025年度适用的所有制度版本和条款", "output": "work/policy_applicability.json"},
+    {"step": 3, "name": "批量数据分析", "description": "执行五类规则的全面数据扫描", "output": "work/analysis/data_findings.json"},
+    {"step": 4, "name": "证据覆盖检查", "description": "逐项验证证据与发现的对应关系", "output": "work/evidence_matrix.json"},
+    {"step": 5, "name": "独立复核", "description": "对初步发现进行误报审查", "output": "work/independent_review.json"},
+    {"step": 6, "name": "审计报告", "description": "生成最终审计摘要", "output": "work/report_draft.json"},
+    {"step": 7, "name": "结果校验与提交", "description": "Schema校验和统一提交", "output": "work/validation_report.json, work/final_result.json"}
   ],
-
-  "complexity_score": 6,
+  "complexity": 6,
   "complexity_reasons": [
-    "政策版本关系（2022 vs 2025）",
-    "多项政策（8个以上政策文档）",
-    "聚合、分组、连接、批量过滤",
-    "五个业务规则",
-    "多阈值、日期边界、豁免条件",
-    "综合审计报告"
+    "涉及至少2项政策（报销管理+预算+差旅+培训+招待+办公通讯+授权=7项）",
+    "需要聚合、分组、连接和批量过滤",
+    "涉及5条业务规则",
+    "涉及多类阈值、日期边界和豁免条件",
+    "综合性审计报告",
+    "涉及制度版本确认"
   ],
-
   "subagent_plan": {
     "policy_researcher": {
-      "role": "policy_researcher",
-      "reason_code": "MULTI_POLICY_VERSION_CHECK",
-      "trigger": "存在2022版和2025版报销制度，需要确认适用版本；多项费用标准制度需要交叉引用",
-      "task": "确定2025全年适用的制度版本、五类规则的具体条款、各项费用标准、豁免条件和审批权限"
+      "needed": true,
+      "reason": "MULTI_POLICY_VERSION_CHECK",
+      "description": "确认7项制度文件的适用版本、条款和相互关系"
     },
     "data_analyst": {
-      "role": "data_analyst",
-      "reason_code": "AGGREGATION_REQUIRED",
-      "trigger": "全年数据需要聚合分析、多表连接、分组统计",
-      "task": "对全年报销数据进行五类规则的批量分析：重复发票检测、7天拆分窗口检测、超标检测、预算超支检测、超期检测"
+      "needed": true,
+      "reason": "AGGREGATION_REQUIRED",
+      "description": "执行五类规则的全面批量数据分析"
     },
     "independent_reviewer": {
-      "role": "independent_reviewer",
-      "reason_code": "COMPREHENSIVE_AUDIT",
-      "trigger": "综合审计需独立复核",
-      "task": "对初步发现进行假阳性复核，特别关注审批豁免、阈值边界、日期窗口、数据完整性"
+      "needed": true,
+      "reason": "COMPREHENSIVE_AUDIT",
+      "description": "对综合性审计的初步发现进行独立复核"
     }
   },
-
   "stopping_conditions": [
-    "所有五类规则的证据覆盖率达到100%",
-    "预检valid=true且提交成功",
-    "所有子智能体结果已登记"
+    "所有五类规则的分析完成且可重现",
+    "所有发现均有证据支撑和政策依据",
+    "evidence_matrix覆盖率达到100%",
+    "独立复核通过",
+    "validation_report状态为pass"
   ],
-
   "unresolved_items": []
 }

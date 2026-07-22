@@ -1,47 +1,175 @@
 {
   "artifact_paths": [
+    "final_submission.json",
+    "submission_receipt.json",
+    "traces/context_events.jsonl",
+    "traces/events.jsonl",
+    "traces/native_events.jsonl",
+    "traces/subagents.jsonl",
+    "traces/tool_calls.jsonl",
+    "work/artifact_index.json",
     "work/audit_plan.json",
-    "work/policy_applicability.json",
+    "work/context_checkpoint.json",
+    "work/decision_log.jsonl",
+    "work/evidence_index.json",
     "work/evidence_matrix.json",
-    "work/validation_report.json",
     "work/final_result.json",
+    "work/independent_review.json",
+    "work/policy_applicability.json",
     "work/report_draft.json",
-    "work/independent_review.json"
+    "work/task_state.json",
+    "work/validation_report.json"
   ],
   "compacted": false,
-  "context_usage_percent": 20.0,
-  "created_at": 1784208797.6002357,
-  "estimation_method": "reported_tokens",
+  "context_usage_percent": 0.0,
+  "created_at": 1784621110.7435224,
+  "estimation_method": "outer_runner_finalization",
   "retained_state": {
     "applicable_policies": [
-      "01_expense_reimbursement_2025.md 第十条"
+      "01_expense_reimbursement_2025.md",
+      "03_authorization_management.md"
     ],
-    "artifact_index": "work/artifact_index.json",
-    "audit_plan": "work/audit_plan.json",
-    "constraints": "只处理发票重复使用相关记录",
+    "artifact_index": [
+      "final_submission.json",
+      "submission_receipt.json",
+      "traces/context_events.jsonl",
+      "traces/events.jsonl",
+      "traces/native_events.jsonl",
+      "traces/subagents.jsonl",
+      "traces/tool_calls.jsonl",
+      "work/artifact_index.json",
+      "work/audit_plan.json",
+      "work/context_checkpoint.json",
+      "work/decision_log.jsonl",
+      "work/evidence_index.json",
+      "work/evidence_matrix.json",
+      "work/final_result.json",
+      "work/independent_review.json",
+      "work/policy_applicability.json",
+      "work/report_draft.json",
+      "work/task_state.json",
+      "work/validation_report.json"
+    ],
+    "audit_plan": {
+      "audit_scope": {
+        "audit_object": "R004236和R004237的拆分报销核查",
+        "business_period": "2025-10-01 至 2025-10-09",
+        "department": "D010 (人力资源部)",
+        "employee": "E0010 (闭想)",
+        "expense_types": [
+          "travel_lodging"
+        ],
+        "records": [
+          "R004236",
+          "R004237"
+        ],
+        "rule": "拆分报销 — 政策第11条"
+      },
+      "complexity": {
+        "reasons": [
+          "单规则（拆分报销）",
+          "两条已知记录，无批量查询或聚合",
+          "存在7天日期边界检查（+1）",
+          "制度版本明确无歧义",
+          "非全面审计"
+        ],
+        "score": 1
+      },
+      "data_questions": [
+        "R004236和R004237的费用发生日期间隔是多少天",
+        "两笔报销的合计金额是否达到较高审批线",
+        "两笔报销是否属于同一员工、同一费用类型"
+      ],
+      "evidence_needed": [
+        "R004236完整详情",
+        "R004237完整详情",
+        "01_expense_reimbursement_2025.md 第11条",
+        "03_authorization_management.md 附件二 审批线"
+      ],
+      "execution_steps": [
+        {
+          "action": "完成审计计划并记录planning_completed检查点",
+          "name": "规划",
+          "step": 1
+        },
+        {
+          "action": "确认2025修订版制度适用性及第11条拆分报销条件",
+          "name": "制度确认",
+          "step": 2
+        },
+        {
+          "action": "获取R004236和R004237详情，计算费用发生日期间隔和合计金额",
+          "name": "数据核查",
+          "step": 3
+        },
+        {
+          "action": "构建证据矩阵，验证覆盖率100%",
+          "name": "证据覆盖检查",
+          "step": 4
+        },
+        {
+          "action": "对边界情况（8天 vs 7天）进行false-positive review",
+          "name": "独立复核",
+          "step": 5
+        },
+        {
+          "action": "生成审计结论报告",
+          "name": "报告生成",
+          "step": 6
+        },
+        {
+          "action": "校验final_result.json并提交",
+          "name": "结果校验",
+          "step": 7
+        }
+      ],
+      "policy_questions": [
+        "拆分报销的7天间隔如何计算（费用发生日期）",
+        "较高审批线的金额阈值是多少",
+        "2025修订版政策是否完全适用于2025年10月的费用"
+      ],
+      "question": "请核查R004236和R004237是否构成7天内拆分报销。必须按费用发生日期计算间隔并核对合计金额；若不构成异常，请明确说明无异常、原因和制度依据。",
+      "required_fields": [
+        "record_id",
+        "employee_id",
+        "expense_date",
+        "expense_type",
+        "amount",
+        "invoice_no",
+        "special_approval"
+      ],
+      "stopping_conditions": [
+        "确认费用日期间隔是否≤7天",
+        "合计金额达到较高审批线时确认是否构成拆分",
+        "若不满足7天条件则明确无异常"
+      ],
+      "subagent_plan": {
+        "reason": "复杂度1，单一规则两条已知记录，主智能体可直接处理",
+        "use_subagent": false
+      },
+      "task_id": "TRAP-003",
+      "task_type": "clean_but_suspicious",
+      "unresolved_items": []
+    },
+    "constraints": [
+      "isolated GATE3 workspace",
+      "formal answer assets prohibited",
+      "outer runner timeout enforced"
+    ],
     "evidence_status": "pass",
-    "preliminary_finding": "无异常",
     "record_ids": [
-      "R000002",
-      "R000005",
-      "R000020",
-      "R000028",
-      "R000037",
-      "R000055",
-      "R004201",
-      "R004202",
-      "R004203",
-      "R004204",
-      "R004205",
-      "R004206"
+      "R004236",
+      "R004237"
     ],
-    "remaining_budget": "sufficient",
-    "scope": "reused_invoices_6_pairs",
-    "submission_status": "ready",
-    "task": "TRAP-003",
-    "task_type": "clean_but_suspicious",
+    "remaining_budget": {
+      "elapsed_seconds": 152.438,
+      "remaining_seconds": 747.562,
+      "timeout_seconds": 900
+    },
+    "submission_status": "accepted",
+    "task": "你正在执行 GATE4 正式证券费用审计评测，当前为领域增强组。\n\n任务ID：TRAP-003\n题型：clean_but_suspicious\n问题：请核查R004236和R004237是否构成7天内拆分报销。必须按费用发生日期计算间隔并核对合计金额；若不构成异常，请明确说明无异常、原因和制度依据。\n\n必须遵循已安装的证券费用审计 Skills；先规划并记录Checkpoint，再按触发条件调查、复核、校验并通过统一工具提交。若复杂度至少为2且存在符合路由规则的角色，必须先授权原生子智能体，并在角色结束后登记结构化摘要和产物。\n\n\n要求：\n1. 必须查询制度和只读业务库后作答，可以使用 Shell、Python、SQLite 和当前工作区临时文件。\n2. 只处理当前独立任务。禁止读取 ground_truth、cases.json、Rubric、判卷代码、历史答案、其他任务或候选轨迹，也不得访问与题目无关的互联网。\n3. anomaly_ids 必须与审计发现一一对应、稳定且类型明确；不得为了迎合未知答案猜测隐藏编号。record_ids 必须完整、准确且只覆盖本题范围。\n4. 有异常时，record_ids 只包含参与本题所问违规的记录，不含累计计算背景、有效豁免或无关规则记录；无异常时仍保留题目直接核查或结论覆盖的记录，并在 answer 中明确写“无异常”。\n5. 必须维护 work/final_result.json、work/evidence_matrix.json 和 work/validation_report.json 三个预置文件。对应Schema的绝对路径分别是 /runtime-schemas/final_result.schema.json、/runtime-schemas/evidence_matrix.schema.json 和 /runtime-schemas/validation_report.schema.json；当前工作区兼容路径分别是 /workspace/runtime-schemas/final_result.schema.json、/workspace/runtime-schemas/evidence_matrix.schema.json 和 /workspace/runtime-schemas/validation_report.schema.json。当前目录已经是 /workspace，禁止拼成 /workspace/workspace，也禁止把 .schema.json 猜成普通 .json。\n6. 先调用 audit_control.validate_audit_result；取得 valid=true 后，再以 result_path=\"work/final_result.json\" 调用 audit_control.submit_audit_result。不得把完整结果直接打印出来代替提交。\n7. 提交成功后最终只输出 GATE4_TASK_PASS；无法提交时只输出 GATE4_TASK_FAIL。\n",
     "unresolved_items": []
   },
-  "stage": "validation_ready",
+  "stage": "submission_ready",
   "task_id": "TRAP-003"
 }

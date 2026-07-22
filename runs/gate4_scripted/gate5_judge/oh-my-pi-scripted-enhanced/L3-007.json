@@ -1,0 +1,178 @@
+{
+  "group": "oh-my-pi-scripted-enhanced",
+  "task_id": "L3-007",
+  "case_family": "retrieval_and_report",
+  "category": "two_hop_retrieval",
+  "graded_at": "2026-07-22T01:03:15+08:00",
+  "checklist_passed": 9,
+  "checklist_total": 9,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "threshold-amount",
+      "value": 1,
+      "reason": "明确列出AR-03档位为≥10000元且<50000元，部门总经理审批，给出了10000元。",
+      "answer_evidence": "AR-03：单笔金额 ≥10,000 且 <50,000元 → 部门总经理审批",
+      "trace_evidence": "get_policy_doc 03_authorization_management.md 返回附件二表格：AR-03 | 大于等于10000元且小于50000元 | 部门总经理",
+      "source": "llm_judge"
+    },
+    {
+      "id": "threshold-inclusive",
+      "value": 1,
+      "reason": "使用≥表示包含10000元边界。",
+      "answer_evidence": "单笔金额 ≥10,000 且 <50,000元",
+      "trace_evidence": "get_policy_doc 03_authorization_management.md 返回附件二表格：AR-03 | 大于等于10000元且小于50000元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-first",
+      "value": 1,
+      "reason": "明确提到报销办法第五条并引用其内容。",
+      "answer_evidence": "报销办法 第五条明确：单笔费用报销的审批权限不在本办法正文列示具体金额，统一按《XX证券授权管理办法》附件二执行。",
+      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md 返回第五条内容：审批权限...统一按《XX证券授权管理办法》附件二执行",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-relation",
+      "value": 1,
+      "reason": "明确说明交叉引用至授权管理办法附件二。",
+      "answer_evidence": "交叉引用至《XX证券授权管理办法》附件二",
+      "trace_evidence": "get_policy_doc 03_authorization_management.md 获取并使用了附件二内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-second",
+      "value": 1,
+      "reason": "轨迹中成功检索了授权管理办法，获取了附件二内容",
+      "answer_evidence": "答案中明确列出附件二审批档位，并引用授权管理办法附件二",
+      "trace_evidence": "调用了get_policy_doc('03_authorization_management.md')，返回了附件二费用报销审批权限表",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-expense",
+      "value": 1,
+      "reason": "候选提交的citations中包含了第一跳制度及条款",
+      "answer_evidence": "citations字段含{'clause_no': '第五条', 'doc_id': '01_expense_reimbursement_2025.md'}",
+      "trace_evidence": "轨迹中get_policy_doc('01_expense_reimbursement_2025.md')成功检索",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-authorization",
+      "value": 1,
+      "reason": "候选提交的citations中包含了第二跳制度及附件",
+      "answer_evidence": "citations字段含{'clause_no': '附件二', 'doc_id': '03_authorization_management.md'}",
+      "trace_evidence": "轨迹中get_policy_doc('03_authorization_management.md')成功检索",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-premature-stop",
+      "value": 1,
+      "reason": "轨迹显示在检索报销办法后继续检索授权管理办法，未提前停止",
+      "answer_evidence": "答案中描述了从报销办法交叉引用至授权管理办法的完整过程",
+      "trace_evidence": "先get_policy_doc('01_expense_reimbursement_2025.md')，后get_policy_doc('03_authorization_management.md')",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 49.836,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": null,
+    "actual_record_ids": [],
+    "record_metrics": null,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 2,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第五条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选答案通过交叉引用正确给出了部门总经理审批线10000元及包含边界，并清晰展示了两跳路径，所有检查项满足通过条件。；候选提交完整执行了两跳检索，引用了所需制度及条款，满足所有检查项",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 5716,
+      "completion_tokens": 2366,
+      "total_tokens": 8082,
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 4308
+    },
+    "batch_count": 2,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 2855,
+          "completion_tokens": 1021,
+          "total_tokens": 3876,
+          "prompt_tokens_details": {
+            "cached_tokens": 640
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 567
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 2215
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 2861,
+          "completion_tokens": 1345,
+          "total_tokens": 4206,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 932
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 2093
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/oh-my-pi-scripted-enhanced/L3-007"
+}

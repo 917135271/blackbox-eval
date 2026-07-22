@@ -1,0 +1,44 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-RR-CASE-001-001",
+      "record_ids": ["R000465", "R000561", "R000888", "R001354"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"},
+        {"doc_id": "05_training_expense.md", "clause_no": "第二条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "员工E0041（邓柳）在2025-12-18至2025-12-25（7日内）提交4笔training_fee报销：R000465 ¥2,157.72、R000561 ¥2,917.45、R000888 ¥2,606.07、R001354 ¥2,083.49，合计¥9,764.73",
+        "4笔单笔金额均低于¥3,000，系统均派生AR-01审批（仅部门经理E0005），无财务复核",
+        "合计金额¥9,764.73落入附件二AR-02档位（¥3,000-¥10,000），必要审批角色为'部门经理，并经财务复核'",
+        "2025修订版第十一条明确：同一员工同一费用类型7日内2笔及以上且合计达较高审批线的应重点核查拆分规避审批",
+        "培训费制度第二条设定每人每期培训课程费不超过¥3,500，单笔未超标但4笔主题各异、分属不同供应商，难以认定为同一培训事项的自然分期",
+        "2022版制度未设置7日合并审查规则，单笔审批线为¥8,000（部门总经理），4笔均远低于此线，按旧制度不构成违规；2025版新增第十一条填补了此制度漏洞"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R000465", "R000561", "R000888", "R001354"],
+  "submitted_record_ids": ["R000465", "R000561", "R000888", "R001354"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "cluster_total": 9764.73,
+    "ar01_threshold": 3000,
+    "ar02_range": "3000-10000",
+    "triggered_tier": "AR-02",
+    "individual_amounts": [2157.72, 2917.45, 2606.07, 2083.49],
+    "date_range": "2025-12-18 to 2025-12-25"
+  },
+  "unresolved_items": []
+}

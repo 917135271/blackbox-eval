@@ -1,0 +1,24 @@
+{
+  "analysis_info": {
+    "task": "L3-003",
+    "description": "Single-transaction threshold exceedance scan using DB columns (city_tier, nights, days)",
+    "total_records": 4240,
+    "violation_count": 5
+  },
+  "thresholds_applied": {
+    "travel_lodging": "Per-night cap by employee_level x city_tier (04_travel_expense.md 第四条), using DB nights column",
+    "local_transport": "Daily cap by city_tier: 一类120/二类100/三类80 (04_travel_expense.md 第六条), using DB days column",
+    "training_fee": "Per person per session <= 3500 (05_training_expense.md 第二条)",
+    "business_entertainment": "Per event <= 5000 (06_business_entertainment.md 第二条)",
+    "office_supplies": "Single transaction > 600 (07_office_communication.md 第二条)",
+    "communication": "Single transaction > 300 (07_office_communication.md 第三条)"
+  },
+  "violations_by_type": {
+    "office_supplies": 1,
+    "communication": 1,
+    "training_fee": 1,
+    "travel_lodging": 1,
+    "local_transport": 1
+  },
+  "methodology_note": "Using database city_tier column (A/B/C→一类/二类/三类), nights, and days columns instead of text extraction"
+}

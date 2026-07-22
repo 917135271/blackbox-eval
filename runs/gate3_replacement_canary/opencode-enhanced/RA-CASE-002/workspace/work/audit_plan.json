@@ -1,0 +1,60 @@
+{
+  "task_id": "RA-CASE-002",
+  "task_type": "policy_data_comparison",
+  "clue_record": "R004209",
+  "audit_scope": {
+    "description": "以R004209为线索，核查E0008(杨丹/D008)相关的费用报销审批合规性",
+    "primary_rule": "AR-02审批档位需部门经理+财务复核双角色审批",
+    "related_rules": [
+      "同一员工同一费用类型7天内多笔合计达上一级审批线需核查拆分（第11条）"
+    ],
+    "expense_types": ["travel_lodging"],
+    "employee_scope": "E0008",
+    "department_scope": "D008",
+    "period": "2025"
+  },
+  "policy_questions": [
+    "R004209的AR-02档位是否缺少财务复核审批？",
+    "R004209/R004210/R004211是否构成7日内同类费用拆分规避审批？",
+    "R004219/R004220是否构成7日内同类费用拆分规避审批？"
+  ],
+  "data_questions": [
+    "R004209/R004210/R004211/R004219/R004220的审批链详情",
+    "E0008所有费用记录列表及聚合分析"
+  ],
+  "required_fields": ["record_id", "employee_id", "expense_date", "expense_type", "amount", "tier_id", "approver_role", "nights", "city_tier"],
+  "evidence_requirements": [
+    "每一笔涉事记录的审批链",
+    "授权管理办法附件二AR-02条款",
+    "费用报销管理办法第11条（拆分规避审批）",
+    "7天内聚合计算结果"
+  ],
+  "execution_steps": [
+    "查询R004209及其关联记录审批详情",
+    "查询授权管理办法AR-02审批要求",
+    "计算E0008 travel_lodging在7天内的聚合金额",
+    "生成证据矩阵",
+    "运行evidence-coverage-check",
+    "运行false-positive-review（如触发条件适用）",
+    "生成审计报告",
+    "运行result-validator",
+    "提交"
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "涉及两个以上业务规则（审批角色缺失+拆分规避审批）",
+      "需要7天窗口内聚合分析",
+      "涉及金额阈值判断"
+    ]
+  },
+  "subagent_plan": {
+    "planned": false,
+    "reason": "复杂度为2，记录范围有限（E0008共11条记录），主智能体可直接完成"
+  },
+  "stopping_conditions": [
+    "证据矩阵覆盖率达到100%",
+    "validation_report状态为pass",
+    "validate_audit_result返回valid=true"
+  ]
+}

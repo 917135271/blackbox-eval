@@ -3,16 +3,16 @@
   "coverage_percent": 100,
   "evidence_rows": [
     {
-      "anomaly_id": "ANO-001",
+      "anomaly_id": "L2-003-DUP-001",
       "record_ids": ["R000020", "R004203"],
       "citations": [
         {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
       ],
       "facts": [
-        "R000020 (BX2025000020): employee 杜丹 (E0028), department 财务管理部 (D009), expense_date 2025-01-05, reimburse_date 2025-02-28, expense_type travel_lodging, amount 669.5 CNY, invoice FP202500000020 (INV000020), status approved",
-        "R004203 (BX2025X004203): employee 杜丹 (E0028), department 财务管理部 (D009), expense_date 2025-04-10, reimburse_date 2025-04-18, expense_type travel_lodging, amount 669.5 CNY, invoice FP202500000020 (INV000020), status approved",
-        "Invoice INV000020 (FP202500000020) has usage_count=2, appearing in both R000020 and R004203 as confirmed by find_reused_invoices",
-        "Article 10 of 01_expense_reimbursement_2025.md states: 同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。"
+        "发票FP202500000020（开票日期2025-01-05，供应商XX供应商2706，金额669.50元）在R000020和R004203两份报销记录中重复使用",
+        "R000020：员工E0028（杜丹，财务管理部），费用日期2025-01-05，报销日期2025-02-28，费用类型travel_lodging，金额669.50元，事由'财务管理部跨部门协同赴杭州住宿费'",
+        "R004203：员工E0028（杜丹，财务管理部），费用日期2025-04-10，报销日期2025-04-18，费用类型travel_lodging，金额669.50元，事由'财务管理部跨部门协同赴杭州住宿费'",
+        "两张报销单中使用完全相同的发票FP202500000020，违反同一发票最多报销1次的规定"
       ],
       "fact_supported": true,
       "rule_supported": true,
@@ -27,10 +27,12 @@
   "missing_evidence": [],
   "no_anomaly_coverage": {},
   "reconciled_figures": {
-    "invoice_amount": 669.5,
-    "record_count": 2,
-    "invoice_id": "INV000020",
-    "invoice_no": "FP202500000020"
+    "total_records_audited": 2,
+    "total_anomalies": 1,
+    "invoice_amount": 669.50,
+    "sql_query_count": 2,
+    "mcp_result_count": 2,
+    "reconciled": true
   },
   "unresolved_items": []
 }

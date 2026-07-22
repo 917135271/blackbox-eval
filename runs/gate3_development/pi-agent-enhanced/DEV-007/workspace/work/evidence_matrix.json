@@ -1,0 +1,54 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-001",
+      "record_ids": ["R900007"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "2025年4月,E9001开发员工甲报销办公用品R900007共650.00元,为单笔报销,无专项审批(special_approval=0)",
+        "月度标准为每人每月不超过600元(07_office_communication.md第二条),实际650元超过标准50元",
+        "无专项审批时报销金额不得超过制度标准1.0倍(01_expense_reimbursement_2025.md第十二条),该记录无专项审批,不享受豁免"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "record_ids": ["R900014", "R900015"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第三条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "2025年9月,E9001开发员工甲报销通讯费两笔:R900014(180.00元,2025-09-03)+R900015(160.00元,2025-09-20),合计340.00元",
+        "月度标准为每人每月不超过300元(07_office_communication.md第三条),实际340元超过标准40元",
+        "两笔记录均无专项审批(special_approval=0),不适用01_expense_reimbursement_2025.md第十二条豁免"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900007", "R900014", "R900015"],
+  "submitted_record_ids": ["R900007", "R900014", "R900015"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "total_office_supplies_records": 5,
+    "total_communication_records": 3,
+    "total_in_scope_records": 8,
+    "over_standard_groups": 2,
+    "over_standard_records": 3,
+    "duplicate_invoice_handled": "FPDEV900001去重后不计入月度超标准"
+  },
+  "unresolved_items": []
+}

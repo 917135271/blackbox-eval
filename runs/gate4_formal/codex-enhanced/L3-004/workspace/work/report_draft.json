@@ -1,0 +1,44 @@
+{
+  "audit_scope": {
+    "object": "超预算专项扫描",
+    "period": "2025-01-01至2025-12-31",
+    "organizations": "全部10个部门",
+    "data_scope": "全年状态为approved的全部费用报销记录",
+    "budget_source": "部门年度预算（来源于系统预算表）"
+  },
+  "verified_facts": [
+    "10个部门中6个部门（D001-D006）年度累计已批准费用超过其年度预算，4个部门（D007-D010）未超预算",
+    "累计计算方法：按reimburse_date升序、record_id升序排列各部门已批准记录，逐笔累加",
+    "D001投资银行部预算230395.17元，R000079使累计从230281.68增至230508.66元，首次超预算",
+    "D002固定收益部预算107785.42元，R002009使累计从107412.40增至108158.44元，首次超预算",
+    "D003财富管理部预算109772.07元，R003968使累计从109665.23增至109878.91元，首次超预算",
+    "D004研究所预算264890.39元，R000894使累计从264827.18增至264953.59元，首次超预算",
+    "D005机构业务部预算278540.94元，R003479使累计从278326.33增至278755.54元，首次超预算",
+    "D006运营管理部预算340961.75元，R000312使累计从340833.30增至341090.20元，首次超预算",
+    "全部6条关键记录的special_approval均为0（无专项审批）"
+  ],
+  "applicable_policies": [
+    {"doc_id": "08_budget_management.md", "clause_no": "第二条", "summary": "各部门应在年度预算额度内发生费用"},
+    {"doc_id": "08_budget_management.md", "clause_no": "第三条", "summary": "累计使用达到年度预算1.0倍后原则上不得继续报销"},
+    {"doc_id": "08_budget_management.md", "clause_no": "第四条", "summary": "超预算支出需履行专项审批"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条", "summary": "部门年度预算不足时不得继续报销，达到1.0倍后确需发生的费用应履行专项审批"}
+  ],
+  "findings": [
+    {"anomaly_id": "L3-004-001", "department": "D001投资银行部", "record_id": "R000079", "cumulative_at_breach": 230508.66, "budget": 230395.17, "special_approval": false},
+    {"anomaly_id": "L3-004-002", "department": "D002固定收益部", "record_id": "R002009", "cumulative_at_breach": 108158.44, "budget": 107785.42, "special_approval": false},
+    {"anomaly_id": "L3-004-003", "department": "D003财富管理部", "record_id": "R003968", "cumulative_at_breach": 109878.91, "budget": 109772.07, "special_approval": false},
+    {"anomaly_id": "L3-004-004", "department": "D004研究所", "record_id": "R000894", "cumulative_at_breach": 264953.59, "budget": 264890.39, "special_approval": false},
+    {"anomaly_id": "L3-004-005", "department": "D005机构业务部", "record_id": "R003479", "cumulative_at_breach": 278755.54, "budget": 278540.94, "special_approval": false},
+    {"anomaly_id": "L3-004-006", "department": "D006运营管理部", "record_id": "R000312", "cumulative_at_breach": 341090.20, "budget": 340961.75, "special_approval": false}
+  ],
+  "anomaly_ids": ["L3-004-001","L3-004-002","L3-004-003","L3-004-004","L3-004-005","L3-004-006"],
+  "record_ids": ["R000079","R002009","R003968","R000894","R003479","R000312"],
+  "citations": [
+    {"doc_id": "08_budget_management.md", "clause_no": "第二条"},
+    {"doc_id": "08_budget_management.md", "clause_no": "第三条"},
+    {"doc_id": "08_budget_management.md", "clause_no": "第四条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"}
+  ],
+  "answer": "对全年已批准费用按reimburse_date升序、record_id升序排列，逐部门累计计算。共发现6个部门超预算且无专项审批，形成6项发现。计算方法：以部门年度预算为基准，将各部门状态为approved的全部报销记录按reimburse_date升序、record_id升序排列，依次累加金额。每次累加后检查累计是否首次超过年度预算（即累计_before < 预算 < 累计_after），若是且该记录special_approval=false，则该记录为关键违规记录。制度依据：XX证券预算管理办法（XX证财规〔2025〕辛号）第二、三、四条及XX证券费用报销管理办法（2025修订版，XX证财规〔2025〕甲号）第十三条，规定部门应在年度预算额度内发生费用，累计达到预算1.0倍后原则上不得继续报销，超预算需专项审批。D007-D010四个部门预算使用率分别为83.78%、77.86%、83.27%、84.82%，均未达到100%，无超预算问题。",
+  "limitations": []
+}

@@ -1,0 +1,181 @@
+{
+  "group": "pi-agent-baseline",
+  "task_id": "L2-003",
+  "case_family": "record_audit",
+  "category": "policy_data_comparison",
+  "graded_at": "2026-07-21T21:07:14+08:00",
+  "checklist_passed": 10,
+  "checklist_total": 10,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "答案明确认定重复报销，无矛盾表述。",
+      "answer_evidence": "发现重复报销异常...构成重复报销。",
+      "trace_evidence": "工具 get_expense_detail 及 find_invoice_usage 显示记录 R000020 和 R004203 使用同一发票 INV000020。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "anomaly-type-count-rule-type",
+      "value": 1,
+      "reason": "发现规则类型完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "anomaly-type-count-count",
+      "value": 1,
+      "reason": "发现数量完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r000020",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r004203",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "policy-basis",
+      "value": 1,
+      "reason": "引用了01_expense_reimbursement_2025.md第十条，条款有效且直接支持重复报销结论。",
+      "answer_evidence": "答案中明确引用\"《XX证券费用报销管理办法(2025修订版)》第十条\"。",
+      "trace_evidence": "search_policy 和 get_policy_excerpt 返回第十条内容：\"同一发票最多报销1次...应认定为重复报销风险\"。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-same-invoice",
+      "value": 1,
+      "reason": "答案明确识别同一发票被重复使用。",
+      "answer_evidence": "发票FP202500000020(INV000020)被...在两张报销单中重复提交。",
+      "trace_evidence": "find_invoice_usage 显示发票 FP202500000020 关联两条记录 R000020 和 R004203。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "答案明确提及两条记录金额均为669.5元，与记录一致。",
+      "answer_evidence": "R000020...金额669.5元...R004203...金额669.5元。",
+      "trace_evidence": "get_expense_detail 显示 R000020 和 R004203 的 amount 字段均为 669.5。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 86.377,
+    "expected_anomaly_ids": [
+      "DUP-001"
+    ],
+    "actual_anomaly_ids": [
+      "ANO-L2-003-001"
+    ],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {
+        "DUP": 1
+      },
+      "actual_types": {
+        "DUP": 1
+      }
+    },
+    "expected_record_ids": [
+      "R000020",
+      "R004203"
+    ],
+    "actual_record_ids": [
+      "R000020",
+      "R004203"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 1,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "核查项全部满足，答案准确识别重复报销异常，制度依据充分，事实描述清晰。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 3586,
+      "completion_tokens": 1234,
+      "total_tokens": 4820,
+      "prompt_cache_hit_tokens": 3584,
+      "prompt_cache_miss_tokens": 2
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 3586,
+          "completion_tokens": 1234,
+          "total_tokens": 4820,
+          "prompt_tokens_details": {
+            "cached_tokens": 3584
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 764
+          },
+          "prompt_cache_hit_tokens": 3584,
+          "prompt_cache_miss_tokens": 2
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      }
+    ]
+  },
+  "run_path": "runs/gate4_formal/pi-agent-baseline/L2-003"
+}

@@ -3,34 +3,118 @@
     "timeout_seconds": 900
   },
   "context": {
-    "checkpoint_count": 6,
+    "checkpoint_count": 7,
     "compaction_count": 0,
-    "last_checkpoint_stage": "investigation_completed",
-    "last_usage_percent": 45.0
+    "last_checkpoint_stage": "review_ready",
+    "last_usage_percent": 40.0
   },
-  "event_sequence": 100,
+  "event_sequence": 70,
   "experiment_group": "codex-enhanced",
   "framework": "codex",
-  "phase": "investigation_completed",
+  "phase": "review_ready",
   "subagent_calls": {
     "data_analyst": 1
   },
   "subagent_invocations": {
-    "5f462a3e-4f87-4e6b-b135-fcde81c1f4cc": {
+    "10525e3d-19ff-45b5-9d5e-38f8a8349e12": {
       "artifact_paths": [
-        "work/audit_plan.json",
-        "work/policy_applicability.json"
+        "work/audit_plan.json"
       ],
-      "authorized_at": 1784206781.5182602,
+      "artifacts": [
+        {
+          "path": "work/subagents/data_analyst/data_findings.json",
+          "sha256": "558b378f2b410bb35a7607698d33864e5287e177f716c82882e5d165d598adb1",
+          "size_bytes": 5722
+        },
+        {
+          "path": "work/subagents/data_analyst/query.sql",
+          "sha256": "c7cfe0e088feeb5498d711e3ed9786789545719fbdce77c26ca2e1511b42dbcd",
+          "size_bytes": 5936
+        },
+        {
+          "path": "work/subagents/data_analyst/office_supplies_detail.json",
+          "sha256": "aec769f223f929e55f9330a96008a1fb7a594ebc11e10d67089ad551e1f0f6cd",
+          "size_bytes": 478
+        },
+        {
+          "path": "work/subagents/data_analyst/communication_detail.json",
+          "sha256": "d7ca46c0024a46bb9050d2f7a50b576442f224ead1632b007200865c3e8a4b88",
+          "size_bytes": 460
+        },
+        {
+          "path": "work/subagents/data_analyst/travel_lodging_detail.json",
+          "sha256": "6040b846b8a15cce19502236cf9d0ada28a3963b0173f3eb94cb5c36b44804dd",
+          "size_bytes": 1027
+        },
+        {
+          "path": "work/subagents/data_analyst/business_entertainment_detail.json",
+          "sha256": "64286ea55bbf2f9773a7c4d9f544b112cb642b5af1b1d13bd06a69ad0615ded3",
+          "size_bytes": 617
+        },
+        {
+          "path": "work/subagents/data_analyst/training_fee_detail.json",
+          "sha256": "10fb7592fb17e8f021bfe43f7788f1f769fc4b169cddf9fb39bd193676bf8dee",
+          "size_bytes": 470
+        },
+        {
+          "path": "work/subagents/data_analyst/local_transport_detail.json",
+          "sha256": "c96c2285a8c00b973cbeecee24d176b38c4b8275d8b28a09464b6a3133bc4362",
+          "size_bytes": 643
+        }
+      ],
+      "authorized_at": 1784619125.2017758,
+      "completed_at": 1784619540.569535,
       "complexity": 5,
-      "invocation_id": "5f462a3e-4f87-4e6b-b135-fcde81c1f4cc",
+      "invocation_id": "10525e3d-19ff-45b5-9d5e-38f8a8349e12",
       "reason_code": "AGGREGATION_REQUIRED",
       "role": "data_analyst",
-      "status": "authorized",
-      "token_budget": 5000
+      "status": "completed",
+      "summary": {
+        "artifact_paths": [
+          "work/subagents/data_analyst/data_findings.json",
+          "work/subagents/data_analyst/query.sql",
+          "work/subagents/data_analyst/office_supplies_detail.json",
+          "work/subagents/data_analyst/communication_detail.json",
+          "work/subagents/data_analyst/travel_lodging_detail.json",
+          "work/subagents/data_analyst/business_entertainment_detail.json",
+          "work/subagents/data_analyst/training_fee_detail.json",
+          "work/subagents/data_analyst/local_transport_detail.json"
+        ],
+        "citations": [
+          "07_office_communication.md 第二条",
+          "07_office_communication.md 第三条",
+          "04_travel_expense.md 第四条",
+          "04_travel_expense.md 第六条",
+          "06_business_entertainment.md 第二条",
+          "06_business_entertainment.md 第三条",
+          "05_training_expense.md 第二条"
+        ],
+        "decision": "reject",
+        "key_findings": [
+          "办公用品(office_supplies): 全量694条, 异常1条 (R004221, 650元>600元)",
+          "通讯费用(communication): 全量640条, 异常1条 (R004222, 330元>300元)",
+          "差旅住宿(travel_lodging): 全量883条, 异常1条 (R004225, D1级A类城市900元/晚>850元标准)",
+          "业务招待(business_entertainment): 全量675条, 异常1条 (R004224, 人均350元>300元)",
+          "培训费(training_fee): 全量578条, 异常1条 (R004223, 3700元>3500元)",
+          "市内交通(local_transport): 全量770条, 异常1条 (R004226, C类城市92元/天>80元标准)",
+          "合计: 6种费用类型共扫描4240条记录, 发现6条异常记录(每类型各1条)"
+        ],
+        "record_ids": [
+          "R004221",
+          "R004222",
+          "R004225",
+          "R004224",
+          "R004223",
+          "R004226"
+        ],
+        "unresolved_items": []
+      },
+      "token_budget": 5000,
+      "token_usage": {}
     }
   },
-  "submission_attempts": 0,
-  "submission_status": "not_submitted",
+  "subagent_rejections": {},
+  "submission_attempts": 2,
+  "submission_status": "accepted",
   "task_id": "L3-003"
 }

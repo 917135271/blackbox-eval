@@ -1,0 +1,31 @@
+{
+  "decision": "pass",
+  "challenged_findings": [],
+  "supporting_evidence": [
+    "R900010 expense_date=2025-06-01, R900011 expense_date=2025-06-09, interval=8 days",
+    "R900010 reimburse_date=2025-06-05, R900011 reimburse_date=2025-06-13, interval=8 days",
+    "Policy threshold: 7天内（≤7 days），observed: 8 days on both interpretations"
+  ],
+  "opposing_evidence": [
+    "合计金额10600元达到AR-03审批线（≥10000元），触发第十一条后半段条件",
+    "发票不同、事由分阶段标注，但业务描述相似（客户走访交通），存在拆分意图的外观风险"
+  ],
+  "exceptions_or_boundaries": [
+    {
+      "type": "date_boundary",
+      "threshold": "7天",
+      "observed_expense_dates": "8天（2025-06-01至2025-06-09）",
+      "observed_reimburse_dates": "8天（2025-06-05至2025-06-13）",
+      "interpretation_tested": [
+        "expense_date差值：9-1=8 > 7",
+        "reimburse_date差值：13-5=8 > 7",
+        "含首日计数：6月1日至6月7日为7天，6月9日为第9天 > 7",
+        "自然周窗口：任意连续7日内均无法同时包含6月1日和6月9日"
+      ],
+      "result": "所有口径下间隔均超过7天，边界明确不触发"
+    }
+  ],
+  "required_changes": [],
+  "rationale": "日期边界是明确的：8天 > 7天，在任何合理计数方式下均不触发拆分报销规则。金额条件虽满足，但日期条件不满足，且两个条件必须同时成立。两笔记录使用不同发票（FPDEV900010 vs FPDEV900011），进一步降低了拆分风险。结论维持无异常。",
+  "unresolved_conflicts": []
+}

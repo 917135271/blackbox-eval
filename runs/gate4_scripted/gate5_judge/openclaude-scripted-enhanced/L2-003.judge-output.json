@@ -1,0 +1,38 @@
+{
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "answer明确认定构成重复报销，无矛盾表述",
+      "answer_evidence": "“构成重复报销异常”",
+      "trace_evidence": "候选提交answer明确结论",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis",
+      "value": 1,
+      "reason": "引用01_expense_reimbursement_2025.md第十条，直接支持重复报销认定",
+      "answer_evidence": "“《XX证券费用报销管理办法(2025修订版)》第十条同一发票最多报销1次”",
+      "trace_evidence": "search_policy和get_policy_excerpt返回第十条原文",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-same-invoice",
+      "value": 1,
+      "reason": "明确识别R000020与R004203共用同一发票FP202500000020",
+      "answer_evidence": "“R000020与R004203共用同一发票FP202500000020”",
+      "trace_evidence": "find_invoice_usage返回FP202500000020对应两条记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "明确说明两条记录金额均为669.5元",
+      "answer_evidence": "“金额669.50元”“涉及金额合计1339.00元（669.50×2）”",
+      "trace_evidence": "get_expense_detail返回R000020和R004203金额均为669.5",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交完全满足冻结二元Checklist四项要求，结论、制度、识别发票和金额均正确且证据充分。",
+  "confidence": 1.0
+}

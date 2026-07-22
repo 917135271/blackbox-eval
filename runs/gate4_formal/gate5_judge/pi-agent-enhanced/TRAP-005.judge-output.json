@@ -1,0 +1,166 @@
+{
+  "checklist": [
+    {
+      "id": "clean-conclusion",
+      "value": 1,
+      "reason": "明确无异常且无矛盾表述",
+      "answer_evidence": "经核查，R004239和R004240不构成重复报销、拆分报销或业务招待费超标准，无异常。",
+      "trace_evidence": "无需轨迹证据",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-business-context",
+      "value": 1,
+      "reason": "准确区分两次独立业务活动",
+      "answer_evidence": "两笔分别为客户甲和客户乙",
+      "trace_evidence": "list_expenses显示reason字段：R004239为“客户甲产品方案交流招待费”，R004240为“客户乙投行业务沟通招待费”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-date-window",
+      "value": 1,
+      "reason": "准确核对日期间隔及7天窗口",
+      "answer_evidence": "间隔1天（10月25日和10月26日）",
+      "trace_evidence": "get_expense_detail显示expense_date分别为2025-10-25和2025-10-26",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-invoice",
+      "value": 1,
+      "reason": "准确排除重复发票",
+      "answer_evidence": "R004239发票FP2025X0004233与R004240发票FP2025X0004234为不同发票",
+      "trace_evidence": "find_invoice_usage显示FP2025X0004233和FP2025X0004234各使用一次",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-amounts",
+      "value": 1,
+      "reason": "两笔金额均准确",
+      "answer_evidence": "R004239金额540元、R004240金额545元",
+      "trace_evidence": "get_expense_detail返回amount:540.0和545.0",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-participants",
+      "value": 1,
+      "reason": "参与人数准确（通过人均计算隐含）",
+      "answer_evidence": "R004239金额540元（人均180元）、R004240金额545元（人均约182元）",
+      "trace_evidence": "轨迹无直接人数，但人均计算隐含3人",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-per-capita",
+      "value": 1,
+      "reason": "两笔人均金额均准确（第二笔约182元近似181.67）",
+      "answer_evidence": "人均180元和人均约182元",
+      "trace_evidence": "金额540和545，人数3人可推得人均180和181.67",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-standard",
+      "value": 1,
+      "reason": "正确比较单次5000元和人均300元标准",
+      "answer_evidence": "均未超过《业务招待费管理办法》第二条单次5000元限额和第三条人均300元限额",
+      "trace_evidence": "get_policy_doc(06_business_entertainment.md)显示第二条单次≤5000元、第三条人均≤300元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-split",
+      "value": 1,
+      "reason": "正确排除拆分规避审批（合计未达较高审批线3000元）",
+      "answer_evidence": "合计金额1085元未达到《授权管理办法》附件二AR-02较高审批线3000元",
+      "trace_evidence": "get_policy_doc(03_authorization_management.md)显示AR-02线为3000元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-business-context",
+      "value": 1,
+      "reason": "轨迹包含数据来源，证明准确区分两次独立业务活动",
+      "answer_evidence": "无需answer证据",
+      "trace_evidence": "list_expenses结果中reason字段明确显示不同客户和事项",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-date-window",
+      "value": 1,
+      "reason": "轨迹包含数据来源，证明日期间隔1天且完成窗口核查",
+      "answer_evidence": "无需answer证据",
+      "trace_evidence": "get_expense_detail返回expense_date，两者间隔1天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-invoice",
+      "value": 1,
+      "reason": "轨迹包含数据来源，证明发票不同",
+      "answer_evidence": "无需answer证据",
+      "trace_evidence": "find_invoice_usage分别返回FP2025X0004233和FP2025X0004234",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-amounts",
+      "value": 1,
+      "reason": "轨迹包含数据来源，证明两笔金额准确",
+      "answer_evidence": "无需answer证据",
+      "trace_evidence": "get_expense_detail返回amount:540.0和545.0",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-participants",
+      "value": 0,
+      "reason": "轨迹未提供参与人数数据，无法独立核验",
+      "answer_evidence": "无需answer证据",
+      "trace_evidence": "所有工具调用均未返回参与人数信息",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-per-capita",
+      "value": 0,
+      "reason": "轨迹缺少人数，无法独立计算人均金额",
+      "answer_evidence": "无需answer证据",
+      "trace_evidence": "仅有金额，无人数，无法独立计算人均180和181.67",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-standard",
+      "value": 0,
+      "reason": "人均标准比对无法在轨迹中独立完成（缺少人数）",
+      "answer_evidence": "无需answer证据",
+      "trace_evidence": "金额未超5000元可直接看出，但人均无法验证",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-split",
+      "value": 1,
+      "reason": "工具轨迹中查询了两笔费用合计1085元，并获取审批线制度，证明未达到任何较高审批线（包括10000元），正确排除拆分规避审批。",
+      "answer_evidence": "答案明确指出“合计金额1085元未达到《授权管理办法》附件二AR-02较高审批线3000元，不触发拆分审查”。",
+      "trace_evidence": "工具调用list_expenses返回R004239金额540元、R004240金额545元；get_policy_doc返回03_authorization_management.md显示AR-02阈值为3000元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用了01_expense_reimbursement_2025.md的第十条和第十一条。",
+      "answer_evidence": "citations中包含{\"doc_id\":\"01_expense_reimbursement_2025.md\",\"clause_no\":\"第十条\"}和{\"doc_id\":\"01_expense_reimbursement_2025.md\",\"clause_no\":\"第十一条\"}。",
+      "trace_evidence": "工具调用get_policy_doc获取了01_expense_reimbursement_2025.md全文。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "准确引用了06_business_entertainment.md的第二条至第四条。",
+      "answer_evidence": "citations中包含第二条、第三条、第四条，doc_id均为06_business_entertainment.md。",
+      "trace_evidence": "工具调用get_policy_doc获取了06_business_entertainment.md全文。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-3",
+      "value": 1,
+      "reason": "准确引用了03_authorization_management.md的附件二。",
+      "answer_evidence": "citations中包含{\"doc_id\":\"03_authorization_management.md\",\"clause_no\":\"附件二\"}。",
+      "trace_evidence": "工具调用get_policy_doc获取了03_authorization_management.md全文，内含附件二。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选答案正确判断无异常，正面推理完整；但轨迹中未提供参与人数，导致反向验证中人数、人均和标准比对无法独立确认。；所有检查项均满足要求：独立核验了合计金额未达到拆分审批线，且准确引用了全部必需制度条款。",
+  "confidence": 0.95
+}

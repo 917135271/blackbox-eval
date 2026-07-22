@@ -1,0 +1,55 @@
+{
+  "in_scope_population_count": 1,
+  "candidate_count": 1,
+  "matched_record_ids": ["R004233"],
+  "findings": [
+    {
+      "record_id": "R004233",
+      "check_type": "approval_path",
+      "result": "anomaly",
+      "detail": {
+        "amount": 9990.0,
+        "ar_tier": "AR-02",
+        "required_approvals": ["部门经理", "财务复核"],
+        "actual_approvals": [
+          {"approval_id": "A004233", "approver_role": "部门经理", "approver_employee_id": "E0008"}
+        ],
+        "missing": ["财务复核"]
+      }
+    },
+    {
+      "record_id": "R004233",
+      "check_type": "expense_standard",
+      "result": "pass",
+      "detail": {
+        "employee_level": "X1",
+        "mapped_rank": "高管级",
+        "city_tier": "A",
+        "mapped_tier": "一类城市",
+        "standard_rate": 1100,
+        "actual_rate": 999,
+        "nights": 10,
+        "total_amount": 9990,
+        "per_night": "9990 / 10 = 999",
+        "judgment": "999 < 1100, within standard"
+      }
+    }
+  ],
+  "aggregate_results": {},
+  "rule_by_population_coverage": {
+    "approval_path_check": {"population": 1, "checked": 1, "anomalies": 1},
+    "expense_standard_check": {"population": 1, "checked": 1, "anomalies": 0}
+  },
+  "completed_checks": [
+    "R004233 expense detail retrieval",
+    "R004233 approvals listing",
+    "Missing financial review confirmation via list_records_missing_approval",
+    "Lodging standard comparison (X1/executive + A-tier → 1100 per night)",
+    "Historical policy threshold comparison"
+  ],
+  "query_artifacts": [],
+  "result_artifacts": [],
+  "data_quality_issues": [],
+  "limitations": [],
+  "unresolved_items": []
+}

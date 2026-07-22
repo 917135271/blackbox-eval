@@ -1,0 +1,70 @@
+{
+  "checklist": [
+    {
+      "id": "threshold-amount",
+      "value": 1,
+      "reason": "候选提交明确给出部门总经理审批线为10000元。",
+      "answer_evidence": "答案中列明\"AR-03（10000～50000元，部门总经理）\"。",
+      "trace_evidence": "工具调用get_policy_doc获取03_authorization_management.md，附件二显示AR-03区间为\"大于等于10000元且小于50000元\"，与候选答案一致。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "threshold-inclusive",
+      "value": 0,
+      "reason": "候选提交未明确说明达到10000元即进入该审批档位或包含10000元边界，仅列出区间。",
+      "answer_evidence": "答案中只有区间\"10000～50000元\"，没有文字明确包含边界。",
+      "trace_evidence": "附件二原文使用\"大于等于10000元\"，明确包含边界，但候选提交未在答案中明确表述此边界条件。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-first",
+      "value": 1,
+      "reason": "候选提交明确引用费用报销办法第五条，识别第一跳。",
+      "answer_evidence": "答案中写道\"XX证券费用报销管理办法（2025修订版）第五条明确规定：...\"。",
+      "trace_evidence": "工具调用get_policy_doc获取01_expense_reimbursement_2025.md，第五条内容与候选引用一致。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-relation",
+      "value": 1,
+      "reason": "候选提交明确说明第五条指向授权管理办法附件二，识别交叉引用关系。",
+      "answer_evidence": "答案中写明\"统一按《XX证券授权管理办法》附件二执行\"和\"通过交叉引用...附件二列明...\"。",
+      "trace_evidence": "工具调用get_policy_doc获取01_expense_reimbursement_2025.md第五条指向授权管理办法附件二，且后续获取了03_authorization_management.md附件二。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-second",
+      "value": 1,
+      "reason": "轨迹显示调用了get_policy_doc获取03_authorization_management.md，结果包含附件二内容。",
+      "answer_evidence": "最终答案明确指出“《XX证券授权管理办法》附件二列明了五档单笔费用审批档位”。",
+      "trace_evidence": "工具调用get_policy_doc，参数doc_id为03_authorization_management.md，返回文本包含“附件二 费用报销审批权限表”。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-expense",
+      "value": 1,
+      "reason": "候选提交的citations中包含doc_id为01_expense_reimbursement_2025.md且clause_no为第五条的引用。",
+      "answer_evidence": "最终答案明确写道“XX证券费用报销管理办法（2025修订版）第五条明确规定”。",
+      "trace_evidence": "submitted_json中citations字段包含{\"clause_no\": \"第五条\", \"doc_id\": \"01_expense_reimbursement_2025.md\"}。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-authorization",
+      "value": 1,
+      "reason": "候选提交的citations中包含doc_id为03_authorization_management.md且clause_no为附件二的引用。",
+      "answer_evidence": "最终答案明确引用“《XX证券授权管理办法》附件二”。",
+      "trace_evidence": "submitted_json中citations字段包含{\"clause_no\": \"附件二\", \"doc_id\": \"03_authorization_management.md\"}。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-premature-stop",
+      "value": 1,
+      "reason": "工具轨迹显示在获取第一跳制度后继续调用了get_policy_doc获取授权管理办法和旧版制度，没有因首份制度未列金额而终止。",
+      "answer_evidence": "最终答案明确进行了交叉引用，未提前停止检索。",
+      "trace_evidence": "调用序列为search_policy、list_policy_docs，然后连续调用get_policy_doc获取03、01、02，证明继续检索。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交正确给出了10000元审批线和两跳路径，但未明确说明边界包含关系，故threshold-inclusive不通过。；候选提交完全满足所有检查项，两跳检索完整，引用准确，未提前停止，结论正确。",
+  "confidence": 1.0
+}

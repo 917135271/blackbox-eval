@@ -1,7 +1,7 @@
-generated_at: '2026-07-16T18:00:29+08:00'
-status: gate1_oh_my_pi_passed_gate2_adapter_and_targeted_gate3_governance_rerun_required
-previous_checkpoint: gate3_submission_and_adapter_checks_passed
-next_gate: gate2_oh_my_pi_adapter_and_targeted_gate3_governance_rerun
+generated_at: '2026-07-22T00:00:00+08:00'
+status: rubric_v7_replacement_canary_runs_complete_judge_blocked_http_402
+previous_checkpoint: gate3_six_framework_development_validation_passed
+next_gate: resume_replacement_canary_judge_errors_then_refreeze
 
 model:
   provider: DeepSeek
@@ -9,15 +9,53 @@ model:
   base_url: https://api.deepseek.com
   api_key_env: LLM_API_KEY
 
+judge:
+  timeout_seconds: 180
+  max_tokens: 4096
+  retries: 4
+  consistency_audit:
+    sample_rate: 0.20
+    repeat_count: 2
+    disagreement_tiebreaker: true
+    selection_seed: rubric-v7-judge-audit
+    minimum_reported_agreement: 0.90
+
+scoring:
+  version: gate5-scoring-v3
+  total_weights:
+    rubric_quality: 0.75
+    stability: 0.15
+    efficiency: 0.10
+  evidence_diagnostics:
+    included_in_total: false
+    measures:
+      - record_id_macro_f1
+      - policy_criterion_score
+      - false_positive_criterion_score
+      - trap_specificity
+  efficiency:
+    ranking_basis: elapsed_time_only
+    token_usage: diagnostic_only_until_full_comparable_coverage
+    time_target_seconds: 180
+    time_hard_max_seconds: 900
+    token_target: 50000
+    token_hard_max: 1000000
+  enhancement_success:
+    minimum_q_gain: 5
+    improvable_family_baseline_ceiling: 95
+    minimum_improvable_families_improved: 2
+    minimum_family_gain: 1
+    maximum_key_family_decline: 5
+
 experiment:
-  framework_count: 5
+  framework_count: 6
   groups_per_framework: 2
-  group_count: 10
+  group_count: 12
   development_case_count: 12
   formal_case_count: 15
-  formal_run_count: 150
+  formal_run_count: 180
   diagnostic_ablation_case_count: 6
-  diagnostic_ablation_run_count: 30
+  diagnostic_ablation_run_count: 36
   prompt_variants: [precise]
   repeats_per_case: 1
   task_timeout_seconds: 900
@@ -33,25 +71,27 @@ groups:
   - opencode-enhanced
   - oh-my-pi-baseline
   - oh-my-pi-enhanced
+  - pi-agent-baseline
+  - pi-agent-enhanced
 
 frameworks:
   claude-code-best:
     repository: https://github.com/claude-code-best/claude-code.git
     version: 2.8.3
     commit: 7680c291ee7d8aa9cb291d518273352ad32256ec
-    gate_status: governance_gate2_passed_targeted_gate3_required
+    gate_status: gate3_development_passed
   codex:
     repository: https://github.com/openai/codex.git
     version: 0.144.4
     commit: 8c68d4c87dc54d38861f5114e920c3de2efa5876
-    gate_status: governance_gate2_passed_targeted_gate3_required
+    gate_status: gate3_development_passed
   openclaude:
     repository: https://github.com/Gitlawb/openclaude.git
     version: 0.24.0
     commit: 7b9e477519f6965b19f4c0db70ae410e3586a72c
     source_cli_sha256: a592103de450fbe08f4de64a2bde13ff4ce832c97ba696569f66bec6b19cecdc
     image_id: sha256:b6c658a0992c89e38a07bcf5e727cf87e991c36e0025f754382ed8c5f3f8cb8e
-    gate_status: governance_gate2_passed_targeted_gate3_required
+    gate_status: gate3_development_passed
   opencode:
     repository: https://github.com/anomalyco/opencode.git
     version: 1.18.1
@@ -59,7 +99,7 @@ frameworks:
     source_cli_sha256: cdf39ec3df50c7ae2517caf2238d520c9aa4dd7832117f1651d393291b90abbe
     image_id: sha256:1b7769c4144ff4bb8b21f2f84bbd88a40c91e5375ec81ef15432a0445977a5bb
     container_runtime_mode: locked_source_via_bun
-    gate_status: governance_gate2_passed_targeted_gate3_required
+    gate_status: gate3_development_passed
   oh-my-pi:
     repository: https://github.com/can1357/oh-my-pi.git
     candidate_version: v17.0.1
@@ -68,7 +108,17 @@ frameworks:
     image_id: sha256:b82b82c1f7aef629e0ed4b443e0c253b559bf21e5d2c09fe8c1d37cb0aea3b87
     image_runtime_user: agent
     container_runtime_mode: locked_source_via_bun
-    gate_status: gate1_source_build_version_nonroot_and_deepseek_tool_canary_passed
+    gate_status: gate3_development_passed
+  pi-agent:
+    repository: https://github.com/earendil-works/pi.git
+    candidate_version: v0.80.10
+    package: '@earendil-works/pi-coding-agent'
+    commit: 8dc78834cde4e329284cf505f9e3f99763df5529
+    source_cli_sha256: af302f231437eaf6f37691bce4b34234fcb626bcb5eb3910d4fc3f6519bf78ca
+    image_id: sha256:8b06583ef6c3b64fdb82c00aa6af949e21102cea878748a0dda41f1abc8f9b9b
+    image_runtime_user: agent
+    container_runtime_mode: locked_source_via_node
+    gate_status: gate3_development_passed
 paths:
   development_evals: data/development/evals.json
   formal_evals: data/formal_case_rubric/evals.json
@@ -77,7 +127,9 @@ paths:
   shared_audit_core: domain-enhancement/shared-audit-core
 
 formal_dataset:
-  dataset_id: securities-expense-audit-formal-15-v1
+  dataset_id: securities-expense-audit-formal-15-v9
+  rubric_version: atomic-binary-checklist-v7
+  checklist_item_count: 251
   case_family_counts:
     policy_and_version: 3
     record_audit: 3
@@ -85,12 +137,13 @@ formal_dataset:
     clean_trap: 3
     retrieval_and_report: 3
   rubric_score_per_case: 100
-  rubric_pass_score: 70
   exclude_categories: [ground_truth_lookup]
 
 governance_revision:
-  gate2_status: passed_for_existing_four_adapters
-  oh_my_pi_adapter_status: gate1_passed_gate2_packaging_required
+  previous_gate3_lock_status: invalidated_by_formal_dataset_v9
+  gate2_status: passed_for_all_six_adapters
+  gate3_status: prior_adapter_validation_passed_formal_freeze_invalidated
+  pi_agent_adapter_status: prior_development_passed_formal_refreeze_required
   outer_runner_is_authoritative: true
   native_hooks_are_supplementary: true
   required_event_streams:
@@ -100,6 +153,25 @@ governance_revision:
     - traces/context_events.jsonl
     - traces/artifact_manifest.json
     - run_manifest.json
+
+replacement_discrimination_canary:
+  case_ids: [PV-CASE-001, RA-CASE-001, RA-CASE-002, RR-CASE-001]
+  groups: all_twelve_baseline_and_enhanced_groups
+  run_count: 48
+  purpose: verify_replacement_cases_are_not_constant_or_near_constant_before_formal_freeze
+  execution:
+    candidate_runs_completed: 48
+    accepted_submissions: 48
+    initial_timeout_attempts_archived: 2
+    judge_completed: 28
+    judge_errors: 20
+    judge_blocker: HTTP_402_PAYMENT_REQUIRED
+    result_status: incomplete
+  acceptance:
+    minimum_case_score_range: 15
+    minimum_case_score_standard_deviation: 5
+    maximum_full_score_groups_per_case: 9
+    format_success_rate: 1.0
   subagent_protocol:
     authorize_tool: authorize_audit_subagent
     complete_tool: complete_audit_subagent
@@ -111,16 +183,16 @@ governance_revision:
     checkpoint_threshold_percent: 60
     compact_threshold_percent: 75
     restricted_search_threshold_percent: 85
-    thresholds_must_be_calibrated_in_gate3: true
+    thresholds_must_be_calibrated_in_gate3: false
+    thresholds_frozen_for_gate4: true
   gate4_blocked_until:
-    - unified_hook_events_verified
-    - subagent_completion_protocol_verified
-    - task_state_and_checkpoint_verified
-    - targeted_gate3_rerun_passed
+    - judge_errors_zero
+    - all_four_cases_pass_dispersion_thresholds
+    - gate3_lock_regenerated_for_dataset_v9
 
 diagnostic_ablation:
   timing: after_formal_main_runs
-  frameworks: 5
+  frameworks: 6
   cases_per_framework: 6
   configuration: enhanced_without_subagents
   included_in_final_ranking: false

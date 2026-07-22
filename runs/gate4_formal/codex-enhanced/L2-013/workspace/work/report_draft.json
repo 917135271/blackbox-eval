@@ -1,38 +1,47 @@
 {
   "audit_scope": {
-    "audited_object": "R004223培训费报销记录",
-    "period": "2025-05-18",
-    "organization": "财务管理部(D009), 员工张婷(E0009)",
-    "data_scope": "全库training_fee类型记录检索, 金额阈值3500.01元以上"
+    "object": "以R004223为线索核查培训费超标准异常",
+    "period": "2025年",
+    "expense_type": "training_fee",
+    "data_scope": "全部training_fee记录，筛选金额超过3500元标准"
   },
   "verified_facts": [
-    "R004223为张婷(E0009)2025-05-18提交的培训费报销, 金额3700.00元",
-    "该记录special_approval=0, 无专项审批",
-    "全库检索仅此一条培训费记录超过3500元标准"
+    "R004223报销费用类型为training_fee（培训费），金额3700.00元",
+    "R004223无专项审批（special_approval=0）",
+    "批量查询全部training_fee记录中，仅R004223金额超过3500元"
   ],
   "applicable_policies": [
-    "05_training_expense.md 第2条: 培训课程费每人每期不超过3500元",
-    "01_expense_reimbursement_2025.md 第12条: 无专项审批时报销金额不得超过对应制度标准的1.0倍"
+    {
+      "doc_id": "05_training_expense.md",
+      "title": "XX证券培训费管理办法",
+      "clause": "第二条",
+      "content": "培训课程费按人次控制，每人每期不超过3500元"
+    },
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "clause": "第十二条",
+      "content": "无专项审批时，报销金额不得超过对应制度标准的1.0倍"
+    }
   ],
   "findings": [
     {
-      "anomaly_id": "L2-013-EXCESS-001",
-      "description": "培训费超标准报销",
-      "policy_basis": "培训费管理办法第2条规定每人每期不超过3500元, 费用报销管理办法第12条规定无专项审批不超过标准1.0倍",
+      "anomaly_id": "ANOMALY-TRN-001",
+      "description": "培训课程费超标准报销",
       "record_ids": ["R004223"],
-      "amount": 3700.00,
-      "standard": 3500.00,
-      "excess": 200.00,
-      "impact": "超出标准200元, 超支比例5.7%"
+      "threshold": "3500.00元/人/期",
+      "observed": "3700.00元",
+      "excess": "200.00元",
+      "impact": "超标报销200.00元"
     }
   ],
-  "recommendations": ["要求补充专项审批或追回超标准部分200元"],
-  "anomaly_ids": ["L2-013-EXCESS-001"],
+  "recommendations": "要求经办人退回超标部分200.00元，或补充专项审批文件",
+  "anomaly_ids": ["ANOMALY-TRN-001"],
   "record_ids": ["R004223"],
   "citations": [
-    {"doc_id": "05_training_expense.md", "clause_no": "第2条"},
-    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第12条"}
+    {"doc_id": "05_training_expense.md", "clause_no": "第二条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
   ],
-  "answer": "以R004223为线索核查发现: 员工张婷(E0009)2025-05-18报销培训费3700.00元(R004223), 超过《培训费管理办法》第2条规定标准3500.00元, 且无专项审批, 违反《费用报销管理办法》第12条。全库检索确认无其他培训费超标准记录。",
-  "limitations": []
+  "answer": "经核查，以R004223为线索发现一项培训费超标准异常：R004223（员工张婷，财务管理部）报销培训课程费3700.00元，超出《XX证券培训费管理办法》第二条规定的每人每期3500.00元标准，超标200.00元。该记录无专项审批，违反《XX证券费用报销管理办法(2025修订版)》第十二条不得超标准1.0倍的规定。",
+  "limitations": "无"
 }

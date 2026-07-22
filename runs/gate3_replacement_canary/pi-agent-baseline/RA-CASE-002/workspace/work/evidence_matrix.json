@@ -1,0 +1,102 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANO-001",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "citations": [
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第五条"}
+      ],
+      "facts": [
+        "R004209: E0008杨丹(经理级)在一类城市住宿5晚，报销3400元，折合680元/晚，超出经理级一类城市标准650元/晚，超标150元",
+        "R004210: E0008杨丹(经理级)在一类城市住宿5晚，报销3400元，折合680元/晚，超出经理级一类城市标准650元/晚，超标150元",
+        "R004211: E0008杨丹(经理级)在一类城市住宿5晚，报销3400元，折合680元/晚，超出经理级一类城市标准650元/晚，超标150元",
+        "三笔记录均无专项审批(special_approval=0)"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANO-002",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "R004209审批记录A004209: 审批人E0008(部门经理)与报销经办人E0008为同一人，构成自审自批",
+        "R004210审批记录A004210: 审批人E0008(部门经理)与报销经办人E0008为同一人，构成自审自批",
+        "R004211审批记录A004211: 审批人E0008(部门经理)与报销经办人E0008为同一人，构成自审自批",
+        "费用报销管理办法第三条要求经办人真实性承诺、部门负责人业务审核、财务复核和授权审批相结合，自审自批违反职责分离原则"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANO-003",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "citations": [
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "R004209金额3400元，属于AR-02档(≥3000且<10000)，要求'部门经理,并经财务复核'双审批",
+        "R004209仅有1条审批记录(A004209,部门经理)，缺少财务复核审批",
+        "R004210金额3400元，属于AR-02档，仅有1条审批记录(A004210,部门经理)，缺少财务复核审批",
+        "R004211金额3400元，属于AR-02档，仅有1条审批记录(A004211,部门经理)，缺少财务复核审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANO-004",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "E0008在7天内(2025-02-26至2025-03-02)提交3笔同类型(travel_lodging)报销: R004209(2/26,3400元), R004210(2/28,3400元), R004211(3/2,3400元)",
+        "三笔合计10200元，达到AR-03审批线(≥10000元)，应经部门总经理审批",
+        "三笔均仅以AR-02(部门经理)审批通过，规避了AR-03的部门总经理审批要求",
+        "三笔事由均为'项目现场住宿费'，属同类事项"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANO-005",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "R004209 expense_date=2025-02-26, nights=5",
+        "R004210 expense_date=2025-02-28, nights=5",
+        "R004211 expense_date=2025-03-02, nights=5",
+        "三笔共15晚住宿，但时间跨度仅5个日历日(2/26-3/2)，住宿期间存在严重重叠，物理上不可能实现",
+        "违反费用报销管理办法第三条真实性原则"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004209", "R004210", "R004211"],
+  "submitted_record_ids": ["R004209", "R004210", "R004211"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "total_amount_claimed": 10200,
+    "total_standard_amount": 9750,
+    "total_excess": 450
+  },
+  "unresolved_items": []
+}

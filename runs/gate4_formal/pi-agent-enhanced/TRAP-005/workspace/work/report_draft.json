@@ -1,0 +1,43 @@
+{
+  "audit_scope": {
+    "task_id": "TRAP-005",
+    "target_records": ["R004239", "R004240"],
+    "audit_period": "2025-10-25 至 2025-10-26",
+    "department": "D008 合规风控部",
+    "employee": "E0008 杨丹",
+    "rules_checked": ["重复报销", "拆分报销", "业务招待费超标准"]
+  },
+  "verified_facts": [
+    "R004239：2025-10-25，业务招待费540元，发票FP2025X0004233（嘉禾餐饮），参与3人，事由为客户甲产品方案交流招待费",
+    "R004240：2025-10-26，业务招待费545元，发票FP2025X0004234（嘉禾餐饮），参与3人，事由为客户乙投行业务沟通招待费",
+    "FP2025X0004233仅被R004239使用（usage_count=1），未重复",
+    "FP2025X0004234仅被R004240使用（usage_count=1），未重复",
+    "E0008在2025-10-18至2025-11-01（7天窗口）内仅有此两笔business_entertainment报销",
+    "两笔合计1085元，AR-01审批线为0-3000元，AR-02审批线为3000-10000元",
+    "R004239人均540÷3=180元，R004240人均545÷3≈181.67元",
+    "两笔均仅有部门经理（E0008本人）审批，审批层级均为AR-01"
+  ],
+  "applicable_policies": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause": "第十条", "rule": "同一发票最多报销1次"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause": "第十一条", "rule": "同一员工、同一费用类型在7天内2笔及以上且合计达较高审批线的应核查拆分"},
+    {"doc_id": "06_business_entertainment.md", "clause": "第二条", "rule": "单次活动费用不超过5000元"},
+    {"doc_id": "06_business_entertainment.md", "clause": "第三条", "rule": "人均不超过300元"},
+    {"doc_id": "06_business_entertainment.md", "clause": "第四条", "rule": "同一客户拜访或同一会议安排不得拆分"},
+    {"doc_id": "03_authorization_management.md", "clause": "附件二", "rule": "AR-01: 0~3000元部门经理审批；AR-02: 3000~10000元部门经理+财务复核"}
+  ],
+  "findings": [],
+  "impact": "无",
+  "recommendations": [],
+  "anomaly_ids": [],
+  "record_ids": ["R004239", "R004240"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第二条"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第三条"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第四条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+  ],
+  "answer": "经核查，R004239和R004240不构成重复报销、拆分报销或业务招待费超标准，无异常。具体如下：（1）重复报销：R004239发票FP2025X0004233与R004240发票FP2025X0004234为不同发票，各自仅使用1次，不违反《费用报销管理办法》第十条。（2）拆分报销：两笔虽为同一员工（E0008杨丹）、同一费用类型（业务招待费）、间隔1天（10月25日和10月26日），但合计金额1085元未达到《授权管理办法》附件二AR-02较高审批线3000元，不触发《费用报销管理办法》第十一条的拆分规避审批审查条件。（3）招待费标准：R004239金额540元（人均180元）、R004240金额545元（人均约182元），均未超过《业务招待费管理办法》第二条单次5000元限额和第三条人均300元限额；两笔分别为客户甲和客户乙，不属于《业务招待费管理办法》第四条禁止的同一客户拆分。综上，无异常。",
+  "limitations": []
+}

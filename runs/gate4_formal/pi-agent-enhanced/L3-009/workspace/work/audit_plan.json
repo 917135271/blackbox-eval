@@ -1,0 +1,127 @@
+{
+  "task_id": "L3-009",
+  "task_type": "audit_report",
+  "audit_scope": {
+    "audit_period": "2025-01-01 to 2025-12-31 (全年)",
+    "organization": "XX证券 all departments, all employees",
+    "expense_types": ["travel_lodging", "local_transport", "office_supplies", "business_entertainment", "communication", "training_fee"],
+    "data_population": {
+      "total_records": 4240,
+      "total_employees": 72,
+      "total_departments": 10,
+      "budget_year": 2025
+    }
+  },
+  "rules_in_scope": [
+    {
+      "rule_id": "R01_duplicate_reimbursement",
+      "rule_name": "重复报销",
+      "policy_ref": "01_expense_reimbursement_2025.md Article 10",
+      "detection": "同一发票在多个报销记录中使用 → 按重复发票组计1项",
+      "counting": "按重复发票组计1项"
+    },
+    {
+      "rule_id": "R02_split_reimbursement",
+      "rule_name": "拆分报销",
+      "policy_ref": "01_expense_reimbursement_2025.md Article 11",
+      "detection": "同一员工、同一费用类型、7天窗口内≥2笔报销, 且合计金额达到较高审批线 → 按聚合组计1项",
+      "counting": "按同一员工+同一费用类型+7天窗口聚合组计1项"
+    },
+    {
+      "rule_id": "R03_over_standard",
+      "rule_name": "超标准报销",
+      "policy_refs": [
+        "04_travel_expense.md Articles 3-5 (住宿标准按职级+城市档位)",
+        "05_training_expense.md Articles 2-5 (培训费/住宿标准)",
+        "06_business_entertainment.md Articles 2-3 (招待单次≤5000, 人均≤300)",
+        "07_office_communication.md Articles 2-3 (办公≤600/人/月, 通讯≤300/人/月)"
+      ],
+      "detection": "单笔或单次即可确认超标; 办公用品和通讯费用不评价多笔月度累计",
+      "counting": "按单笔/单次计1项"
+    },
+    {
+      "rule_id": "R04_over_budget",
+      "rule_name": "超预算",
+      "policy_refs": [
+        "08_budget_management.md Articles 2-4",
+        "01_expense_reimbursement_2025.md Article 13"
+      ],
+      "detection": "按部门按reimburse_date+record_id累计, 首次超过年度预算1.0倍且无special_approval的记录",
+      "counting": "按部门计1项"
+    },
+    {
+      "rule_id": "R05_overdue_reimbursement",
+      "rule_name": "超期报销",
+      "policy_ref": "01_expense_reimbursement_2025.md Article 7",
+      "detection": "expense_date到reimburse_date超过60天",
+      "counting": "按记录计1项"
+    }
+  ],
+  "policy_questions": [
+    "确认2025年全年适用2025修订版报销管理办法(2022版已废止)",
+    "确认差旅住宿标准按职级+城市档位",
+    "确认培训住宿标准按城市档位",
+    "确认业务招待单次≤5000元且人均≤300元",
+    "确认办公用品≤600元/人/月, 通讯≤300元/人/月",
+    "确认超预算需专项审批",
+    "确认超期60天限制"
+  ],
+  "data_questions": [
+    "找出所有被多个报销记录使用的发票(重复报销)",
+    "找出同一员工+同一费用类型+7天窗口内≥2笔的记录组(拆分报销)",
+    "逐笔检查住宿类记录是否超过职级+城市档位标准",
+    "逐笔检查培训费是否超过标准",
+    "逐笔检查业务招待是否超过单次5000或人均300",
+    "按部门累计检查超预算记录",
+    "找出expense_date到reimburse_date超过60天的记录"
+  ],
+  "required_fields": [
+    "record_id, employee_id, department_id, expense_type, expense_date, reimburse_date",
+    "amount, invoice_id, city_tier, nights, days, participants",
+    "special_approval, budget_year, status",
+    "employee_level, department annual_budget",
+    "invoice_no (for duplicate detection)"
+  ],
+  "evidence_requirements": [
+    "每个异常发现需有对应的record_id和policy clause",
+    "evidence_matrix需覆盖全部异常发现",
+    "no_anomaly结论需有完整搜索proof"
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "planning", "output": "work/audit_plan.json", "status": "pending"},
+    {"step": 2, "action": "policy_version_check", "output": "work/policy_applicability.json", "status": "pending"},
+    {"step": 3, "action": "batch_expense_analysis (data analyst subagent)", "output": "work/analysis/data_findings.json", "status": "pending"},
+    {"step": 4, "action": "evidence_coverage_check", "output": "work/evidence_matrix.json", "status": "pending"},
+    {"step": 5, "action": "false_positive_review", "output": "work/independent_review.json", "status": "pending"},
+    {"step": 6, "action": "audit_report", "output": "work/report_draft.json", "status": "pending"},
+    {"step": 7, "action": "result_validator", "output": "work/validation_report.json", "status": "pending"},
+    {"step": 8, "action": "validate_and_submit", "output": "submission", "status": "pending"}
+  ],
+  "complexity": {
+    "score": 6,
+    "reasons": [
+      "policy version check (2025 vs deprecated 2022) = +1",
+      "multiple policies (01,03,04,05,06,07,08) = +1",
+      "aggregation/grouping/joins/batch filtering across 4240 records = +1",
+      "five business rules = +1",
+      "thresholds/dates/exemptions/approvals = +1",
+      "comprehensive audit report = +1"
+    ]
+  },
+  "subagent_plan": {
+    "data_analyst": {
+      "role": "data_analyst",
+      "reason_code": "MULTI_RECORD_SCOPE",
+      "complexity": 6,
+      "requested_token_budget": 10000,
+      "task": "全面分析2025年全年4240条报销记录,覆盖五类规则: 1)重复报销:找出所有被多次使用的发票; 2)拆分报销:同一员工+同一费用类型+7天窗口聚合; 3)超标准:逐笔检查住宿(按职级+城市档位)、培训费、业务招待(单次≤5000,人均≤300); 办公/通讯不评价月度累计; 4)超预算:按部门按reimburse_date+record_id累计,找出首次超过预算1.0倍且无special_approval的记录; 5)超期报销:expense到reimburse超过60天。每次查询必须在work/sql/保存SQL。结果写入work/analysis/data_findings.json。",
+      "artifact_paths": ["work/analysis/"]
+    }
+  },
+  "stopping_conditions": [
+    "evidence_matrix coverage_percent = 100 and status = pass",
+    "validation_report status = pass",
+    "submit_audit_result returns success"
+  ],
+  "unresolved_items": []
+}

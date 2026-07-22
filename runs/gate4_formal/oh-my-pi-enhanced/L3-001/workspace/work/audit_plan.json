@@ -1,105 +1,76 @@
 {
-  "task_id": "L3-001",
-  "type": "full_year_rule_audit",
   "task_scope": {
-    "audit_object": "全年重复报销专项扫描",
-    "rule": "第十条: 同一发票最多报销1次",
-    "business_period": "2025年全年",
-    "expense_types": "所有费用类型",
-    "organization": "XX证券所有部门",
-    "deliverable": "全部异常ID和记录ID集合"
+    "task_id": "L3-001",
+    "task_type": "full_year_rule_audit",
+    "question": "对全年数据做重复报销专项扫描，按重复发票组生成稳定的发现ID",
+    "audit_object": "全量费用报销记录",
+    "audit_period": "2025年度全年",
+    "expense_types": "all",
+    "deliverable": "所有重复发票组的发现ID和关联record_id集合，全量扫描方法和制度依据说明"
   },
   "policy_questions": [
     {
-      "question": "重复报销的核心定义是什么?",
+      "question": "同一发票重复报销的禁止性规定",
+      "rule": "Article 10",
+      "policy_doc": "01_expense_reimbursement_2025.md",
       "clause": "第十条",
-      "details": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。",
-      "boundaries": "同一发票(invoice_no)出现在不同报销记录(record_id)中即构成重复报销"
-    },
-    {
-      "question": "是否存在豁免条件?",
-      "clause": "需确认",
-      "details": "检查是否存在特殊审批可豁免重复报销的情况"
+      "content": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的，应认定为重复报销风险。"
     }
   ],
   "data_questions": [
     {
-      "question": "哪些发票被多次使用?",
-      "method": "通过find_reused_invoices和find_invoice_usage查找被多次使用的发票",
-      "required_fields": [
-        "invoice_no",
-        "record_id",
-        "amount",
-        "expense_date",
-        "employee_id",
-        "department_id",
-        "expense_type",
-        "status",
-        "special_approval"
-      ]
-    },
-    {
-      "question": "每张重复发票关联的全部报销记录是什么?",
-      "method": "对每个被多次使用的发票,通过find_invoice_usage获取所有关联记录",
-      "required_fields": [
-        "record_id",
-        "invoice_no",
-        "amount",
-        "expense_date",
-        "employee_id",
-        "status"
-      ]
+      "question": "哪些发票在多个报销记录中被使用",
+      "tables": [
+        "invoices",
+        "reimbursement_records"
+      ],
+      "method": "find_reused_invoices + 逐条detail验证",
+      "expected": "发票级分组，usage_count >= 2"
     }
   ],
   "required_fields": [
+    "invoice_id",
     "invoice_no",
-    "record_id",
+    "vendor_name",
+    "invoice_date",
     "amount",
-    "expense_date",
-    "reimburse_date",
+    "expense_type",
+    "record_id",
     "employee_id",
     "department_id",
-    "expense_type",
+    "expense_date",
+    "reimburse_date",
     "status",
-    "special_approval",
-    "invoice_date",
-    "vendor_name"
+    "special_approval"
   ],
-  "evidence_requirements": [
-    "每张重复发票证明: invoice_no出现在≥2个不同报销记录中",
-    "每个重复报销记录的详细信息",
-    "排除有效豁免(如有)"
+  "evidence_needs": [
+    "每对重复记录需确认：同一发票编号、不同报销单(reimburse_record)、均为approved状态"
   ],
   "execution_steps": [
-    "1. audit-query-planner: 生成审计计划",
-    "2. 授权并启动data_analyst子智能体: 批量查询重复发票及关联记录",
-    "3. policy-version-check: 确认适用制度版本(2025全年适用2025修订版)",
-    "4. batch-expense-analysis: 完成数据分析(由子智能体执行)",
-    "5. evidence-coverage-check: 构建证据矩阵",
-    "6. false-positive-review: 独立复核(触发条件: 需检查豁免)",
-    "7. audit-report: 生成审计报告",
-    "8. result-validator: 校验并提交"
+    "1. 规划并记录planning_completed checkpoint",
+    "2. 策略适用性检查：确认2025版政策覆盖全年",
+    "3. 数据扫描：find_reused_invoices + 逐record detail核实",
+    "4. 形成初步发现",
+    "5. 证据覆盖检查",
+    "6. 误报复核（如触发）",
+    "7. 审计报告",
+    "8. 结果验证",
+    "9. 提交"
   ],
   "complexity": {
-    "score": 3,
+    "score": 2,
     "reasons": [
-      "聚合/分组/关联: 需要查找重复使用的发票并关联多条记录 (+1)",
-      "批量筛选: 全年数据扫描 (+1)",
-      "需要检查豁免/例外: special_approval字段可能豁免 (+1)"
+      "aggregation/grouping: 需按发票分组找重复",
+      "comprehensive audit report: 需说明全量扫描方法和制度依据"
     ]
   },
   "subagent_plan": {
-    "role": "data_analyst",
-    "reason_code": "AGGREGATION_REQUIRED",
-    "justification": "需要批量扫描全年发票使用,聚合重复发票,关联多条报销记录,使用Python进行去重和交叉验证",
-    "task_description": "对全年报销数据进行重复报销专项扫描。使用find_reused_invoices查找被≥2次使用的发票,对每张发票通过find_invoice_usage获取全部关联记录,收集每条记录的详细信息(包括special_approval状态)。将结果写入work/analysis/data_findings.json和work/subagents/data_analyst/"
+    "required": false,
+    "reason": "find_reused_invoices MCP工具已直接返回完整结果集（6组重复），无需额外batch分析；策略单一明确无版本歧义"
   },
   "stopping_conditions": [
-    "所有重复使用的发票均已识别并关联全部记录",
-    "每项发现都有证据支撑",
-    "证据矩阵coverage_percent=100且status=pass",
-    "validation_report status=pass",
-    "submit_audit_result成功"
-  ],
-  "unresolved_items": []
+    "所有重复发票组均经record detail验证",
+    "evidence_matrix覆盖100%",
+    "validation_report通过"
+  ]
 }

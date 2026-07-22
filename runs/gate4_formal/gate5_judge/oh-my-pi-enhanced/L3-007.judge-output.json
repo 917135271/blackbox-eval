@@ -1,35 +1,70 @@
 {
-  "criteria": [
+  "checklist": [
     {
-      "id": "threshold",
-      "score": 35,
-      "reason": "答案明确给出部门总经理审批线为AR-03：金额≥10000且<50000元，金额和边界均正确。",
-      "answer_evidence": "经交叉引用检索：...AR-03 金额≥10000且<50000元由部门总经理审批",
-      "trace_evidence": "get_policy_doc 03_authorization_management.md 获取附件二，包含AR-03区间"
+      "id": "threshold-amount",
+      "value": 1,
+      "reason": "候选答案明确给出AR-03档位金额为10000≤金额<50000元，明确包含部门总经理审批线10000元。",
+      "answer_evidence": "答案中写明“AR-03(10000≤金额<50000元,部门总经理)”。",
+      "trace_evidence": "get_policy_doc 03_authorization_management.md 返回附件二表格中包含“AR-03 | 大于等于10000元且小于50000元 | 部门总经理”。",
+      "source": "llm_judge"
     },
     {
-      "id": "two-hop-path",
-      "score": 30,
-      "reason": "候选明确描述了从费用报销办法第五条交叉引用到授权管理办法附件二的完整两跳路径。",
-      "answer_evidence": "交叉引用路径：01_expense_reimbursement_2025.md第五条→03_authorization_management.md附件二",
-      "trace_evidence": "先get 01_expense_reimbursement_2025.md，再get 03_authorization_management.md，路径可复核"
+      "id": "threshold-inclusive",
+      "value": 1,
+      "reason": "候选答案用不等式“10000≤金额”表明达到10000元即进入该档位。",
+      "answer_evidence": "答案中“AR-03(10000≤金额<50000元,部门总经理)”明确了包含10000元边界。",
+      "trace_evidence": "附件二原文“大于等于10000元”支持了包含边界。",
+      "source": "llm_judge"
     },
     {
-      "id": "citations",
-      "score": 20,
-      "reason": "提交的引用包含01_expense_reimbursement_2025.md和03_authorization_management.md，均为有效制度文档。",
-      "answer_evidence": "citations字段包含这两份文档，且均为现行有效版本",
-      "trace_evidence": "工具调用记录中get_policy_doc输出了这两份文档的完整内容"
+      "id": "two-hop-path-first",
+      "value": 1,
+      "reason": "候选答案识别并引用了费用报销办法第五条。",
+      "answer_evidence": "答案开头“01_expense_reimbursement_2025.md第五条引用…”，citations中有对应条目。",
+      "trace_evidence": "工具调用get_policy_doc获取了01_expense_reimbursement_2025.md内容，包含第五条。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-relation",
+      "value": 1,
+      "reason": "候选答案明确说明第五条指向授权管理办法附件二。",
+      "answer_evidence": "答案中“01_expense_reimbursement_2025.md第五条引用03_authorization_management.md附件二”。",
+      "trace_evidence": "get_policy_doc返回05条内容：“统一按《XX证券授权管理办法》附件二执行”。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-second",
+      "value": 1,
+      "reason": "候选答案完成了第二跳检索，定位并引用了授权管理办法附件二。",
+      "answer_evidence": "答案中“03_authorization_management.md附件二”及citations中的附件二条目。",
+      "trace_evidence": "工具调用get_policy_doc及search_policy获取了03_authorization_management.md，并包含附件二审批权限表。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-expense",
+      "value": 1,
+      "reason": "候选提交中明确引用了费用报销办法第五条。",
+      "answer_evidence": "submitted_json的citations中包含{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第五条\"}。",
+      "trace_evidence": "工具调用链显示获取了该文档。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-authorization",
+      "value": 1,
+      "reason": "候选提交中明确引用了授权管理办法附件二。",
+      "answer_evidence": "submitted_json的citations中包含{\"doc_id\": \"03_authorization_management.md\", \"clause_no\": \"附件二\"}。",
+      "trace_evidence": "工具调用链显示获取了该文档及附件。",
+      "source": "llm_judge"
     },
     {
       "id": "no-premature-stop",
-      "score": 10,
-      "reason": "轨迹显示候选在读取01号文档后没有停止，而是进一步检索了03号文档，完成了交叉引用。",
-      "answer_evidence": "最终答案基于两份文档得出结论",
-      "trace_evidence": "工具调用序列：get_policy_doc 01 → get_policy_doc 03，证明继续检索"
+      "value": 1,
+      "reason": "轨迹显示在费用报销办法未列出金额后，继续检索了授权管理办法，未提前结束。",
+      "answer_evidence": "候选答案给出了交叉引用结果，表明进行了进一步检索。",
+      "trace_evidence": "工具调用：先获取01文件，随后search_policy和get_policy_doc 03文件，未在第一步停止。",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [],
-  "overall_comment": "候选准确完成了二跳检索，找到了部门总经理审批线10000元，并给出了完整的交叉引用路径和双文档证据，轨迹无缺陷。",
+  "overall_comment": "候选完全满足所有检查项：准确给出了10000元审批线并说明包含边界，完整呈现了两跳检索路径和交叉引用关系，且提供了对应的制度引证，检索过程未提前终止。",
   "confidence": 1.0
 }

@@ -1,0 +1,55 @@
+{
+  "task_id": "DEV-003",
+  "task_type": "single_anomaly",
+  "question": "以R900001为线索核查重复报销，返回全部相关记录及异常结论。",
+  "audit_object": "R900001及其同发票关联记录",
+  "expense_types": ["office_supplies"],
+  "business_period": "2025-01",
+  "organization_scope": "D901/开发审计一部",
+  "requested_deliverable": "重复报销异常结论及全部相关记录",
+  "policy_questions": [
+    {
+      "question": "同一发票是否可以多次报销？",
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第十条",
+      "rule": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "发票FPDEV900001被哪些报销记录使用？",
+      "method": "find_invoice_usage",
+      "fields": ["record_id", "invoice_no", "amount", "expense_date", "employee_id"]
+    }
+  ],
+  "required_fields": ["record_id", "invoice_no", "invoice_amount", "amount", "expense_date", "reimburse_date", "employee_id", "department_id", "expense_type", "status", "special_approval"],
+  "evidence_requirements": [
+    "R900001和R900002的完整报销明细",
+    "发票FPDEV900001的usage记录",
+    "政策条款第十条原文"
+  ],
+  "execution_steps": [
+    "1. 获取R900001详情及发票FPDEV900001",
+    "2. 通过find_invoice_usage查找同发票所有记录",
+    "3. 获取所有关联记录(R900002)完整详情",
+    "4. 查询重复报销政策条款",
+    "5. 比对确认同一发票重复使用",
+    "6. 证据覆盖检查",
+    "7. 形成审计报告",
+    "8. 校验并提交"
+  ],
+  "complexity": 1,
+  "complexity_reasons": [
+    "单规则：仅核查重复报销(第十条)",
+    "已知线索记录R900001，仅需追踪同发票记录",
+    "无需聚合、分组或多表联接",
+    "无政策版本争议（2025版明确适用）",
+    "无需子智能体"
+  ],
+  "subagent_plan": null,
+  "stopping_conditions": [
+    "找到所有使用FPDEV900001的报销记录",
+    "确认是否存在重复报销"
+  ],
+  "unresolved_items": []
+}

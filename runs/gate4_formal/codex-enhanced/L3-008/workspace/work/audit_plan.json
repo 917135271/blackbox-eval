@@ -1,16 +1,34 @@
 {
   "task_id": "L3-008",
-  "question": "比较差旅住宿和培训住宿标准,说明为什么不能混用",
-  "scope": "All training_fee (578) and travel_lodging (883) records",
-  "applicable_rules": [
-    {"doc_id": "04_travel_expense.md", "clause": "第四条", "rule": "差旅住宿标准"},
-    {"doc_id": "04_travel_expense.md", "clause": "第七条", "rule": "培训期间住宿不适用差旅住宿表"},
-    {"doc_id": "05_training_expense.md", "clause": "第五条", "rule": "培训住宿标准"},
-    {"doc_id": "05_training_expense.md", "clause": "第六条", "rule": "培训住宿不得与差旅住宿标准混用"}
+  "task_type": "near_clause_disambiguation",
+  "complexity": 2,
+  "scope": {
+    "rule": "差旅住宿标准 vs 培训住宿标准",
+    "applicable_docs": ["04_travel_expense.md", "05_training_expense.md"],
+    "question": "比较差旅住宿和培训住宿的适用制度、标准维度和数值，列出培训住宿一、二、三类城市标准，并举例说明为何不能混用"
+  },
+  "steps": [
+    {
+      "step": "读取差旅费管理办法获知差旅住宿标准",
+      "status": "completed"
+    },
+    {
+      "step": "读取培训费管理办法获知培训住宿标准",
+      "status": "completed"
+    },
+    {
+      "step": "比较两套制度的适用制度、标准维度和数值",
+      "status": "in_progress"
+    },
+    {
+      "step": "证据覆盖检查与复核",
+      "status": "pending"
+    },
+    {
+      "step": "生成审计报告并校验提交",
+      "status": "pending"
+    }
   ],
-  "complexity": 3,
-  "subagent": "data_analyst",
-  "required_fields": ["city_tier", "employee_level", "nights", "days", "participants", "invoice_id", "special_approval"],
-  "stop_conditions": ["All 48 violation records identified", "Evidence coverage 100%", "False-positive review passed"],
-  "status": "investigation_completed"
+  "subagent_routing": null,
+  "reasoning": "该任务为制度比较题，不涉及违规发现，无需子智能体。直接对比04_travel_expense.md和05_training_expense.md中的住宿标准。"
 }

@@ -1,119 +1,152 @@
 {
+  "group": "opencode-enhanced",
+  "task_id": "L3-006",
   "case_family": "policy_and_version",
-  "case_score": 87.5,
-  "case_score_raw": 87.5,
   "category": "version_trap",
-  "criteria": [
+  "graded_at": "2026-07-21T21:02:16+08:00",
+  "checklist_passed": 7,
+  "checklist_total": 8,
+  "checklist_pass_rate": 87.5,
+  "checklist": [
     {
-      "answer_evidence": "单笔金额大于等于10000元且小于50000元",
       "id": "current-value",
-      "reason": "明确给出部门总经理审批线为单笔金额大于等于10000元且小于50000元，现行值10000元准确。",
-      "score": 30.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用，答案基于文档直接给出。"
+      "value": 1,
+      "reason": "答案明确给出部门总经理审批线现行金额为单笔≥10,000元且<50,000元，现行值10000元准确。",
+      "answer_evidence": "部门总经理审批线现行金额为单笔≥10,000元且<50,000元",
+      "trace_evidence": "",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "2022版已被2025修订版第十四条正式废止...旧版审批金额已被后续制度替代",
-      "id": "deprecated-value",
-      "reason": "清晰说明2022版被废止、旧审批金额被替代，但未明确提及旧值8000元，仅废止状态正确。",
-      "score": 12.5,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用，答案来自文档解读。"
+      "id": "deprecated-value-amount",
+      "value": 0,
+      "reason": "答案未明确给出2022版审批线旧值8000元，仅说明废止，未提及具体金额。",
+      "answer_evidence": "答案中无8000元描述",
+      "trace_evidence": "",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "应采用2025修订版。2022版已被2025修订版第十四条正式废止...",
+      "id": "deprecated-value-status",
+      "value": 1,
+      "reason": "答案明确说明2022版已于2025年1月1日起废止。",
+      "answer_evidence": "2022版（XX证财规〔2022〕乙号）已于2025年1月1日起废止",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
       "id": "applicable-version",
-      "reason": "明确选择2025修订版，并引用废止条款和旧版存档声明，理由充分。",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用，推论过程合理。"
+      "value": 1,
+      "reason": "答案选择2025修订版并说明2022版废止，正确指出适用版本及时间关系。",
+      "answer_evidence": "费用报销审批线应采用2025修订版...2022版...已于2025年1月1日起废止",
+      "trace_evidence": "",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "citations中包含doc_id 01_expense_reimbursement_2025.md和02_expense_reimbursement_2022_deprecated.md",
-      "id": "two-version-evidence",
-      "reason": "同时引用01_expense_reimbursement_2025.md第十四条和02_expense_reimbursement_2022_deprecated.md第一、四条，两份制度证据齐全。",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用，但引用的文档存在于语料库。"
+      "id": "two-version-evidence-current",
+      "value": 1,
+      "reason": "答案引用了01_expense_reimbursement_2025.md的第十四条（施行生效条款）和第五条，提供了现行效力依据。",
+      "answer_evidence": "citations: 01_expense_reimbursement_2025.md 第十四条",
+      "trace_evidence": "",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "",
+      "id": "two-version-evidence-deprecated",
+      "value": 1,
+      "reason": "答案引用了02_expense_reimbursement_2022_deprecated.md的第一条、第二条、第四条，包含废止声明。",
+      "answer_evidence": "citations: 02_expense_reimbursement_2022_deprecated.md 第一条、第二条、第四条",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-version-evidence-amount",
+      "value": 1,
+      "reason": "答案引用了03_authorization_management.md的附件二，该附件包含部门总经理10000元审批档位。",
+      "answer_evidence": "citations: 03_authorization_management.md 附件二",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
       "id": "submission",
+      "value": 1,
       "reason": "统一提交已接受且Schema有效",
-      "score": 5.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "无费用记录，未提交任何record_id，不存在伪造。",
-      "score_cap": 20,
-      "source": "llm_judge"
-    },
-    {
-      "id": "deprecated-policy-as-current",
-      "triggered": false,
-      "reason": "明确指出2022版已废止，未将其作为现行依据。",
-      "score_cap": 40,
-      "source": "llm_judge"
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 276.753,
+    "expected_anomaly_ids": [],
     "actual_anomaly_ids": [],
-    "actual_record_ids": [],
     "anomaly_metrics": {
-      "actual_types": {},
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
       "count_exact": true,
       "expected_types": {},
-      "f1": 1.0,
-      "precision": 1.0,
-      "recall": 1.0
+      "actual_types": {}
     },
-    "citation_count": 4,
-    "elapsed_seconds": 201.676,
-    "expected_anomaly_ids": [],
     "expected_record_ids": null,
+    "actual_record_ids": [],
     "record_metrics": null,
-    "required_citations": [
-      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
-      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount",
-      "document:01_expense_reimbursement_2025.md",
-      "document:02_expense_reimbursement_2022_deprecated.md"
-    ],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
     "trap_tokens_in_conclusion": [],
-    "unknown_record_ids": []
+    "citation_count": 8,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十四条"
+      },
+      {
+        "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+        "clause_no": "第一条、第二条、第四条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T22:30:06+08:00",
-  "group": "opencode-enhanced",
   "judge": {
-    "attempt": 1,
-    "confidence": 1.0,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "答案准确指出应采用2025修订版，并正确给出部门总经理审批线10000元。对旧版已废止状态交代清楚，但未提及具体旧值8000元，因此该项部分扣分。证据引用充分，无关键失败。",
     "status": "ok",
+    "confidence": 0.95,
+    "overall_comment": "除未明确给出2022版旧值8000元外，其余表述准确，引用完整，整体合规。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 1802,
-      "completion_tokens_details": {
-        "reasoning_tokens": 1218
-      },
-      "prompt_cache_hit_tokens": 1024,
-      "prompt_cache_miss_tokens": 1500,
-      "prompt_tokens": 2524,
-      "prompt_tokens_details": {
-        "cached_tokens": 1024
-      },
-      "total_tokens": 4326
-    }
+      "prompt_tokens": 2398,
+      "completion_tokens": 1655,
+      "total_tokens": 4053,
+      "prompt_cache_hit_tokens": 2304,
+      "prompt_cache_miss_tokens": 94
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 2398,
+          "completion_tokens": 1655,
+          "total_tokens": 4053,
+          "prompt_tokens_details": {
+            "cached_tokens": 2304
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1061
+          },
+          "prompt_cache_hit_tokens": 2304,
+          "prompt_cache_miss_tokens": 94
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 7
+      }
+    ]
   },
-  "passed": true,
-  "run_path": "runs/gate4_formal/opencode-enhanced/L3-006",
-  "task_id": "L3-006"
+  "run_path": "runs/gate4_formal/opencode-enhanced/L3-006"
 }

@@ -1,0 +1,72 @@
+{
+  "task_id": "TRAP-002",
+  "audit_scope": "核查R004234与R004235是否构成重复报销或拆分报销",
+  "verified_facts": {
+    "R004234": {
+      "employee": "E0009（张婷）",
+      "department": "D009（财务管理部）",
+      "expense_date": "2025-10-20",
+      "expense_type": "office_supplies",
+      "amount": 250.00,
+      "invoice_no": "FP2025X0004228",
+      "invoice_id": "INV004228",
+      "vendor": "华文办公服务有限公司",
+      "reason": "项目资料及办公耗材采购"
+    },
+    "R004235": {
+      "employee": "E0009（张婷）",
+      "department": "D009（财务管理部）",
+      "expense_date": "2025-10-20",
+      "expense_type": "office_supplies",
+      "amount": 250.00,
+      "invoice_no": "FP2025X0004229",
+      "invoice_id": "INV004229",
+      "vendor": "华文办公服务有限公司",
+      "reason": "项目资料及办公耗材采购"
+    },
+    "comparison": {
+      "same_invoice": false,
+      "FP2025X0004228_usage_count": 1,
+      "FP2025X0004229_usage_count": 1,
+      "day_difference": 0,
+      "combined_amount": 500.00,
+      "higher_approval_threshold_ar02": 3000.00
+    }
+  },
+  "applicable_policies": [
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "effective_date": "2025-01-01",
+      "clauses": ["第十条", "第十一条"]
+    },
+    {
+      "doc_id": "03_authorization_management.md",
+      "title": "XX证券授权管理办法",
+      "effective_date": "2025-01-01",
+      "clauses": ["附件二"]
+    }
+  ],
+  "findings": [
+    {
+      "rule": "重复报销（第十条）",
+      "result": "不触发",
+      "detail": "R004234发票FP2025X0004228与R004235发票FP2025X0004229为不同发票，且各自仅使用1次，不构成同一发票重复报销。"
+    },
+    {
+      "rule": "拆分报销（第十一条）",
+      "result": "不触发",
+      "detail": "两笔报销虽为同一员工（E0009）、同一费用类型（office_supplies）、在7天内（同日2025-10-20），但合计金额500.00元未达到授权管理办法附件二较高审批线AR-02的3000元门槛，不构成拆分规避审批。"
+    }
+  ],
+  "conclusion": "无异常",
+  "answer": "经核查，R004234与R004235不构成重复报销或拆分报销。具体原因：(1)重复报销：两笔报销使用不同发票（FP2025X0004228与FP2025X0004229），且各发票仅使用1次，不符合第十条同一发票重复报销的认定条件。(2)拆分报销：两笔报销虽满足同一员工、同一费用类型、7天内2笔及以上的形式条件，但合计金额500.00元未达到授权管理办法附件二较高审批线AR-02（3000元），不符合第十一条拆分规避审批的认定条件。依据XX证券费用报销管理办法(2025修订版)第十条、第十一条及XX证券授权管理办法附件二，认定无异常。",
+  "anomaly_ids": [],
+  "record_ids": ["R004234", "R004235"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+  ],
+  "limitations": []
+}

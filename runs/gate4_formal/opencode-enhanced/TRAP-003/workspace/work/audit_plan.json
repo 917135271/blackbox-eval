@@ -2,127 +2,80 @@
   "task_id": "TRAP-003",
   "task_type": "clean_but_suspicious",
   "scope": {
-    "description": "核查TRAP-003涉及的记录是否构成异常。任务类型为clean_but_suspicious,即记录表面上可疑但实际应合规。需要从数据注入样本中识别TRAP-003对应的记录集,并逐一核查各项政策规则是否构成违规。",
-    "audit_period": "2025年度",
-    "expense_types": "所有类型",
-    "records_of_interest": "数据注入样本记录(R004201-R004240),尤其是陷阱样本(R004233-R004240)",
-    "requested_deliverable": "确定TRAP-003涉及的记录是否存在异常,无异常则说明'无异常'"
+    "question": "核查R004236和R004237是否构成7天内拆分报销",
+    "records": ["R004236", "R004237"],
+    "audit_period": "2025-10-01 to 2025-10-09",
+    "rule": "expense_reimbursement_2025.md 第十一条 拆分报销"
   },
   "policy_questions": [
-    "哪些制度文件适用于2025年度费用报销?(01_expense_reimbursement_2025.md为主要文件)",
-    "拆分报销规则(第十一条):同一员工同一费用类型7天内2笔以上且合计达到较高审批线是否触发?",
-    "发票重复使用规则(第十条):是否存在同一发票多次报销?",
-    "超标准规则(第十二条):报销金额是否超过对应制度标准1.0倍?",
-    "超期报销规则(第七条):费用发生后是否在60天内提交?",
-    "审批权限规则:是否匹配正确的审批角色?",
-    "差旅住宿标准:住宿费是否超过职级对应标准?",
-    "业务招待标准:招待费是否超过单次5000或人均300?",
-    "培训费标准:培训课程费是否超过3500?",
-    "办公与通讯标准:办公用品是否超过月600,通讯是否超过月300?"
-  ],
-  "data_questions": [
-    "TRAP-003对应的具体记录集是哪些?",
-    "这些记录是否存在拆分报销模式(同一员工同一类型7天内多笔)?",
-    "这些记录是否存在发票重复使用?",
-    "这些记录的金额是否超过对应政策标准?",
-    "这些记录是否存在超期报销?",
-    "这些记录是否有缺失的审批?",
-    "这些记录的部门预算是否充足?"
-  ],
-  "required_fields": [
-    "record_id, employee_id, expense_type, amount, expense_date, reimburse_date",
-    "city_tier, nights, reason, special_approval, status",
-    "employee_name, employee_level, position_role, department_id",
-    "invoice_no, vendor_name, invoice_amount",
-    "approval records (tier_id, approver_role, approval_status)",
-    "department budget information"
-  ],
-  "evidence_requirements": [
-    "每条可疑记录的政策标准计算",
-    "所有相关审批记录",
-    "发票使用情况",
-    "部门预算占用情况",
-    "制度条款引用"
-  ],
-  "execution_steps": [
     {
-      "step": "planning",
-      "description": "创建审计计划,确定调查范围和方法",
-      "expected_artifact": "work/audit_plan.json",
-      "stopping_condition": "计划内容明确,范围/规则/字段/证据/路由/停止条件均已说明"
+      "id": "Q1",
+      "question": "拆分报销的构成要件是什么？",
+      "applicable_policy": "01_expense_reimbursement_2025.md",
+      "clause": "第十一条"
     },
     {
-      "step": "policy_check",
-      "description": "确认适用的政策版本和关键条款",
-      "expected_artifact": "政策版本确认结果",
-      "stopping_condition": "所有适用条款已确认且无版本冲突"
-    },
-    {
-      "step": "record_identification",
-      "description": "从注入样本中识别TRAP-003对应的记录",
-      "expected_artifact": "明确的记录ID列表",
-      "stopping_condition": "记录集已确定且仅覆盖本题范围"
-    },
-    {
-      "step": "data_analysis",
-      "description": "对目标记录进行全面合规检查(拆分/超标准/超期/发票重复/审批)",
-      "expected_artifact": "详细的合规检查结果",
-      "stopping_condition": "所有规则检查完成"
-    },
-    {
-      "step": "evidence_coverage",
-      "description": "检查证据覆盖率",
-      "expected_artifact": "work/evidence_matrix.json",
-      "stopping_condition": "coverage=100%, status=pass"
-    },
-    {
-      "step": "review",
-      "description": "假阳性复核",
-      "expected_artifact": "复核结论",
-      "stopping_condition": "所有例外情况已审查"
-    },
-    {
-      "step": "report",
-      "description": "生成审计报告",
-      "expected_artifact": "work/final_result.json",
-      "stopping_condition": "报告内容完整"
-    },
-    {
-      "step": "validation",
-      "description": "结果校验和提交",
-      "expected_artifact": "work/validation_report.json",
-      "stopping_condition": "校验通过并提交成功"
+      "id": "Q2",
+      "question": "附件二的较高审批线是什么？",
+      "applicable_policy": "03_authorization_management.md",
+      "clause": "附件二"
     }
   ],
+  "data_questions": [
+    {
+      "id": "Q3",
+      "question": "R004236和R004237是否为同一员工、同一费用类型？",
+      "fields": ["employee_id", "expense_type"]
+    },
+    {
+      "id": "Q4",
+      "question": "两笔费用的日期间隔是否在7天内？",
+      "fields": ["expense_date"]
+    },
+    {
+      "id": "Q5",
+      "question": "合计金额是否达到较高审批线？",
+      "fields": ["amount"]
+    }
+  ],
+  "required_fields": ["record_id", "employee_id", "expense_date", "expense_type", "amount", "invoice_no", "invoice_id", "status", "department_id"],
+  "evidence_requirements": [
+    "R004236完整记录",
+    "R004237完整记录",
+    "拆分报销政策条款(第十一条)",
+    "审批权限表(附件二)",
+    "日期间隔计算结果",
+    "金额合计计算结果"
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "查询R004236和R004237费用详情", "status": "completed"},
+    {"step": 2, "action": "查询拆分报销制度和审批权限表", "status": "completed"},
+    {"step": 3, "action": "计算日期间隔和合计金额", "status": "completed"},
+    {"step": 4, "action": "依据制度判定是否构成拆分报销", "status": "completed"},
+    {"step": 5, "action": "运行evidence-coverage-check", "status": "pending"},
+    {"step": 6, "action": "运行audit-report", "status": "pending"},
+    {"step": 7, "action": "运行result-validator", "status": "pending"},
+    {"step": 8, "action": "validate_audit_result", "status": "pending"},
+    {"step": 9, "action": "submit_audit_result", "status": "pending"}
+  ],
   "complexity": {
-    "score": 3,
+    "score": 1,
     "reasons": [
-      "需要确认适用的政策版本(2025版vs2022版)",
-      "需要批量数据检索和分析(多表join,聚合分析)",
-      "需要检查多条业务规则(拆分/超标准/超期/发票/审批)",
-      "存在阈值判断和边界条件",
-      "clean_but_suspicious题型需要仔细排除假阳性"
+      "单规则(第七条拆分报销)双已知记录任务",
+      "仅需日期间隔计算和金额求和，无需聚合或分组",
+      "无政策版本冲突，现行2025版制度适用"
     ]
   },
   "subagent_plan": {
-    "use_subagent": true,
-    "role": "data_analyst",
-    "reason_code": "MULTI_RECORD_SCOPE",
-    "task_description": "检索所有注入样本记录(R004201-R004240),分析每条记录的合规状态,包括:拆分报销检查(同一员工同一类型7天窗口)、发票重复检查、超标准计算(差旅/培训/招待/办公/通讯标准对比)、超期报销检查(60天)、审批完整性检查。返回每条记录的合规判定和证据。",
-    "artifact_paths": [
-      "work/audit_plan.json"
-    ],
-    "requested_token_budget": 8000
+    "decision": "no_subagent",
+    "reason": "复杂度1，双记录单规则，主智能体可直接完成"
   },
   "stopping_conditions": [
-    "所有注入记录(R004201-R004240)的合规状态已明确",
-    "TRAP-003对应记录已识别",
-    "无剩余未解决的模糊规则解释",
-    "evidence_matrix coverage达到100%",
-    "validation_report状态为pass"
+    "日期间隔计算完成且与7天阈值比较完毕",
+    "金额合计与审批线比较完毕",
+    "evidence_matrix status为pass且覆盖率100%",
+    "validation_report通过",
+    "validate_audit_result返回valid=true"
   ],
-  "unresolved_items": [
-    "TRAP-003具体对应哪组注入记录尚待确定",
-    "需要实际数据查询后才能确定是否存在异常"
-  ]
+  "unresolved_items": []
 }

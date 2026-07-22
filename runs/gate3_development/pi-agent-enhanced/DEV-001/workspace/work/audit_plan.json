@@ -1,0 +1,69 @@
+{
+  "task_id": "DEV-001",
+  "audit_object": "R900012",
+  "question": "核查R900012是否构成超期报销",
+  "audit_period": {
+    "expense_date": "2025-12-20",
+    "reimburse_date": "2026-01-10",
+    "fiscal_year": 2025
+  },
+  "organization_scope": {
+    "employee_id": "E9001",
+    "department_id": "D901"
+  },
+  "applicable_rules": [
+    {
+      "policy": "XX证券费用报销管理办法(2025修订版)",
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause": "第七条",
+      "description": "60天规则：员工应在费用发生后60天内提交报销申请"
+    },
+    {
+      "policy": "XX证券费用报销管理办法(2025修订版)",
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause": "第九条",
+      "description": "会计年度末15天补充提交规则：会计年度末发生的费用，最迟可在财政年度结束后15天内补充提交"
+    }
+  ],
+  "policy_applicability": {
+    "reason": "费用发生日期2025-12-20在现行2025修订版施行日(2025-01-01)之后，2025版为唯一适用制度",
+    "excluded": ["原2022版已于2025-01-01废止"]
+  },
+  "data_questions": [
+    "R900012的expense_date和reimburse_date分别是多少",
+    "R900012的费用类型和金额",
+    "R900012是否有特殊审批"
+  ],
+  "analysis": {
+    "expense_date": "2025-12-20",
+    "reimburse_date": "2026-01-10",
+    "days_between": 21,
+    "article_7_deadline": "2026-02-18",
+    "article_7_days_allowed": 60,
+    "article_9_deadline": "2026-01-15",
+    "article_9_days_allowed": 15,
+    "fiscal_year_end": "2025-12-31"
+  },
+  "complexity": 1,
+  "complexity_reasons": [
+    "单一已知记录R900012，仅需直接查询",
+    "单一适用制度(2025修订版)，无版本冲突",
+    "两项规则(第七条和第九条)均在同一文档中",
+    "日期边界判断直接，无需聚合或批量"
+  ],
+  "subagent_plan": "none — complexity=1，主智能体直接完成",
+  "execution_steps": [
+    "1. 查询R900012详情（已完成）",
+    "2. 检索并确认适用制度版本 — policy-version-check compact",
+    "3. 计算两条规则下的截止日期并与reimburse_date比较",
+    "4. 撰写work/report_draft.json",
+    "5. 执行evidence-coverage-check并写入work/evidence_matrix.json",
+    "6. 执行false-positive-review（触发条件：日期边界判断）",
+    "7. 执行result-validator",
+    "8. 调用validate_audit_result和submit_audit_result"
+  ],
+  "stopping_conditions": [
+    "确认R900012在第七条和第九条下的合规性后即可停止",
+    "不扩展至其他记录或其他规则"
+  ]
+}

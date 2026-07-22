@@ -1,99 +1,61 @@
 {
-  "task_scope": {
-    "task_id": "L3-001",
-    "type": "full_year_rule_audit",
-    "audit_object": "重复报销 (Duplicate Reimbursement)",
-    "question": "对全年数据做重复报销专项扫描，返回全部异常ID和记录ID集合"
-  },
-  "audit_period": {
-    "start": "2025-01-01",
-    "end": "2025-12-31",
-    "policy_effective_date": "2025-01-01"
-  },
-  "applicable_policy": {
-    "doc_id": "01_expense_reimbursement_2025.md",
-    "title": "XX证券费用报销管理办法(2025修订版)",
-    "applicable_clause": "第十条",
-    "rule_text": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。",
-    "citation": {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
+  "task_id": "L3-001",
+  "task_type": "full_year_rule_audit",
+  "scope": {
+    "audit_object": "重复报销专项扫描（同一发票多次报销）",
+    "rule": "同一发票最多报销1次",
+    "business_period": "2025年全年",
+    "organization_scope": "XX证券全部部门及员工",
+    "expense_types": "全部费用类型"
   },
   "policy_questions": [
     {
-      "id": "PQ-1",
-      "question": "哪些发票在全年报销记录中被使用了超过1次（即同一invoice_no出现在不同record_id中）？",
-      "rule": "第十条：同一发票最多报销1次",
-      "boundary": "发票使用次数 >= 2"
+      "question": "制度中关于同一发票重复报销的规定是什么？",
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause": "第十条",
+      "rule_text": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。"
     }
   ],
   "data_questions": [
     {
-      "id": "DQ-1",
-      "question": "全年所有被重复使用的发票及其关联的报销记录",
-      "method": "使用 find_reused_invoices 获取重复发票列表，再用 find_invoice_usage 或 get_expense_detail 获取关联记录",
-      "required_fields": ["invoice_no", "record_id", "expense_date", "amount", "employee_id", "department_id", "status"]
+      "question": "全年数据中哪些发票被使用了2次或以上？",
+      "method": "find_reused_invoices(min_usage_count=2)",
+      "expected_output": "重复发票列表及关联record_id集合"
     }
   ],
-  "tables_and_fields": [
-    "invoices: invoice_no, amount, usage_count, linked_record_ids",
-    "expenses: record_id, expense_date, amount, status, employee_id, department_id, expense_type, invoice_no"
+  "required_fields": ["record_id", "invoice_no", "employee_id", "department_id", "amount", "expense_type", "expense_date", "reimburse_date", "status"],
+  "evidence_requirements": [
+    "每笔重复报销记录的详细信息（get_expense_detail）",
+    "政策条款原文及文档ID"
   ],
   "execution_steps": [
-    {
-      "step": 1,
-      "name": "Policy Research",
-      "action": "确认第十条适用性，2025年政策生效日期，无政策版本冲突",
-      "status": "completed"
-    },
-    {
-      "step": 2,
-      "name": "Data Analysis - Batch",
-      "action": "批量查询所有 reused invoices (usage_count >= 2)，获取所有关联报销记录",
-      "subagent": "data_analyst",
-      "reason_code": "AGGREGATION_REQUIRED"
-    },
-    {
-      "step": 3,
-      "name": "Evidence Coverage Check",
-      "action": "运行 evidence-coverage-check 确保证据覆盖完整"
-    },
-    {
-      "step": 4,
-      "name": "False Positive Review",
-      "action": "检查是否有豁免或例外情况"
-    },
-    {
-      "step": 5,
-      "name": "Audit Report",
-      "action": "生成审计报告"
-    },
-    {
-      "step": 6,
-      "name": "Validation and Submission",
-      "action": "运行 result-validator 和 validate_audit_result，通过后提交"
-    }
+    {"step": "planning", "action": "制定审计计划", "status": "in_progress"},
+    {"step": "policy_check", "action": "查询并确认适用的制度条款", "status": "pending"},
+    {"step": "data_scan", "action": "全量扫描重复发票（find_reused_invoices）", "status": "pending"},
+    {"step": "detail_verification", "action": "逐条验证每对重复报销记录详情", "status": "pending"},
+    {"step": "evidence_coverage", "action": "证据覆盖检查", "status": "pending"},
+    {"step": "false_positive_review", "action": "假阳性复核", "status": "pending"},
+    {"step": "reporting", "action": "生成审计报告", "status": "pending"},
+    {"step": "validation", "action": "结果校验", "status": "pending"},
+    {"step": "submission", "action": "提交审计结果", "status": "pending"}
   ],
-  "complexity": 2,
-  "complexity_reasons": [
-    "批量聚合/分组/连接（按invoice分组，跨全年纪录连接）：+1",
-    "综合审计报告交付物：+1",
-    "单一规则（第十条），无政策版本冲突，无多政策，无阈值模糊",
-    "总计：2"
-  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "需要全量聚合扫描（find_reused_invoices） +1",
+      "需要完整审计报告 +1",
+      "单一规则、单一政策、无阈值边界/豁免/版本冲突"
+    ]
+  },
   "subagent_plan": {
-    "role": "data_analyst",
-    "reason_code": "AGGREGATION_REQUIRED",
-    "task": "查询全年所有重复使用的发票（usage_count >= 2）及其关联的所有报销记录详情，按发票分组输出"
+    "planned": false,
+    "reason": "复杂度为2，find_reused_invoices工具已提供全量结果，数据范围明确（6组12条记录），可在主智能体中紧凑完成。单一规则、单一政策，无需独立数据或政策角色。"
   },
   "stopping_conditions": [
-    "所有 reused invoices 已检索完毕",
-    "所有关联报销记录已查明",
-    "证据矩阵覆盖率达到100%",
-    "无更多需要核查的发票"
+    "全量find_reused_invoices结果已获取且验证",
+    "所有重复发票对应的record详情已逐条确认",
+    "政策条款已引用",
+    "证据覆盖、假阳性复核、结果校验均通过"
   ],
-  "artifact_requirements": {
-    "audit_plan": "work/audit_plan.json",
-    "evidence_matrix": "work/evidence_matrix.json",
-    "final_result": "work/final_result.json",
-    "validation_report": "work/validation_report.json"
-  }
+  "unresolved_items": []
 }

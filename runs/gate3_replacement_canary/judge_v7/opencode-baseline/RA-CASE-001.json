@@ -1,0 +1,255 @@
+{
+  "group": "opencode-baseline",
+  "dataset_id": "securities-expense-audit-formal-15-v9",
+  "rubric_version": "atomic-binary-checklist-v7",
+  "task_id": "RA-CASE-001",
+  "case_family": "record_audit",
+  "category": "policy_data_comparison",
+  "graded_at": "2026-07-22T21:14:30+08:00",
+  "checklist_passed": 10,
+  "checklist_total": 12,
+  "checklist_pass_rate": 83.333,
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "明确认定构成重复报销，无矛盾表述",
+      "answer_evidence": "存在异常...同一发票...重复使用，构成重复报销。",
+      "trace_evidence": "无需工具轨迹，结论在最终答案中明确。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "anomaly-type",
+      "value": 1,
+      "reason": "发现规则类型完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "anomaly-count",
+      "value": 1,
+      "reason": "发现数量完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-r000028",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-r004204",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "same-invoice",
+      "value": 1,
+      "reason": "明确识别同一发票INV000028在R000028和R004204中重复使用",
+      "answer_evidence": "发票FP202500000028被报销记录R000028和R004204重复使用",
+      "trace_evidence": "无工具轨迹，但答案证据充分。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "same-amount",
+      "value": 1,
+      "reason": "准确识别两条记录金额均为165.58元",
+      "answer_evidence": "金额均为165.58元",
+      "trace_evidence": "无工具轨迹，但答案证据充分。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "approved-records",
+      "value": 0,
+      "reason": "无工具轨迹证据支持两条记录均为approved状态",
+      "answer_evidence": "答案未明确提及审批状态",
+      "trace_evidence": "工具轨迹为空，无证据。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "invoice-usage-investigation",
+      "value": 0,
+      "reason": "未在结论前通过发票查询或等价数据查询确认完整使用集合。工具调用次数为0，无查询证据。",
+      "answer_evidence": "答案声称发票FP202500000028被R000028和R004204重复使用，但未展示查询过程。",
+      "trace_evidence": "轨迹摘要显示call_count为0，无查询发票使用记录的工具调用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis",
+      "value": 1,
+      "reason": "引用了《XX证券费用报销管理办法(2025修订版)》第十条，条款直接支持同一发票最多报销一次的结论。",
+      "answer_evidence": "答案引用第十条并说明“同一发票最多报销1次”，citations中包含该条款。",
+      "trace_evidence": "无工具调用，但提交的JSON中包含有效引用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "critical_failures": [],
+  "score_cap": null,
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 319.049,
+    "expected_anomaly_ids": [
+      "DUP-001"
+    ],
+    "actual_anomaly_ids": [
+      "AN-CASE-001-001"
+    ],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {
+        "DUP": 1
+      },
+      "actual_types": {
+        "DUP": 1
+      }
+    },
+    "expected_record_ids": [
+      "R000028",
+      "R004204"
+    ],
+    "actual_record_ids": [
+      "R000028",
+      "R004204"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 1,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 0.9,
+    "overall_comment": "除审批状态无工具证据外，其他检查均通过。；政策依据满足，但缺乏发票反查的证明过程。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 5579,
+      "completion_tokens": 3284,
+      "total_tokens": 8863,
+      "prompt_cache_hit_tokens": 1920,
+      "prompt_cache_miss_tokens": 3659
+    },
+    "batch_count": 2,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 1969,
+          "completion_tokens": 962,
+          "total_tokens": 2931,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 624
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 1201
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 1811,
+          "completion_tokens": 1021,
+          "total_tokens": 2832,
+          "prompt_tokens_details": {
+            "cached_tokens": 640
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 766
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 1171
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 2
+      }
+    ],
+    "consistency_audit": {
+      "sampled_count": 2,
+      "agreement_count": 2,
+      "agreement_rate": 1.0,
+      "disagreement_ids": [],
+      "tied_ids": [],
+      "tiebreak_count": 0,
+      "repeat_count": 2,
+      "batches": [
+        {
+          "model": "deepseek-v4-pro",
+          "usage": {
+            "prompt_tokens": 1799,
+            "completion_tokens": 1301,
+            "total_tokens": 3100,
+            "prompt_tokens_details": {
+              "cached_tokens": 512
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 1121
+            },
+            "prompt_cache_hit_tokens": 512,
+            "prompt_cache_miss_tokens": 1287
+          },
+          "finish_reason": "stop",
+          "attempt": 1,
+          "max_tokens": 4096,
+          "shape_attempt": 1,
+          "criteria_count": 2
+        }
+      ]
+    }
+  },
+  "run_path": "runs/gate3_replacement_canary/opencode-baseline/RA-CASE-001"
+}

@@ -1,146 +1,209 @@
 {
+  "group": "opencode-enhanced",
+  "task_id": "TRAP-002",
   "case_family": "clean_trap",
-  "case_score": 20,
-  "case_score_raw": 45.0,
   "category": "clean_but_suspicious",
-  "criteria": [
+  "graded_at": "2026-07-21T21:02:49+08:00",
+  "checklist_passed": 10,
+  "checklist_total": 14,
+  "checklist_pass_rate": 71.429,
+  "checklist": [
     {
-      "answer_evidence": "answer: '无异常', anomaly_ids: []",
       "id": "clean-conclusion",
-      "reason": "候选明确给出无异常结论，anomaly_ids为空，无矛盾表述。",
-      "score": 30.0,
-      "source": "llm_judge",
-      "trace_evidence": "候选无工具调用，但最终答案与预期一致。"
+      "value": 1,
+      "reason": "候选答案明确给出'无异常'结论，无矛盾表述",
+      "answer_evidence": "答案开头'无异常'，结尾'不构成重复报销或拆分报销'",
+      "trace_evidence": "",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "record_ids: [R000002, R004201, ...] 共12条，非预期记录。",
-      "id": "record-scope",
-      "reason": "候选提交完全无关记录ID，未核查预期核心记录R004234和R004235。",
-      "score": 0.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用显示核查正确记录，no_anomaly_coverage描述重复发票扫描，非题目要求。"
-    },
-    {
-      "answer_evidence": "no_anomaly_coverage: '重复发票注入样本...不构成异常'，未涉及不同发票和总额。",
-      "id": "case-specific-reason",
-      "reason": "候选理由错误，未说明不同发票和总金额低于审批线，而是归因于注入样本。",
-      "score": 0.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用验证发票差异和金额聚合。"
-    },
-    {
-      "answer_evidence": "无相关验证。",
-      "id": "reverse-check",
-      "reason": "无工具调用证据，未对阈值、日期、发票等边界条件进行核查。",
-      "score": 0.0,
-      "source": "llm_judge",
-      "trace_evidence": "tool_trace_summary: call_count: 0，无任何工具使用痕迹。"
-    },
-    {
+      "id": "record-scope-include-r004234",
+      "value": 1,
+      "reason": "期望record_id已提交",
       "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-include-r004235",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "case-specific-reason-invoice",
+      "value": 1,
+      "reason": "候选答案准确说明发票不同，不构成重复发票",
+      "answer_evidence": "答案：'R004234发票为FP2025X0004228，R004235发票为FP2025X0004229，发票不同'",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "候选答案准确计算7天内合计500元",
+      "answer_evidence": "答案：'合计金额500元（250+250）'",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 0,
+      "reason": "候选答案声称未达到3000元审批线，但预期应说明未达到10000元审批线",
+      "answer_evidence": "答案：'未达到...较高审批线3000元（AR-02档）'",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-invoice",
+      "value": 0,
+      "reason": "工具轨迹未调用，无独立核验过程，无法证明数据来源或计算",
+      "answer_evidence": "",
+      "trace_evidence": "工具调用次数为0，无任何工具轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 0,
+      "reason": "工具轨迹未调用，无独立核验过程，无法证明数据来源或计算",
+      "answer_evidence": "",
+      "trace_evidence": "工具调用次数为0，无任何工具轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 0,
+      "reason": "工具轨迹未调用，无独立核验过程，无法证明数据来源或计算",
+      "answer_evidence": "",
+      "trace_evidence": "工具调用次数为0，无任何工具轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "候选答案准确引用了01_expense_reimbursement_2025.md的第十条和第十一条",
+      "answer_evidence": "答案中提及'《XX证券费用报销管理办法(2025修订版)》第十条'和'第十一条'，citations包含对应条款",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "候选答案准确引用了03_authorization_management.md的附件二",
+      "answer_evidence": "答案中提及'《XX证券授权管理办法》附件二'，citations包含对应条款",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
       "id": "no-unsupported-output",
-      "reason": "未提交实质异常",
-      "score": 10.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    },
-    {
+      "value": 1,
+      "reason": "未提交异常ID",
       "answer_evidence": "",
-      "id": "submission",
-      "reason": "统一提交已接受且Schema有效",
-      "score": 5.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": true,
-      "reason": "候选用无关记录（重复发票扫描得到的12条记录）支撑核心结论，实际应核查R004234和R004235，构成无关记录支撑核心结论。",
-      "score_cap": 20,
-      "source": "llm_judge"
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     },
     {
-      "id": "trap-false-positive",
-      "triggered": false,
-      "reason": "",
-      "score_cap": 30,
-      "source": "llm_judge"
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 236.537,
+    "expected_anomaly_ids": [],
     "actual_anomaly_ids": [],
-    "actual_record_ids": [
-      "R000002",
-      "R004201",
-      "R000005",
-      "R004202",
-      "R000020",
-      "R004203",
-      "R000028",
-      "R004204",
-      "R000037",
-      "R004205",
-      "R000055",
-      "R004206"
-    ],
     "anomaly_metrics": {
-      "actual_types": {},
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
       "count_exact": true,
       "expected_types": {},
-      "f1": 1.0,
-      "precision": 1.0,
-      "recall": 1.0
+      "actual_types": {}
     },
-    "citation_count": 1,
-    "elapsed_seconds": 344.611,
-    "expected_anomaly_ids": [],
     "expected_record_ids": [
       "R004234",
       "R004235"
     ],
+    "actual_record_ids": [
+      "R004234",
+      "R004235"
+    ],
     "record_metrics": {
-      "exact": false,
-      "extra_count": 12,
-      "f1": 0.0,
-      "missing_count": 2,
-      "precision": 0.0,
-      "recall": 0.0
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
     },
-    "required_citations": [],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
     "trap_tokens_in_conclusion": [],
-    "unknown_record_ids": []
+    "citation_count": 3,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条、第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T23:27:19+08:00",
-  "group": "opencode-enhanced",
   "judge": {
-    "attempt": 1,
-    "confidence": 0.95,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "候选答案结论表面正确，但核查记录范围完全错误，未针对题目要求的边界条件，且无工具调用证据。因触发虚构记录关键错误，总分限制在20分。",
-    "shape_attempt": 1,
     "status": "ok",
+    "confidence": 0.6,
+    "overall_comment": "结论无异常基本正确，但审批线阈值与预期不符（声称3000而非10000），且无工具轨迹支撑独立核验，完整性不足。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 3031,
-      "completion_tokens_details": {
-        "reasoning_tokens": 2518
-      },
-      "prompt_cache_hit_tokens": 1408,
-      "prompt_cache_miss_tokens": 990,
-      "prompt_tokens": 2398,
-      "prompt_tokens_details": {
-        "cached_tokens": 1408
-      },
-      "total_tokens": 5429
-    }
+      "prompt_tokens": 2793,
+      "completion_tokens": 1766,
+      "total_tokens": 4559,
+      "prompt_cache_hit_tokens": 2688,
+      "prompt_cache_miss_tokens": 105
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 2793,
+          "completion_tokens": 1766,
+          "total_tokens": 4559,
+          "prompt_tokens_details": {
+            "cached_tokens": 2688
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1017
+          },
+          "prompt_cache_hit_tokens": 2688,
+          "prompt_cache_miss_tokens": 105
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 9
+      }
+    ]
   },
-  "passed": false,
-  "run_path": "runs/gate4_formal/opencode-enhanced/TRAP-002",
-  "task_id": "TRAP-002"
+  "run_path": "runs/gate4_formal/opencode-enhanced/TRAP-002"
 }

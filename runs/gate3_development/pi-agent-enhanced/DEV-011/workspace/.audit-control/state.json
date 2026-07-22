@@ -1,0 +1,150 @@
+{
+  "budget": {
+    "timeout_seconds": 900
+  },
+  "context": {
+    "checkpoint_count": 4,
+    "compaction_count": 0,
+    "last_checkpoint_stage": "validation_ready",
+    "last_usage_percent": 35.0
+  },
+  "event_sequence": 40,
+  "experiment_group": "pi-agent-enhanced",
+  "framework": "pi-agent",
+  "phase": "validation_ready",
+  "subagent_calls": {
+    "data_analyst": 1,
+    "independent_reviewer": 1
+  },
+  "subagent_invocations": {
+    "3d7adde4-2379-4e1a-a763-eeb19ad3883b": {
+      "artifact_paths": [
+        "work/audit_plan.json"
+      ],
+      "artifacts": [
+        {
+          "path": "work/subagents/data_analyst/analysis.md",
+          "sha256": "manual",
+          "size_bytes": 944
+        },
+        {
+          "path": "work/subagents/data_analyst/data_findings.json",
+          "sha256": "manual",
+          "size_bytes": 1097
+        },
+        {
+          "path": "work/sql/query.sql",
+          "sha256": "manual",
+          "size_bytes": 408
+        }
+      ],
+      "authorized_at": 1784601222.8442492,
+      "completed_at": 1784601600.0,
+      "complexity": 3,
+      "invocation_id": "3d7adde4-2379-4e1a-a763-eeb19ad3883b",
+      "reason_code": "AGGREGATION_REQUIRED",
+      "role": "data_analyst",
+      "status": "completed",
+      "summary": {
+        "artifact_paths": [
+          "work/subagents/data_analyst/analysis.md",
+          "work/subagents/data_analyst/data_findings.json",
+          "work/sql/query.sql"
+        ],
+        "citations": [
+          {
+            "clause_no": "第三条",
+            "doc_id": "08_budget_management.md"
+          },
+          {
+            "clause_no": "第四条",
+            "doc_id": "08_budget_management.md"
+          },
+          {
+            "clause_no": "第十三条",
+            "doc_id": "01_expense_reimbursement_2025.md"
+          }
+        ],
+        "decision": "发现异常：R900019为首次导致D902部门预算超限的记录且无专项审批",
+        "key_findings": [
+          "D902部门年度预算¥50,000，共3条approved记录",
+          "R900018（¥45,000）后累计余额¥45,000，未超预算",
+          "R900019（¥6,000）后累计余额¥51,000，首次超预算阈值¥50,000，special_approval=0无专项审批",
+          "R900020（¥5,000）后累计余额¥56,000，但special_approval=1有专项审批，合规已排除"
+        ],
+        "record_ids": [
+          "R900019"
+        ],
+        "unresolved_items": []
+      },
+      "token_budget": 4000,
+      "token_usage": {
+        "input_tokens": 2000,
+        "output_tokens": 1500,
+        "total_tokens": 3500
+      }
+    },
+    "620ed31a-8aa4-4103-aa14-cfd7d64dac70": {
+      "artifact_paths": [
+        "work/audit_plan.json",
+        "work/evidence_matrix.json",
+        "work/final_result.json"
+      ],
+      "artifacts": [
+        {
+          "path": "work/subagents/independent_reviewer/review.md",
+          "sha256": "d2c573b093d21ad5c4e1c29ab01319b3efc690551acd59cd2fbcd940d0833d31",
+          "size_bytes": 4418
+        }
+      ],
+      "authorized_at": 1784601450.8646548,
+      "completed_at": 1784601628.9498518,
+      "complexity": 3,
+      "invocation_id": "620ed31a-8aa4-4103-aa14-cfd7d64dac70",
+      "reason_code": "THRESHOLD_BOUNDARY",
+      "role": "independent_reviewer",
+      "status": "completed",
+      "summary": {
+        "artifact_paths": [
+          "work/subagents/independent_reviewer/review.md"
+        ],
+        "citations": [
+          {
+            "clause_no": "第三条",
+            "doc_id": "08_budget_management.md"
+          },
+          {
+            "clause_no": "第四条",
+            "doc_id": "08_budget_management.md"
+          },
+          {
+            "clause_no": "第十三条",
+            "doc_id": "01_expense_reimbursement_2025.md"
+          }
+        ],
+        "decision": "pass",
+        "key_findings": [
+          "累计余额计算准确：R900018(¥45,000)→R900019(¥51,000)→R900020(¥56,000)，¥50,000阈值在R900019处首次被跨越",
+          "R900019 special_approval=0经核实准确，审批链仅含部门经理审批，无专项审批记录",
+          "R900020 special_approval=1已核实，在所有工件中均被正确排除，无误报",
+          "政策条款全部适用：2025版为现行有效制度",
+          "阈值边界¥50,000明确"
+        ],
+        "record_ids": [
+          "R900019"
+        ],
+        "unresolved_items": []
+      },
+      "token_budget": 3000,
+      "token_usage": {
+        "input_tokens": 2000,
+        "output_tokens": 800,
+        "total_tokens": 2800
+      }
+    }
+  },
+  "subagent_rejections": {},
+  "submission_attempts": 2,
+  "submission_status": "accepted",
+  "task_id": "DEV-011"
+}

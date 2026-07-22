@@ -1,0 +1,62 @@
+{
+  "in_scope_population": {
+    "count": 2,
+    "description": "E9001 + travel_transport + 2025-01-27~2025-02-10 (R900003 expense_date ±7 days)",
+    "records": ["R900003", "R900004"]
+  },
+  "candidate_count": 2,
+  "matched_record_ids": ["R900003", "R900004"],
+  "analysis": {
+    "split_reimbursement_check": {
+      "rule": "Article 11, 01_expense_reimbursement_2025.md",
+      "same_employee": true,
+      "employee_id": "E9001",
+      "same_expense_type": true,
+      "expense_type": "travel_transport",
+      "within_7_days": true,
+      "date1": "2025-02-03",
+      "date2": "2025-02-06",
+      "days_between": 3,
+      "combined_amount": 10400,
+      "individual_tiers": ["AR-02", "AR-02"],
+      "combined_tier": "AR-03",
+      "higher_tier_reached": true,
+      "same_matter": true,
+      "matter_description": "同一客户路演交通费",
+      "is_split_reimbursement": true
+    },
+    "invoice_check": {
+      "invoice_1": "FPDEV900003",
+      "invoice_2": "FPDEV900004",
+      "different_invoices": true,
+      "each_used_once": true,
+      "no_duplicate_invoice": true
+    },
+    "approval_check": {
+      "r900003_approvals": ["部门经理(AP000003, AR-02)"],
+      "r900004_approvals": ["部门经理(AP000004, AR-02)"],
+      "missing_finance_review": "Both records missing 财务复核 as required by AR-02"
+    }
+  },
+  "rule_by_population_coverage": [
+    {
+      "rule": "拆分报销 (Article 11)",
+      "population": "E9001 travel_transport 7-day window",
+      "coverage": "2/2 records checked",
+      "status": "complete"
+    }
+  ],
+  "completed_checks": [
+    "Same employee check: PASS (both E9001)",
+    "Same expense type check: PASS (both travel_transport)",
+    "7-day window check: PASS (3 days apart)",
+    "Combined amount threshold: ¥10,400 → AR-03, higher than individual AR-02",
+    "Same matter check: PASS (同一客户路演)",
+    "Invoice uniqueness: PASS (different invoices, each used once)",
+    "Split reimbursement conclusion: CONFIRMED"
+  ],
+  "query_and_result_paths": [],
+  "data_quality_issues": [],
+  "limitations": "No SQLite database available; all queries performed via API tools with complete result sets",
+  "unresolved_items": []
+}

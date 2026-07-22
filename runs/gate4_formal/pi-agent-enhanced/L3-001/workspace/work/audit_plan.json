@@ -1,0 +1,62 @@
+{
+  "task_id": "L3-001",
+  "task_type": "full_year_rule_audit",
+  "task_question": "对全年数据做重复报销专项扫描，按重复发票组生成稳定的发现ID，返回全部发现ID和关联record_id集合，并说明全量扫描方法和制度依据。",
+  "audit_scope": {
+    "object": "2025全年费用报销记录",
+    "rule": "同一发票最多报销1次（重复报销）",
+    "business_period": "2025-01-01 至 2025-12-31",
+    "organization": "XX证券全部门、全员工",
+    "expense_types": "全部费用类型"
+  },
+  "policy_questions": [
+    {
+      "question": "当前有效制度中关于重复报销的规定",
+      "answer": "《XX证券费用报销管理办法(2025修订版)》第十条：同一发票最多报销1次。发现同一发票在不同报销单中重复出现的，应认定为重复报销风险。",
+      "applicable_doc": "01_expense_reimbursement_2025.md",
+      "clause_no": "第十条",
+      "effective_date": "2025-01-01"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "全年是否存在同一发票被多笔报销记录使用的情况",
+      "method": "按发票编号GROUP BY统计使用次数，筛选usage_count>=2的发票组",
+      "tables": ["invoices", "expense_records"],
+      "fields": ["invoice_no", "record_id", "employee_id", "expense_date", "amount", "expense_type", "special_approval", "status"]
+    }
+  ],
+  "required_fields": ["record_id", "invoice_no", "employee_id", "expense_date", "amount", "expense_type", "special_approval", "status", "reason"],
+  "evidence_needs": [
+    "每张重复发票的关联记录明细",
+    "制度原文引用",
+    "全量扫描覆盖率证明",
+    "排除特殊审批或豁免的核查"
+  ],
+  "execution_steps": [
+    {"step": 1, "name": "audit-query-planner", "artifact": "work/audit_plan.json"},
+    {"step": 2, "name": "policy-version-check (compact)", "artifact": "work/policy_applicability.json"},
+    {"step": 3, "name": "batch-expense-analysis: 全量重复发票扫描", "artifact": "work/analysis/data_findings.json"},
+    {"step": 4, "name": "evidence-coverage-check", "artifact": "work/evidence_matrix.json"},
+    {"step": 5, "name": "false-positive-review", "artifact": "work/independent_review.json"},
+    {"step": 6, "name": "audit-report", "artifact": "work/report_draft.json"},
+    {"step": 7, "name": "result-validator + validate + submit", "artifact": "work/final_result.json"}
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "aggregation/grouping/joins: 需要按发票GROUP BY统计使用次数并关联报销记录",
+      "comprehensive audit report: 需要全量扫描并说明方法和制度依据"
+    ]
+  },
+  "subagent_plan": {
+    "planned": false,
+    "reason": "数据量可控（6组重复），单一规则，无版本冲突，已在主智能体中完成全量扫描和明细核查"
+  },
+  "stopping_conditions": [
+    "全部重复发票组已识别并逐条核实",
+    "全量扫描覆盖率100%",
+    "排除特殊审批后确认无豁免"
+  ],
+  "unresolved_items": []
+}

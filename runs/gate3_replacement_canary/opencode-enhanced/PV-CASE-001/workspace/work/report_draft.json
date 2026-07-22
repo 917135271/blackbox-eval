@@ -1,0 +1,63 @@
+{
+  "audit_scope": {
+    "task_id": "PV-CASE-001",
+    "clue_record": "R004233",
+    "audit_object": "费用报销记录R004233的审批路径及费用标准适用",
+    "period": "2025-10-03(费用发生日)",
+    "organization": "D008合规风控部",
+    "employee": "E0012杨丽华(分管副总/X1)"
+  },
+  "verified_facts": [
+    {"fact": "R004233金额9990元,费用类型为travel_lodging(差旅住宿)", "source": "get_expense_detail"},
+    {"fact": "城市档位A类(一类城市),住宿10晚", "source": "get_expense_detail"},
+    {"fact": "审批链仅一条记录:AR-02档位,部门经理E0008(杨丹)审批通过", "source": "list_approvals"},
+    {"fact": "list_records_missing_approval('财务复核')确认R004233缺失财务复核", "source": "list_records_missing_approval"},
+    {"fact": "special_approval=0,无特殊审批豁免", "source": "get_expense_detail"},
+    {"fact": "发票FP2025X0004227仅使用1次,无重复报销", "source": "find_invoice_usage"},
+    {"fact": "实际住宿费9990元/10晚=999元/晚", "source": "计算"},
+    {"fact": "D008部门年度预算381600元,累计已用297095.29元,未超支", "source": "get_department_budget"}
+  ],
+  "applicable_policies": [
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二", "rule": "AR-02档位[3000,10000)需部门经理并经财务复核"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条", "rule": "审批权限统一按授权管理办法附件二执行"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条", "rule": "2025版自2025-01-01施行,2022版同时废止"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "第四条", "rule": "高管级一类城市住宿标准1100元/人/晚"},
+    {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条", "rule": "旧版8000元线→部门总经理(已废止)"},
+    {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第四条", "rule": "旧版审批金额已被后续制度替代,不得作为现行审批依据"}
+  ],
+  "findings": [
+    {
+      "anomaly_id": "ANOM-PV-001-001",
+      "type": "审批路径缺失财务复核",
+      "record_id": "R004233",
+      "description": "R004233金额9990元落入现行AR-02档位[3000,10000),必要审批角色为'部门经理,并经财务复核',但审批链仅存在部门经理审批,缺失财务复核。无特殊审批豁免。",
+      "policy_basis": ["03_authorization_management.md附件二", "01_expense_reimbursement_2025.md第五条"],
+      "severity": "high"
+    }
+  ],
+  "no_anomaly_checks": [
+    {"check": "住宿费标准", "result": "999元/晚 ≤ 1100元/晚,合规"},
+    {"check": "部门预算", "result": "297095.29+9990 < 381600,未超支"},
+    {"check": "发票重复", "result": "FP2025X0004227仅使用1次,无异常"},
+    {"check": "拆分规避审批", "result": "E0012在±7天内无其他travel_lodging报销"}
+  ],
+  "historical_deviation": {
+    "scenario": "若继续使用2022版历史审批线",
+    "wrong_judgment": "2022版规定≥8000元需部门总经理审批,R004233金额9990元将错误地被判定为缺少部门总经理审批。但2022版已于2025-01-01废止,现行AR-02档位仅需部门经理+财务复核。历史审批线8000元低于现行AR-03起步线10000元,继续使用会造成过度从严的误判。",
+    "correct_basis": "01_expense_reimbursement_2025.md第十四条明确废止2022版,03_authorization_management.md附件二的AR-02/AR-03分界线为10000元。"
+  },
+  "impact": "财务复核缺失意味着票据合法性、费用归属、预算占用和制度标准的独立复核环节缺失,不符合01_expense_reimbursement_2025.md第三条和第六条的管理原则。",
+  "recommendations": ["补充财务复核审批记录"],
+  "anomaly_ids": ["ANOM-PV-001-001"],
+  "record_ids": ["R004233"],
+  "citations": [
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条"},
+    {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"},
+    {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第四条"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "第四条"}
+  ],
+  "answer": "R004233(杨丽华,分管副总,差旅住宿9990元/10晚)核查结论:审批路径存在异常——现行AR-02档位[3000,10000)要求'部门经理,并经财务复核',实际仅有部门经理审批,缺失财务复核(异常ID:ANOM-PV-001-001)。住宿标准999元/晚未超出高管级一类城市1100元/晚限额,合规。2022版历史审批线(8000元→部门总经理)已由2025修订版正式废止,继续使用会导致将9990元误判为缺少部门总经理审批,但实际上2025现行AR-02档位仅要求部门经理+财务复核,而非部门总经理。",
+  "limitations": []
+}

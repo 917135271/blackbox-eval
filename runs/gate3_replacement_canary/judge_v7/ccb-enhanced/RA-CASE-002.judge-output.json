@@ -1,0 +1,86 @@
+{
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "答案明确将ANOM-R004209-002定性为'拆分报销规避审批'，结论为'拆分行为规避了部门总经理审批,违反制度第十一条'，无矛盾表述。",
+      "answer_evidence": "答案异常ANOM-R004209-002描述及结论：'拆分报销规避审批(ANOM-R004209-002)'和'拆分行为规避了部门总经理审批,违反制度第十一条'。",
+      "trace_evidence": "工具调用get_expense_detail获取R004209/R004210/R004211详情，显示同一员工E0008、同一费用类型travel_lodging、不同日期，合计金额10200。结合制度01_expense_reimbursement_2025.md第十一条和03_authorization_management.md附件二AR-02/AR-03，支撑拆分报销结论。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "same-employee-type",
+      "value": 1,
+      "reason": "三条记录均属于E0008且费用类型均为travel_lodging，聚合维度正确。",
+      "answer_evidence": "答案多处说明属于E0008且均为差旅住宿费，如'anomaly_ids: ANOM-R004209-001'列出'E0008'和'差旅住宿费'，证据矩阵facts提及'同一员工E0008同一费用类型travel_lodging'。",
+      "trace_evidence": "list_expenses调用参数employee_id=E0008, expense_type=travel_lodging返回三条记录R004209/R004210/R004211，employee_id均为E0008，expense_type均为travel_lodging。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "window-dates",
+      "value": 1,
+      "reason": "三个日期完整且判断位于7天窗口内（5个日历日）。",
+      "answer_evidence": "答案ANOM-R004209-001中列出三笔费用日期'2025-02-26'、'2025-02-28'、'2025-03-02'，并称'5个日历日内'。",
+      "trace_evidence": "get_expense_detail for R004209/R004210/R004211返回expense_date字段分别为'2025-02-26'、'2025-02-28'、'2025-03-02'。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "amounts",
+      "value": 1,
+      "reason": "三笔金额均列为3400元，完整准确。",
+      "answer_evidence": "答案中计算'3400/5=680'，明确列出R004209、R004210、R004211金额均为3400元。",
+      "trace_evidence": "get_expense_detail返回的record.amount字段均为3400.0。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "sum",
+      "value": 1,
+      "reason": "最终答案中明确合计金额为10200元，工具轨迹中获取到三笔费用均为3400元，计算正确",
+      "answer_evidence": "三笔合计金额10,200元",
+      "trace_evidence": "get_expense_detail for R004209, R004210, R004211 均返回 amount:3400.0; list_expenses 筛选得到三笔金额均为3400",
+      "source": "llm_judge"
+    },
+    {
+      "id": "threshold",
+      "value": 1,
+      "reason": "明确说明合计达到AR-03审批线(≥10000元)，与现行10000元较高审批线比较正确",
+      "answer_evidence": "三笔合计金额10,200元,达到AR-03审批线(≥10,000元,需部门总经理审批)",
+      "trace_evidence": "get_policy_doc 03_authorization_management.md 返回附件二内容，AR-03 为 >=10000 元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "distinct-invoices",
+      "value": 1,
+      "reason": "工具轨迹显示三张发票号码不同且各使用一次，候选报告了拆分报销而不报告重复报销，正确区分",
+      "answer_evidence": "未出现重复发票异常(DUP)，仅报告拆分报销(ANOM-R004209-002)",
+      "trace_evidence": "find_invoice_usage 分别针对 FP2025X0004203、FP2025X0004204、FP2025X0004205 均返回 usage_count:1，且记录仅对应一条费用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-expense",
+      "value": 1,
+      "reason": "候选提交中citations直接引用了01_expense_reimbursement_2025.md第十一条，且答案中提及拆分报销违反第十一条，满足引用7天聚合及达到较高审批线的拆分核查规则",
+      "answer_evidence": "违反《费用报销管理办法》第十一条",
+      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md 返回文件内容，其中第十一条涉及拆分报销核查规则",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-authorization",
+      "value": 1,
+      "reason": "引用了授权管理办法附件二并提及10000元审批线",
+      "answer_evidence": "answer中提及附件二AR-03审批线(≥10,000元)，citations包含03_authorization_management.md#附件二",
+      "trace_evidence": "工具get_policy_doc 03_authorization_management.md返回附件二，包含AR-03行",
+      "source": "llm_judge"
+    },
+    {
+      "id": "window-investigation",
+      "value": 1,
+      "reason": "通过员工E0008、费用类型travel_lodging查询获得三条记录",
+      "answer_evidence": "answer中提及R004209、R004210、R004211",
+      "trace_evidence": "工具list_expenses参数employee_id=E0008, expense_type=travel_lodging返回三记录",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选答案在所有四个检查点上均提供了明确证据，事实与制度依据充分，符合通过条件。；所有检查项均通过：合计金额计算正确，审批线比较明确，正确区分拆分与重复，并正确引用制度条款。；满足所有检查项",
+  "confidence": 0.9933333333333333
+}

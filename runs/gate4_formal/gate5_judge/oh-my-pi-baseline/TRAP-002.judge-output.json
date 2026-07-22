@@ -1,46 +1,78 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "clean-conclusion",
-      "score": 30,
-      "reason": "明确给出无异常结论，没有矛盾表述。",
-      "answer_evidence": "“无异常。...所有记录不存在...异常。”",
-      "trace_evidence": ""
+      "value": 1,
+      "reason": "候选答案明确判断无异常，无矛盾表述",
+      "answer_evidence": "答案开头'无异常。经核查，R004234与R004235不构成重复报销，也不构成拆分报销。'",
+      "trace_evidence": "",
+      "source": "llm_judge"
     },
     {
-      "id": "record-scope",
-      "score": 7.5,
-      "reason": "候选核查了核心记录R004234和R004235，但提交的记录范围包含8条，多出了无关记录，导致记录集合不准确。",
-      "answer_evidence": "record_ids: [R004233-R004240]",
-      "trace_evidence": "tool calls for R004234, R004235, etc."
+      "id": "case-specific-reason-invoice",
+      "value": 1,
+      "reason": "准确说明两条记录发票不同",
+      "answer_evidence": "答案指出'R004234使用发票FP2025X0004228（INV004228），R004235使用发票FP2025X0004229（INV004229），两份报销使用不同发票'",
+      "trace_evidence": "find_invoice_usage 分别查询两个发票，返回不同 record_id，usage_count 均为 1",
+      "source": "llm_judge"
     },
     {
-      "id": "case-specific-reason",
-      "score": 25,
-      "reason": "完整说明了不同发票、非重复报销且合计未超限额，符合专属原因。",
-      "answer_evidence": "“R004234与R004235为同日同额不同发票,非重复报销且合计未超月度限额”",
-      "trace_evidence": "查找重复发票，查看明细发票号不同，计算合计金额250+250=500低于AR-02线。"
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "准确计算7天内合计500元",
+      "answer_evidence": "答案明确'两笔合计金额为500.00元（250.00+250.00）'",
+      "trace_evidence": "get_expense_detail R004234 金额 250.0，R004235 金额 250.0，日期同为 2025-10-20",
+      "source": "llm_judge"
     },
     {
-      "id": "reverse-check",
-      "score": 15,
-      "reason": "轨迹中调用了重复发票检查、缺失审批检查、获取授权审批表等，进行了反向验证。",
-      "answer_evidence": "",
-      "trace_evidence": "find_reused_invoices, list_records_missing_approval, get_policy_doc for authorization attachment, etc."
+      "id": "case-specific-reason-threshold",
+      "value": 0,
+      "reason": "未说明500元未达到10000元审批线，而是比较3000元",
+      "answer_evidence": "答案称'合计金额未达到较高审批线AR-02（≥3000元）'，未提及10000元",
+      "trace_evidence": "get_policy_excerpt 显示 AR-02 为≥3000，AR-03 为≥10000；答案未引用 10000 元线",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-invoice",
+      "value": 1,
+      "reason": "轨迹独立核验发票不同且有数据来源",
+      "answer_evidence": "答案引用发票编号和查询结果",
+      "trace_evidence": "find_invoice_usage 返回两个不同发票号，usage_count 均为 1，对应 record_id 不同",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "轨迹包含金额数据，可计算合计500元",
+      "answer_evidence": "答案计算合计 250+250=500",
+      "trace_evidence": "get_expense_detail 返回 amount 250.0 和 expense_date 均为 2025-10-20",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 0,
+      "reason": "轨迹未证明正确比较合计金额与10000元审批线",
+      "answer_evidence": "答案比较的是 3000 元，非 10000 元",
+      "trace_evidence": "get_policy_excerpt 提供了 AR-03 线为 10000 元，但答案未使用该阈值",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用 01_expense_reimbursement_2025.md 第十条、第十一条",
+      "answer_evidence": "citations 包含 doc_id: 01_expense_reimbursement_2025.md, clause_no: 第十条 和 第十一条",
+      "trace_evidence": "search_policy 和 get_policy_excerpt 均调用 01_expense_reimbursement_2025.md",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "准确引用 03_authorization_management.md 附件二",
+      "answer_evidence": "citations 包含 doc_id: 03_authorization_management.md, clause_no: 附件二",
+      "trace_evidence": "get_policy_doc 和 get_policy_excerpt 调用了 03_authorization_management.md，返回附件二内容",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "所有提交的记录ID均存在于数据库。"
-    },
-    {
-      "id": "trap-false-positive",
-      "triggered": false,
-      "reason": "候选未将任何记录判断为异常。"
-    }
-  ],
-  "overall_comment": "候选正确判断了无异常并给出了合理解释，但提交的记录范围超出了题目核心范围，包含了无关记录，导致记录范围评分未得满分。",
-  "confidence": 0.95
+  "overall_comment": "候选答案正确判定无异常并解释了发票不同和合计金额，但拆分报销审批线比较时错误地使用了 3000 元而非制度要求的 10000 元较高审批线，导致两项与阈值相关的检查未通过。",
+  "confidence": 0.9
 }

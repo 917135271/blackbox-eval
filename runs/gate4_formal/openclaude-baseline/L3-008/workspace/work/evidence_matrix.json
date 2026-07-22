@@ -1,34 +1,85 @@
 {
   "status": "pass",
   "coverage_percent": 100,
-  "evidence_rows": [],
+  "evidence_rows": [
+    {
+      "anomaly_id": "L3-008-CLAUSE-001",
+      "record_ids": [
+        "R002599",
+        "R001990"
+      ],
+      "citations": [
+        {
+          "doc_id": "04_travel_expense.md",
+          "clause_no": "第三条"
+        },
+        {
+          "doc_id": "04_travel_expense.md",
+          "clause_no": "第四条"
+        }
+      ],
+      "facts": [
+        "差旅住宿标准由职级和城市档位双维度确定: 员工级 450/380/300, 经理级 650/550/450, 部门负责人级 850/700/600, 高管级 1100/900/750 (一类/二类/三类, 元/人/晚)",
+        "R002599: travel_lodging, 员工李帅(E0079), 赴合肥参加业务协调会住宿费 294.48元, 合肥为三类城市, 员工级差旅标准300元, 未超标"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "L3-008-CLAUSE-002",
+      "record_ids": [
+        "R002599",
+        "R001990"
+      ],
+      "citations": [
+        {
+          "doc_id": "05_training_expense.md",
+          "clause_no": "第五条"
+        }
+      ],
+      "facts": [
+        "培训住宿标准仅按城市档位确定: 一类500元, 二类420元, 三类350元, 不区分职级",
+        "R001990: training_fee, 员工王淑兰(E0051), 星河专项知识培训费 3002.54元, 为培训课程费(非住宿费), 适用第二条每人每期不超过3500元"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "L3-008-CLAUSE-003",
+      "record_ids": [
+        "R002599",
+        "R001990"
+      ],
+      "citations": [
+        {
+          "doc_id": "04_travel_expense.md",
+          "clause_no": "第七条"
+        },
+        {
+          "doc_id": "05_training_expense.md",
+          "clause_no": "第六条"
+        }
+      ],
+      "facts": [
+        "差旅费管理办法第七条: 培训期间住宿不适用本办法住宿表, 应按培训费管理办法执行",
+        "培训费管理办法第六条: 培训住宿标准仅适用于培训期间住宿, 不得与差旅住宿标准混用",
+        "两个制度有明确的排他条款, 场景不可交叉适用",
+        "数值对照: 一类城市, 员工级差旅450元 vs 培训500元(培训高50元); 经理级差旅650元 vs 培训500元(差旅高150元)"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
   "candidate_record_ids": [
-    "R000347",
-    "R003992",
-    "R002457",
-    "R000442",
-    "R002003",
-    "R000328",
-    "R001870",
-    "R002576",
-    "R001150",
-    "R002604",
-    "R001215",
-    "R003071"
+    "R002599",
+    "R001990"
   ],
   "submitted_record_ids": [
-    "R000347",
-    "R003992",
-    "R002457",
-    "R000442",
-    "R002003",
-    "R000328",
-    "R001870",
-    "R002576",
-    "R001150",
-    "R002604",
-    "R001215",
-    "R003071"
+    "R002599",
+    "R001990"
   ],
   "unowned_record_ids": [],
   "unused_candidate_record_ids": [],
@@ -36,8 +87,41 @@
   "missing_evidence": [],
   "no_anomaly_coverage": {
     "complete": true,
-    "description": "经核查差旅住宿与培训住宿相关记录，未发现标准混用的违规情况。差旅住宿按职级×城市档位（4×3矩阵），培训住宿仅按城市档位（1×3向量），两者结构不同、设计逻辑不同，且两项制度均明确禁止混用。"
+    "reason": "本题为 near_clause_disambiguation 制度条款辨析, 非违规发现。差旅住宿与培训住宿各有独立的适用制度、标准维度和数值, 两制度均设有排他条款禁止混用。R002599和R001990分别代表两个费用类型下的正常报销记录, 用于说明制度适用范围。"
   },
-  "reconciled_figures": {},
+  "reconciled_figures": {
+    "travel_lodging_standard_matrix": {
+      "dimensions": [
+        "职级",
+        "城市档位"
+      ],
+      "一类城市": {
+        "员工级": 450,
+        "经理级": 650,
+        "部门负责人级": 850,
+        "高管级": 1100
+      },
+      "二类城市": {
+        "员工级": 380,
+        "经理级": 550,
+        "部门负责人级": 700,
+        "高管级": 900
+      },
+      "三类城市": {
+        "员工级": 300,
+        "经理级": 450,
+        "部门负责人级": 600,
+        "高管级": 750
+      }
+    },
+    "training_lodging_standard": {
+      "dimensions": [
+        "城市档位"
+      ],
+      "一类城市": 500,
+      "二类城市": 420,
+      "三类城市": 350
+    }
+  },
   "unresolved_items": []
 }

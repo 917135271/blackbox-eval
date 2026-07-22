@@ -1,0 +1,70 @@
+{
+  "checklist": [
+    {
+      "id": "threshold-amount",
+      "value": 1,
+      "reason": "明确给出部门总经理审批线为10000元",
+      "answer_evidence": "AR-03(10000≤金额<50000元，部门总经理审批)",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "threshold-inclusive",
+      "value": 1,
+      "reason": "明确说明包含10000元边界",
+      "answer_evidence": "AR-03(10000≤金额<50000元，部门总经理审批)",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-first",
+      "value": 1,
+      "reason": "识别第一跳为费用报销办法第五条",
+      "answer_evidence": "现行《XX证券费用报销管理办法(2025修订版)》第五条明确...",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-relation",
+      "value": 1,
+      "reason": "明确说明制度间交叉引用关系",
+      "answer_evidence": "统一按《XX证券授权管理办法》附件二执行",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-second",
+      "value": 1,
+      "reason": "最终答案完成交叉引用至授权管理办法附件二，并详述审批档位。",
+      "answer_evidence": "answer中“经交叉引用，附件二列示五个审批档位...”，citations包含03_authorization_management.md附件二。",
+      "trace_evidence": "tool_trace为空，但final_answer证实第二跳检索完成。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-expense",
+      "value": 1,
+      "reason": "提交的引用中明确包含费用报销办法第五条。",
+      "answer_evidence": "submitted_json的citations含有doc_id:01_expense_reimbursement_2025.md, clause_no:第五条。",
+      "trace_evidence": "tool_trace无记录，但提交内容直接引用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-authorization",
+      "value": 1,
+      "reason": "提交的引用中明确包含授权管理办法附件二。",
+      "answer_evidence": "submitted_json的citations含有doc_id:03_authorization_management.md, clause_no:附件二。",
+      "trace_evidence": "tool_trace无记录，但提交内容直接引用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-premature-stop",
+      "value": 1,
+      "reason": "答案显示未因费用报销办法未列金额而终止，继续检索至授权管理办法。",
+      "answer_evidence": "answer中“审批权限不在本办法正文列示具体金额，统一按《XX证券授权管理办法》附件二执行”及后续内容。",
+      "trace_evidence": "tool_trace为空，但final_answer表明未提前停止检索。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选回答完全满足所有检查项，正确给出审批金额10000元并包含边界，且识别了两跳制度引用路径。；候选提交完整完成两跳检索，正确引用了两份制度及具体条款/附件，未提前终止检索。",
+  "confidence": 1.0
+}

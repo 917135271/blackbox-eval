@@ -1,0 +1,41 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-R000028-001",
+      "record_ids": ["R000028", "R004204"],
+      "citations": [
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第十条"
+        }
+      ],
+      "facts": [
+        "发票FP202500000028由XX供应商1999开具，金额165.58元，发票日期2025-03-09",
+        "R000028（员工张林E0036，通讯费，支出日期2025-03-09，金额165.58元）使用发票FP202500000028报销，状态为approved，仅经部门经理E0010审批",
+        "R004204（同一员工张林E0036，通讯费，支出日期2025-05-10，金额165.58元）再次使用同一发票FP202500000028报销，状态为approved，仅经部门经理E0010审批",
+        "find_invoice_usage查询确认FP202500000028的usage_count=2，关联record_id为R000028和R004204",
+        "制度第十条明确规定同一发票最多报销1次，发现同一发票在不同报销单中重复出现应认定为重复报销风险"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R000028", "R004204"],
+  "submitted_record_ids": ["R000028", "R004204"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": false
+  },
+  "reconciled_figures": {
+    "total_records_reviewed": 2,
+    "total_anomalies_found": 1,
+    "total_citations_used": 1
+  },
+  "unresolved_items": []
+}

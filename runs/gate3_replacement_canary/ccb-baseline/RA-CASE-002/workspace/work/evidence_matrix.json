@@ -1,0 +1,80 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-001",
+      "record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+      "citations": [
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第五条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "E0008杨丹职级为D1/部门经理，按差旅费管理办法第三条、第四条，对应经理级住宿标准，一类城市上限¥650/人/晚",
+        "R004209: ¥3,400/5晚=¥680/晚，超标¥30/晚",
+        "R004210: ¥3,400/5晚=¥680/晚，超标¥30/晚",
+        "R004211: ¥3,400/5晚=¥680/晚，超标¥30/晚",
+        "R004219: ¥5,200/7晚≈¥743/晚，超标¥93/晚",
+        "R004220: ¥5,200/7晚≈¥743/晚，超标¥93/晚",
+        "以上5条记录special_approval均为0，无专项审批，违反费用报销管理办法第十二条"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+      "citations": [
+        {"doc_id": "03_authorization_management.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第三条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第六条"}
+      ],
+      "facts": [
+        "5条记录审批档位均为AR-02，授权管理办法附件二规定AR-02需'部门经理,并经财务复核'",
+        "各记录仅有1条审批，审批人均为E0008本人，角色为'部门经理'，无财务复核",
+        "E0008同时作为经办人和审批人，违反费用报销管理办法第三条的职责分离原则",
+        "费用报销管理办法第五条规定系统应按附件二自动派生审批角色，实际审批角色不完整"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-003",
+      "record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "第二条"}
+      ],
+      "facts": [
+        "拆分组A: R004209(02-26)、R004210(02-28)、R004211(03-02)，同一员工E0008、同一类型travel_lodging、同一事由、同一供应商，7天内3笔合计¥10,200",
+        "拆分组B: R004219(11-27)、R004220(12-01)，同一员工E0008、同一类型travel_lodging、同一事由、同一供应商，7天内2笔合计¥10,400",
+        "附件二AR-03起算线为¥10,000，两组合计金额均达到AR-03(部门总经理审批)线",
+        "各单笔仅按AR-02(部门经理)自审批，规避了AR-03的必要审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+  "submitted_record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": false
+  },
+  "reconciled_figures": {
+    "R004209": {"standard_per_night": 650, "actual_per_night": 680, "excess_per_night": 30, "nights": 5, "total_excess": 150},
+    "R004210": {"standard_per_night": 650, "actual_per_night": 680, "excess_per_night": 30, "nights": 5, "total_excess": 150},
+    "R004211": {"standard_per_night": 650, "actual_per_night": 680, "excess_per_night": 30, "nights": 5, "total_excess": 150},
+    "R004219": {"standard_per_night": 650, "actual_per_night": 742.86, "excess_per_night": 92.86, "nights": 7, "total_excess": 650},
+    "R004220": {"standard_per_night": 650, "actual_per_night": 742.86, "excess_per_night": 92.86, "nights": 7, "total_excess": 650}
+  },
+  "unresolved_items": []
+}

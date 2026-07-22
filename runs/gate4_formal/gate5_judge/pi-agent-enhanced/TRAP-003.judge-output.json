@@ -1,0 +1,94 @@
+{
+  "checklist": [
+    {
+      "id": "clean-conclusion",
+      "value": 1,
+      "reason": "明确判断无异常，结论与表述无矛盾",
+      "answer_evidence": "答案开头'无异常'，结尾'不构成拆分报销'，无矛盾",
+      "trace_evidence": "工具轨迹未出现异常标记，验证报告anomaly_ids为空",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-gap",
+      "value": 1,
+      "reason": "日期间隔计算为8天，明确在答案中说明",
+      "answer_evidence": "答案中明确'两笔报销的费用发生日期间隔为8天'",
+      "trace_evidence": "工具调用获取R004236和R004237费用发生日期分别为2025-10-01和2025-10-09，相差8天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-window",
+      "value": 1,
+      "reason": "正确应用7天窗口边界，指出超过7天阈值",
+      "answer_evidence": "答案中'超过《XX证券费用报销管理办法(2025修订版)》第十一条规定的7天阈值（8天 > 7天）'",
+      "trace_evidence": "搜索政策结果包含'同一员工、同一费用类型在7天内出现2笔及以上报销'，明确7天窗口",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 0,
+      "reason": "未在最终答案中明确说明合计金额为10400元",
+      "answer_evidence": "答案仅提及两笔金额各5200元，未明确合计为10400元",
+      "trace_evidence": "工具调用返回金额分别为5200元，证据矩阵计算合计10400元，但答案本身未直接说明",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 0,
+      "reason": "未明确说明金额虽达10000元审批线但因超窗不构成拆分",
+      "answer_evidence": "仅说明不满足7天内条件，未明确提及金额达标但与时间窗口条件的关系",
+      "trace_evidence": "授权管理办法附件二显示10000元审批线，合计金额10400元达到该线，但答案未进行明确综合说明",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-gap",
+      "value": 1,
+      "reason": "工具轨迹包含费用发生日期，可证明日期间隔为8天",
+      "answer_evidence": "已在上文引用答案",
+      "trace_evidence": "工具get_expense_detail返回R004236 expense_date:'2025-10-01'，R004237 expense_date:'2025-10-09'，间隔8天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-window",
+      "value": 1,
+      "reason": "工具轨迹包含政策条文，明确写出7天窗口",
+      "answer_evidence": "已在上文引用答案",
+      "trace_evidence": "search_policy和get_policy_excerpt返回'第十一条...在7天内出现2笔及以上报销'，证明7天阈值",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "工具轨迹返回两笔金额均为5200元，可合计为10400元",
+      "answer_evidence": "已在上文引用答案",
+      "trace_evidence": "get_expense_detail两次调用返回amount均为5200.0，合计10400元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 1,
+      "reason": "工具轨迹包含授权管理办法附件二，显示10000元审批线，金额合计达到该线",
+      "answer_evidence": "已在上文引用答案",
+      "trace_evidence": "get_policy_doc('03_authorization_management.md')返回文本包含'| AR-03 | 大于等于10000元且小于50000元 | 部门总经...'，证明10000元阈值",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用01_expense_reimbursement_2025.md第十一条",
+      "answer_evidence": "citations中包含{'doc_id':'01_expense_reimbursement_2025.md','clause_no':'第十一条'}",
+      "trace_evidence": "get_policy_excerpt返回该条文，工具调用证明匹配",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 0,
+      "reason": "未引用03_authorization_management.md附件二",
+      "answer_evidence": "citations中缺少该制度引用",
+      "trace_evidence": "工具轨迹调用了get_policy_doc('03_authorization_management.md')，获取到附件二内容，但最终答案未引用",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选答案结论正确且无矛盾，间隔、窗口和基本逻辑推理准确，但未明确说明合计金额10400元以及金额虽达审批线但因超窗不构成拆分的关键细节，也未引用所需的第二项制度依据，导致部分检查项未通过。",
+  "confidence": 1.0
+}

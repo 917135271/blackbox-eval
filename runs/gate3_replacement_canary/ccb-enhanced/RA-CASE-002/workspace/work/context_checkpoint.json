@@ -1,0 +1,169 @@
+{
+  "artifact_paths": [
+    "final_submission.json",
+    "submission_receipt.json",
+    "traces/context_events.jsonl",
+    "traces/events.jsonl",
+    "traces/subagents.jsonl",
+    "traces/tool_calls.jsonl",
+    "work/artifact_index.json",
+    "work/audit_plan.json",
+    "work/context_checkpoint.json",
+    "work/decision_log.jsonl",
+    "work/evidence_index.json",
+    "work/evidence_matrix.json",
+    "work/final_result.json",
+    "work/independent_review.json",
+    "work/policy_applicability.json",
+    "work/report_draft.json",
+    "work/task_state.json",
+    "work/validation_report.json"
+  ],
+  "compacted": false,
+  "context_usage_percent": 0.0,
+  "created_at": 1784723287.8493936,
+  "estimation_method": "outer_runner_finalization",
+  "retained_state": {
+    "applicable_policies": [
+      "01_expense_reimbursement_2025.md",
+      "03_authorization_management.md",
+      "04_travel_expense.md"
+    ],
+    "artifact_index": [
+      "final_submission.json",
+      "submission_receipt.json",
+      "traces/context_events.jsonl",
+      "traces/events.jsonl",
+      "traces/subagents.jsonl",
+      "traces/tool_calls.jsonl",
+      "work/artifact_index.json",
+      "work/audit_plan.json",
+      "work/context_checkpoint.json",
+      "work/decision_log.jsonl",
+      "work/evidence_index.json",
+      "work/evidence_matrix.json",
+      "work/final_result.json",
+      "work/independent_review.json",
+      "work/policy_applicability.json",
+      "work/report_draft.json",
+      "work/task_state.json",
+      "work/validation_report.json"
+    ],
+    "audit_plan": {
+      "audit_scope": {
+        "amount": 3400.0,
+        "business_period": "2025",
+        "city_tier": "A",
+        "department_id": "D008",
+        "employee_id": "E0008",
+        "expense_date": "2025-02-26",
+        "expense_type": "travel_lodging",
+        "nights": 5,
+        "primary_record": "R004209",
+        "rule_scope": [
+          "travel_lodging_standard",
+          "approval_compliance",
+          "self_approval",
+          "standard_exceedance"
+        ]
+      },
+      "clue_record": "R004209",
+      "complexity": 2,
+      "complexity_reasons": [
+        "Single rule (travel_lodging standard + approval compliance)",
+        "One employee scope",
+        "Threshold and standard comparison needed",
+        "Approval compliance check (self-approval)"
+      ],
+      "data_questions": [
+        {
+          "id": "DQ1",
+          "purpose": "Check for split claims (Article 11)",
+          "question": "Are there other travel_lodging records for E0008 within 7 days of 2025-02-26?"
+        },
+        {
+          "id": "DQ2",
+          "purpose": "Check for duplicate invoice (Article 10)",
+          "question": "Is invoice INV004203 reused in any other record?"
+        },
+        {
+          "id": "DQ3",
+          "purpose": "Check budget compliance (Article 13)",
+          "question": "What is E0008's budget usage?"
+        }
+      ],
+      "execution_steps": [
+        "1. Write audit_plan.json (done)",
+        "2. Record planning_completed checkpoint",
+        "3. Run policy-version-check for applicable policies",
+        "4. Query E0008 travel_lodging records for split claims check",
+        "5. Check invoice reuse for INV004203",
+        "6. Check E0008 budget and department budget",
+        "7. Run evidence-coverage-check",
+        "8. Run false-positive-review if applicable",
+        "9. Generate audit-report",
+        "10. Run result-validator",
+        "11. Submit final result"
+      ],
+      "policy_questions": [
+        {
+          "expected_answer": "650元/晚 for 经理级 in 一类城市",
+          "id": "PQ1",
+          "policy_doc": "04_travel_expense.md",
+          "question": "What is the travel lodging standard for D1/经理级 in city tier A?"
+        },
+        {
+          "expected_answer": "Yes, AR-02 requires 部门经理 + 财务复核",
+          "id": "PQ2",
+          "policy_doc": "03_authorization_management.md",
+          "question": "Does AR-02 approval tier require financial review (财务复核) in addition to department manager?"
+        },
+        {
+          "expected_answer": "Separation of duties principle; self-approval without financial review violates AR-02 requirement",
+          "id": "PQ3",
+          "policy_doc": "01_expense_reimbursement_2025.md, 03_authorization_management.md",
+          "question": "Is self-approval prohibited or restricted?"
+        },
+        {
+          "expected_answer": "Yes, Article 12: reimbursement cannot exceed 1.0x standard without special approval",
+          "id": "PQ4",
+          "policy_doc": "01_expense_reimbursement_2025.md",
+          "question": "Does exceeding the standard without special approval violate Article 12?"
+        }
+      ],
+      "stopping_conditions": [
+        "All policy questions answered with citations",
+        "All data questions answered with evidence",
+        "Evidence matrix at 100% coverage with status pass",
+        "Validation report passes"
+      ],
+      "subagent_plan": {
+        "reason": "Complexity 2 but single-rule single-employee scope manageable in main agent",
+        "required": false
+      },
+      "task_id": "RA-CASE-002",
+      "task_type": "policy_data_comparison"
+    },
+    "constraints": [
+      "isolated GATE3 workspace",
+      "formal answer assets prohibited",
+      "outer runner timeout enforced"
+    ],
+    "evidence_status": "pass",
+    "record_ids": [
+      "R004209",
+      "R004210",
+      "R004211"
+    ],
+    "remaining_budget": {
+      "elapsed_seconds": 868.002,
+      "remaining_seconds": 31.998,
+      "timeout_seconds": 900
+    },
+    "submission_status": "accepted",
+    "task": "你正在执行GATE3新正式题区分度Canary，该运行只用于冻结前验证，不进入正式排名。当前为领域增强组。\n\n任务ID：RA-CASE-002\n题型：policy_data_comparison\n问题：请以R004209为线索，结合现行制度和业务数据核查相关费用记录是否存在异常。请返回核查涉及的record_id集合、审计结论、关键事实和制度依据；如存在异常，再返回发现ID。\n\n遵循已安装的证券费用审计Skills，按需使用Checkpoint、子智能体、证据复核和结果校验。\n\n要求：\n1. 必须查询制度和只读业务库后作答，可以使用Shell、Python、SQLite和当前隔离工作区文件。\n2. 禁止读取 ground_truth、cases.json、Rubric、判卷代码、历史答案、其他任务或候选轨迹，也不得访问无关互联网。\n3. 有异常时，record_ids只包含参与本题违规的记录；无异常时仍保留直接核查或结论覆盖的记录，并在answer中明确写“无异常”。\n4. 必须维护work/final_result.json、work/evidence_matrix.json和work/validation_report.json，先取得validate_audit_result的valid=true，再以result_path=\"work/final_result.json\"调用submit_audit_result。\n5. 不得打印最终JSON代替统一提交。提交成功后只输出GATE3_CANARY_PASS；无法提交时只输出GATE3_CANARY_FAIL。\n",
+    "unresolved_items": []
+  },
+  "stage": "submission_ready",
+  "task_id": "RA-CASE-002"
+}

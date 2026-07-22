@@ -1,0 +1,344 @@
+{
+  "group": "openclaude-baseline",
+  "dataset_id": "securities-expense-audit-formal-15-v9",
+  "rubric_version": "atomic-binary-checklist-v7",
+  "task_id": "PV-CASE-001",
+  "case_family": "policy_and_version",
+  "category": "policy_data_comparison",
+  "graded_at": "2026-07-22T21:14:55+08:00",
+  "checklist_passed": 13,
+  "checklist_total": 16,
+  "checklist_pass_rate": 81.25,
+  "checklist": [
+    {
+      "id": "record-r004233",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "no-anomaly",
+      "value": 0,
+      "reason": "提交了异常ID",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-amount",
+      "value": 1,
+      "reason": "答案和工具痕迹均明确显示金额为9990元",
+      "answer_evidence": "【关键计算】中“R004233报销金额9990元”",
+      "trace_evidence": "get_expense_detail返回amount: 9990.0",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-tier",
+      "value": 1,
+      "reason": "答案明确判断9990元属于AR-02，工具痕迹确认",
+      "answer_evidence": "“落入《授权管理办法》附件二AR-02档（≥3000元且<10000元）”",
+      "trace_evidence": "get_expense_detail返回tier_id: \"AR-02\"",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-roles",
+      "value": 1,
+      "reason": "答案清楚说明部门经理和财务复核两个必要环节，未加入部门总经理",
+      "answer_evidence": "“必要审批角色为「部门经理,并经财务复核」”",
+      "trace_evidence": "get_policy_doc(03_authorization_management.md)返回AR-02要求“部门经理,并经财务复核”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "approval-trace",
+      "value": 1,
+      "reason": "工具痕迹显示实际审批记录为AR-02且部门经理已审批",
+      "answer_evidence": "答案提到“实际审批记录仅有部门经理（E0008）1条”",
+      "trace_evidence": "list_approvals返回tier_id: \"AR-02\", approver_role: \"部门经理\"",
+      "source": "llm_judge"
+    },
+    {
+      "id": "lodging-calculation",
+      "value": 0,
+      "reason": "答案未明确给出住宿限额11000元，缺少总限额表述，不符合'职级、城市、晚数、单晚标准和总限额均正确'的pass_condition。",
+      "answer_evidence": "关键计算中列明职级X1、一类城市、住宿10晚、单晚标准1100元，但未计算总限额11000元。",
+      "trace_evidence": "get_expense_detail返回amount和city_tier，未直接提供nights；get_policy_doc(04_travel_expense.md)提供标准1100元/晚；轨迹中无总限额计算步骤。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "lodging-conclusion",
+      "value": 1,
+      "reason": "明确给出未超住宿标准结论，且无矛盾表述。",
+      "answer_evidence": "关键计算中写明'折合999元/晚，低于1100元标准上限'，认定'费用标准适用正确'。",
+      "trace_evidence": "get_expense_detail获取R004233金额9990元；get_policy_doc(04_travel_expense.md)确认高管级一类城市标准1100元/晚。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-version",
+      "value": 1,
+      "reason": "明确识别现行版本为2025修订版和授权管理办法，未将废止的2022版作为有效依据。",
+      "answer_evidence": "现行制度依据引用'XX证券费用报销管理办法(2025修订版)'和'XX证券授权管理办法'，并指出2022版已废止。",
+      "trace_evidence": "get_policy_doc调用了01_expense_reimbursement_2025.md和03_authorization_management.md；对2022版仅用于历史对比。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "legacy-status",
+      "value": 1,
+      "reason": "正确给出旧线8000元并明确其已废止，不得作为现行判断依据。",
+      "answer_evidence": "明确指出'《XX证券费用报销管理办法(2022版)》（已废止）规定单笔≥8000元应提交部门总经理审批'，并说明继续使用旧线会造成判断偏差。",
+      "trace_evidence": "get_policy_doc(02_expense_reimbursement_2022_deprecated.md)获取旧制度内容；search_policy未将旧线作为现行依据。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "legacy-impact",
+      "value": 1,
+      "reason": "准确说明8000元至10000元区间将被错误升级至部门总经理审批，并联系R004233说明",
+      "answer_evidence": "【继续使用历史审批线的判断偏差】中明确若继续使用≥8000元线，会错误认为只需部门总经理审批，将本笔报销误升级。",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-expense",
+      "value": 0,
+      "reason": "只引用了2025费用报销办法第五条，未引用第十二条和第十四条",
+      "answer_evidence": "提交答案中仅引用了第五条",
+      "trace_evidence": "工具调用中获取了全文但未引用第十二条和第十四条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-authorization",
+      "value": 1,
+      "reason": "候选提交准确引用了03_authorization_management.md的附件二，并明确了AR-02和10000元审批线。",
+      "answer_evidence": "answer中写明：“落入《授权管理办法》附件二AR-02档（≥3000元且<10000元）”；citations包含{\"doc_id\": \"03_authorization_management.md\", \"clause_no\": \"附件二\"}。",
+      "trace_evidence": "工具调用get_policy_doc(\"03_authorization_management.md\")返回附件二内容，包含“AR-02 | 大于等于3000元且小于10000元 | 部门经理,并经财务复核”。",
+      "source": "llm_judge_consensus"
+    },
+    {
+      "id": "policy-travel",
+      "value": 1,
+      "reason": "引用差旅费办法第四条，准确说明高管级一类城市住宿标准1100元",
+      "answer_evidence": "答案引用《XX证券差旅费管理办法》第四条",
+      "trace_evidence": "工具调用中get_policy_doc和search_policy均返回第四条住宿标准表",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "substantive-false-positive",
+      "check": "将无异常案例提交为实质异常",
+      "score_cap": 40.0,
+      "reason": "实际提交异常数=1"
+    }
+  ],
+  "score_cap": 40.0,
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 200.977,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [
+      "ANOM-PV-CASE-001-001"
+    ],
+    "anomaly_metrics": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "count_exact": false,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": [
+      "R004233"
+    ],
+    "actual_record_ids": [
+      "R004233"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 4,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第五条、第十二条、第十四条"
+      },
+      {
+        "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+        "clause_no": "第一条、第二条、第四条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      },
+      {
+        "doc_id": "04_travel_expense.md",
+        "clause_no": "第三条"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 0.9666666666666667,
+    "overall_comment": "四个检查项均满足通过条件，金额、审批档位、所需角色和实际审批记录都与制度相符。；候选提交大部分满足要求，但在住宿限额计算上遗漏了总限额11000元的明确表述，导致lodging-calculation项未通过。其他检查项均正确。；部分政策引用完整，但未完整引用费用报销办法和授权管理办法中关键条款。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 37042,
+      "completion_tokens": 10335,
+      "total_tokens": 47377,
+      "prompt_cache_hit_tokens": 4096,
+      "prompt_cache_miss_tokens": 32946
+    },
+    "batch_count": 3,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 7532,
+          "completion_tokens": 1336,
+          "total_tokens": 8868,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 956
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 6508
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 7530,
+          "completion_tokens": 2681,
+          "total_tokens": 10211,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 2064
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 6506
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 7525,
+          "completion_tokens": 4061,
+          "total_tokens": 11586,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 3638
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 6501
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      }
+    ],
+    "consistency_audit": {
+      "sampled_count": 2,
+      "agreement_count": 1,
+      "agreement_rate": 0.5,
+      "disagreement_ids": [
+        "policy-authorization"
+      ],
+      "tied_ids": [
+        "policy-authorization"
+      ],
+      "tiebreak_count": 1,
+      "repeat_count": 2,
+      "batches": [
+        {
+          "model": "deepseek-v4-pro",
+          "usage": {
+            "prompt_tokens": 7280,
+            "completion_tokens": 1610,
+            "total_tokens": 8890,
+            "prompt_tokens_details": {
+              "cached_tokens": 512
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 1335
+            },
+            "prompt_cache_hit_tokens": 512,
+            "prompt_cache_miss_tokens": 6768
+          },
+          "finish_reason": "stop",
+          "attempt": 1,
+          "max_tokens": 4096,
+          "shape_attempt": 1,
+          "criteria_count": 2
+        },
+        {
+          "model": "deepseek-v4-pro",
+          "usage": {
+            "prompt_tokens": 7175,
+            "completion_tokens": 647,
+            "total_tokens": 7822,
+            "prompt_tokens_details": {
+              "cached_tokens": 512
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 424
+            },
+            "prompt_cache_hit_tokens": 512,
+            "prompt_cache_miss_tokens": 6663
+          },
+          "finish_reason": "stop",
+          "attempt": 1,
+          "max_tokens": 4096,
+          "shape_attempt": 1,
+          "criteria_count": 1
+        }
+      ]
+    }
+  },
+  "run_path": "runs/gate3_replacement_canary/openclaude-baseline/PV-CASE-001"
+}

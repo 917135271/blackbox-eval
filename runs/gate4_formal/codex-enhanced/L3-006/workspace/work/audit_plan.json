@@ -1,20 +1,60 @@
 {
   "task_id": "L3-006",
-  "complexity": 1,
-  "question": "请判断费用报销审批线应采用2022版还是2025修订版,并指出部门总经理审批线。",
-  "scope": {
-    "rule": "费用报销审批权限版本适用性及部门总经理审批线",
-    "type": "version_trap",
-    "policy_docs": ["01_expense_reimbursement_2025.md", "02_expense_reimbursement_2022_deprecated.md", "03_authorization_management.md"]
-  },
-  "steps": [
-    "policy-version-check: 对比2022版与2025修订版的施行日期、废止条款和适用性",
-    "retrieve-authorization-thresholds: 从授权管理办法附件二提取部门总经理审批线",
-    "evidence-coverage-check: 确认所有事实与规则均有制度支撑",
-    "false-positive-review: 独立复核版本适用性结论",
-    "audit-report: 生成最终结论",
-    "result-validator: 校验并提交"
+  "task_type": "version_trap",
+  "audit_object": "费用报销审批线（部门总经理审批线）",
+  "audit_period": "不限定 — 需确定现行有效版本",
+  "organization_scope": "XX证券全公司",
+  "policy_questions": [
+    "2022版与2025修订版费用报销管理办法各自的生效日期、废止/替代关系",
+    "部门总经理审批线的金额阈值在两个版本中的规定",
+    "当前应适用哪个版本及其效力状态",
+    "现行金额的具体条款出处"
   ],
-  "subagent_required": false,
-  "reason_no_subagent": "Complexity 1, single-rule version_trap, no data queries needed"
+  "data_questions": [],
+  "required_fields": [
+    "doc_id",
+    "effective_date",
+    "expiry_date",
+    "repeal_info",
+    "replacement_relationship",
+    "department_gm_approval_threshold",
+    "clause_no"
+  ],
+  "evidence_requirements": {
+    "policy_docs": ["01_expense_reimbursement_2025.md", "02_expense_reimbursement_2022_deprecated.md"],
+    "authorization_mgmt": "03_authorization_management.md (if relevant)"
+  },
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "policy version / effective date / repeal relationship",
+      "two or more policies (2022 vs 2025)",
+      "thresholds (approval amount thresholds)"
+    ]
+  },
+  "subagent_plan": {
+    "role": "policy_researcher",
+    "reason_code": "MULTI_POLICY_VERSION_CHECK",
+    "task": "Compare 2022 and 2025 expense reimbursement policies, determine which version applies, identify department GM approval threshold, and provide validity status with clause citations",
+    "artifact_paths": []
+  },
+  "execution_steps": [
+    {"step": "audit_plan", "status": "completed", "description": "Create audit plan"},
+    {"step": "checkpoint_planning_completed", "status": "pending", "description": "Record planning_completed checkpoint"},
+    {"step": "authorize_subagent", "status": "pending", "description": "Authorize policy_researcher subagent"},
+    {"step": "launch_subagent", "status": "pending", "description": "Launch native policy_researcher role"},
+    {"step": "complete_subagent", "status": "pending", "description": "Register subagent summary via complete_audit_subagent"},
+    {"step": "evidence_coverage", "status": "pending", "description": "Run evidence-coverage-check"},
+    {"step": "false_positive_review", "status": "pending", "description": "Run false-positive-review if triggered"},
+    {"step": "audit_report", "status": "pending", "description": "Run audit-report"},
+    {"step": "result_validator", "status": "pending", "description": "Run result-validator"},
+    {"step": "validate_and_submit", "status": "pending", "description": "Validate and submit final result"}
+  ],
+  "stopping_conditions": [
+    "Both policy versions retrieved and compared",
+    "Applicable version identified with evidence",
+    "Department GM approval threshold found with clause citation",
+    "Validity status of both versions documented"
+  ],
+  "unresolved_items": []
 }

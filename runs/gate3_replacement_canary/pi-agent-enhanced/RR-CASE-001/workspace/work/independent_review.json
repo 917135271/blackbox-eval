@@ -1,0 +1,44 @@
+{
+  "decision": "pass",
+  "challenged_findings": [
+    {
+      "finding_id": "FIND-RR-CASE-001-001",
+      "challenge": "4笔记录的培训主题不同（合规实务、投行业务、专业技能、项目管理），供应商也不同，可能是独立培训事件而非同一事项拆分",
+      "resolution": "第十一条的触发条件为'同一员工、同一费用类型在7天内出现2笔及以上报销且合计金额达到较高审批线'，规则的比较单元是费用类型(training_fee)而非培训主题或供应商。即使培训内容不同，只要满足同一员工、同一费用类型、7天窗口、合计超线四个条件即触发核查。这不等于认定故意拆分，而是认定系统应触发但未触发第十一条的'重点核查'机制",
+      "upheld": true
+    },
+    {
+      "finding_id": "FIND-RR-CASE-001-001",
+      "challenge": "R001354的日期(2025-12-25)距R000465(2025-12-18)恰好7天，是否在'7天内'边界上存在争议",
+      "resolution": "中文'7天内'按通常理解包含第7天(即expense_date差值≤7天)。SQL查询使用julianday差值≤7，R001354与R000465相差恰好7.0天，应计入窗口。即使排除R001354，剩余3笔(R000465+R000561+R000888)合计¥7681.24仍超过AR-02线¥3000",
+      "upheld": true
+    },
+    {
+      "finding_id": "FIND-RR-CASE-001-001",
+      "challenge": "第十一条用语为'应重点核查'而非'禁止'或'违规'，是否意味着仅需标记而不构成实质性异常",
+      "resolution": "在审计语境下，系统未能执行第十一条要求的'重点核查'本身就是控制缺陷。4笔记录均按AR-01单独审批通过，未触发任何聚合审查或升级审批，构成控制层面的异常。即使最终核查结论为'无主观拆分意图'，过程性异常仍然成立",
+      "upheld": true
+    }
+  ],
+  "exceptions_and_boundaries": {
+    "training_fee_limit": {"limit": 3500, "all_within_limit": true, "issue": false},
+    "invoice_reuse": {"checked": true, "any_reuse": false, "issue": false},
+    "special_approval": {"any": false, "issue": false},
+    "r001354_boundary": {"day_diff": 7.0, "included": true, "exclusion_impact": "即使排除R001354，3笔合计¥7681.24仍超AR-02线"}
+  },
+  "supporting_evidence": [
+    "SQL滑动窗口查询确认2025-12-18至12-25共4笔training_fee记录",
+    "每笔审批均为AR-01(部门经理)，合计¥9764.73超过AR-02线¥3000",
+    "2025版第十一条明确规定7天2笔及以上合计超线应重点核查"
+  ],
+  "opposing_evidence": [
+    "4笔培训主题各异、供应商不同，可能为独立业务事项",
+    "单笔均未超过培训费上限3500元",
+    "无发票重复使用",
+    "2022版旧制度下不会触发任何核查"
+  ],
+  "required_changes": [],
+  "supplemental_query": null,
+  "rationale": "初步结论经受独立质疑：第十一条触发条件客观满足（同一员工E0041、同一费用类型training_fee、7天窗口、合计超AR-02线），即使培训内容不同也不能否定触发条件。审计结论定位于'控制缺陷/应触发未触发核查'而非'已证实故意拆分'。2022版对比分析提供了制度版本风险视角。结论维持。",
+  "unresolved_conflicts": []
+}

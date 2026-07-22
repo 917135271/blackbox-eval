@@ -1,0 +1,117 @@
+{
+  "task_id": "RA-CASE-001",
+  "task_type": "policy_data_comparison",
+  "clue_record": "R000028",
+  "scope": {
+    "audit_object": "以R000028为线索，核查相关通讯费用记录是否存在异常",
+    "expense_types": ["communication"],
+    "business_period": "2025年（现行制度适用期）",
+    "organization_scope": "员工E0036（张林）及部门D010（人力资源部）",
+    "deliverable": "record_ids集合、审计结论、关键事实、制度依据；如存在异常则附加发现ID"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ1",
+      "question": "通讯费用每人每月是否超过300元上限？",
+      "policy_doc": "07_office_communication.md",
+      "clause": "第三条",
+      "threshold": "每人每月不超过300元"
+    },
+    {
+      "id": "PQ2",
+      "question": "同一发票是否被重复报销？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十条",
+      "threshold": "同一发票最多报销1次"
+    },
+    {
+      "id": "PQ3",
+      "question": "是否存在拆分报销规避审批？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十一条",
+      "threshold": "同一员工、同一费用类型7天内2笔及以上，且合计达AR-02线（3000元）"
+    },
+    {
+      "id": "PQ4",
+      "question": "报销是否超过60天期限？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第七条",
+      "threshold": "60天内提交"
+    },
+    {
+      "id": "PQ5",
+      "question": "部门年度预算是否充足？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十三条",
+      "threshold": "预算使用不超过1.0倍"
+    },
+    {
+      "id": "PQ6",
+      "question": "审批角色是否符合附件二要求？",
+      "policy_doc": "03_authorization_management.md",
+      "clause": "附件二",
+      "threshold": "单笔<3000元需部门经理AR-01"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ1",
+      "question": "员工E0036在2025年3月的所有通讯费用记录及合计金额",
+      "tables": ["reimbursement"],
+      "fields": ["record_id", "amount", "expense_date", "employee_id"]
+    },
+    {
+      "id": "DQ2",
+      "question": "发票INV000028是否被其他报销记录使用",
+      "tables": ["invoice_usage"],
+      "fields": ["invoice_no", "record_ids"]
+    },
+    {
+      "id": "DQ3",
+      "question": "员工E0036在R000028前后7天内是否有其他通讯费用",
+      "tables": ["reimbursement"],
+      "fields": ["record_id", "amount", "expense_date"]
+    },
+    {
+      "id": "DQ4",
+      "question": "部门D010的年度预算和使用情况",
+      "tables": ["department_budget"],
+      "fields": ["annual_budget", "used_amount", "remaining"]
+    }
+  ],
+  "evidence_requirements": [
+    "R000028详情及审批链",
+    "E0036 2025年3月通讯费用汇总",
+    "INV000028使用情况",
+    "E0036 3月2日-3月16日通讯费用记录（拆分检查）",
+    "D010部门预算状态",
+    "相关政策条款原文"
+  ],
+  "execution_steps": [
+    { "step": 1, "action": "policy_research", "description": "已读取通讯费、费用报销、授权管理三项制度" },
+    { "step": 2, "action": "data_investigation", "description": "核查R000028自身合规性（金额、期限、审批）" },
+    { "step": 3, "action": "data_investigation", "description": "扩展核查：E0036月度通讯费汇总、发票复用、拆分嫌疑、部门预算" },
+    { "step": 4, "action": "evidence_review", "description": "运行evidence-coverage-check" },
+    { "step": 5, "action": "reporting", "description": "运行audit-report" },
+    { "step": 6, "action": "validation_and_submission", "description": "运行result-validator、validate_audit_result、submit_audit_result" }
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "涉及3项制度（通讯费、费用报销、授权管理）",
+      "需聚合查询（月度汇总、拆分检测）",
+      "多项业务规则（月度上限、发票复用、拆分、预算、延迟、审批）",
+      "涉及阈值和日期边界"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "复杂度2，可在主智能体内完成；范围限定于单一费用类型和单一员工/部门"
+  },
+  "stopping_conditions": [
+    "所有6个政策问题均有明确结论",
+    "证据矩阵覆盖率达到100%",
+    "validate_audit_result返回valid=true"
+  ],
+  "unresolved_items": []
+}

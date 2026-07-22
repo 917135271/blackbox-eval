@@ -1,0 +1,220 @@
+{
+  "group": "pi-agent-baseline",
+  "task_id": "L3-008",
+  "case_family": "policy_and_version",
+  "category": "near_clause_disambiguation",
+  "graded_at": "2026-07-21T21:07:34+08:00",
+  "checklist_passed": 16,
+  "checklist_total": 17,
+  "checklist_pass_rate": 94.118,
+  "checklist": [
+    {
+      "id": "travel-dimensions-policy",
+      "value": 1,
+      "reason": "候选答案明确提到差旅住宿适用《XX证券差旅费管理办法》",
+      "answer_evidence": "一、差旅住宿与培训住宿的适用制度对比 1. 差旅住宿适用制度：《XX证券差旅费管理办法》",
+      "trace_evidence": "工具调用get_policy_doc和search_policy均获取了04_travel_expense.md内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "travel-dimensions-job-level",
+      "value": 1,
+      "reason": "候选答案明确包含员工职级维度",
+      "answer_evidence": "差旅住宿标准维度为二维：员工职级（员工级、经理级、部门负责人级、高管级共4级）",
+      "trace_evidence": "search_policy返回03条款提到员工职级",
+      "source": "llm_judge"
+    },
+    {
+      "id": "travel-dimensions-city-tier",
+      "value": 1,
+      "reason": "候选答案明确包含城市档位维度",
+      "answer_evidence": "城市档位（一类、二类、三类共3级）",
+      "trace_evidence": "search_policy返回03条款提到城市档位",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-policy",
+      "value": 1,
+      "reason": "候选答案正确指出培训住宿适用培训费管理办法",
+      "answer_evidence": "2. 培训住宿适用制度：《XX证券培训费管理办法》（XX证人规〔2025〕戊号），第五条。",
+      "trace_evidence": "工具get_policy_doc获取了05_training_expense.md",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-tier-a",
+      "value": 1,
+      "reason": "一类城市培训住宿标准500元，数值和单位正确",
+      "answer_evidence": "| 一类城市 | 500元 |",
+      "trace_evidence": "get_policy_doc 05_training_expense.md 表格显示一类城市500元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-tier-b",
+      "value": 1,
+      "reason": "二类城市培训住宿标准420元，数值和单位正确",
+      "answer_evidence": "| 二类城市 | 420元 |",
+      "trace_evidence": "get_policy_doc 05_training_expense.md 表格显示二类城市420元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-tier-c",
+      "value": 1,
+      "reason": "三类城市培训住宿标准350元，数值和单位正确",
+      "answer_evidence": "| 三类城市 | 350元 |",
+      "trace_evidence": "get_policy_doc 05_training_expense.md 表格显示三类城市350元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-scenario",
+      "value": 1,
+      "reason": "对照场景明确为二类城市，职级包括员工级等多个职级",
+      "answer_evidence": "四、同城市档位下培训住宿与差旅住宿数值对照（以二类城市为例）",
+      "trace_evidence": "search_policy返回差旅住宿表格包含二类城市各职级数据",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-travel-value",
+      "value": 1,
+      "reason": "二类城市差旅住宿标准与制度表一致",
+      "answer_evidence": "员工级380元、经理级550元、部门负责人级700元、高管级900元",
+      "trace_evidence": "get_policy_doc 04_travel_expense.md 二类城市列与答案数值完全一致",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-training-value",
+      "value": 1,
+      "reason": "二类城市培训住宿标准420元，与制度表一致",
+      "answer_evidence": "培训住宿（二类城市）| 420元",
+      "trace_evidence": "get_policy_doc 05_training_expense.md 二类城市培训标准420元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-same-tier",
+      "value": 1,
+      "reason": "两侧数值均使用二类城市进行比较",
+      "answer_evidence": "以二类城市为例，差旅和培训均给出二类标准",
+      "trace_evidence": "答案表格中城市档位一致",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-mixing-scenario",
+      "value": 1,
+      "reason": "答案明确区分培训与差旅场景，指出按实际场景选择制度",
+      "answer_evidence": "两套制度互不替代，必须严格按照费用发生的实际场景（出差or培训）选择对应制度执行。",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-mixing-dimensions",
+      "value": 1,
+      "reason": "答案指出培训只按城市，差旅还按职级",
+      "answer_evidence": "差旅住宿按职级分层...培训住宿统一按城市档位",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-mixing-conclusion",
+      "value": 1,
+      "reason": "答案明确作出不得混用结论，引用第六条",
+      "answer_evidence": "培训住宿标准仅适用于培训期间住宿，不得与差旅住宿标准混用。",
+      "trace_evidence": "search_policy返回05_training_expense.md第六条片段",
+      "source": "llm_judge"
+    },
+    {
+      "id": "comparison-evidence-travel",
+      "value": 0,
+      "reason": "候选提交的citations缺少差旅费管理办法第三条，只有第四条和第七条",
+      "answer_evidence": "citations仅包含第四条、第七条，无第三条",
+      "trace_evidence": "candidate_submission的citations数组未引用第三条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "comparison-evidence-training",
+      "value": 1,
+      "reason": "培训费管理办法第五条、第六条均已引用",
+      "answer_evidence": "citations包含第五条、第六条（doc_id: 05_training_expense.md）",
+      "trace_evidence": "candidate_submission的citations包含这两条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 89.248,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": null,
+    "actual_record_ids": [],
+    "record_metrics": null,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 4,
+    "required_citations": [
+      {
+        "doc_id": "04_travel_expense.md",
+        "clause_no": "第三条、第四条、第七条"
+      },
+      {
+        "doc_id": "05_training_expense.md",
+        "clause_no": "第五条、第六条"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 0.99,
+    "overall_comment": "候选答案在事实内容、分析推理方面均正确，但证据引用环节未完整包含差旅费管理办法第三条，导致comparison-evidence-travel项不通过。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 5808,
+      "completion_tokens": 3324,
+      "total_tokens": 9132,
+      "prompt_cache_hit_tokens": 5760,
+      "prompt_cache_miss_tokens": 48
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 5808,
+          "completion_tokens": 3324,
+          "total_tokens": 9132,
+          "prompt_tokens_details": {
+            "cached_tokens": 5760
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1873
+          },
+          "prompt_cache_hit_tokens": 5760,
+          "prompt_cache_miss_tokens": 48
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 16
+      }
+    ]
+  },
+  "run_path": "runs/gate4_formal/pi-agent-baseline/L3-008"
+}

@@ -3,18 +3,31 @@
   "$id": "https://example.local/schemas/case-rubric.schema.json",
   "title": "Securities expense audit case-by-case rubric dataset",
   "type": "object",
-  "required": ["dataset_id", "case_count", "source", "cases"],
+  "required": ["dataset_id", "rubric_version", "case_count", "source", "replacements", "cases"],
   "additionalProperties": false,
   "properties": {
     "dataset_id": {"type": "string", "minLength": 1},
+    "rubric_version": {"const": "atomic-binary-checklist-v7"},
     "case_count": {"const": 15},
     "source": {
       "type": "object",
-      "required": ["evals", "ground_truth"],
+      "required": ["evals", "ground_truth", "replacement_cases"],
       "additionalProperties": false,
       "properties": {
         "evals": {"type": "string"},
-        "ground_truth": {"type": "string"}
+        "ground_truth": {"type": "string"},
+        "replacement_cases": {"type": "string"}
+      }
+    },
+    "replacements": {
+      "type": "object",
+      "required": ["L1-001", "L2-003", "L2-008", "L3-010"],
+      "additionalProperties": false,
+      "properties": {
+        "L1-001": {"const": "PV-CASE-001"},
+        "L2-003": {"const": "RA-CASE-001"},
+        "L2-008": {"const": "RA-CASE-002"},
+        "L3-010": {"const": "RR-CASE-001"}
       }
     },
     "case_family_counts": {
@@ -59,6 +72,9 @@
           ]
         },
         "prompt": {"type": "string", "minLength": 1},
+        "source_prompt": {"type": "string", "minLength": 1},
+        "prompt_change_reason": {"type": "string", "minLength": 1},
+        "replaces": {"type": "string", "pattern": "^[A-Z0-9-]+$"},
         "selection_reason": {"type": "string", "minLength": 1},
         "ground_truth_refs": {
           "type": "array",
@@ -71,45 +87,86 @@
     },
     "rubric": {
       "type": "object",
-      "required": ["max_score", "pass_score", "criteria", "critical_failures"],
+      "required": [
+        "scoring_method",
+        "item_result_values",
+        "normalization",
+        "checklist"
+      ],
       "additionalProperties": false,
       "properties": {
-        "max_score": {"const": 100},
-        "pass_score": {"type": "integer", "minimum": 1, "maximum": 100},
-        "criteria": {
+        "scoring_method": {"const": "binary_checklist"},
+        "normalization": {"const": "equal_item_ratio"},
+        "item_result_values": {
+          "type": "array",
+          "prefixItems": [{"const": 0}, {"const": 1}],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "checklist": {
           "type": "array",
           "minItems": 4,
-          "items": {"$ref": "#/$defs/criterion"}
+          "maxItems": 30,
+          "items": {"$ref": "#/$defs/checkItem"}
         },
         "critical_failures": {
           "type": "array",
+          "uniqueItems": true,
           "items": {"$ref": "#/$defs/criticalFailure"}
         }
       }
     },
-    "criterion": {
+    "criticalFailure": {
+      "type": "object",
+      "required": ["id", "check", "deterministic_rule", "score_cap"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+        "check": {"type": "string", "minLength": 1},
+        "deterministic_rule": {
+          "enum": ["unexpected-anomaly-reported", "record-precision-below", "anomaly-precision-below"]
+        },
+        "expected": {"type": "number", "minimum": 0, "maximum": 1},
+        "score_cap": {"type": "number", "minimum": 0, "maximum": 100}
+      }
+    },
+    "checkItem": {
       "type": "object",
       "required": [
         "id",
-        "title",
-        "description",
-        "weight",
+        "check",
         "metric",
         "evaluation_mode",
         "expected",
         "evidence_sources",
-        "anchors"
+        "pass_condition",
+        "fail_condition"
       ],
       "additionalProperties": false,
       "properties": {
         "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
-        "title": {"type": "string", "minLength": 1},
-        "description": {"type": "string", "minLength": 1},
-        "weight": {"type": "integer", "minimum": 1, "maximum": 100},
+        "check": {"type": "string", "minLength": 1},
         "metric": {
           "enum": ["conclusion", "evidence", "policy", "reasoning", "false_positive", "format"]
         },
         "evaluation_mode": {"enum": ["deterministic", "llm", "hybrid"]},
+        "deterministic_rule": {
+          "enum": [
+            "expected-record-present",
+            "no-unexpected-records",
+            "anomaly-rule-type-exact",
+            "anomaly-count-exact",
+            "anomaly-type-count-exact",
+            "no-anomaly-ids",
+            "record-ids-unique",
+            "record-recall-at-least",
+            "record-precision-at-least",
+            "anomaly-recall-at-least",
+            "anomaly-precision-at-least",
+            "excluded-records-absent"
+          ]
+        },
         "expected": {},
         "evidence_sources": {
           "type": "array",
@@ -117,26 +174,8 @@
           "uniqueItems": true,
           "items": {"enum": ["final_answer", "submitted_json", "tool_trace", "workspace_artifact"]}
         },
-        "anchors": {
-          "type": "object",
-          "required": ["full", "partial", "zero"],
-          "additionalProperties": false,
-          "properties": {
-            "full": {"type": "string", "minLength": 1},
-            "partial": {"type": "string", "minLength": 1},
-            "zero": {"type": "string", "minLength": 1}
-          }
-        }
-      }
-    },
-    "criticalFailure": {
-      "type": "object",
-      "required": ["id", "condition", "score_cap"],
-      "additionalProperties": false,
-      "properties": {
-        "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
-        "condition": {"type": "string", "minLength": 1},
-        "score_cap": {"type": "integer", "minimum": 0, "maximum": 100}
+        "pass_condition": {"type": "string", "minLength": 1},
+        "fail_condition": {"type": "string", "minLength": 1}
       }
     }
   }

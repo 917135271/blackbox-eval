@@ -17,6 +17,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from audit_trace import finish_run, redact_secret_in_tree, start_run  # noqa: E402
+from formal_eval_plan import (  # noqa: E402
+    GROUPS,
+    MODEL_BASE_URL,
+    MODEL_NAME,
+    TASK_TIMEOUT_SECONDS,
+)
 
 
 DOMAIN = ROOT / "domain-enhancement"
@@ -28,18 +34,7 @@ CODEX_PLUGIN = DOMAIN / "adapters" / "codex" / "securities-expense-audit"
 OPENCLAUDE_PLUGIN = DOMAIN / "adapters" / "openclaude" / "securities-expense-audit"
 OPENCODE_PLUGIN = DOMAIN / "adapters" / "opencode" / "securities-expense-audit"
 OH_MY_PI_PLUGIN = DOMAIN / "adapters" / "oh-my-pi" / "securities-expense-audit"
-GROUPS = (
-    "ccb-baseline",
-    "ccb-enhanced",
-    "codex-baseline",
-    "codex-enhanced",
-    "openclaude-baseline",
-    "openclaude-enhanced",
-    "opencode-baseline",
-    "opencode-enhanced",
-    "oh-my-pi-baseline",
-    "oh-my-pi-enhanced",
-)
+PI_AGENT_PLUGIN = DOMAIN / "adapters" / "pi-agent" / "securities-expense-audit"
 PROXY_PORT = 18790
 
 
@@ -272,7 +267,7 @@ config_file = "/home/codex/.codex/agents/data_analyst.toml"
 description = "Challenge findings for exceptions, boundaries, omissions, and false positives."
 config_file = "/home/codex/.codex/agents/independent_reviewer.toml"
 '''
-    return f'''model = "deepseek-v4-pro"
+    return f'''model = "{MODEL_NAME}"
 model_provider = "deepseek"
 model_context_window = 131072
 model_auto_compact_token_limit = 100000
@@ -338,14 +333,14 @@ def opencode_config(task_id: str, enhanced: bool) -> dict[str, Any]:
     config: dict[str, Any] = {
         "$schema": "https://opencode.ai/config.json",
         "autoupdate": False,
-        "model": "deepseek/deepseek-v4-pro",
+        "model": f"deepseek/{MODEL_NAME}",
         "enabled_providers": ["deepseek"],
         "provider": {
             "deepseek": {
                 "npm": "@ai-sdk/openai-compatible",
                 "name": "DeepSeek",
-                "options": {"baseURL": "https://api.deepseek.com", "apiKey": "{env:LLM_API_KEY}"},
-                "models": {"deepseek-v4-pro": {"name": "deepseek-v4-pro"}},
+                "options": {"baseURL": MODEL_BASE_URL, "apiKey": "{env:LLM_API_KEY}"},
+                "models": {MODEL_NAME: {"name": MODEL_NAME}},
             }
         },
         "instructions": ["AGENTS.md"],
@@ -420,15 +415,15 @@ def opencode_config(task_id: str, enhanced: bool) -> dict[str, Any]:
 
 
 def oh_my_pi_models_config() -> str:
-    return """providers:
+    return f"""providers:
   deepseek:
-    baseUrl: https://api.deepseek.com/v1
+    baseUrl: {MODEL_BASE_URL}/v1
     apiKey: LLM_API_KEY
     api: openai-completions
     auth: apiKey
     models:
-      - id: deepseek-v4-pro
-        name: DeepSeek V4 Pro
+      - id: {MODEL_NAME}
+        name: {MODEL_NAME}
         reasoning: true
         input: [text]
         contextWindow: 131072
@@ -562,6 +557,11 @@ def prepare_task(group: str, task: dict[str, Any]) -> tuple[Path, Path, Path]:
             shutil.copytree(OH_MY_PI_PLUGIN / "skills", omp_dir / "skills")
             shutil.copytree(OH_MY_PI_PLUGIN / ".omp" / "agents", omp_dir / "agents")
             shutil.copytree(OH_MY_PI_PLUGIN / ".omp" / "extensions", omp_dir / "extensions")
+    elif group.startswith("pi-agent"):
+        if enhanced:
+            pi_dir = workspace / ".pi"
+            pi_dir.mkdir()
+            shutil.copytree(PI_AGENT_PLUGIN / ".pi" / "agents", pi_dir / "agents")
     else:
         raise ValueError(f"unsupported group: {group}")
     return base, workspace, artifacts
@@ -588,11 +588,11 @@ def ccb_command(group: str, task: dict[str, Any], baseline_runtime: Path, env: d
         "-e", "CLAUDE_CODE_USE_OPENAI=1",
         "-e", "OPENAI_MAX_RETRIES=2",
         "-e", "OPENAI_TIMEOUT_MS=120000",
-        "-e", "OPENAI_BASE_URL=https://api.deepseek.com",
-        "-e", "OPENAI_MODEL=deepseek-v4-pro",
-        "-e", "ANTHROPIC_DEFAULT_HAIKU_MODEL=deepseek-v4-pro",
-        "-e", "ANTHROPIC_DEFAULT_SONNET_MODEL=deepseek-v4-pro",
-        "-e", "ANTHROPIC_DEFAULT_OPUS_MODEL=deepseek-v4-pro",
+        "-e", f"OPENAI_BASE_URL={MODEL_BASE_URL}",
+        "-e", f"OPENAI_MODEL={MODEL_NAME}",
+        "-e", f"ANTHROPIC_DEFAULT_HAIKU_MODEL={MODEL_NAME}",
+        "-e", f"ANTHROPIC_DEFAULT_SONNET_MODEL={MODEL_NAME}",
+        "-e", f"ANTHROPIC_DEFAULT_OPUS_MODEL={MODEL_NAME}",
         "-e", f"AUDIT_TASK_ID={task['id']}",
         "-e", "AUDIT_WORK_DIR=/workspace",
         "-e", f"AUDIT_SUBAGENTS_ENABLED={'1' if enhanced else '0'}",
@@ -676,8 +676,8 @@ def openclaude_command(group: str, task: dict[str, Any], baseline_runtime: Path,
     command += [
         "-e", "OPENAI_API_KEY",
         "-e", "CLAUDE_CODE_USE_OPENAI=1",
-        "-e", "OPENAI_BASE_URL=https://api.deepseek.com/v1",
-        "-e", "OPENAI_MODEL=deepseek-v4-pro",
+        "-e", f"OPENAI_BASE_URL={MODEL_BASE_URL}/v1",
+        "-e", f"OPENAI_MODEL={MODEL_NAME}",
         "-e", "OPENCLAUDE_CONFIG_DIR=/tmp/openclaude-config",
         "-e", f"AUDIT_TASK_ID={task['id']}",
         "-e", "AUDIT_WORK_DIR=/workspace",
@@ -699,7 +699,7 @@ def openclaude_command(group: str, task: dict[str, Any], baseline_runtime: Path,
         "blackbox-eval/openclaude-source:0.24.0",
         "-p",
         "--provider", "openai",
-        "--model", "deepseek-v4-pro",
+        "--model", MODEL_NAME,
         "--output-format", "stream-json",
         "--verbose",
         "--bare",
@@ -742,7 +742,7 @@ def opencode_command(group: str, task: dict[str, Any], baseline_runtime: Path, e
         "-w", "/workspace",
         "blackbox-eval/opencode-source:1.18.1",
         "run", "--pure", "--dir", "/workspace", "--format", "json",
-        "--model", "deepseek/deepseek-v4-pro", "--variant", "high", "--auto",
+        "--model", f"deepseek/{MODEL_NAME}", "--variant", "high", "--auto",
         task_prompt(task, enhanced),
     ]
     return command, env.copy()
@@ -780,10 +780,10 @@ def oh_my_pi_command(group: str, task: dict[str, Any], baseline_runtime: Path, e
         "--no-session",
         "--no-title",
         "--provider", "deepseek",
-        "--model", "deepseek-v4-pro",
+        "--model", MODEL_NAME,
         "--thinking", "high",
         "--approval-mode", "yolo",
-        "--max-time", "900",
+        "--max-time", str(TASK_TIMEOUT_SECONDS),
         "--tools",
         (
             "read,bash,edit,eval,glob,grep,lsp,checkpoint,todo,write,task,hub"
@@ -792,6 +792,63 @@ def oh_my_pi_command(group: str, task: dict[str, Any], baseline_runtime: Path, e
         ),
         "--cwd", "/workspace",
         task_prompt(task, enhanced),
+    ]
+    return command, env.copy()
+
+
+def pi_agent_command(group: str, task: dict[str, Any], baseline_runtime: Path, env: dict[str, str]) -> tuple[list[str], dict[str, str]]:
+    base, workspace, artifacts = prepare_task(group, task)
+    enhanced = group.endswith("enhanced")
+    name = f"g3-{group}-{task['id'].lower()}"
+    command = ["docker", "run", "--rm", "--name", name]
+    command += [
+        "-e", "LLM_API_KEY",
+        "-e", f"AUDIT_TASK_ID={task['id']}",
+        "-e", "AUDIT_WORK_DIR=/workspace",
+        "-e", f"AUDIT_SUBAGENTS_ENABLED={'1' if enhanced else '0'}",
+        "-e", "AUDIT_FRAMEWORK=pi-agent",
+        "-e", f"AUDIT_EXPERIMENT_GROUP={group}",
+        "-e", "AUDIT_CONTROL_MCP_PATH=/plugin/shared/control-mcp/audit_control_mcp.py",
+        "-e", "EVAL_EXPENSE_DB=/benchmark/data/expense.db",
+        "-e", "EVAL_POLICY_CORPUS_DIR=/benchmark/data/corpus",
+        "-e", "EVAL_TASK_LOG=/artifacts/tool_calls.jsonl",
+    ]
+    command += common_volumes(workspace, artifacts)
+    command += volume(PI_AGENT_PLUGIN, "/plugin")
+    command += [
+        "-w", "/workspace",
+        "blackbox-eval/pi-agent-source:0.80.10",
+        "--print",
+        "--mode", "json",
+        "--no-session",
+        "--offline",
+        "--approve",
+        "--no-extensions",
+        "--no-skills",
+        "--provider", "deepseek-eval",
+        "--model", MODEL_NAME,
+        "--thinking", "high",
+        "-e", "/plugin/.pi/extensions/business-tools.ts",
+        "-e", "/plugin/.pi/extensions/audit-governance.ts",
+    ]
+    if enhanced:
+        command += ["-e", "/plugin/.pi/extensions/subagent/index.ts"]
+        for skill in sorted((PI_AGENT_PLUGIN / "skills").glob("*/SKILL.md")):
+            command += ["--skill", f"/plugin/skills/{skill.parent.name}/SKILL.md"]
+    business_tools = (
+        "list_policy_docs,search_policy,get_policy_doc,get_policy_excerpt,"
+        "list_expenses,get_expense_detail,find_invoice_usage,list_invoices,find_reused_invoices,"
+        "summarize_expenses,summarize_department_budgets,list_records_by_reimburse_delay,"
+        "list_records_missing_approval,list_employees,get_employee,get_department_budget,list_approvals"
+    )
+    control_tools = (
+        "authorize_audit_subagent,complete_audit_subagent,checkpoint_audit_context,"
+        "validate_audit_result,submit_audit_result"
+    )
+    command += [
+        "--tools",
+        f"read,bash,edit,write,{business_tools},{control_tools}{',subagent' if enhanced else ''}",
+        task_prompt(task, enhanced, "pi-agent"),
     ]
     return command, env.copy()
 
@@ -853,6 +910,7 @@ def run_one(group: str, task: dict[str, Any], baseline_runtime: Path, timeout: i
         "openclaude": openclaude_command,
         "opencode": opencode_command,
         "oh-my-pi": oh_my_pi_command,
+        "pi-agent": pi_agent_command,
     }
     prefix = group.rsplit("-", 1)[0]
     builder = builders[prefix]
@@ -864,13 +922,14 @@ def run_one(group: str, task: dict[str, Any], baseline_runtime: Path, timeout: i
         "openclaude": "openclaude",
         "opencode": "opencode",
         "oh-my-pi": "oh-my-pi",
+        "pi-agent": "pi-agent",
     }[prefix]
     start_run(
         workspace=base / "workspace",
         task_id=task["id"],
         framework=framework,
         experiment_group=group,
-        model="deepseek-v4-pro",
+        model=MODEL_NAME,
         timeout_seconds=timeout,
     )
     started = time.time()
@@ -935,7 +994,7 @@ def main() -> int:
     parser.add_argument("--groups", nargs="+", choices=GROUPS, default=list(GROUPS))
     parser.add_argument("--task-id", action="append", default=[])
     parser.add_argument("--workers", type=int, default=4)
-    parser.add_argument("--timeout", type=int, default=900)
+    parser.add_argument("--timeout", type=int, default=TASK_TIMEOUT_SECONDS)
     parser.add_argument("--resume", action="store_true", help="Rerun only missing or unaccepted tasks and preserve successful runs.")
     parser.add_argument("--force", action="store_true", help="With --resume, archive and rerun every selected task even if accepted.")
     args = parser.parse_args()
@@ -964,7 +1023,7 @@ def main() -> int:
                 "CODEX_DEEPSEEK_PROXY_HOST": "0.0.0.0",
                 "CODEX_DEEPSEEK_PROXY_PORT": str(PROXY_PORT),
                 "CODEX_PROXY_TRACE": str(proxy_dir / "trace.jsonl"),
-                "LLM_MODEL_NAME": "deepseek-v4-pro",
+                "LLM_MODEL_NAME": MODEL_NAME,
             })
             proxy_out = (proxy_dir / "stdout.log").open("w", encoding="utf-8")
             proxy_err = (proxy_dir / "stderr.log").open("w", encoding="utf-8")

@@ -1,49 +1,55 @@
 {
   "task_id": "L1-001",
   "task_type": "policy_qa",
-  "question": "现行制度下,单笔费用报销达到多少金额需要部门总经理审批?",
-  "scope": {
-    "audit_object": "policy threshold lookup",
-    "rule": "expense reimbursement approval threshold for department general manager",
-    "period": "current (现行制度)",
-    "deliverable": "threshold amount and policy citation"
+  "question": "现行制度下，单笔费用报销达到多少金额需要部门总经理审批？请说明适用版本、金额边界及费用报销办法与授权管理办法中的制度依据，并说明旧版审批线是否仍适用。",
+  "audit_scope": {
+    "audit_object": "单笔费用报销部门总经理审批金额阈值",
+    "expense_types": ["全部费用类型"],
+    "business_period": "现行制度",
+    "organization": "XX证券",
+    "deliverable": "政策依据及金额阈值说明"
   },
   "policy_questions": [
-    "What is the current expense reimbursement amount threshold requiring department general manager (部门总经理) approval?"
+    "现行费用报销审批权限由哪些制度文件规定？",
+    "单笔费用报销部门总经理审批的金额阈值是多少？",
+    "旧版(2022版)费用报销管理办法中的审批线是否仍适用？",
+    "授权管理办法附件二的审批权限表具体内容是什么？"
   ],
   "data_questions": [],
   "required_fields": [],
   "evidence_requirements": [
-    "Policy document specifying the approval threshold",
-    "Exact threshold amount in RMB"
-  ],
-  "execution_steps": [
-    "1. Search/query policy for department general manager approval threshold",
-    "2. Run policy-version-check if multiple versions or date boundaries are found",
-    "3. Record evidence and construct answer",
-    "4. Run evidence-coverage-check",
-    "5. Run audit-report",
-    "6. Run result-validator",
-    "7. Submit via audit_control.submit_audit_result"
+    "01_expense_reimbursement_2025.md: 现行费用报销办法中关于审批权限的条款",
+    "03_authorization_management.md: 授权管理办法附件二费用报销审批权限表",
+    "02_expense_reimbursement_2022_deprecated.md: 旧版制度审批线及废除/替代关系"
   ],
   "complexity": {
-    "score": 0,
+    "score": 3,
     "reasons": [
-      "Single policy fact lookup",
-      "No aggregation, joins, or batch filtering",
-      "No multi-rule or multi-policy"
+      "涉及政策版本更替与废除关系（2022版→2025版）",
+      "涉及两个及以上政策文件（费用报销办法+授权管理办法）",
+      "涉及金额阈值边界判定"
     ]
   },
   "subagent_plan": {
-    "policy_researcher": false,
-    "data_analyst": false,
-    "independent_reviewer": false,
-    "note": "Complexity 0-1, all work in main agent"
+    "use_subagent": true,
+    "role": "policy_researcher",
+    "reason_code": "MULTI_POLICY_VERSION_CHECK",
+    "task_description": "调查现行制度下部门总经理审批金额阈值。需要：(1)确认2025版费用报销管理办法第五条关于审批权限的规定；(2)阅读授权管理办法附件二费用报销审批权限表，提取部门总经理审批的金额边界；(3)确认2022旧版制度的废除状态及8000元旧审批线不再适用；(4)整理所有适用的制度条款和引用。"
   },
+  "execution_steps": [
+    "审计规划（当前步骤）",
+    "授权并启动policy_researcher子智能体进行政策版本和条款调查",
+    "登记子智能体结果",
+    "证据覆盖检查",
+    "误报复核（阈值边界）",
+    "审计报告",
+    "结果校验",
+    "提交"
+  ],
   "stopping_conditions": [
-    "Policy threshold found and cited",
-    "Evidence coverage passes",
-    "Validation passes",
-    "Submission accepted"
-  ]
+    "明确现行制度下部门总经理审批金额阈值",
+    "提供费用报销办法和授权管理办法的具体条款引用",
+    "确认旧版审批线已废除，不再适用"
+  ],
+  "unresolved_items": []
 }

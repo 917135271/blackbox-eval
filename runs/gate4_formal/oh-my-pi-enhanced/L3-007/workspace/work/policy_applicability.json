@@ -3,50 +3,57 @@
     {
       "doc_id": "01_expense_reimbursement_2025.md",
       "title": "XX证券费用报销管理办法(2025修订版)",
-      "status": "effective",
       "effective_date": "2025-01-01",
-      "expiry_date": null,
-      "applicable_clauses": ["第五条"],
-      "applicability_reason": "现行有效制度，2025年1月1日起施行，覆盖审计期间"
+      "status": "active",
+      "applicable_clauses": [
+        {
+          "clause_no": "第五条",
+          "content": "单笔费用报销的审批权限,不在本办法正文列示具体金额,统一按《XX证券授权管理办法》附件二执行。费用系统应按附件二自动派生审批角色。",
+          "role": "cross_reference_anchor"
+        },
+        {
+          "clause_no": "第十一条",
+          "content": "同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到《授权管理办法》附件二较高审批线的,应重点核查拆分规避审批。",
+          "role": "split_avoidance_rule"
+        }
+      ],
+      "cross_references": ["03_authorization_management.md 附件二"]
     },
     {
       "doc_id": "03_authorization_management.md",
       "title": "XX证券授权管理办法",
-      "status": "effective",
       "effective_date": "2025-01-01",
-      "expiry_date": null,
-      "applicable_clauses": ["附件二"],
-      "applicability_reason": "被2025版报销办法第五条引用，现行有效"
+      "status": "active",
+      "applicable_clauses": [
+        {
+          "clause_no": "第二条",
+          "content": "本办法附件二适用于费用报销系统自动派生审批角色,相关金额为现行有效审批线。",
+          "role": "cross_reference_target"
+        },
+        {
+          "clause_no": "附件二",
+          "content": "费用报销审批权限表: AR-01(0≤x<3000, 部门经理); AR-02(3000≤x<10000, 部门经理,并经财务复核); AR-03(10000≤x<50000, 部门总经理); AR-04(50000≤x<200000, 分管副总); AR-05(x≥200000, 总经理办公会)",
+          "role": "approval_threshold_table"
+        }
+      ]
     }
   ],
   "excluded_policies": [
     {
       "doc_id": "02_expense_reimbursement_2022_deprecated.md",
       "title": "XX证券费用报销管理办法(2022版)",
-      "exclusion_reason": "已被2025修订版废止，仅作制度沿革留档，不得作为现行审批依据"
+      "exclusion_reason": "已被2025修订版废止,第十四条明确自2025年1月1日起施行新版,原2022版同时废止"
     }
   ],
-  "cross_reference": {
-    "source": {"doc_id": "01_expense_reimbursement_2025.md", "clause": "第五条"},
-    "target": {"doc_id": "03_authorization_management.md", "clause": "附件二"},
-    "path": "2025报销办法第五条→授权管理办法附件二",
-    "verified": true
+  "cross_reference_chain": {
+    "path": "01_expense_reimbursement_2025.md 第五条 → 03_authorization_management.md 附件二",
+    "approval_tiers": [
+      {"tier_id": "AR-01", "amount_range": "0 ≤ x < 3000", "required_roles": ["部门经理"]},
+      {"tier_id": "AR-02", "amount_range": "3000 ≤ x < 10000", "required_roles": ["部门经理", "财务复核"]},
+      {"tier_id": "AR-03", "amount_range": "10000 ≤ x < 50000", "required_roles": ["部门总经理"]},
+      {"tier_id": "AR-04", "amount_range": "50000 ≤ x < 200000", "required_roles": ["分管副总"]},
+      {"tier_id": "AR-05", "amount_range": "x ≥ 200000", "required_roles": ["总经理办公会"]}
+    ]
   },
-  "approval_tiers": [
-    {"tier": "AR-01", "range": "大于等于0元且小于3000元", "min": 0, "max": 3000, "exclusive_max": true, "required_approver": "部门经理"},
-    {"tier": "AR-02", "range": "大于等于3000元且小于10000元", "min": 3000, "max": 10000, "exclusive_max": true, "required_approver": "部门经理，并经财务复核"},
-    {"tier": "AR-03", "range": "大于等于10000元且小于50000元", "min": 10000, "max": 50000, "exclusive_max": true, "required_approver": "部门总经理"},
-    {"tier": "AR-04", "range": "大于等于50000元且小于200000元", "min": 50000, "max": 200000, "exclusive_max": true, "required_approver": "分管副总"},
-    {"tier": "AR-05", "range": "大于等于200000元", "min": 200000, "max": null, "exclusive_max": false, "required_approver": "总经理办公会"}
-  ],
-  "version_relationships": [
-    {
-      "from": "02_expense_reimbursement_2022_deprecated.md",
-      "to": "01_expense_reimbursement_2025.md",
-      "relationship": "replaced_by",
-      "reason": "2025修订版第十四条明确废止2022版"
-    }
-  ],
-  "conflicts": [],
   "unresolved_items": []
 }

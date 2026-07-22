@@ -1,9 +1,32 @@
 {
   "status": "pass",
   "coverage_percent": 100,
-  "evidence_rows": [],
-  "candidate_record_ids": ["R000166", "R000214"],
-  "submitted_record_ids": ["R000166", "R000214"],
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANO-L3-008-001",
+      "record_ids": ["R003992", "R001829", "R002877", "R002576"],
+      "citations": [
+        {"doc_id": "04_travel_expense.md", "clause_no": "第三条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第七条"},
+        {"doc_id": "05_training_expense.md", "clause_no": "第五条"},
+        {"doc_id": "05_training_expense.md", "clause_no": "第六条"}
+      ],
+      "facts": [
+        "R003992: 合肥(C类)分支机构培训支持住宿费, 部门负责人级(D1), 1晚450.66元(450.66元/晚), 培训C类标准350元/晚, 超出100.66元",
+        "R001829: 上海(A类)分支机构培训支持住宿费, 经理级(M1), 1晚527.40元(527.40元/晚), 培训A类标准500元/晚, 超出27.40元",
+        "R002877: 杭州(B类)分支机构培训支持住宿费, 部门负责人级(D1), 1晚501.84元(501.84元/晚), 培训B类标准420元/晚, 超出81.84元",
+        "R002576: 杭州(B类)分支机构培训支持住宿费, 经理级(M1), 3晚1398.90元(466.30元/晚), 培训B类标准420元/晚, 超出46.30元",
+        "以上四条记录均以travel_lodging类型报销, 理由含'培训支持', 但根据04号制度第七条和05号制度第六条, 培训期间住宿应适用培训住宿标准, 不得与差旅住宿标准混用",
+        "这四条记录在差旅住宿标准下均合规(部门负责人级C类600、经理级A类650、部门负责人级B类700、经理级B类550), 但在培训住宿标准下均超标"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R003992", "R001829", "R002877", "R002576"],
+  "submitted_record_ids": ["R003992", "R001829", "R002877", "R002576"],
   "unowned_record_ids": [],
   "unused_candidate_record_ids": [],
   "unused_citations": [],
@@ -11,6 +34,10 @@
   "no_anomaly_coverage": {
     "complete": true
   },
-  "reconciled_figures": {},
+  "reconciled_figures": {
+    "total_training_related_travel_lodging": 8,
+    "exceeds_training_standard": 4,
+    "within_both_standards": 4
+  },
   "unresolved_items": []
 }

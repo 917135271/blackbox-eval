@@ -1,9 +1,9 @@
 {
   "status": "pass",
-  "coverage_percent": 100,
+  "coverage_percent": 100.0,
   "evidence_rows": [
     {
-      "anomaly_id": "L2-003-DUP-001",
+      "anomaly_id": "DUP-L2-003-001",
       "record_ids": [
         "R000020",
         "R004203"
@@ -15,10 +15,10 @@
         }
       ],
       "facts": [
-        "FP202500000020在R000020中被报销，金额669.5元，费用类型travel_lodging，状态approved",
-        "同一发票FP202500000020在R004203中再次被报销，金额669.5元，费用类型travel_lodging，状态approved",
-        "两笔记录均为同一员工杜丹(E0028)，同一部门财务管理部(D009)，同一发票日期2025-01-05",
-        "发票FP202500000020的find_invoice_usage返回usage_count=2"
+        "R000020: 员工杜丹(E0028)/财务管理部(D009), 发票FP202500000020, 金额669.50元, 费用类型travel_lodging, 费用日期2025-01-05, 报销日期2025-02-28, 状态approved",
+        "R004203: 员工杜丹(E0028)/财务管理部(D009), 发票FP202500000020, 金额669.50元, 费用类型travel_lodging, 费用日期2025-04-10, 报销日期2025-04-18, 状态approved",
+        "两张记录共用同一发票FP202500000020(INV000020), 供应商XX供应商2706, 发票日期2025-01-05, 发票金额669.50元, 事由均为财务管理部跨部门协同赴杭州住宿费",
+        "发票FP202500000020使用次数=2, 关联record_ids=['R000020','R004203']"
       ],
       "fact_supported": true,
       "rule_supported": true,
@@ -37,12 +37,23 @@
   "unused_candidate_record_ids": [],
   "unused_citations": [],
   "missing_evidence": [],
-  "no_anomaly_coverage": {
-    "complete": true
-  },
+  "no_anomaly_coverage": {},
   "reconciled_figures": {
-    "invoice_fp202500000020_usage_count": 2,
-    "total_duplicate_amount": 669.5
+    "invoice_FP202500000020": {
+      "invoice_amount": 669.5,
+      "records": [
+        {
+          "record_id": "R000020",
+          "amount": 669.5
+        },
+        {
+          "record_id": "R004203",
+          "amount": 669.5
+        }
+      ],
+      "total_reimbursed": 1339.0,
+      "duplicate_amount": 669.5
+    }
   },
   "unresolved_items": []
 }

@@ -1,0 +1,255 @@
+{
+  "group": "ccb-enhanced",
+  "dataset_id": "securities-expense-audit-formal-15-v9",
+  "rubric_version": "atomic-binary-checklist-v7",
+  "task_id": "RA-CASE-001",
+  "case_family": "record_audit",
+  "category": "policy_data_comparison",
+  "graded_at": "2026-07-22T21:11:43+08:00",
+  "checklist_passed": 9,
+  "checklist_total": 12,
+  "checklist_pass_rate": 75.0,
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "候选答案明确认定发票重复报销，无矛盾表述。",
+      "answer_evidence": "'FIND-001(发票重复报销): 发票FP202500000028...被...在R000028...和R004204...两次报销中使用,违反...第十条'",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "anomaly-type",
+      "value": 0,
+      "reason": "发现规则类型不匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "anomaly-count",
+      "value": 0,
+      "reason": "发现数量不匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-r000028",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-r004204",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 0,
+      "reason": "存在范围外record_id：['R002127']",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "same-invoice",
+      "value": 1,
+      "reason": "候选答案识别同一发票FP202500000028在两条记录中重复使用。",
+      "answer_evidence": "'发票FP202500000028...被...在R000028...和R004204...两次报销中使用'",
+      "trace_evidence": "find_invoice_usage('FP202500000028')返回两条记录R000028和R004204",
+      "source": "llm_judge"
+    },
+    {
+      "id": "same-amount",
+      "value": 1,
+      "reason": "候选答案和工具证据均确认两条记录金额165.58元。",
+      "answer_evidence": "'金额165.58元'",
+      "trace_evidence": "get_expense_detail('R000028')和get_expense_detail('R004204')结果中amount均为165.58",
+      "source": "llm_judge"
+    },
+    {
+      "id": "approved-records",
+      "value": 1,
+      "reason": "工具证据显示R000028和R004204审批状态均为approved。",
+      "answer_evidence": "'状态approved'",
+      "trace_evidence": "get_expense_detail('R000028')和get_expense_detail('R004204')的approvals中approval_status均为'approved'",
+      "source": "llm_judge"
+    },
+    {
+      "id": "invoice-usage-investigation",
+      "value": 1,
+      "reason": "使用了发票反查工具 find_invoice_usage 确认发票 FP202500000028 的完整使用记录，获得 R000028 和 R004204。",
+      "answer_evidence": "答案中明确：“find_invoice_usage确认FP202500000028的usage_count=2, find_reused_invoices全局列表确认INV000028在6张复用发票中”。",
+      "trace_evidence": "工具调用 find_invoice_usage(invoice_no=\"FP202500000028\") 返回记录包含 R000028 和 R004204；find_reused_invoices() 也列出 INV000028 及其 usage_count=2。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis",
+      "value": 1,
+      "reason": "引用了现行制度第十条，且该条款直接支持同一发票最多报销一次的结论。",
+      "answer_evidence": "提交的 citations 中包括 {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十条\"}，并在 FIND-001 中陈述违反第十条规定。",
+      "trace_evidence": "get_policy_doc(\"01_expense_reimbursement_2025.md\") 返回内容明确包含：“第十条 同一发票最多报销1次。”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "critical_failures": [],
+  "score_cap": null,
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 479.981,
+    "expected_anomaly_ids": [
+      "DUP-001"
+    ],
+    "actual_anomaly_ids": [
+      "FIND-001",
+      "FIND-002"
+    ],
+    "anomaly_metrics": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "count_exact": false,
+      "expected_types": {
+        "DUP": 1
+      },
+      "actual_types": {}
+    },
+    "expected_record_ids": [
+      "R000028",
+      "R004204"
+    ],
+    "actual_record_ids": [
+      "R000028",
+      "R004204",
+      "R002127"
+    ],
+    "record_metrics": {
+      "precision": 0.666667,
+      "recall": 1.0,
+      "f1": 0.8,
+      "exact": false,
+      "missing_count": 0,
+      "extra_count": 1
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 2,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "FIND-001对应的四个检查项均满足通过条件，审计结论、发票、金额、审批状态事实明确。；两个检查项均满足：发票反查完整确认了重复使用记录，制度依据准确有效。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 25734,
+      "completion_tokens": 2814,
+      "total_tokens": 28548,
+      "prompt_cache_hit_tokens": 768,
+      "prompt_cache_miss_tokens": 24966
+    },
+    "batch_count": 2,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 8729,
+          "completion_tokens": 1006,
+          "total_tokens": 9735,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 655
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 8729
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 8571,
+          "completion_tokens": 884,
+          "total_tokens": 9455,
+          "prompt_tokens_details": {
+            "cached_tokens": 384
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 548
+          },
+          "prompt_cache_hit_tokens": 384,
+          "prompt_cache_miss_tokens": 8187
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 2
+      }
+    ],
+    "consistency_audit": {
+      "sampled_count": 1,
+      "agreement_count": 1,
+      "agreement_rate": 1.0,
+      "disagreement_ids": [],
+      "tied_ids": [],
+      "tiebreak_count": 0,
+      "repeat_count": 2,
+      "batches": [
+        {
+          "model": "deepseek-v4-pro",
+          "usage": {
+            "prompt_tokens": 8434,
+            "completion_tokens": 924,
+            "total_tokens": 9358,
+            "prompt_tokens_details": {
+              "cached_tokens": 384
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 697
+            },
+            "prompt_cache_hit_tokens": 384,
+            "prompt_cache_miss_tokens": 8050
+          },
+          "finish_reason": "stop",
+          "attempt": 1,
+          "max_tokens": 4096,
+          "shape_attempt": 1,
+          "criteria_count": 1
+        }
+      ]
+    }
+  },
+  "run_path": "runs/gate3_replacement_canary/ccb-enhanced/RA-CASE-001"
+}

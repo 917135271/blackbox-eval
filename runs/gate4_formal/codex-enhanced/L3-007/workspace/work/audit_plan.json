@@ -1,18 +1,23 @@
 {
   "task_id": "L3-007",
-  "question": "报销办法没有直接列审批金额时,请通过交叉引用找到单笔费用审批档位",
-  "type": "two_hop_retrieval",
-  "complexity": 1,
-  "rule_scope": "交叉引用审批档位",
-  "primary_doc": "01_expense_reimbursement_2025.md",
-  "cross_ref_doc": "03_authorization_management.md",
-  "clue": "single rule, two-hop cross-reference",
+  "task_type": "two_hop_retrieval",
+  "complexity": 2,
+  "question": "报销办法没有直接列审批金额时,请通过交叉引用找到单笔费用审批档位。",
+  "scope": {
+    "rule_clauses": [
+      {"doc_id": "01_expense_reimbursement_2025.md", "clause": "第五条", "summary": "单笔费用报销审批权限不在本办法列示,统一按《XX证券授权管理办法》附件二执行"},
+      {"doc_id": "03_authorization_management.md", "clause": "附件二", "summary": "费用报销审批权限表: AR-01至AR-05五档审批线"}
+    ],
+    "applies_to": "所有单笔费用报销记录,需交叉引用授权管理办法附件二确定审批档位"
+  },
   "steps": [
-    "Step 1: Confirm reimbursement policy defers to authorization policy (Article 5)",
-    "Step 2: Cross-reference authorization policy Attachment 2 for approval tiers",
-    "Step 3: Identify and verify expense records with approval tier cross-reference",
-    "Step 4: Build evidence matrix and final result"
+    {"phase": "planning", "action": "记录 planning_completed checkpoint", "status": "pending"},
+    {"phase": "investigation", "action": "交叉引用:通过报销办法第五条找到授权管理办法附件二,获取审批档位表", "status": "pending"},
+    {"phase": "investigation", "action": "分析费用报销记录,将每笔金额映射到对应审批档位", "status": "pending"},
+    {"phase": "investigation", "action": "检查是否存在审批角色缺失或错配的记录", "status": "pending"},
+    {"phase": "review", "action": "evidence-coverage-check, false-positive-review", "status": "pending"},
+    {"phase": "report", "action": "audit-report, result-validator", "status": "pending"},
+    {"phase": "submit", "action": "validate_audit_result, submit_audit_result", "status": "pending"}
   ],
-  "subagent": null,
-  "created": "2026-07-16T00:00:00Z"
+  "subagent_plan": null
 }

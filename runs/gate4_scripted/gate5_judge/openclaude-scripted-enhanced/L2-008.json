@@ -1,0 +1,221 @@
+{
+  "group": "openclaude-scripted-enhanced",
+  "task_id": "L2-008",
+  "case_family": "record_audit",
+  "category": "policy_data_comparison",
+  "graded_at": "2026-07-22T00:57:11+08:00",
+  "checklist_passed": 12,
+  "checklist_total": 12,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "答案明确认定构成拆分报销，无矛盾表述。",
+      "answer_evidence": "答案首句：“发现员工E0009（张婷……）拆分报销异常”。",
+      "trace_evidence": "工具 search_policy 返回第十一条拆分报销规则，支撑结论。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "anomaly-type-count-rule-type",
+      "value": 1,
+      "reason": "提交的发现描述为拆分报销，符合SPLIT规则类型。",
+      "answer_evidence": "答案明确使用“拆分报销”表述。",
+      "trace_evidence": "工具 search_policy 返回的第十一条直接对应拆分报销规则。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "anomaly-type-count-count",
+      "value": 1,
+      "reason": "发现数量完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r004212",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r004213",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "引用《费用报销管理办法》第十一条拆分报销条款。",
+      "answer_evidence": "答案引用：“违反《XX证券费用报销管理办法(2025修订版)》第十一条”。",
+      "trace_evidence": "工具 search_policy 返回第十一条原文，工具 get_policy_doc 获取完整文件。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-authorization",
+      "value": 1,
+      "reason": "引用《授权管理办法》附件二10000元审批线来源。",
+      "answer_evidence": "答案指出：“达到《XX证券授权管理办法》附件二AR-03审批线（≥¥10,000）”。",
+      "trace_evidence": "工具 get_policy_doc 返回附件二审批权限表，明确AR-03对应≥10000元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-window",
+      "value": 1,
+      "reason": "候选回答正确计算R004212和R004213的日期窗口为5天，小于7天。",
+      "answer_evidence": "日期窗口2025-04-10至2025-04-15共5天（在7天内）",
+      "trace_evidence": "get_expense_detail返回R004212日期2025-04-10，R004213日期2025-04-15，间隔5天。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-sum",
+      "value": 1,
+      "reason": "候选回答正确计算两笔报销合计金额为¥10,200。",
+      "answer_evidence": "合计金额¥10,200",
+      "trace_evidence": "get_expense_detail返回R004212金额5100，R004213金额5100，合计10200。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-threshold",
+      "value": 1,
+      "reason": "候选回答正确比较合计金额与10000元审批线，达到AR-03线。",
+      "answer_evidence": "达到《XX证券授权管理办法》附件二AR-03审批线（≥¥10,000）",
+      "trace_evidence": "get_policy_doc返回03_authorization_management.md中AR-03区间为≥10000元，AR-02为≥3000且<10000元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 118.486,
+    "expected_anomaly_ids": [
+      "SPLIT-001"
+    ],
+    "actual_anomaly_ids": [
+      "AN-L2-008-001"
+    ],
+    "anomaly_metrics": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "count_exact": true,
+      "expected_types": {
+        "SPLIT": 1
+      },
+      "actual_types": {}
+    },
+    "expected_record_ids": [
+      "R004212",
+      "R004213"
+    ],
+    "actual_record_ids": [
+      "R004212",
+      "R004213"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 2,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选提交正确识别拆分报销异常，引用制度准确，通过所有检查项。；候选答案准确识别7天窗口、合计金额和审批线比较，三项推理检查均满足要求。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 8256,
+      "completion_tokens": 3212,
+      "total_tokens": 11468,
+      "prompt_cache_hit_tokens": 768,
+      "prompt_cache_miss_tokens": 7488
+    },
+    "batch_count": 2,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4180,
+          "completion_tokens": 2244,
+          "total_tokens": 6424,
+          "prompt_tokens_details": {
+            "cached_tokens": 384
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1822
+          },
+          "prompt_cache_hit_tokens": 384,
+          "prompt_cache_miss_tokens": 3796
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4076,
+          "completion_tokens": 968,
+          "total_tokens": 5044,
+          "prompt_tokens_details": {
+            "cached_tokens": 384
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 586
+          },
+          "prompt_cache_hit_tokens": 384,
+          "prompt_cache_miss_tokens": 3692
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 3
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/openclaude-scripted-enhanced/L2-008"
+}

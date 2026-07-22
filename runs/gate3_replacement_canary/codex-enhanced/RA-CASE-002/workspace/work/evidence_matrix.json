@@ -1,0 +1,57 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-001",
+      "record_ids": ["R004209", "R004219", "R004220"],
+      "citations": [
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"}
+      ],
+      "facts": [
+        "R004209金额3400元处于AR-02区间(3000-10000),仅有一笔审批记录(A004209,批准人E0008部门经理),缺少财务复核审批",
+        "R004219金额5200元,仅有一笔审批记录(A004219,批准人E0008部门经理),缺少财务复核审批",
+        "R004220金额5200元,仅有一笔审批记录(A004220,批准人E0008部门经理),缺少财务复核审批",
+        "三笔记录均为同一员工E0008(杨丹)自我审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "record_ids": ["R004219", "R004220"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "R004219(2025-11-27, travel_lodging, 5200元)与R004220(2025-12-01, travel_lodging, 5200元)为同一员工E0008杨丹、同一费用类型travel_lodging,间隔仅4天",
+        "两笔合计10400元,超过AR-03审批线10000元,拆分后每笔5200元仅需AR-02部门经理审批,规避更高审批层级(AR-03需部门总经理)",
+        "两笔报销理由均为'项目现场住宿费',发票方均为安程酒店管理有限公司"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004209", "R004219", "R004220"],
+  "submitted_record_ids": ["R004209", "R004219", "R004220"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "R004209_amount": 3400,
+    "R004209_nights": 5,
+    "R004209_per_night": 680,
+    "R004219_amount": 5200,
+    "R004220_amount": 5200,
+    "split_combined_amount": 10400,
+    "split_days_apart": 4,
+    "D1_standard_per_night_A_tier": 850
+  },
+  "unresolved_items": []
+}

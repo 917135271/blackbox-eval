@@ -1,28 +1,38 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "audit-conclusion",
-      "score": 20,
-      "reason": "结论为重复报销，异常ID准确对应DUP类型",
-      "answer_evidence": "提交anomaly_ids包含L2-003-001，答案称'重复报销异常'",
-      "trace_evidence": "find_invoice_usage确认FP202500000020关联R000020和R004203，记录金额均为669.5"
+      "value": 1,
+      "reason": "候选答案明确认定重复报销，结论无矛盾。",
+      "answer_evidence": "answer中明确：“发现重复报销异常...该行为构成明显的重复报销违规。”",
+      "trace_evidence": "find_invoice_usage工具显示同一发票FP202500000020被记录R000020和R004203使用，支持重复使用事实。",
+      "source": "llm_judge"
     },
     {
       "id": "policy-basis",
-      "score": 15,
-      "reason": "引用现行制度第十条，且与重复报销管控要求一致",
-      "answer_evidence": "citations中列出'第十条'，答案称'违反2025修订版费用报销管理办法第十条'",
-      "trace_evidence": "search_policy和get_policy_excerpt返回第十条全文：'同一发票最多报销1次...'"
+      "value": 1,
+      "reason": "明确引用《XX证券费用报销管理办法(2025修订版)》第十条，并说明“同一发票最多报销1次”，条款有效支持结论。",
+      "answer_evidence": "answer中引用：“依据《XX证券费用报销管理办法(2025修订版)》第十条“同一发票最多报销1次””，并列入citations。",
+      "trace_evidence": "get_policy_excerpt返回第十条内容：“同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。”",
+      "source": "llm_judge"
     },
     {
-      "id": "case-reasoning",
-      "score": 20,
-      "reason": "完整列出两笔记录和发票号、金额669.5元，证据闭环",
-      "answer_evidence": "答案写明'FP202500000020...R000020...669.50元'和'R004203...669.50元'",
-      "trace_evidence": "get_expense_detail(R000020)和(R004203)均返回amount:669.5，find_invoice_usage核实发票关联"
+      "id": "case-reasoning-same-invoice",
+      "value": 1,
+      "reason": "明确识别发票FP202500000020在R000020和R004203中重复使用。",
+      "answer_evidence": "answer：“发票FP202500000020（INV000020）由同一员工E0028...在两条报销记录R000020和R004203中重复使用”",
+      "trace_evidence": "find_invoice_usage工具对FP202500000020的查询结果显示record_ids包含R000020和R004203。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "明确指出两条记录金额均为669.50元，与记录一致。",
+      "answer_evidence": "answer：“单张发票金额669.50元被重复报销”，并说明合计1,339.00元。",
+      "trace_evidence": "get_expense_detail(R000020)和get_expense_detail(R004203)均返回amount:669.5。",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [],
-  "overall_comment": "候选完全识别了重复报销异常，制度引用和事实推理准确，无虚构记录。",
+  "overall_comment": "候选提交准确识别重复报销异常，所有检查项均满足。",
   "confidence": 1.0
 }

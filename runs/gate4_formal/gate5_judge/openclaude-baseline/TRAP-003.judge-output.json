@@ -1,39 +1,94 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "clean-conclusion",
-      "score": 30,
-      "reason": "明确判断无异常，无矛盾表述。",
-      "answer_evidence": "anomaly_ids: [], 回答: '无异常。'",
-      "trace_evidence": "提交异常ID列表为空。"
+      "value": 1,
+      "reason": "明确给出无异常结论且无矛盾表述",
+      "answer_evidence": "answer字段明确声明“无异常”且anomaly_ids为空",
+      "trace_evidence": "",
+      "source": "llm_judge"
     },
     {
-      "id": "case-specific-reason",
-      "score": 25,
-      "reason": "完整说明专属原因：相隔8天超过7天拆分核查窗口，不构成拆分规避。",
-      "answer_evidence": "两笔报销日期(2025-10-01与2025-10-09)相隔8天,超过《费用报销管理办法》第十一条规定的7天拆分核查窗口,不构成拆分规避审批。",
-      "trace_evidence": "获取R004236和R004237详情，expense_date分别为2025-10-01和2025-10-09，相隔8天。"
+      "id": "case-specific-reason-gap",
+      "value": 1,
+      "reason": "准确计算日期间隔为8天",
+      "answer_evidence": "answer中写明“费用发生日期间隔为8天”",
+      "trace_evidence": "get_expense_detail返回expense_date:2025-10-01和2025-10-09，间隔8天",
+      "source": "llm_judge"
     },
     {
-      "id": "reverse-check",
-      "score": 15,
-      "reason": "轨迹中核对了日期窗口、员工信息、差旅标准、审批层级，并执行了发票重用和审批检查等反向核查。",
-      "answer_evidence": "同时检查住宿标准743元/晚 vs 850元限额，审批层级AR-02合规。",
-      "trace_evidence": "调用find_reused_invoices, list_records_missing_approval, get_employee(E0010), get_policy_doc(04_travel_expense.md)等。"
+      "id": "case-specific-reason-window",
+      "value": 1,
+      "reason": "正确说明8天超出7天聚合窗口",
+      "answer_evidence": "answer中写明“不满足……7天时间条件（8天>7天）”",
+      "trace_evidence": "get_policy_excerpt获取第十一条明确“7天内”条件",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "准确计算合计金额10400元",
+      "answer_evidence": "answer中写明“两笔报销合计金额10400元（5200+5200）”",
+      "trace_evidence": "get_expense_detail返回amount:5200, 5200，合计10400",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 1,
+      "reason": "正确说明金额条件满足但时间窗口条件不满足",
+      "answer_evidence": "answer中写明“合计金额10400元……但间隔天数已超出制度规定的7天核查窗口，无需进一步核查审批线规避问题”",
+      "trace_evidence": "get_policy_doc获取03_authorization_management.md附件二含AR-03 10000元线，且日期间隔核验为8天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-gap",
+      "value": 1,
+      "reason": "工具轨迹包含数据来源并证明间隔8天",
+      "answer_evidence": "",
+      "trace_evidence": "get_expense_detail调用并返回R004236和R004237的expense_date，间隔8天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-window",
+      "value": 1,
+      "reason": "工具轨迹包含7天窗口制度依据并证明超出",
+      "answer_evidence": "",
+      "trace_evidence": "search_policy/get_policy_excerpt返回第十一条“7天内”条件，结合日期核验为8天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "工具轨迹包含金额数据并证明合计10400元",
+      "answer_evidence": "",
+      "trace_evidence": "get_expense_detail返回两个5200，合计10400",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 1,
+      "reason": "工具轨迹包含审批线和窗口依据，证明金额满足但时间不满足",
+      "answer_evidence": "",
+      "trace_evidence": "get_policy_doc获取附件二显示10000元审批线，且前述证据显示间隔8天超出7天窗口",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用01_expense_reimbursement_2025.md#第十一条",
+      "answer_evidence": "citations包含{doc_id:01_expense_reimbursement_2025.md, clause_no:第十一条}",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 0,
+      "reason": "未引用03_authorization_management.md#附件二",
+      "answer_evidence": "citations仅包含01_expense_reimbursement_2025.md，缺少03_authorization_management.md#附件二",
+      "trace_evidence": "工具调用get_policy_doc('03_authorization_management.md')但最终提交未引用",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "提交记录ID R004236和R004237均真实存在。"
-    },
-    {
-      "id": "trap-false-positive",
-      "triggered": false,
-      "reason": "结论为无异常，未判异常。"
-    }
-  ],
-  "overall_comment": "正确识别了本题合规记录，基于日期窗口差异和标准核查给出无异常结论，反向验证全面。",
-  "confidence": 0.95
+  "overall_comment": "除缺少附件二引用外，所有检查项均满足，结论与推理正确。",
+  "confidence": 0.9
 }

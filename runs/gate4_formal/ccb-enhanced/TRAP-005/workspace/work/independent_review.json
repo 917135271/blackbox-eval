@@ -1,39 +1,46 @@
 {
   "task_id": "TRAP-005",
   "decision": "pass",
-  "challenged_findings": [],
-  "supporting_evidence": [
+  "challenged_findings": [
     {
-      "type": "record_label",
-      "detail": "R004202 reason字段明确标注为'重复发票注入样本:青竹系统测试交通费'，是系统级别的注入样本标识"
+      "finding": "NO_SPLIT_R004239_R004240",
+      "challenge": "同一员工、同一供应商、连续日期、相近金额(540/545)是否构成拆分?",
+      "defense": "两条记录明确标注不同客户(客户甲vs客户乙)和不同业务目的(产品方案交流vs投行业务沟通),发票不同且发票日期不同。即使恶意合并为1085元,仍处于AR-01档位(<3000),不存在规避审批的动机。按06_business_entertainment.md第四条,同一客户拜访或会议才触发拆分禁令,此处不适用。",
+      "verdict": "upheld"
     },
     {
-      "type": "record_format",
-      "detail": "R004202的record_no为BX2025X004202，包含'X'标记，与正常记录BX2025000005格式不同，属于测试注入数据的标识模式"
+      "finding": "NO_EXCESSIVE_R004239_R004240",
+      "challenge": "人均计算是否正确?若两天为同一批3人聚餐,累计人均361.67元是否超标?",
+      "defense": "业务招待费管理办法第三条的人均限额按单次活动计算,非累计。两条记录分别核算:R004239人均180元,R004240人均181.67元,均低于300元上限。即使是同一批人也应按各自活动独立核算。",
+      "verdict": "upheld"
     },
     {
-      "type": "chronological_inconsistency",
-      "detail": "R004202的expense_date=2025-03-10早于invoice_date=2025-06-07，发票日期在费用发生之后3个月，真实报销中不可能出现发票日期晚于费用发生日的情况"
-    },
-    {
-      "type": "invoice_date_match",
-      "detail": "R000005的expense_date=2025-06-07与invoice_date=2025-06-07一致，说明FP202500000005对应的真实费用为R000005"
+      "finding": "NO_DUPLICATE_R004239_R004240",
+      "challenge": "发票是否可能在不同系统中被重复使用?",
+      "defense": "SQLite全库查询确认FP2025X0004233和FP2025X0004234各仅使用1次。发票号不同且各自独立。",
+      "verdict": "upheld"
     }
+  ],
+  "supporting_evidence": [
+    "SQLite确认两条记录发票不同且各只用1次",
+    "SQLite确认E0008在10月18日至11月2日窗口内仅有这两笔business_entertainment",
+    "业务招待费管理办法第二条(5000元上限):540和545远低于上限",
+    "业务招待费管理办法第三条(300元人均上限):180和181.67低于上限",
+    "费用报销管理办法第十一条:合计1085元<AR-02最低线3000元,不触发拆分审查",
+    "附件二AR-01:0-3000元为部门经理审批,两笔各自及合计均在此档"
   ],
   "opposing_evidence": [
-    {
-      "type": "policy_clause",
-      "detail": "01_expense_reimbursement_2025.md第十条规定同一发票最多报销1次，重复出现应认定为重复报销风险"
-    }
+    "同一员工(E0008杨丹)同一供应商(嘉禾餐饮)连续两天,表面可疑",
+    "两笔金额非常接近(540/545),差值仅5元",
+    "审批人为E0008本人(部门经理自批),存在内控关注点,但不在本次审计规则范围内"
   ],
-  "exceptions_or_boundaries": [
-    {
-      "type": "synthetic_data",
-      "detail": "R004202属于系统注入的合成测试数据，非真实费用报销。注入样本不构成实际违规。"
-    }
-  ],
+  "exceptions_and_boundaries": {
+    "threshold_boundaries": "所有金额远低于制度上限(5000/300/3000),不存在边界争议",
+    "approval_exemptions": "无special_approval,无豁免适用",
+    "policy_transition": "所有事件发生在2025年10月,2025版制度已生效,无过渡期问题"
+  },
   "required_changes": [],
   "supplemental_query": null,
-  "rationale": "R004202的三重标识（reason注入样本标签、record_no中X格式、expense_date与invoice_date时间倒挂）一致证明其为合成测试数据。虽然政策第十条将重复发票认定为风险，但该风险的触发对象为真实报销记录。注入样本本身不含真实费用，不构成实际违规。原始R000005的费用是真实有效的。结论保持无异常。",
+  "rationale": "独立复核确认无异常结论成立。三个规则(重复报销、拆分报销、业务招待费超标准)均有充分证据支持。表面可疑因素(同一员工、同一供应商、连续日期、相近金额)均有合理解释:不同客户、不同业务目的、不同发票。即使按最不利假设(恶意拆分),合计金额1085元仍未触发更高审批线,不满足拆分规避审批的构成要件。人均和单次金额均远低于制度上限。",
   "unresolved_conflicts": []
 }

@@ -1,53 +1,86 @@
 {
-  "criteria": [
+  "checklist": [
     {
-      "id": "current-threshold",
-      "score": 30,
-      "reason": "答案明确指出现行2025修订版部门总经理审批线为10,000元（AR-03档），金额和版本均准确。",
-      "answer_evidence": "现行附件二费用报销审批权限表（AR-01至AR-05）……部门总经理审批线：旧版≥8,000元 → 现行≥10,000元（AR-03档：[10,000, 50,000)区间）",
-      "trace_evidence": "工具get_policy_doc(03_authorization_management.md)返回附件二包含AR-03: 大于等于10000元且小于50000元，部门总经理审批。"
+      "id": "current-threshold-version",
+      "value": 1,
+      "reason": "明确识别2025修订版为现行版本",
+      "answer_evidence": "答案中写明“2025版（现行有效）审批线”",
+      "trace_evidence": "工具调用了01_expense_reimbursement_2025.md文档",
+      "source": "llm_judge"
     },
     {
-      "id": "old-threshold-status",
-      "score": 25,
-      "reason": "答案准确指出旧版2022版8000元审批线，并明确说明该版本已废止，且引用其第四条声明。",
-      "answer_evidence": "旧版制度曾规定，单笔报销金额达到8000元的，应提交部门总经理审批……2022版第四条明确声明其审批金额已被后续制度替代，不得作为现行审批依据。",
-      "trace_evidence": "工具get_policy_doc(02_expense_reimbursement_2022_deprecated.md)返回第二条为8000元，第四条为废止声明。"
+      "id": "current-threshold-amount",
+      "value": 1,
+      "reason": "明确给出现行金额10000元",
+      "answer_evidence": "答案中列明“10,000 ≤ 金额 < 50,000元 → 部门总经理”",
+      "trace_evidence": "get_policy_doc获取授权管理办法附件二显示AR-03从10000起",
+      "source": "llm_judge"
     },
     {
-      "id": "cross-reference",
-      "score": 20,
-      "reason": "答案完整说明了费用报销管理办法（2025修订版）通过授权管理办法附件二取得现行审批金额的制度关系。",
-      "answer_evidence": "现行审批权限统一按照《XX证券授权管理办法》（XX证综规〔2025〕丙号）附件二执行。2025修订版第五条规定：‘单笔费用报销的审批权限，不在本办法正文列示具体金额，统一按《XX证券授权管理办法》附件二执行。’",
-      "trace_evidence": "工具get_policy_doc(01_expense_reimbursement_2025.md)返回第五条引用附件二；get_policy_doc(03_authorization_management.md)返回附件二具体金额。"
+      "id": "old-threshold-status-amount",
+      "value": 1,
+      "reason": "明确给出旧版金额8000元",
+      "answer_evidence": "答案中写明“旧版审批线一：单笔报销金额 ≥ 8,000元 → 部门总经理”",
+      "trace_evidence": "get_policy_doc获取2022版文档第二条显示8000元",
+      "source": "llm_judge"
     },
     {
-      "id": "risk-explanation",
-      "score": 20,
-      "reason": "答案详细解释了旧线会导致两个金额区间误判的具体风险，并提出了强制绑定版本、标记废止制度等具体校验措施。",
-      "answer_evidence": "【误判类型一】8,000元≤金额<10,000元区间……若按旧线审计，该区间内所有记录将被错误标记为“缺失部门总经理审批”。……【误判类型二】30,000元≤金额<50,000元区间……将被错误标记为“缺失分管副总审批”。……审计建议（1）（2）（3）。",
-      "trace_evidence": "无特定工具调用需引用。"
+      "id": "old-threshold-status-status",
+      "value": 1,
+      "reason": "明确说明旧版废止",
+      "answer_evidence": "答案中说明“2022版审批线已于2025年1月1日起被废止”且引用了废止条款",
+      "trace_evidence": "2022版文档第一条和第四条自认废止",
+      "source": "llm_judge"
+    },
+    {
+      "id": "cross-reference-expense",
+      "value": 1,
+      "reason": "引用费用报销办法第五条",
+      "answer_evidence": "答案中引用“《XX证券费用报销管理办法(2025修订版)》第五条”",
+      "trace_evidence": "get_policy_doc获取了01文档，其中第五条明确交叉引用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "cross-reference-relation",
+      "value": 1,
+      "reason": "正确说明第五条将金额授权给附件二",
+      "answer_evidence": "答案中说明“通过该办法第五条交叉引用至《XX证券授权管理办法》附件二执行”",
+      "trace_evidence": "工具获取了第三条制度，显示附件二是审批金额来源",
+      "source": "llm_judge"
+    },
+    {
+      "id": "cross-reference-authorization",
+      "value": 1,
+      "reason": "引用附件二中的现行金额",
+      "answer_evidence": "答案中引用“《XX证券授权管理办法》附件二”列明金额档位",
+      "trace_evidence": "get_policy_doc获取03文档附件二内容，含10000元等",
+      "source": "llm_judge"
+    },
+    {
+      "id": "risk-explanation-risk",
+      "value": 1,
+      "reason": "具体说明旧线造成的误判方向（假阳性）",
+      "answer_evidence": "答案在误判场景一中以R004233为例说明误用旧版将错误认定缺少审批，导致假阳性",
+      "trace_evidence": "list_expenses和get_expense_detail验证了R004233金额9990元和AR-02审批",
+      "source": "llm_judge"
+    },
+    {
+      "id": "risk-explanation-control",
+      "value": 1,
+      "reason": "提出可执行的版本校验措施",
+      "answer_evidence": "答案中提出制度时效性校验、交叉引用完整性检查等六条措施",
+      "trace_evidence": "工具搜索和文档获取显示了多个版本和引用结构，措施基于此",
+      "source": "llm_judge"
     },
     {
       "id": "report-shape",
-      "score": 5,
-      "reason": "答案以完整的审计说明形式提交，结构包含背景、差异、风险、建议、结论，与 submitted_json 字段一致，无冲突。",
-      "answer_evidence": "全文为“版本陷阱审计说明”标题及分节内容，且答案文本与 citations、record_ids 对应。",
-      "trace_evidence": "submitted_json 中 answer 和 record_ids 等字段一致，无冲突。"
+      "value": 1,
+      "reason": "以审计说明形式提交，表达完整且一致",
+      "answer_evidence": "答案包括新旧审批线、交叉引用依据、误判风险和版本校验措施，结构完整",
+      "trace_evidence": "提交的answer字段包含完整审计说明",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "使用的 record_id R004233 在数据集中存在，工具 get_expense_detail 和 list_approvals 均返回有效记录，未虚构。"
-    },
-    {
-      "id": "deprecated-policy-as-current",
-      "triggered": false,
-      "reason": "答案明确指出2022版已废止，所有结论均基于现行2025版和授权管理办法附件二，未将旧版作为当前审批依据。"
-    }
-  ],
-  "overall_comment": "审计说明完整准确地指出了现行审批线10000元与已废止的旧线8000元，清晰阐述制度引用关系，具体说明误判风险并提出可行建议，格式规范，无关键失败。",
-  "confidence": 0.95
+  "overall_comment": "候选提交完整覆盖了版本陷阱审计的所有要求，识别了现行与废止版本、金额、交叉引用，准确分析了误判风险并提出了有效的版本校验措施，表述一致。",
+  "confidence": 1.0
 }

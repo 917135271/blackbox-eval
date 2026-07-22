@@ -1,46 +1,62 @@
 {
-  "criteria": [
+  "checklist": [
     {
-      "id": "current-threshold",
-      "score": 45,
-      "reason": "金额明确10000元且包含边界",
-      "answer_evidence": "答案写明“达到10,000元（含）且低于50,000元时，需要部门总经理审批”",
-      "trace_evidence": "工具调用get_policy_excerpt和get_policy_doc确认AR-03为大于等于10000元，需部门总经理"
+      "id": "current-threshold-amount",
+      "value": 1,
+      "reason": "明确给出了现行部门总经理审批金额为10000元。",
+      "answer_evidence": "“达到大于等于人民币10,000元（含）且小于50,000元时，需要部门总经理审批。”",
+      "trace_evidence": "工具追踪显示获取了03_authorization_management.md，附件二AR-03档位区间为“大于等于10000元且小于50000元”。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-threshold-inclusive",
+      "value": 1,
+      "reason": "明确说明10000元本身包含在内。",
+      "answer_evidence": "“下限含10,000元”",
+      "trace_evidence": "附件二明确显示“大于等于10000元”，包含边界。",
+      "source": "llm_judge"
     },
     {
       "id": "current-version",
-      "score": 20,
-      "reason": "明确识别现行版本为2025修订版",
-      "answer_evidence": "引用《XX证券授权管理办法》（XX证综规〔2025〕丙号）和《XX证券费用报销管理办法（2025修订版）》",
-      "trace_evidence": "list_policy_docs列出2025修订版，get_policy_doc返回授权管理办法发文字号2025丙号"
+      "value": 1,
+      "reason": "明确结论基于2025修订版。",
+      "answer_evidence": "“《XX证券费用报销管理办法(2025修订版)》（XX证财规〔2025〕甲号）与《XX证券授权管理办法》（XX证综规〔2025〕丙号），均自二〇二五年一月一日起施行。”",
+      "trace_evidence": "工具调用获取了01_expense_reimbursement_2025.md，文档标题为2025修订版。",
+      "source": "llm_judge"
     },
     {
-      "id": "policy-citation",
-      "score": 20,
-      "reason": "引用了有效制度且定位到正确审批档位",
-      "answer_evidence": "引用“附件二费用报销审批权限表AR-03档位”及“《XX证券费用报销管理办法（2025修订版）》第五条”",
-      "trace_evidence": "get_policy_excerpt返回附件二AR-03，金额10000-50000需部门总经理；费用报销管理办法第五条指向授权管理办法附件二"
+      "id": "policy-citation-expense-rule",
+      "value": 1,
+      "reason": "引用了费用报销办法第五条。",
+      "answer_evidence": "“《XX证券费用报销管理办法(2025修订版)》第五条”",
+      "trace_evidence": "get_policy_doc返回01_expense_reimbursement_2025.md，其中第五条指向附件二。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-authorization",
+      "value": 1,
+      "reason": "引用了授权管理办法附件二。",
+      "answer_evidence": "“《XX证券授权管理办法》附件二”",
+      "trace_evidence": "get_policy_doc返回03_authorization_management.md，包含附件二AR-03档位。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-cross-reference",
+      "value": 1,
+      "reason": "说明了费用报销办法指向授权管理办法附件二的交叉引用关系。",
+      "answer_evidence": "“第五条：单笔费用报销的审批权限不在本办法正文列示具体金额，统一按《XX证券授权管理办法》附件二执行。”",
+      "trace_evidence": "费用报销办法正文第五条明确指向授权管理办法附件二。",
+      "source": "llm_judge"
     },
     {
       "id": "old-value-control",
-      "score": 10,
-      "reason": "未提及旧值但当前值正确，无错误使用8000元",
-      "answer_evidence": "答案仅涉及现行制度下10000元，未出现8000元",
-      "trace_evidence": "无使用2022版记录，工具调用都针对2025版"
+      "value": 1,
+      "reason": "明确排除旧版8000元审批线。",
+      "answer_evidence": "“旧版8,000元的审批线已失效，现行有效审批线以上述附件二AR-03的10,000元为准。”",
+      "trace_evidence": "get_policy_doc获取02_expense_reimbursement_2022_deprecated.md，其第四条声明审批金额被替代。",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "提交的record_ids均在数据库中存在，未用无关记录支撑结论"
-    },
-    {
-      "id": "deprecated-policy-as-current",
-      "triggered": false,
-      "reason": "未使用已废止制度，均引用2025修订版"
-    }
-  ],
-  "overall_comment": "候选回答完全正确，明确现行审批线为10000元（含），引用有效制度，无使用旧版或虚假记录。",
+  "overall_comment": "所有检查项均满足，候选回答准确完整，引用了正确的现行制度和具体条款，金额边界清晰，并正确排除了旧版规定。",
   "confidence": 1.0
 }

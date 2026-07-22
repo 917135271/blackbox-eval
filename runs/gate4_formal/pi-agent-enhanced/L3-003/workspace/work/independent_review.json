@@ -1,0 +1,53 @@
+{
+  "decision": "pass",
+  "challenged_findings": [],
+  "review_results": [
+    {
+      "anomaly_id": "ANOM-L3-003-01",
+      "record_id": "R004225",
+      "challenge": "是否接近阈值边界？900 vs 850差距50元",
+      "resolution": "确认超标。D1级A类城市标准850元/晚，实际900元/晚，超过标准5.9%。special_approval=0，无豁免。审批链仅部门经理级别自审批，无更高审批。维持异常判定"
+    },
+    {
+      "anomaly_id": "ANOM-L3-003-02",
+      "record_id": "R004226",
+      "challenge": "是否接近阈值边界？92 vs 80差距12元",
+      "resolution": "确认超标。C类城市标准80元/日，实际92元/日，超过标准15%。special_approval=0，无豁免。维持异常判定"
+    },
+    {
+      "anomaly_id": "ANOM-L3-003-03",
+      "record_id": "R004224",
+      "challenge": "人均350 vs 300，单次700未超5000",
+      "resolution": "确认超标。人均350元>300元标准，超过16.7%。special_approval=0，无豁免。维持异常判定"
+    },
+    {
+      "anomaly_id": "ANOM-L3-003-04",
+      "record_id": "R004223",
+      "challenge": "3700 vs 3500差距200元",
+      "resolution": "确认超标。课程费每人每期≤3500元，实际3700元>3500元，超过5.7%。special_approval=0。维持异常判定。注意数据库缺少days/nights/city_tier，无法排除该记录同时涉及住宿或每日费用超标的可能性"
+    },
+    {
+      "anomaly_id": "ANOM-L3-003-05",
+      "record_id": "R004221",
+      "challenge": "650 vs 600差距50元，是否可能为月度唯一记录未超累计预算",
+      "resolution": "确认超标。任务要求办公用品仅检查单笔自身是否超过月度上限600元，不评价月度累计。650>600，special_approval=0。维持异常判定"
+    },
+    {
+      "anomaly_id": "ANOM-L3-003-06",
+      "record_id": "R004222",
+      "challenge": "330 vs 300差距30元，是否接近边界",
+      "resolution": "确认超标。任务要求通讯费用仅检查单笔自身是否超过月度上限300元，不评价月度累计。330>300，special_approval=0。维持异常判定"
+    }
+  ],
+  "supporting_evidence": [
+    "全部6条记录均通过get_expense_detail确认special_approval=0",
+    "全部6条记录的审批链均未包含专项审批角色",
+    "全量扫描覆盖4240条记录，排除special_approval=1的记录数为0（全年无special_approval记录）",
+    "SQL查询条件明确，口径一致，可复现"
+  ],
+  "opposing_evidence": [],
+  "exceptions_or_boundaries": [],
+  "required_changes": [],
+  "rationale": "逐条复查6个发现：所有发现均确认超标，special_approval均为0，审批链无专项审批。阈值差距虽小但明确超过标准，不存在豁免或例外。全量扫描方法正确，SQL条件与制度条款一一对应。",
+  "unresolved_conflicts": []
+}

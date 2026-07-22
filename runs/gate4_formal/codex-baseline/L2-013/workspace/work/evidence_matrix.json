@@ -3,36 +3,15 @@
   "coverage_percent": 100,
   "evidence_rows": [
     {
-      "anomaly_id": "ANOMALY_L2_013_01",
+      "anomaly_id": "L2-013-001",
       "record_ids": ["R004223"],
       "citations": [
         {"doc_id": "05_training_expense.md", "clause_no": "第二条"},
         {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
       ],
       "facts": [
-        "R004223 expense_type=training_fee, amount=3700.00元, special_approval=0",
-        "05_training_expense.md第二条规定培训课程费每人每期不超过3500元",
-        "3700元 > 3500元,超出标准200元",
-        "01_expense_reimbursement_2025.md第十二条规定无专项审批时报销金额不得超过对应制度标准的1.0倍",
-        "R004223无专项审批(special_approval=0),实际报销3700元超出培训费标准3500元"
-      ],
-      "fact_supported": true,
-      "rule_supported": true,
-      "coverage_status": "pass"
-    },
-    {
-      "anomaly_id": "ANOMALY_L2_013_02",
-      "record_ids": ["R004223"],
-      "citations": [
-        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"},
-        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"}
-      ],
-      "facts": [
-        "R004223 amount=3700.00元,落入AR-02档位(3000-10000元)",
-        "03_authorization_management.md附件二规定AR-02档位必要审批角色为'部门经理,并经财务复核'",
-        "R004223仅有部门经理(E0009)审批,缺少财务复核审批",
-        "list_approvals(R004223)确认只有1条审批记录,角色为部门经理",
-        "list_records_missing_approval(财务复核)结果包含R004223"
+        "R004223 培训费(外部专业培训课程费)金额为3700.00元，超出《XX证券培训费管理办法》第二条规定的每人每期3500元上限",
+        "R004223 无特殊审批(special_approval=0)，不符合《XX证券费用报销管理办法(2025修订版)》第十二条无专项审批时报销金额不得超过对应制度标准1.0倍的要求"
       ],
       "fact_supported": true,
       "rule_supported": true,

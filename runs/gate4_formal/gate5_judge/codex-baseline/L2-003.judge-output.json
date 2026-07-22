@@ -1,34 +1,38 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "audit-conclusion",
-      "score": 20,
-      "reason": "明确识别为重复报销异常，异常类型正确（虽使用自定义ID ANO-DUP-001，但本质为重复报销，与预期DUP-003同类型），结论与预期一致。",
-      "answer_evidence": "\"发现重复报销异常：发票FP202500000020（INV000020）被员工杜丹...在报销单R000020和R004203中重复使用\"",
-      "trace_evidence": "find_invoice_usage(FP202500000020) 返回两条记录，确认同一发票在R000020和R004203中使用"
+      "value": 1,
+      "reason": "候选答案明确认定'构成重复报销'，无矛盾表述。",
+      "answer_evidence": "answer:'将同一张发票...重复提交并均获批准报销，构成重复报销'",
+      "trace_evidence": "不适用，结论由最终答案直接给出",
+      "source": "llm_judge"
     },
     {
       "id": "policy-basis",
-      "score": 15,
-      "reason": "正确引用现行《XX证券费用报销管理办法（2025修订版）》第十条，该条即费用报销管理办法-6.1对应条款，直接支持重复报销认定。",
-      "answer_evidence": "\"该行为违反《XX证券费用报销管理办法（2025修订版）》第十条'同一发票最多报销1次'的规定\"",
-      "trace_evidence": "search_policy 和 get_policy_excerpt 返回第十条原文"
+      "value": 1,
+      "reason": "引用了制度第十条并准确说明其规定'同一发票最多报销1次'，支持结论。",
+      "answer_evidence": "citations:[{'clause_no':'第十条','doc_id':'01_expense_reimbursement_2025.md'}]，answer:'违反了《XX证券费用报销管理办法(2025修订版)》第十条'同一发票最多报销1次'的规定'",
+      "trace_evidence": "tool:search_policy 返回结果中包含'第十条 同一发票最多报销1次...'；tool:get_policy_excerpt 确认第十条原文",
+      "source": "llm_judge"
     },
     {
-      "id": "case-reasoning",
-      "score": 20,
-      "reason": "通过业务数据完整说明同一发票FP202500000020在R000020和R004203重复使用，金额均为669.5元，员工、费用类型等细节清晰，金额一致。",
-      "answer_evidence": "\"R000020...金额669.50元\"、\"R004203...金额669.50元\"，\"两笔报销使用同一发票FP202500000020\"",
-      "trace_evidence": "get_expense_detail(R000020) 和 get_expense_detail(R004203) 均返回 amount=669.5"
-    }
-  ],
-  "critical_failures": [
+      "id": "case-reasoning-same-invoice",
+      "value": 1,
+      "reason": "明确识别并说明同一发票FP202500000020被两条记录重复使用。",
+      "answer_evidence": "answer:'同一张发票FP202500000020（XX供应商2706，金额669.5元，住宿费）在两条报销记录R000020和R004203中重复提交'",
+      "trace_evidence": "tool:find_invoice_usage 参数 invoice_no='FP202500000020' 返回records包含record_id R000020 和 R004203",
+      "source": "llm_judge"
+    },
     {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "所有提交的record_id（R000020、R004203）均通过数据库查询确认存在，无虚构或无关记录。"
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "指出两条记录金额均为669.5元，与记录一致。",
+      "answer_evidence": "answer:'R000020（报销日期2025-01-05，报销金额669.5元）和R004203（报销日期2025-04-10，报销金额669.5元）'",
+      "trace_evidence": "tool:get_expense_detail record_id='R000020' 返回amount:669.5；tool:get_expense_detail record_id='R004203' 返回amount:669.5",
+      "source": "llm_judge"
     }
   ],
-  "overall_comment": "候选正确识别重复报销异常，依据现行制度第十条，并引用金额等关键事实，逻辑清晰，结论准确。",
+  "overall_comment": "候选答案准确识别重复报销异常，完整列出相关记录，正确引用制度依据，推理清晰，全部检查项通过。",
   "confidence": 1.0
 }

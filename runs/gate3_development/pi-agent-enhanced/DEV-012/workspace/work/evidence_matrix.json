@@ -1,0 +1,167 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-DUP-001",
+      "record_ids": ["R900001","R900002"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
+      ],
+      "facts": [
+        "发票INV900001(FPDEV900001)在R900001和R900002中重复使用",
+        "R900001: E9001, office_supplies, 2025-01-05, 金额480元",
+        "R900002: E9001, office_supplies, 2025-01-06, 金额480元",
+        "同一发票报销2次,违反\"同一发票最多报销1次\"规定"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-SPLIT-001",
+      "record_ids": ["R900003","R900004"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "R900003: E9001, travel_transport, 2025-02-03, 金额5200元",
+        "R900004: E9001, travel_transport, 2025-02-06, 金额5200元",
+        "同一员工(E9001)同一费用类型(travel_transport)间隔3天(≤7天)",
+        "合计金额10400元,达到AR-03审批线(≥10000元),存在拆分规避审批嫌疑"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-STD-001",
+      "record_ids": ["R900013"],
+      "citations": [
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R900013: E9002(经理级), travel_lodging, 一类城市(A), 2晚, 金额1400元, 每晚700元",
+        "经理级一类城市住宿标准为650元/人/晚",
+        "每晚700元 > 标准650元, 超出50元/晚, 无专项审批(special_approval=0)"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-STD-002",
+      "record_ids": ["R900005"],
+      "citations": [
+        {"doc_id": "06_business_entertainment.md", "clause_no": "第三条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R900005: E9001, business_entertainment, 2025-03-12, 金额3600元, 参与10人, 人均360元",
+        "业务招待人均标准为300元",
+        "人均360元 > 标准300元, 超出60元/人, 无专项审批(special_approval=0)"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-STD-003",
+      "record_ids": ["R900017"],
+      "citations": [
+        {"doc_id": "06_business_entertainment.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R900017: E9001, business_entertainment, 2025-10-06, 金额5200元, 参与20人, 人均260元",
+        "业务招待单次活动标准为5000元",
+        "单次5200元 > 标准5000元, 超出200元, 无专项审批(special_approval=0)"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-STD-004",
+      "record_ids": ["R900001","R900002","R900007"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "E9001 2025年1月办公用品合计: R900001(480元)+R900002(480元)=960元, 超过月控标准600元",
+        "E9001 2025年4月办公用品: R900007(650元), 超过月控标准600元",
+        "三笔记录均无专项审批(special_approval=0)"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-STD-005",
+      "record_ids": ["R900014","R900015"],
+      "citations": [
+        {"doc_id": "07_office_communication.md", "clause_no": "第三条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "E9001 2025年9月通讯费合计: R900014(180元)+R900015(160元)=340元, 超过月控标准300元",
+        "两笔记录均无专项审批(special_approval=0)"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-OVERDUE-001",
+      "record_ids": ["R900006"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第七条"}
+      ],
+      "facts": [
+        "R900006: E9001, communication, 费用发生日期2025-03-01, 报销提交日期2025-05-05",
+        "间隔65天, 超过60天期限, 超出5天"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-BUDGET-001",
+      "record_ids": ["R900019"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"},
+        {"doc_id": "08_budget_management.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "D902(开发审计二部)年度预算50000元",
+        "R900018(2025-01-15, 45000元): 累计45000元, 未超预算(上下文记录)",
+        "R900019(2025-02-15, 6000元): 累计51000元, 首次超过预算50000元, 超支1000元",
+        "R900019无专项审批(special_approval=0)",
+        "R900020虽有special_approval=1已豁免,不计入异常"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900001","R900002","R900003","R900004","R900005","R900006","R900007","R900013","R900014","R900015","R900017","R900019"],
+  "submitted_record_ids": ["R900001","R900002","R900003","R900004","R900005","R900006","R900007","R900013","R900014","R900015","R900017","R900019"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": false
+  },
+  "reconciled_figures": {
+    "total_records_checked": 21,
+    "total_anomalies": 9,
+    "total_anomaly_records": 12,
+    "rules_checked": 5,
+    "policies_cited": 7
+  },
+  "unresolved_items": []
+}

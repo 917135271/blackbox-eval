@@ -1,0 +1,223 @@
+{
+  "group": "codex-scripted-enhanced",
+  "task_id": "L2-008",
+  "case_family": "record_audit",
+  "category": "policy_data_comparison",
+  "graded_at": "2026-07-22T00:54:27+08:00",
+  "checklist_passed": 12,
+  "checklist_total": 12,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "answer中明确认定构成拆分报销且无矛盾表述",
+      "answer_evidence": "“构成将同一事项拆分为多笔以规避更高审批层级的违规行为，违反《XX证券费用报销管理办法(2025修订版)》第十一条”",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "anomaly-type-count-rule-type",
+      "value": 1,
+      "reason": "发现规则类型完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "anomaly-type-count-count",
+      "value": 1,
+      "reason": "发现数量完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r004212",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r004213",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "明确引用了费用报销办法第十一条",
+      "answer_evidence": "citations中包含{doc_id: \"01_expense_reimbursement_2025.md\", clause_no: \"第十一条\"}，answer中提及该条款",
+      "trace_evidence": "get_policy_excerpt获取了第十一条内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-authorization",
+      "value": 1,
+      "reason": "明确引用了授权管理办法附件二",
+      "answer_evidence": "citations中包含{doc_id: \"03_authorization_management.md\", clause_no: \"附件二\"}，answer中计算了AR-02和AR-03档位",
+      "trace_evidence": "get_policy_doc获取了附件二完整内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-window",
+      "value": 1,
+      "reason": "正确计算为7天窗口内（间隔6天）",
+      "answer_evidence": "“于2025年4月10日和2025年4月15日（间隔6天，在7天窗口内）”",
+      "trace_evidence": "list_expenses查询了员工E0009在2025-04-03至2025-04-17的travel_lodging记录，确认日期",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-sum",
+      "value": 1,
+      "reason": "候选提交明确说明合计金额为¥10,200。",
+      "answer_evidence": "合计¥10,200",
+      "trace_evidence": "R004212金额5100，R004213金额5100，合计10200。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-threshold",
+      "value": 1,
+      "reason": "候选提交将合计10200元与AR-03档位10000元审批线比较，得出结论达到更高审批层级。",
+      "answer_evidence": "合计¥10,200已达到AR-03档位（10000-49999元，部门总经理）",
+      "trace_evidence": "附件二显示AR-03单笔金额区间≥10000元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 111.566,
+    "expected_anomaly_ids": [
+      "SPLIT-001"
+    ],
+    "actual_anomaly_ids": [
+      "SPLIT-R004212"
+    ],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {
+        "SPLIT": 1
+      },
+      "actual_types": {
+        "SPLIT": 1
+      }
+    },
+    "expected_record_ids": [
+      "R004212",
+      "R004213"
+    ],
+    "actual_record_ids": [
+      "R004212",
+      "R004213"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 2,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "所有检查项均通过；候选提交正确推导合计金额并准确比较审批阈值，所有检查项均通过。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 11556,
+      "completion_tokens": 2269,
+      "total_tokens": 13825,
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 10404
+    },
+    "batch_count": 2,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 5869,
+          "completion_tokens": 1607,
+          "total_tokens": 7476,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1173
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 5101
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 5687,
+          "completion_tokens": 662,
+          "total_tokens": 6349,
+          "prompt_tokens_details": {
+            "cached_tokens": 384
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 428
+          },
+          "prompt_cache_hit_tokens": 384,
+          "prompt_cache_miss_tokens": 5303
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 2
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/codex-scripted-enhanced/L2-008"
+}

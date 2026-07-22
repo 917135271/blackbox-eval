@@ -1,0 +1,451 @@
+{
+  "group": "oh-my-pi-scripted-enhanced",
+  "task_id": "L3-003",
+  "case_family": "full_year_audit",
+  "category": "full_year_rule_audit",
+  "graded_at": "2026-07-22T01:04:45+08:00",
+  "checklist_passed": 16,
+  "checklist_total": 27,
+  "checklist_pass_rate": 59.259,
+  "checklist": [
+    {
+      "id": "finding-type-count-rule-type",
+      "value": 1,
+      "reason": "发现规则类型完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "finding-type-count-count",
+      "value": 0,
+      "reason": "提交发现数量为3，不符预期6",
+      "answer_evidence": "候选答案anomaly_ids仅3个",
+      "trace_evidence": "actual_anomaly_ids长度为3",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004221",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r004222",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r004223",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r004224",
+      "value": 0,
+      "reason": "提交的record_ids不含R004224",
+      "answer_evidence": "record_ids为['R004221','R004222','R004223']",
+      "trace_evidence": "提交的record_ids中无R004224",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004225",
+      "value": 0,
+      "reason": "提交的record_ids不含R004225",
+      "answer_evidence": "record_ids为['R004221','R004222','R004223']",
+      "trace_evidence": "提交的record_ids中无R004225",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004226",
+      "value": 0,
+      "reason": "提交的record_ids不含R004226",
+      "answer_evidence": "record_ids为['R004221','R004222','R004223']",
+      "trace_evidence": "提交的record_ids中无R004226",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "候选答案明确将R004221列为办公用品超标准发现，满足分组要求。",
+      "answer_evidence": "发现R004221（李丽娟，650元，2025-01-24），超出月度上限50元。",
+      "trace_evidence": "list_expenses(office_supplies, min_amount=600.01) 返回R004221；get_expense_detail(R004221) 确认金额650元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "候选答案明确将R004222列为通讯费用超标准发现，满足分组要求。",
+      "answer_evidence": "发现R004222（杨丹，330元，2025-03-20），超出月度上限30元。",
+      "trace_evidence": "list_expenses(communication, min_amount=300.01) 返回R004222；get_expense_detail(R004222) 确认金额330元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "候选答案明确将R004223列为培训费超标准发现，满足分组要求。",
+      "answer_evidence": "发现R004223（张婷，3700元，2025-05-18），超出期度上限200元。",
+      "trace_evidence": "list_expenses(training_fee, min_amount=3500.01) 返回R004223；get_expense_detail(R004223) 确认金额3700元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 0,
+      "reason": "候选提交未报告R004224，缺少该项超标准发现。",
+      "answer_evidence": "候选答案仅列出三项异常，未提及R004224。",
+      "trace_evidence": "工具调用未查询R004224；全量扫描未能覆盖该记录。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 0,
+      "reason": "候选提交未包含记录R004225",
+      "answer_evidence": "",
+      "trace_evidence": "候选提交record_ids: [\"R004221\", \"R004222\", \"R004223\"]",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 0,
+      "reason": "候选提交未包含记录R004226",
+      "answer_evidence": "",
+      "trace_evidence": "候选提交record_ids: [\"R004221\", \"R004222\", \"R004223\"]",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "工具调用summarize_expenses返回全年各费用类型记录数，list_expenses覆盖超标准筛选，证明全量扫描",
+      "answer_evidence": "办公用品扫描694条，通讯640条，培训578条等",
+      "trace_evidence": "summarize_expenses返回各费用类型record_count；list_expenses对办公用品min_amount=600.01等过滤",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-approval",
+      "value": 1,
+      "reason": "候选提交对每个异常记录确认无专项审批，且超标准记录仅这三个无专项审批",
+      "answer_evidence": "发现...无专项审批确认",
+      "trace_evidence": "get_expense_detail返回记录无special_approval标志",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-office",
+      "value": 1,
+      "reason": "办公用品仅单笔金额>600元即判定异常，符合方法要求",
+      "answer_evidence": "办公用品单笔>600元判定异常，发现R004221金额650元超标",
+      "trace_evidence": "list_expenses office_supplies min_amount=600.01返回1条记录，金额650元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-communication",
+      "value": 1,
+      "reason": "通讯费用仅单笔金额>300元即判定异常，符合方法要求",
+      "answer_evidence": "通讯费用单笔>300元判定异常，发现R004222金额330元超标",
+      "trace_evidence": "list_expenses communication min_amount=300.01返回1条记录，金额330元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-training",
+      "value": 1,
+      "reason": "培训课程费仅单次金额>3500元即判定异常，符合方法要求",
+      "answer_evidence": "培训课程费单次>3500元判定异常，发现R004223金额3700元超标",
+      "trace_evidence": "list_expenses training_fee min_amount=3500.01返回1条记录，金额3700元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-entertainment",
+      "value": 1,
+      "reason": "业务招待费同时核查单次5000元和人均300元标准，无超标，符合方法要求",
+      "answer_evidence": "业务招待费检查单次活动≤5000元，并抽查高额记录计算人均，均未超标",
+      "trace_evidence": "list_expenses business_entertainment min_amount=5000.01返回空；min_amount=300.01并查询详情检查人均",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-travel",
+      "value": 0,
+      "reason": "未对差旅住宿进行单笔扫描，未使用职级、城市档位和晚数",
+      "answer_evidence": "候选提交称差旅住宿缺少nights/days/city_tier字段无法单笔确认，不在本题扫描范围",
+      "trace_evidence": "工具调用list_expenses for travel_lodging但未获取职级、城市和晚数信息，未应用标准",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-transport",
+      "value": 0,
+      "reason": "未对市内交通进行单笔扫描，未使用城市档位和天数",
+      "answer_evidence": "候选提交未提及市内交通扫描方法",
+      "trace_evidence": "工具调用list_expenses for local_transport但未获取城市档位和天数信息，未应用标准",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 0,
+      "reason": "中间查询仅发现3条，与最终提交的3项一致，但期望为6条，不一致",
+      "answer_evidence": "提交发现3项异常（R004221,R004222,R004223），非6项",
+      "trace_evidence": "list_expenses调用仅返回3条超标记录，未达到6条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "引用了费用报销管理办法第十二条",
+      "answer_evidence": "citations中包含{\"doc_id\":\"01_expense_reimbursement_2025.md\",\"clause_no\":\"第十二条\"}",
+      "trace_evidence": "工具调用get_policy_doc获取了01_expense_reimbursement_2025.md，其中包含第十二条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-special",
+      "value": 0,
+      "reason": "候选提交未引用《业务招待费管理办法》专项标准，仅引用了办公通讯和培训费标准，未完全满足各费用类型与查询条件的对应要求。",
+      "answer_evidence": "候选提交仅引用了07号文件第二条、第三条和05号文件第二条，缺少06号《业务招待费管理办法》相关条款。",
+      "trace_evidence": "工具调用记录了获取07、05、04、06号文件，但最终提交未引用06号标准。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 224.129,
+    "expected_anomaly_ids": [
+      "OVERSTD-001",
+      "OVERSTD-002",
+      "OVERSTD-003",
+      "OVERSTD-004",
+      "OVERSTD-005",
+      "OVERSTD-006"
+    ],
+    "actual_anomaly_ids": [
+      "ANO_L3_003_001",
+      "ANO_L3_003_002",
+      "ANO_L3_003_003"
+    ],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.666667,
+      "count_exact": false,
+      "expected_types": {
+        "OVERSTD": 6
+      },
+      "actual_types": {
+        "OVERSTD": 3
+      }
+    },
+    "expected_record_ids": [
+      "R004221",
+      "R004222",
+      "R004223",
+      "R004224",
+      "R004225",
+      "R004226"
+    ],
+    "actual_record_ids": [
+      "R004221",
+      "R004222",
+      "R004223"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.666667,
+      "exact": false,
+      "missing_count": 3,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 4,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十二条"
+      },
+      {
+        "doc_id": "04_travel_expense.md",
+        "clause_no": "第三条至第六条"
+      },
+      {
+        "doc_id": "05_training_expense.md",
+        "clause_no": "第二条至第五条"
+      },
+      {
+        "doc_id": "06_business_entertainment.md",
+        "clause_no": "第二条、第三条"
+      },
+      {
+        "doc_id": "07_office_communication.md",
+        "clause_no": "第二条、第三条"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 0.975,
+    "overall_comment": "候选提交仅发现3项异常，缺少R004224、R004225、R004226，未达6项要求。；候选提交正确识别了前三项超标准异常，但遗漏了R004224，导致该项分组未满足。；候选提交仅发现3项异常，缺少R004225、R004226，但扫描范围和方法正确。；候选正确执行了所有费用类型的专项扫描方法：办公用品单笔>600元，通讯费单笔>300元，培训费单次>3500元，业务招待费双标准。报告结果与扫描方法一致。；候选答案仅扫描了3类费用，遗漏了期望的差旅住宿和市内交通超标记录，未采用正确的计算口径；政策引用正确。；政策依据检查未通过，因缺少业务招待费专项制度引用，不符合完整对应要求。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 65562,
+      "completion_tokens": 10720,
+      "total_tokens": 76282,
+      "prompt_cache_hit_tokens": 5760,
+      "prompt_cache_miss_tokens": 59802
+    },
+    "batch_count": 6,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 10981,
+          "completion_tokens": 1342,
+          "total_tokens": 12323,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 974
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 9957
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 11003,
+          "completion_tokens": 1159,
+          "total_tokens": 12162,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 646
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 9979
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 10987,
+          "completion_tokens": 2142,
+          "total_tokens": 13129,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1742
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 9963
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 10978,
+          "completion_tokens": 2065,
+          "total_tokens": 13043,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1565
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 9954
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 10982,
+          "completion_tokens": 2197,
+          "total_tokens": 13179,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1720
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 9958
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 10631,
+          "completion_tokens": 1815,
+          "total_tokens": 12446,
+          "prompt_tokens_details": {
+            "cached_tokens": 640
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1650
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 9991
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 1
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/oh-my-pi-scripted-enhanced/L3-003"
+}

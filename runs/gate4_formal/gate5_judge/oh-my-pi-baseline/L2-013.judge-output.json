@@ -1,34 +1,54 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "audit-conclusion",
-      "score": 20,
-      "reason": "正确判定为超标准异常，异常类型匹配",
-      "answer_evidence": "提交 anomaly_ids 包含 L2-013-TRAINING-OVERSTANDARD，类型为 OVERSTD；answer 明确说明构成超标准报销",
-      "trace_evidence": "工具轨迹显示查询到 R004223 金额 3700 元，查询到培训费标准 3500 元，并引用第十二条超标规定"
+      "value": 1,
+      "reason": "answer明确认定超标准且无矛盾",
+      "answer_evidence": "发现1项培训课程费超标准异常，违反超标准报销禁止",
+      "trace_evidence": "get_expense_detail确认R004223金额3700元，类型training_fee，无专项审批",
+      "source": "llm_judge"
     },
     {
-      "id": "policy-basis",
-      "score": 15,
-      "reason": "引用了费用报销管理办法-6.3 对应的现行条款（第十二条）并结合培训费标准，依据充分",
-      "answer_evidence": "citations 引用了 《XX证券费用报销管理办法(2025修订版)》第十二条 和 《XX证券培训费管理办法》第二条",
-      "trace_evidence": "轨迹中多次调用获取第十二条内容，并获取培训费管理办法全文，确认第二条标准 3500 元"
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "正确引用了费用报销办法第十二条",
+      "answer_evidence": "引用《XX证券费用报销管理办法(2025修订版)》第十二条",
+      "trace_evidence": "get_policy_doc('01_expense_reimbursement_2025.md')返回第十二条内容",
+      "source": "llm_judge"
     },
     {
-      "id": "case-reasoning",
-      "score": 20,
-      "reason": "明确说明费用类型、金额 3700 元、超标标准 3500 元、无专项审批，推理完整一致",
-      "answer_evidence": "answer 指出 '金额3700元，超出...上限3500元，且未取得专项审批'",
-      "trace_evidence": "get_expense_detail 返回 amount 3700.0；get_policy_excerpt 返回第二条不超过 3500 元；get_policy_excerpt 返回第十二条"
-    }
-  ],
-  "critical_failures": [
+      "id": "policy-basis-training",
+      "value": 1,
+      "reason": "正确引用了培训费管理办法第二条",
+      "answer_evidence": "引用《XX证券培训费管理办法》第二条",
+      "trace_evidence": "get_policy_doc('05_training_expense.md')返回第二条内容：每人每期不超过3500元",
+      "source": "llm_judge"
+    },
     {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "提交的 record_id R004223 存在于数据库，未使用无关记录"
+      "id": "case-reasoning-type",
+      "value": 1,
+      "reason": "费用类型识别正确",
+      "answer_evidence": "费用类型：培训费（training_fee）",
+      "trace_evidence": "get_expense_detail返回expense_type: 'training_fee'",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "报销金额识别正确",
+      "answer_evidence": "报销培训费¥3,700.00",
+      "trace_evidence": "get_expense_detail返回amount: 3700.0",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-limit",
+      "value": 1,
+      "reason": "标准及超标比较正确",
+      "answer_evidence": "标准不超过¥3,500.00，本次超出标准¥200.00",
+      "trace_evidence": "get_policy_doc确认第二条标准3500元，get_expense_detail确认金额3700元",
+      "source": "llm_judge"
     }
   ],
-  "overall_comment": "候选提交准确识别超标准异常，制度依据正确，推理清晰，符合预期。",
+  "overall_comment": "候选提交完整识别了超标准异常，所有检查项通过。",
   "confidence": 1.0
 }

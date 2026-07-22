@@ -1,0 +1,158 @@
+{
+  "checklist": [
+    {
+      "id": "finding-type-count-count",
+      "value": 0,
+      "reason": "候选提交的异常数量为7，不符合预期的6。",
+      "answer_evidence": "candidate_submission中anomaly_ids列表包含7个ID：ANOM-OS-001, ANOM-COMM-001, ANOM-TF-001, ANOM-BE-001, ANOM-TL-001, ANOM-TL-002, ANOM-LT-001。",
+      "trace_evidence": "无工具调用轨迹。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-no-extra",
+      "value": 0,
+      "reason": "提交的record_ids中除了预期的6条记录外，还包含大量其他记录，如R000059等。",
+      "answer_evidence": "candidate_submission的record_ids列表共有305条记录，远超预期的R004221-R004226六条。",
+      "trace_evidence": "无工具调用轨迹。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "记录R004221在候选提交中单独属于一个发现（ANOM-OS-001），符合预期分组。",
+      "answer_evidence": "candidate_evidence_matrix显示R004221仅关联到anomaly_id: ANOM-OS-001，且该发现仅有此一条记录。",
+      "trace_evidence": "无工具调用轨迹。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "记录R004222在候选提交中单独属于一个发现（ANOM-COMM-001），符合预期分组。",
+      "answer_evidence": "candidate_evidence_matrix显示R004222仅关联到anomaly_id: ANOM-COMM-001，且该发现仅有此一条记录。",
+      "trace_evidence": "无工具调用轨迹。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "记录R004223在候选提交中属于发现ANOM-TF-001，且该发现分组仅含R004223，符合预期分组。",
+      "answer_evidence": "candidate_evidence_matrix中ANOM-TF-001的record_ids为['R004223']，单记录分组。",
+      "trace_evidence": "无工具调用，依据提交的evidence_matrix分组。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 1,
+      "reason": "记录R004224在候选提交中属于发现ANOM-BE-001，分组仅含R004224，匹配预期。",
+      "answer_evidence": "candidate_evidence_matrix中ANOM-BE-001的record_ids为['R004224']。",
+      "trace_evidence": "无工具调用，依据提交的evidence_matrix分组。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 1,
+      "reason": "记录R004225在候选提交中属于发现ANOM-TL-002，分组仅含R004225。",
+      "answer_evidence": "candidate_evidence_matrix中ANOM-TL-002的record_ids为['R004225']。",
+      "trace_evidence": "无工具调用，依据提交的evidence_matrix分组。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 1,
+      "reason": "记录R004226在候选提交中属于发现ANOM-LT-001，分组仅含R004226。",
+      "answer_evidence": "candidate_evidence_matrix中ANOM-LT-001的record_ids为['R004226']。",
+      "trace_evidence": "无工具调用，依据提交的evidence_matrix分组。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 0,
+      "reason": "工具调用轨迹为空，未提供任何查询或脚本证据证明覆盖全年全部记录",
+      "answer_evidence": "候选答案声称全量扫描，但无工具轨迹支持",
+      "trace_evidence": "call_count=0，无工具调用记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-approval",
+      "value": 0,
+      "reason": "无轨迹证明查询或脚本排除了有专项审批的记录",
+      "answer_evidence": "候选答案未提及排除审批，且证据矩阵未提供相关查询",
+      "trace_evidence": "call_count=0，无工具调用记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-office",
+      "value": 0,
+      "reason": "无轨迹证明办公用品按单笔600元口径核查",
+      "answer_evidence": "证据矩阵声称办公用品单笔650元异常，但无查询逻辑显示600元阈值",
+      "trace_evidence": "call_count=0，无工具调用记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-communication",
+      "value": 0,
+      "reason": "无轨迹证明通讯费用按单笔300元口径核查",
+      "answer_evidence": "证据矩阵声称通讯费用单笔超300元，但无查询逻辑显示300元阈值",
+      "trace_evidence": "call_count=0，无工具调用记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-training",
+      "value": 1,
+      "reason": "培训费按单次3500元核查",
+      "answer_evidence": "答案中明确“培训费单笔超3500元每期上限”",
+      "trace_evidence": "无工具调用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-entertainment",
+      "value": 0,
+      "reason": "业务招待费只核查了人均标准，未核查单次5000元标准",
+      "answer_evidence": "答案只提到“业务招待费人均超300元”，未提单次标准",
+      "trace_evidence": "无工具调用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-travel",
+      "value": 1,
+      "reason": "差旅住宿使用了职级、城市档位和住宿晚数",
+      "answer_evidence": "ANOM-TL-001和ANOM-TL-002 facts中按职级和城市档位计算每晚均价",
+      "trace_evidence": "无工具调用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-transport",
+      "value": 1,
+      "reason": "市内交通使用了城市档位和出差天数",
+      "answer_evidence": "ANOM-LT-001 facts中按三类城市和1天计算日均费用",
+      "trace_evidence": "无工具调用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 0,
+      "reason": "中间统计为7类异常，与预期6项发现不一致，未满足pass_condition",
+      "answer_evidence": "答案中称合计7类异常305条记录，与预期6项发现不一致",
+      "trace_evidence": "无中间统计证据，最终提交7个anomaly_ids，305条record_ids",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 0,
+      "reason": "未引用费用报销办法第十二条",
+      "answer_evidence": "citations中无01_expense_reimbursement_2025.md第十二条",
+      "trace_evidence": "提交的citations只包含04、05、06、07号文档",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-special",
+      "value": 1,
+      "reason": "专项标准与查询条件基本对应",
+      "answer_evidence": "citations包含07_office_communication.md第二条、第三条，05_training_expense.md第二条，06_business_entertainment.md第三条，04_travel_expense.md第四条、第六条",
+      "trace_evidence": "扫描的办公通讯、培训、业务招待、差旅住宿和市内交通均引用对应专项制度条款",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交存在两个主要问题：发现数量超出预期（7而非6），且包含大量不应出现的记录ID；但R004221和R004222的记录分组正确。；所有检查项均满足：候选提交正确将指定记录作为独立发现分组，与预期一致。；候选提交缺乏必要的工具调用轨迹，无法验证全量扫描、排除审批及具体费用口径的执行过程，所有检查项均不满足。；候选提交基本正确描述了全量扫描方法，但业务招待费未体现单次5000元标准的核查。；候选提交多报告1类异常（7 vs 6），未引用总则条款，但专项标准引用基本合理。",
+  "confidence": 0.93
+}

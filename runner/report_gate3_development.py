@@ -12,6 +12,21 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from formal_eval_plan import (
+    BASELINE_GROUPS,
+    DEVELOPMENT_RUN_COUNT,
+    DEVELOPMENT_TASK_COUNT,
+    ENHANCED_GROUPS,
+    FORMAL_RUN_COUNT,
+    FORMAL_TASK_COUNT,
+    FRAMEWORK_KEYS,
+    GROUPS,
+    MODEL_NAME,
+    TASK_TIMEOUT_SECONDS,
+)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 RUN_ROOT = ROOT / "runs" / "gate3_development"
@@ -19,20 +34,6 @@ DEV = ROOT / "data" / "development"
 OUTPUT_JSON = ROOT / "output" / "gate3_development.json"
 OUTPUT_MD = ROOT / "output" / "gate3_development.md"
 FREEZE_PATH = ROOT / "config" / "gate3_frozen_lock.json"
-GROUPS = (
-    "ccb-baseline",
-    "ccb-enhanced",
-    "codex-baseline",
-    "codex-enhanced",
-    "openclaude-baseline",
-    "openclaude-enhanced",
-    "opencode-baseline",
-    "opencode-enhanced",
-    "oh-my-pi-baseline",
-    "oh-my-pi-enhanced",
-)
-BASELINE_GROUPS = tuple(group for group in GROUPS if group.endswith("baseline"))
-ENHANCED_GROUPS = tuple(group for group in GROUPS if group.endswith("enhanced"))
 
 
 def load_json(path: Path) -> Any:
@@ -242,14 +243,17 @@ def group_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def run_tests() -> dict[str, Any]:
+    env = os.environ.copy()
+    env["GATE3_BUILDING_FREEZE"] = "1"
     completed = subprocess.run(
-        [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"],
+        [sys.executable, "-m", "pytest", "-q"],
         cwd=ROOT,
         text=True,
         encoding="utf-8",
         errors="replace",
         capture_output=True,
         check=False,
+        env=env,
     )
     output = (completed.stdout + completed.stderr).strip()
     return {"ok": completed.returncode == 0, "returncode": completed.returncode, "output_tail": output[-4000:]}
@@ -309,6 +313,7 @@ def freeze_files() -> dict[str, str]:
         ROOT / "runner" / "run_gate3_development.py",
         ROOT / "runner" / "audit_trace.py",
         ROOT / "runner" / "report_gate3_development.py",
+        ROOT / "runner" / "formal_eval_plan.py",
         ROOT / "candidates" / "codex" / "deepseek_chat_proxy.py",
         ROOT / "fixtures" / "expense_query_mcp.py",
         ROOT / "fixtures" / "policy_query_mcp.py",
@@ -320,6 +325,7 @@ def freeze_files() -> dict[str, str]:
         ROOT / "domain-enhancement" / "adapters" / "openclaude" / "securities-expense-audit" / "build_manifest.json",
         ROOT / "domain-enhancement" / "adapters" / "opencode" / "securities-expense-audit" / "build_manifest.json",
         ROOT / "domain-enhancement" / "adapters" / "oh-my-pi" / "securities-expense-audit" / "build_manifest.json",
+        ROOT / "domain-enhancement" / "adapters" / "pi-agent" / "securities-expense-audit" / "build_manifest.json",
         ROOT / "data" / "formal_case_rubric",
         ROOT / "schemas" / "case-rubric.schema.json",
         ROOT / "config" / "expanded_eval_plan.yaml",
@@ -346,29 +352,40 @@ def build_report() -> dict[str, Any]:
     run_count = sum(summary["present"] for summary in summaries.values())
     source = (ROOT / "runner" / "run_gate3_development.py").read_text(encoding="utf-8")
     checks = {
-        "twelve_independent_development_tasks": len(tasks) == 12,
-        "one_hundred_twenty_runs_present": run_count == 120,
-        "at_least_eleven_submissions_per_group": all(summary["accepted"] >= 11 for summary in summaries.values()),
+        "configured_development_tasks_present": len(tasks) == DEVELOPMENT_TASK_COUNT,
+        "all_development_runs_present": run_count == DEVELOPMENT_RUN_COUNT,
+        "at_most_one_missing_submission_per_group": all(
+            summary["accepted"] >= DEVELOPMENT_TASK_COUNT - 1 for summary in summaries.values()
+        ),
         "timeouts_at_most_one_per_group": all(summary["timeouts"] <= 1 for summary in summaries.values()),
-        "preflight_used_for_every_task": all(summary["preflight_tasks"] == 12 for summary in summaries.values()),
+        "preflight_used_for_every_task": all(
+            summary["preflight_tasks"] == DEVELOPMENT_TASK_COUNT for summary in summaries.values()
+        ),
         "baseline_has_no_subagent_calls": all(not summaries[group]["subagent_calls"] for group in BASELINE_GROUPS),
         "enhanced_uses_controlled_subagents": all(sum(summaries[group]["subagent_calls"].values()) > 0 for group in ENHANCED_GROUPS),
         "enhanced_skill_workflow_loaded": all(
-            summaries[group]["skill_workflow_loaded_tasks"] == 12 for group in ENHANCED_GROUPS
+            summaries[group]["skill_workflow_loaded_tasks"] == DEVELOPMENT_TASK_COUNT for group in ENHANCED_GROUPS
         ),
-        "unified_event_stream_complete": all(summary["event_complete_tasks"] == 12 for summary in summaries.values()),
-        "artifact_manifest_present": all(summary["artifact_manifest_tasks"] == 12 for summary in summaries.values()),
-        "enhanced_checkpoint_recorded": all(summaries[group]["checkpoint_tasks"] == 12 for group in ENHANCED_GROUPS),
+        "unified_event_stream_complete": all(
+            summary["event_complete_tasks"] == DEVELOPMENT_TASK_COUNT for summary in summaries.values()
+        ),
+        "artifact_manifest_present": all(
+            summary["artifact_manifest_tasks"] == DEVELOPMENT_TASK_COUNT for summary in summaries.values()
+        ),
+        "enhanced_checkpoint_recorded": all(
+            summaries[group]["checkpoint_tasks"] == DEVELOPMENT_TASK_COUNT for group in ENHANCED_GROUPS
+        ),
         "enhanced_checkpoint_state_recoverable": all(
-            summaries[group]["checkpoint_retention_tasks"] == 12 for group in ENHANCED_GROUPS
+            summaries[group]["checkpoint_retention_tasks"] == DEVELOPMENT_TASK_COUNT for group in ENHANCED_GROUPS
         ),
         "enhanced_context_events_recorded": all(
-            summaries[group]["context_event_tasks"] == 12 for group in ENHANCED_GROUPS
+            summaries[group]["context_event_tasks"] == DEVELOPMENT_TASK_COUNT for group in ENHANCED_GROUPS
         ),
         "subagent_completion_protocol_closed": all(
-            summaries[group]["subagent_protocol_complete_tasks"] == 12 for group in ENHANCED_GROUPS
+            summaries[group]["subagent_protocol_complete_tasks"] == DEVELOPMENT_TASK_COUNT for group in ENHANCED_GROUPS
         ),
-        "oh_my_pi_native_hook_recorded": summaries["oh-my-pi-enhanced"]["native_hook_tasks"] == 12,
+        "oh_my_pi_native_hook_recorded": summaries["oh-my-pi-enhanced"]["native_hook_tasks"] == DEVELOPMENT_TASK_COUNT,
+        "pi_agent_native_hook_recorded": summaries["pi-agent-enhanced"]["native_hook_tasks"] == DEVELOPMENT_TASK_COUNT,
         "trap_false_positives_at_most_one": all(summary["trap_false_positives"] <= 1 for summary in summaries.values()),
         "single_rule_scope_is_exact": all(
             next(row for row in details[group] if row["task_id"] == "DEV-003")["record_exact"]
@@ -381,7 +398,9 @@ def build_report() -> dict[str, Any]:
     }
     passed = all(checks.values())
     diagnostics = {
-        "enhanced_correct_at_least_ten": all(summaries[group]["correct"] >= 10 for group in ENHANCED_GROUPS),
+        "enhanced_correct_within_two_of_full_score": all(
+            summaries[group]["correct"] >= DEVELOPMENT_TASK_COUNT - 2 for group in ENHANCED_GROUPS
+        ),
         "note": "Development semantic scoring is diagnostic only; development tasks have no frozen case-by-case rubric.",
     }
     report = {
@@ -401,10 +420,10 @@ def build_report() -> dict[str, Any]:
         freeze = {
             "gate": "GATE3",
             "frozen_at": report["generated_at"],
-            "model": "deepseek-v4-pro",
+            "model": MODEL_NAME,
             "groups": list(GROUPS),
-            "formal_task_count_per_group": 15,
-            "task_timeout_seconds": 900,
+            "formal_task_count_per_group": FORMAL_TASK_COUNT,
+            "task_timeout_seconds": TASK_TIMEOUT_SECONDS,
             "files": freeze_files(),
         }
         FREEZE_PATH.write_text(json.dumps(freeze, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -414,7 +433,7 @@ def build_report() -> dict[str, Any]:
 
 def markdown(report: dict[str, Any]) -> str:
     group_rows = "\n".join(
-        f"| {group} | {value['accepted']}/12 | {value['correct']}/12 | {value['trap_false_positives']} | "
+        f"| {group} | {value['accepted']}/{DEVELOPMENT_TASK_COUNT} | {value['correct']}/{DEVELOPMENT_TASK_COUNT} | {value['trap_false_positives']} | "
         f"{value['timeouts']} | {value['mean_seconds']} | {sum(value['subagent_calls'].values())} |"
         for group, value in report["groups"].items()
     )
@@ -440,11 +459,11 @@ def markdown(report: dict[str, Any]) -> str:
 
 ## 结论
 
-GATE3 **{'通过' if report['status'] == 'pass' else '未通过'}**。12道开发题只用于执行链路调试，不设置逐题Rubric。开发集使用独立的 `R900xxx` 业务记录命名空间，候选容器未挂载15道正式题、正式Ground Truth、Rubric或判卷实现。
+GATE3 **{'通过' if report['status'] == 'pass' else '未通过'}**。{DEVELOPMENT_TASK_COUNT}道开发题只用于执行链路调试，不设置逐题Rubric。开发集使用独立的 `R900xxx` 业务记录命名空间，候选容器未挂载{FORMAL_TASK_COUNT}道正式题、正式Ground Truth、Rubric或判卷实现。
 
-{'允许进入 GATE4 十组正式15题运行。' if report['allow_next_gate'] else '暂不允许进入 GATE4，需修复失败项并重新试跑。'}
+{'允许进入 GATE4 正式运行。' if report['allow_next_gate'] else '暂不允许进入 GATE4，需修复失败项并重新试跑。'}
 
-## 十组结果
+## {len(GROUPS)}组结果
 
 | 实验组 | 提交成功 | 语义正确 | 陷阱误报 | 超时 | 平均秒数 | 子智能体调用 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -474,8 +493,8 @@ GATE3 **{'通过' if report['status'] == 'pass' else '未通过'}**。12道开�
 
 - 冻结文件：`{freeze.get('path', '未生成')}`
 - 冻结文件数量：{freeze.get('file_count', 0)}
-- 正式运行单题超时：900秒
-- 正式实验：Claude Code Best、Codex、OpenClaude、OpenCode、oh-my-pi × 原生基线/领域增强，共10组，每组15题，共150次运行
+- 正式运行单题超时：{TASK_TIMEOUT_SECONDS}秒
+- 正式实验：{len(FRAMEWORK_KEYS)}个框架 × 原生基线/领域增强，共{len(GROUPS)}组，每组{FORMAL_TASK_COUNT}题，共{FORMAL_RUN_COUNT}次运行
 """
 
 

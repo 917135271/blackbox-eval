@@ -2,10 +2,58 @@
   "budget": {
     "timeout_seconds": 900
   },
-  "completed_steps": [],
-  "pending_steps": [],
+  "checkpoints": {
+    "investigation_completed": {
+      "status": "completed",
+      "summary": "发票不同(INV004228 vs INV004229)，不构成重复报销；合计500元低于AR-02审批线3000元，不构成拆分报销",
+      "timestamp": "2026-07-21T00:00:02Z"
+    },
+    "planning_completed": {
+      "artifact": "work/audit_plan.json",
+      "status": "completed",
+      "timestamp": "2026-07-21T00:00:00Z"
+    },
+    "review_ready": {
+      "coverage_percent": 100,
+      "evidence_matrix": "work/evidence_matrix.json",
+      "evidence_status": "pass",
+      "status": "completed",
+      "timestamp": "2026-07-21T00:00:03Z"
+    }
+  },
+  "completed_steps": [
+    "planning",
+    "investigation",
+    "evidence_coverage_check"
+  ],
+  "complexity": 1,
+  "pending_steps": [
+    "report",
+    "false_positive_review",
+    "validation",
+    "submission"
+  ],
   "phase": "submission_ready",
-  "scope": {},
+  "preliminary_findings": {
+    "anomaly_ids": [],
+    "conclusion": "无异常",
+    "has_anomaly": false,
+    "reasons": [
+      "R004234使用发票INV004228(FP2025X0004228)，R004235使用发票INV004229(FP2025X0004229)，发票不同，不构成重复报销",
+      "两笔报销同一员工(E0009)、同一费用类型(office_supplies)、同日(2025-10-20)，7天内合计500元，未达到AR-02较高审批线3000元，不构成拆分报销"
+    ]
+  },
+  "scope": {
+    "record_ids": [
+      "R004234",
+      "R004235"
+    ],
+    "rules": [
+      "duplicate_reimbursement",
+      "split_reimbursement"
+    ]
+  },
+  "subagent_status": "none_required",
   "submission_status": "accepted",
   "task_id": "TRAP-002",
   "unresolved_items": []

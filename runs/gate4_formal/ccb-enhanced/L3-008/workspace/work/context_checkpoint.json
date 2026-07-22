@@ -1,46 +1,187 @@
 {
-  "artifact_paths": [],
+  "artifact_paths": [
+    "final_submission.json",
+    "submission_receipt.json",
+    "traces/context_events.jsonl",
+    "traces/events.jsonl",
+    "traces/subagents.jsonl",
+    "traces/tool_calls.jsonl",
+    "work/artifact_index.json",
+    "work/audit_plan.json",
+    "work/context_checkpoint.json",
+    "work/decision_log.jsonl",
+    "work/evidence_index.json",
+    "work/evidence_matrix.json",
+    "work/final_result.json",
+    "work/policy_applicability.json",
+    "work/report_draft.json",
+    "work/task_state.json",
+    "work/validation_report.json"
+  ],
   "compacted": false,
-  "context_usage_percent": 50.0,
-  "created_at": 1784205984.2889946,
-  "estimation_method": "reported_tokens",
+  "context_usage_percent": 0.0,
+  "created_at": 1784617385.312046,
+  "estimation_method": "outer_runner_finalization",
   "retained_state": {
     "applicable_policies": [
-      "04_travel_expense.md Art 4,7",
-      "05_training_expense.md Art 5,6",
-      "01_expense_reimbursement_2025.md Art 12"
+      "04_travel_expense.md",
+      "05_training_expense.md"
     ],
-    "artifact_index": {
-      "work/audit_plan.json": "completed",
-      "work/evidence_matrix.json": "completed",
-      "work/policy_applicability.json": "completed",
-      "work/subagents/policy_researcher/policy_findings.json": "completed"
+    "artifact_index": [
+      "final_submission.json",
+      "submission_receipt.json",
+      "traces/context_events.jsonl",
+      "traces/events.jsonl",
+      "traces/subagents.jsonl",
+      "traces/tool_calls.jsonl",
+      "work/artifact_index.json",
+      "work/audit_plan.json",
+      "work/context_checkpoint.json",
+      "work/decision_log.jsonl",
+      "work/evidence_index.json",
+      "work/evidence_matrix.json",
+      "work/final_result.json",
+      "work/policy_applicability.json",
+      "work/report_draft.json",
+      "work/task_state.json",
+      "work/validation_report.json"
+    ],
+    "audit_plan": {
+      "complexity": {
+        "reasons": [
+          "制度对比事实型任务，仅涉及两个制度条款的直接读取和比较",
+          "无需数据查询、聚合、分组或批量处理",
+          "无需子智能体"
+        ],
+        "score": 1
+      },
+      "data_questions": [],
+      "evidence_requirements": [
+        "04_travel_expense.md 全文（含第四条住宿标准表、第七条衔接条款）",
+        "05_training_expense.md 全文（含第五条培训住宿标准表、第六条禁止混用条款）"
+      ],
+      "execution_steps": [
+        {
+          "action": "audit-query-planner",
+          "artifact": "work/audit_plan.json",
+          "status": "completed",
+          "step": 1
+        },
+        {
+          "action": "policy_query",
+          "artifacts": [
+            "04_travel_expense.md",
+            "05_training_expense.md"
+          ],
+          "description": "读取并对比差旅住宿和培训住宿两套制度全文",
+          "status": "completed",
+          "step": 2
+        },
+        {
+          "action": "policy-version-check",
+          "description": "检查制度版本和适用性",
+          "status": "pending",
+          "step": 3
+        },
+        {
+          "action": "evidence-coverage-check",
+          "description": "核查证据覆盖",
+          "status": "pending",
+          "step": 4
+        },
+        {
+          "action": "audit-report",
+          "description": "生成对比报告",
+          "status": "pending",
+          "step": 5
+        },
+        {
+          "action": "result-validator",
+          "description": "校验最终结果",
+          "status": "pending",
+          "step": 6
+        },
+        {
+          "action": "validate + submit",
+          "description": "验证并提交",
+          "status": "pending",
+          "step": 7
+        }
+      ],
+      "policy_questions": [
+        "差旅住宿的适用制度、标准维度（职级×城市档位）、各档位数值是什么？",
+        "培训住宿的适用制度、标准维度（仅城市档位）、各档位数值是什么？",
+        "两项制度之间的衔接条款（第七条/第六条）如何规定互斥关系？",
+        "同一城市档位下差旅标准与培训标准的数值差异及不能混用的原因"
+      ],
+      "question": "分别比较差旅住宿和培训住宿的适用制度、标准维度和数值。请列出培训住宿一、二、三类城市标准，并至少举一个同城市档位下与某职级差旅标准的数值对照，说明为什么不能混用。",
+      "required_fields": [
+        "policy_doc_id",
+        "clause_number",
+        "standard_dimension",
+        "city_tier",
+        "rank_level",
+        "amount"
+      ],
+      "scope": {
+        "audit_object": "差旅住宿 vs 培训住宿制度条款对比",
+        "business_period": "不适用（制度比较任务）",
+        "expense_types": [
+          "差旅住宿费",
+          "培训住宿费"
+        ],
+        "policies_in_scope": [
+          {
+            "clauses": [
+              "第三条",
+              "第四条",
+              "第七条"
+            ],
+            "doc_id": "04_travel_expense.md",
+            "title": "XX证券差旅费管理办法"
+          },
+          {
+            "clauses": [
+              "第五条",
+              "第六条"
+            ],
+            "doc_id": "05_training_expense.md",
+            "title": "XX证券培训费管理办法"
+          }
+        ]
+      },
+      "stopping_conditions": [
+        "两套制度的条款全文均已读取",
+        "培训住宿一、二、三类城市标准已列出",
+        "至少一个同城市档位下差旅住宿与培训住宿的数值对照已完成",
+        "不能混用的原因已基于衔接条款说明",
+        "final_result.json 通过 validate 校验",
+        "submit 成功"
+      ],
+      "subagent_plan": {
+        "reason": "复杂度1，制度条款对比任务，主智能体直接完成",
+        "use_subagent": false
+      },
+      "task_id": "L3-008",
+      "task_type": "near_clause_disambiguation",
+      "unresolved_items": []
     },
-    "audit_plan": "work/audit_plan.json",
-    "constraints": "Single-rule near_clause_disambiguation; anomaly only for training stays under travel_lodging exceeding training std",
-    "evidence_status": "pass at 100%",
-    "record_ids": [
-      "R001481",
-      "R001664",
-      "R000328",
-      "R002576",
-      "R003507",
-      "R004138",
-      "R003618",
-      "R003771",
-      "R000214",
-      "R000245",
-      "R001150",
-      "R001829",
-      "R002877",
-      "R003992",
-      "R004094"
+    "constraints": [
+      "isolated GATE3 workspace",
+      "formal answer assets prohibited",
+      "outer runner timeout enforced"
     ],
-    "remaining_budget": "sufficient",
-    "submission_status": "pending",
-    "task": "L3-008: Compare travel vs training lodging standards",
+    "evidence_status": "pass",
+    "record_ids": [],
+    "remaining_budget": {
+      "elapsed_seconds": 261.463,
+      "remaining_seconds": 638.537,
+      "timeout_seconds": 900
+    },
+    "submission_status": "accepted",
+    "task": "你正在执行 GATE4 正式证券费用审计评测，当前为领域增强组。\n\n任务ID：L3-008\n题型：near_clause_disambiguation\n问题：分别比较差旅住宿和培训住宿的适用制度、标准维度和数值。请列出培训住宿一、二、三类城市标准，并至少举一个同城市档位下与某职级差旅标准的数值对照，说明为什么不能混用。\n\n必须遵循已安装的证券费用审计 Skills；先规划并记录Checkpoint，再按触发条件调查、复核、校验并通过统一工具提交。若复杂度至少为2且存在符合路由规则的角色，必须先授权原生子智能体，并在角色结束后登记结构化摘要和产物。\n\n\n要求：\n1. 必须查询制度和只读业务库后作答，可以使用 Shell、Python、SQLite 和当前工作区临时文件。\n2. 只处理当前独立任务。禁止读取 ground_truth、cases.json、Rubric、判卷代码、历史答案、其他任务或候选轨迹，也不得访问与题目无关的互联网。\n3. anomaly_ids 必须与审计发现一一对应、稳定且类型明确；不得为了迎合未知答案猜测隐藏编号。record_ids 必须完整、准确且只覆盖本题范围。\n4. 有异常时，record_ids 只包含参与本题所问违规的记录，不含累计计算背景、有效豁免或无关规则记录；无异常时仍保留题目直接核查或结论覆盖的记录，并在 answer 中明确写“无异常”。\n5. 必须维护 work/final_result.json、work/evidence_matrix.json 和 work/validation_report.json 三个预置文件。对应Schema的绝对路径分别是 /runtime-schemas/final_result.schema.json、/runtime-schemas/evidence_matrix.schema.json 和 /runtime-schemas/validation_report.schema.json；当前工作区兼容路径分别是 /workspace/runtime-schemas/final_result.schema.json、/workspace/runtime-schemas/evidence_matrix.schema.json 和 /workspace/runtime-schemas/validation_report.schema.json。当前目录已经是 /workspace，禁止拼成 /workspace/workspace，也禁止把 .schema.json 猜成普通 .json。\n6. 先调用 audit_control.validate_audit_result；取得 valid=true 后，再以 result_path=\"work/final_result.json\" 调用 audit_control.submit_audit_result。不得把完整结果直接打印出来代替提交。\n7. 提交成功后最终只输出 GATE4_TASK_PASS；无法提交时只输出 GATE4_TASK_FAIL。\n",
     "unresolved_items": []
   },
-  "stage": "review_ready",
+  "stage": "submission_ready",
   "task_id": "L3-008"
 }

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "context-checkpoint.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "stage",
+    "context_usage_percent",
+    "compacted",
+    "retained_state",
+    "artifact_paths"
+  ],
+  "properties": {
+    "task_id": {"type": "string", "minLength": 1},
+    "stage": {
+      "type": "string",
+      "enum": [
+        "task_started",
+        "planning_completed",
+        "investigation_completed",
+        "review_ready",
+        "validation_ready",
+        "submission_ready"
+      ]
+    },
+    "context_usage_percent": {"type": "number", "minimum": 0, "maximum": 100},
+    "compacted": {"type": "boolean"},
+    "estimation_method": {"type": "string"},
+    "retained_state": {
+      "type": "object",
+      "required": [
+        "task",
+        "constraints",
+        "audit_plan",
+        "applicable_policies",
+        "record_ids",
+        "evidence_status",
+        "unresolved_items",
+        "artifact_index",
+        "remaining_budget",
+        "submission_status"
+      ]
+    },
+    "artifact_paths": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "created_at": {"type": "number"}
+  }
+}

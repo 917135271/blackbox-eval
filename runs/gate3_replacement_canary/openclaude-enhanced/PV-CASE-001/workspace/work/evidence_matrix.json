@@ -1,0 +1,134 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "finding": "住宿费标准符合制度要求",
+      "record_ids": [
+        "R004233"
+      ],
+      "facts": [
+        "杨丽华(E0012),X1级分管副总(高管级),A类城市住宿10晚,金额9990元,折合999元/晚"
+      ],
+      "rules": [
+        "04_travel_expense.md第四条: 高管级一类城市住宿标准1100元/晚"
+      ],
+      "citations": [
+        {
+          "doc_id": "04_travel_expense.md",
+          "clause_no": "第四条"
+        }
+      ],
+      "passed": true,
+      "anomaly_id": null
+    },
+    {
+      "finding": "审批路径缺少财务复核环节",
+      "record_ids": [
+        "R004233"
+      ],
+      "facts": [
+        "R004233仅有一条审批记录A004233: AR-02档位,部门经理E0008杨丹审批,缺少财务复核角色审批"
+      ],
+      "rules": [
+        "03_authorization_management.md附件二AR-02: >=3000且<10000,必要审批角色为部门经理并经财务复核"
+      ],
+      "citations": [
+        {
+          "doc_id": "03_authorization_management.md",
+          "clause_no": "附件二"
+        }
+      ],
+      "passed": false,
+      "anomaly_id": "AN-R004233-MISSING_FINANCIAL_REVIEW"
+    },
+    {
+      "finding": "发票无重复使用",
+      "record_ids": [
+        "R004233"
+      ],
+      "facts": [
+        "FP2025X0004227仅被R004233使用1次,usage_count=1"
+      ],
+      "rules": [
+        "01_expense_reimbursement_2025.md第十条: 同一发票最多报销1次"
+      ],
+      "citations": [
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第十条"
+        }
+      ],
+      "passed": true,
+      "anomaly_id": null
+    },
+    {
+      "finding": "部门预算未超限",
+      "record_ids": [
+        "R004233"
+      ],
+      "facts": [
+        "D008年度预算381600元,累计使用297095.29元,使用率77.8%,未超过100%阈值"
+      ],
+      "rules": [
+        "01_expense_reimbursement_2025.md第十三条: 预算不足时不得继续报销"
+      ],
+      "citations": [
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第十三条"
+        }
+      ],
+      "passed": true,
+      "anomaly_id": null
+    },
+    {
+      "finding": "现行审批权限适用正确,旧版制度会造成判断偏差",
+      "record_ids": [
+        "R004233"
+      ],
+      "facts": [
+        "9990元按现行2025制度属AR-02[3000,10000),需部门经理+财务复核",
+        "若按旧版2022制度>=8000元应提交部门总经理,既错误升级审批层级又忽略财务复核"
+      ],
+      "rules": [
+        "01_expense_reimbursement_2025.md第五条: 审批权限按授权管理办法附件二执行",
+        "02_expense_reimbursement_2022_deprecated.md第二条: 旧版>=8000提交部门总经理; 第四条: 旧版不得作为现行审批依据"
+      ],
+      "citations": [
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第五条"
+        },
+        {
+          "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+          "clause_no": "第二条"
+        }
+      ],
+      "passed": true,
+      "anomaly_id": null
+    }
+  ],
+  "candidate_record_ids": [
+    "R004233"
+  ],
+  "submitted_record_ids": [
+    "R004233"
+  ],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true
+  },
+  "reconciled_figures": {
+    "lodging_per_night": "9990/10=999",
+    "lodging_standard": "1100",
+    "lodging_check": "999<=1100,PASS",
+    "approval_tier": "AR-02",
+    "approval_required": "部门经理+财务复核",
+    "approval_actual": "仅部门经理"
+  },
+  "unresolved_items": []
+}

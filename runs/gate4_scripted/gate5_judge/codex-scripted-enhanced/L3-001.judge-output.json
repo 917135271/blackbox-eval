@@ -1,0 +1,94 @@
+{
+  "checklist": [
+    {
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "候选提交明确将R000002和R004201归为同一发现DUP-FP202500000002，与期望分组完全一致。",
+      "answer_evidence": "DUP-FP202500000002: 发票FP202500000002...记录R000002(2025-08-19) + R004201(2025-02-10)",
+      "trace_evidence": "find_reused_invoices返回发票FP202500000002的record_ids包含['R000002','R004201']",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "候选提交明确将R000005和R004202归为同一发现DUP-FP202500000005，与期望分组完全一致。",
+      "answer_evidence": "DUP-FP202500000005: 发票FP202500000005...记录R000005(2025-06-07) + R004202(2025-03-10)",
+      "trace_evidence": "find_reused_invoices返回发票FP202500000005的record_ids包含['R000005','R004202']",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "候选提交明确将R000020和R004203归为同一发现DUP-FP202500000020，与期望分组完全一致。",
+      "answer_evidence": "DUP-FP202500000020: 发票FP202500000020...记录R000020(2025-01-05) + R004203(2025-04-10)",
+      "trace_evidence": "find_reused_invoices返回发票FP202500000020的record_ids包含['R000020','R004203']",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 1,
+      "reason": "候选提交明确将R000028和R004204归为同一发现DUP-FP202500000028，与期望分组完全一致。",
+      "answer_evidence": "DUP-FP202500000028: 发票FP202500000028...记录R000028(2025-03-09) + R004204(2025-05-10)",
+      "trace_evidence": "find_reused_invoices返回发票FP202500000028的record_ids包含['R000028','R004204']",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 1,
+      "reason": "答案和证据矩阵明确列出R000037和R004205属于同一发现DUP-FP202500000037，工具调用了两个记录的详情。",
+      "answer_evidence": "发现详情中DUP-FP202500000037包含记录R000037和R004205。",
+      "trace_evidence": "get_expense_detail调用R000037和R004205，均返回成功，确认金额、员工等一致。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 1,
+      "reason": "答案和证据矩阵明确列出R000055和R004206属于同一发现DUP-FP202500000055，工具调用了两个记录的详情。",
+      "answer_evidence": "发现详情中DUP-FP202500000055包含记录R000055和R004206。",
+      "trace_evidence": "get_expense_detail调用R000055和R004206，均返回成功，确认金额、员工等一致。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "工具find_reused_invoices无时间过滤，扫描全部数据，返回了所有重复2次及以上的发票，覆盖全年。",
+      "answer_evidence": "答案中说“全量查询使用次数≥2的发票”。",
+      "trace_evidence": "find_reused_invoices调用参数只有min_usage_count=2，无日期限制，结果包含全年记录。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-invoice-key",
+      "value": 1,
+      "reason": "工具find_reused_invoices基于发票ID聚合识别重复使用。",
+      "answer_evidence": "答案中说“通过查询所有被使用2次及以上的发票（find_reused_invoices, min_usage_count=2）”。",
+      "trace_evidence": "find_reused_invoices返回结果中按invoice_id分组，如invoice_no: \"FP202500000002\"，包含重复记录。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-grouping",
+      "value": 1,
+      "reason": "候选提交的6个发现ID分别对应6张不同的重复发票，每组仅一项发现，符合按发票分组的要求。",
+      "answer_evidence": "anomaly_ids 包含 DUP-FP202500000002、...、DUP-FP202500000055，共6项，每项对应一个发票号。",
+      "trace_evidence": "find_reused_invoices 返回6个发票，每个发票对应一个 usage_count=2，并按发票号分组。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 1,
+      "reason": "find_reused_invoices 返回6组重复发票，最终提交的发现数量也是6，中间统计与最终结果一致。",
+      "answer_evidence": "最终提交的 record_ids 共12条，对应6个发现。",
+      "trace_evidence": "find_reused_invoices 结果预览显示 has_next: false，共6个发票对象，与最终6项发现匹配。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis",
+      "value": 1,
+      "reason": "引用了 01_expense_reimbursement_2025.md 第十条，查询条件 min_usage_count=2 直接对应条款中的“同一发票最多报销1次，重复出现应认定为重复报销风险”。",
+      "answer_evidence": "提交中 citations 包含 doc_id: 01_expense_reimbursement_2025.md, clause_no: 第十条。",
+      "trace_evidence": "search_policy 返回的第一条结果为第十条内容；find_reused_invoices 使用了 min_usage_count=2 查询重复使用发票。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交完全匹配期望的发现记录分组，所有4项均通过。；候选提交完整发现了6组重复发票，记录映射正确，全量扫描方法和重复键符合要求，制度引用准确。；候选提交完全满足所有检查项：按发票分组、数量一致、制度依据清晰。",
+  "confidence": 1.0
+}

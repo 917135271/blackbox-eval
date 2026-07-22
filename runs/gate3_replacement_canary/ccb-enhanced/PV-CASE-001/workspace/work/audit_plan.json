@@ -1,0 +1,92 @@
+{
+  "task_id": "PV-CASE-001",
+  "task_type": "policy_data_comparison",
+  "clue": "R004233",
+  "audit_scope": {
+    "record_id": "R004233",
+    "expense_type": "travel_lodging",
+    "employee_id": "E0012",
+    "department_id": "D008",
+    "expense_date": "2025-10-03",
+    "amount": 9990.0,
+    "city_tier": "A",
+    "nights": 10,
+    "business_period": "2025-10"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ1",
+      "question": "R004233的住宿费标准是否在现行制度范围内？",
+      "policy_docs": ["04_travel_expense.md"],
+      "rule": "差旅费管理办法第四条：高管级一类城市住宿标准1100元/晚",
+      "expected": "999元/晚 ≤ 1100元/晚"
+    },
+    {
+      "id": "PQ2",
+      "question": "R004233的审批路径是否符合现行授权管理办法附件二？",
+      "policy_docs": ["03_authorization_management.md", "01_expense_reimbursement_2025.md"],
+      "rule": "授权管理办法附件二：AR-02(3000-10000元)需部门经理+财务复核",
+      "expected": "9990元在AR-02区间，审批记录为部门经理"
+    },
+    {
+      "id": "PQ3",
+      "question": "历史制度(2022版)的审批线与现行制度有何差异？继续使用历史审批线会造成什么判断偏差？",
+      "policy_docs": ["02_expense_reimbursement_2022_deprecated.md", "03_authorization_management.md"],
+      "rule": "2022版：≥8000元需部门总经理；现行：AR-02(3000-10000)需部门经理+财务复核",
+      "expected": "历史规则会错误要求部门总经理审批，而现行规则下部门经理审批已足够"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ1",
+      "question": "R004233的完整费用明细和审批记录",
+      "source": "get_expense_detail(R004233)",
+      "status": "completed"
+    },
+    {
+      "id": "DQ2",
+      "question": "E0012的员工职级和职位信息",
+      "source": "get_employee(E0012)",
+      "status": "completed"
+    }
+  ],
+  "required_fields": [
+    "record_id", "amount", "nights", "city_tier", "expense_type",
+    "employee_level", "position_role", "approval_tier", "approver_role",
+    "special_approval", "status"
+  ],
+  "evidence_requirements": {
+    "expense_standard": "住宿标准表(差旅费管理办法第四条)与实报金额比较",
+    "approval_path": "授权管理办法附件二审批线与实际审批记录比较",
+    "historical_comparison": "2022版审批线与现行审批线的差异分析"
+  },
+  "execution_steps": [
+    {"step": 1, "action": "audit-query-planner", "status": "in_progress"},
+    {"step": 2, "action": "policy-version-check", "status": "pending"},
+    {"step": 3, "action": "batch-expense-analysis (single record verification)", "status": "pending"},
+    {"step": 4, "action": "evidence-coverage-check", "status": "pending"},
+    {"step": 5, "action": "false-positive-review (if triggered)", "status": "pending"},
+    {"step": 6, "action": "audit-report", "status": "pending"},
+    {"step": 7, "action": "result-validator", "status": "pending"},
+    {"step": 8, "action": "validate + submit", "status": "pending"}
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "policy version comparison (2022 vs 2025) +1",
+      "two business rules (expense standard + approval path) +1",
+      "single known record, no aggregation, no multi-policy ambiguity"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "Complexity 2, single-record verification with clear policy references. Compact main-agent execution is sufficient."
+  },
+  "stopping_conditions": [
+    "All policy questions answered with citations",
+    "Evidence matrix at 100% coverage with status pass",
+    "Validation report returns valid=true",
+    "submit_audit_result succeeds"
+  ],
+  "unresolved_items": []
+}

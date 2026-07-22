@@ -1,0 +1,94 @@
+{
+  "checklist": [
+    {
+      "id": "clean-conclusion",
+      "value": 1,
+      "reason": "候选提交明确判断R004236和R004237不构成拆分报销异常，异常ID列表为空，结论无矛盾",
+      "answer_evidence": "answer中明确写道“不构成7天内拆分报销异常”",
+      "trace_evidence": "无工具调用，答案直接陈述无异常结论",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-gap",
+      "value": 1,
+      "reason": "候选提交正确计算两笔费用发生日期间隔为8天",
+      "answer_evidence": "answer中：“R004236费用发生日期为2025-10-01，R004237费用发生日期为2025-10-09，两笔报销按费用发生日期计算间隔为8天”",
+      "trace_evidence": "无工具调用，日期间隔可从提交中直接获取",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-window",
+      "value": 1,
+      "reason": "候选提交明确指出8天超过7天聚合窗口，不满足触发条件",
+      "answer_evidence": "answer中：“超过《XX证券费用报销管理办法(2025修订版)》...第十一条规定的'7天内'触发条件”",
+      "trace_evidence": "无工具调用，判断基于制度条款",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "候选提交准确计算合计金额为10400元",
+      "answer_evidence": "answer中：“合计金额10,400元”",
+      "trace_evidence": "无工具调用，金额合计可从提交中获取",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 1,
+      "reason": "正确说明金额条件满足但时间窗口条件不满足",
+      "answer_evidence": "合计金额10,400元可达到附件二AR-03较高审批线，但因费用发生日期间隔不满足7天内要件，不构成拆分报销违规。",
+      "trace_evidence": "无工具轨迹，推理源自候选答案。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-gap",
+      "value": 0,
+      "reason": "缺少工具轨迹或工作产物证明日期间隔计算为8天",
+      "answer_evidence": "R004236费用发生日期为2025-10-01，R004237费用发生日期为2025-10-09，间隔为8天。",
+      "trace_evidence": "工具轨迹为空（call_count=0），无工作产物。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-window",
+      "value": 0,
+      "reason": "缺少工具轨迹或工作产物证明正确应用7天窗口边界",
+      "answer_evidence": "间隔为8天，超过《XX证券费用报销管理办法(2025修订版)》第十一条规定的'7天内'触发条件。",
+      "trace_evidence": "工具轨迹为空（call_count=0），无工作产物。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 0,
+      "reason": "缺少工具轨迹或工作产物证明准确计算合计金额10400元",
+      "answer_evidence": "合计金额10,400元。",
+      "trace_evidence": "工具轨迹为空（call_count=0），无工作产物。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 0,
+      "reason": "工具轨迹为空（call_count=0），未通过工具查询获取费用发生日期和金额，无法验证数据来源；候选自写的evidence_matrix和answer中的计算缺乏工具调用证据。",
+      "answer_evidence": "answer中计算了间隔8天和合计金额10400元，但无工具查询记录。",
+      "trace_evidence": "tool_trace_summary显示call_count=0，无任何工具调用样本。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用了01_expense_reimbursement_2025.md#第十一条。",
+      "answer_evidence": "citations中包含{doc_id: '01_expense_reimbursement_2025.md', clause_no: '第十一条'}，answer中提及该制度。",
+      "trace_evidence": "无需工具轨迹。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "准确引用了03_authorization_management.md#附件二。",
+      "answer_evidence": "citations中包含{doc_id: '03_authorization_management.md', clause_no: '附件二'}，answer中提及该制度。",
+      "trace_evidence": "无需工具轨迹。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交完全满足所有检查项，结论正确且推理清晰；候选提交在推理上正确阐述了金额达标但时间窗口不满足，但因完全未调用工具且未提供工作产物，三项需要数据来源或计算过程的证据检查未能通过。；拆分报销核查结论正确，但缺乏通过工具查询取证的证据；制度引用完全准确。",
+  "confidence": 0.9666666666666667
+}

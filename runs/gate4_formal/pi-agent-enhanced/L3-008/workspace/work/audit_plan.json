@@ -1,0 +1,71 @@
+{
+  "task_scope": {
+    "task_id": "L3-008",
+    "type": "near_clause_disambiguation",
+    "question": "分别比较差旅住宿和培训住宿的适用制度、标准维度和数值。请列出培训住宿一、二、三类城市标准，并至少举一个同城市档位下与某职级差旅标准的数值对照，说明为什么不能混用。",
+    "audit_object": "差旅住宿与培训住宿制度比较",
+    "expense_types": ["差旅住宿", "培训住宿"],
+    "business_period": "现行制度有效期（2025修订版）",
+    "organization_scope": "全公司"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ1",
+      "question": "差旅住宿的适用制度是什么？标准维度和数值是什么？",
+      "candidate_policies": ["04_travel_expense.md"],
+      "clauses": ["第三条", "第四条", "第五条", "第七条"]
+    },
+    {
+      "id": "PQ2",
+      "question": "培训住宿的适用制度是什么？标准维度和数值是什么？",
+      "candidate_policies": ["05_training_expense.md"],
+      "clauses": ["第五条", "第六条"]
+    },
+    {
+      "id": "PQ3",
+      "question": "两制度之间是否存在交叉引用或排他性条款？",
+      "candidate_policies": ["04_travel_expense.md", "05_training_expense.md"],
+      "clauses": ["差旅办法第七条", "培训办法第六条"]
+    }
+  ],
+  "data_questions": [],
+  "required_fields": [],
+  "evidence_requirements": [
+    "差旅住宿标准表（第四条）完整引用",
+    "培训住宿标准表（第五条）完整引用",
+    "交叉引用排他条款（差旅第七条、培训第六条）完整引用",
+    "至少一个同城市档位下的数值对照"
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "读取差旅费管理办法(04_travel_expense.md)全文", "artifact": "policy reading"},
+    {"step": 2, "action": "读取培训费管理办法(05_training_expense.md)全文", "artifact": "policy reading"},
+    {"step": 3, "action": "执行policy-version-check确认制度适用性", "artifact": "work/policy_applicability.json"},
+    {"step": 4, "action": "比较两制度的标准维度与数值", "artifact": "analysis notes"},
+    {"step": 5, "action": "执行evidence-coverage-check", "artifact": "work/evidence_matrix.json"},
+    {"step": 6, "action": "执行audit-report", "artifact": "work/report_draft.json"},
+    {"step": 7, "action": "执行result-validator", "artifact": "work/validation_report.json"},
+    {"step": 8, "action": "调用validate_audit_result预检", "artifact": "preflight result"},
+    {"step": 9, "action": "调用submit_audit_result提交", "artifact": "final submission"}
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "涉及两个制度（+1）",
+      "涉及两条业务规则（差旅住宿标准、培训住宿标准）（+1）",
+      "无版本冲突、无数据聚合需求、无阈值判断、非综合审计报告"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "复杂度2，仅涉及两个现行制度的直接比较阅读，无历史版本冲突、无数据查询需求，主智能体可直接完成"
+  },
+  "stopping_conditions": [
+    "已完整列出培训住宿三类城市标准",
+    "已提供至少一个同城市档位数值对照",
+    "已说明不能混用的制度依据",
+    "evidence_matrix状态为pass且coverage_percent为100",
+    "validation_report状态为pass",
+    "validate_audit_result返回valid=true"
+  ],
+  "unresolved_items": []
+}

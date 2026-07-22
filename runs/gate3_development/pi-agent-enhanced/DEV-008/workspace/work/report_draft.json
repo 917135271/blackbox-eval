@@ -1,0 +1,37 @@
+{
+  "audit_scope": {
+    "object": "超期报销扫描",
+    "period": "2025年度全部记录",
+    "organization": "全部门",
+    "data_scope": "expense_records全表21条记录"
+  },
+  "verified_facts": [
+    "全库21条记录延迟天数计算完毕，仅R900006(65天)超过60天阈值",
+    "R900006: expense_date=2025-03-01, reimburse_date=2025-05-05, delay=65天, special_approval=0",
+    "年末补充提交2条：R900012(21天)和R900021(6天)，均在合规期限内"
+  ],
+  "applicable_policies": [
+    "XX证券费用报销管理办法(2025修订版) 第七条: 60天报销期限",
+    "XX证券费用报销管理办法(2025修订版) 第九条: 年末补充提交例外"
+  ],
+  "findings": [
+    {
+      "anomaly_id": "ANOM-001",
+      "record_id": "R900006",
+      "policy_clause": "第七条",
+      "description": "延迟65天超过60天报销期限，无特殊审批，不适用年末例外",
+      "impact": "违规报销200元通讯费",
+      "recommendation": "应追回或补办审批手续"
+    }
+  ],
+  "impact": "1笔违规，金额200元",
+  "recommendations": ["对R900006进行追回或补充审批"],
+  "anomaly_ids": ["ANOM-001"],
+  "record_ids": ["R900006"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第七条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第九条"}
+  ],
+  "answer_text": "超期报销扫描完成，发现1笔异常R900006，年末补充提交全部合规",
+  "limitations": []
+}

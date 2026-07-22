@@ -2,11 +2,28 @@
   "status": "pass",
   "errors": [],
   "warnings": [],
-  "field_checks": {"anomaly_ids": "pass", "record_ids": "pass", "answer": "pass", "citations": "pass"},
-  "id_checks": {"record_ids_in_db": "verified", "anomaly_ids_format": "pass"},
-  "evidence_checks": {"coverage": "100%", "evidence_rows_match": true},
-  "answer_consistency_checks": {"record_count_match": true, "anomaly_count_match": true},
-  "repair_count": 1,
+  "field_checks": {
+    "anomaly_ids": {"present": true, "type": "array", "non_empty_strings": true, "unique": true},
+    "record_ids": {"present": true, "type": "array", "pattern_match": true, "unique": true},
+    "answer": {"present": true, "type": "string", "non_empty": true},
+    "citations": {"present": true, "type": "array", "each_has_doc_id_and_clause": true, "unique": true}
+  },
+  "id_checks": {
+    "record_ids_in_db": true,
+    "doc_ids_in_corpus": true,
+    "anomaly_ids_consistent": true
+  },
+  "evidence_checks": {
+    "status_pass": true,
+    "coverage_100_percent": true,
+    "anomaly_record_agreement": true
+  },
+  "answer_consistency_checks": {
+    "positive_record_ids_match": true,
+    "no_context_records": true,
+    "threshold_values_stated": true
+  },
+  "repair_count": 0,
   "repairable_fields": [],
   "submission_allowed": true
 }

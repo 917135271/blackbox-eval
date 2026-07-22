@@ -1,41 +1,28 @@
 {
   "status": "pass",
   "coverage_percent": 100,
-  "evidence_rows": [
-    {
-      "anomaly_id": "VERSION_TRAP_OLD_APPROVAL_LINE",
-      "record_ids": ["R004233"],
-      "citations": [
-        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"},
-        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第三条"},
-        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第四条"},
-        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"},
-        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条"},
-        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
-      ],
-      "facts": [
-        "2022版第二条规定单笔报销≥8000元需部门总经理审批，第三条规定≥30000元需分管副总审批",
-        "2025版第五条将审批权限统一委托给《授权管理办法》附件二，不再在本办法中列示具体金额",
-        "2025版第十四条明确自2025年1月1日起施行，2022版同时废止",
-        "2022版第四条自认审批金额已被后续制度替代，不得作为现行审批依据",
-        "现行附件二审批线为：AR-01 [0,3000)部门经理；AR-02 [3000,10000)部门经理+财务复核；AR-03 [10000,50000)部门总经理；AR-04 [50000,200000)分管副总；AR-05 [200000,∞)总经理办公会",
-        "旧版8000元部门总经理线在现行制度中无对应节点；现行AR-03上线为50000元而非旧版30000元",
-        "记录R004233金额9990元处于[8000,10000)版本陷阱区间：按旧版≥8000需部门总经理审批(会误判为审批缺失)，按现行AR-02仅需部门经理+财务复核(实际审批记录为AR-02部门经理审批，合规)",
-        "在[3000,8000)区间有94条记录：按旧版低于8000无需特别审批(会遗漏财务复核要求)，按现行AR-02需部门经理+财务复核",
-        "[30000,50000)区间虽无实际记录，但该区间同样构成版本陷阱：旧版≥30000需分管副总(误判审批缺失)，现行AR-03仅需部门总经理(合规)"
-      ],
-      "fact_supported": true,
-      "rule_supported": true,
-      "coverage_status": "pass"
-    }
-  ],
-  "candidate_record_ids": ["R004233"],
-  "submitted_record_ids": ["R004233"],
+  "evidence_rows": [],
+  "candidate_record_ids": [],
+  "submitted_record_ids": [],
   "unowned_record_ids": [],
   "unused_candidate_record_ids": [],
   "unused_citations": [],
   "missing_evidence": [],
-  "no_anomaly_coverage": {},
+  "no_anomaly_coverage": {
+    "complete": true,
+    "searched_population": "XX证券费用报销管理制度全量政策文档（2022旧版、2025修订版）及授权管理办法",
+    "query_conditions": "全文检索对比2022版与2025版审批金额线，验证交叉引用链完整性（报销管理办法第五条-授权管理办法附件二）",
+    "checked_rules": [
+      "2025修订版第五条：审批权限委托至授权管理办法附件二",
+      "2025修订版第十四条：2022版废止，2025-01-01起施行",
+      "2022版第二条：8000元-部门总经理（已废止）",
+      "2022版第三条：30000元-分管副总（已废止）",
+      "2022版第四条：审批金额已被后续制度替代（自认无效）",
+      "授权管理办法附件二：AR-01至AR-05五档现行审批线"
+    ],
+    "population_count": 3,
+    "conclusion": "无异常。2022旧版审批线（8000元/30000元）已废止；2025现行审批线为AR-01至AR-05五档体系，通过交叉引用链确立。所有政策引用均已从原文验证，版本效力状态明确。"
+  },
   "reconciled_figures": {},
   "unresolved_items": []
 }

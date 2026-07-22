@@ -1,123 +1,180 @@
 {
+  "group": "codex-baseline",
+  "task_id": "L3-010",
   "case_family": "retrieval_and_report",
-  "case_score": 100.0,
-  "case_score_raw": 100.0,
   "category": "audit_report",
-  "criteria": [
+  "graded_at": "2026-07-21T20:54:24+08:00",
+  "checklist_passed": 11,
+  "checklist_total": 11,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
     {
-      "answer_evidence": "答案中写明“现行(2025)审批线(附件二)：AR-03: 10000元≤金额<50000元 → 部门总经理”。",
-      "id": "current-threshold",
-      "reason": "明确指出2025修订版现行部门总经理审批线为10000元，金额准确且版本清晰。",
-      "score": 30.0,
-      "source": "llm_judge",
-      "trace_evidence": "轨迹中调用get_policy_doc获取03_authorization_management.md，返回附件二显示AR-03为10000元≤金额<50000元需部门总经理。"
+      "id": "current-threshold-version",
+      "value": 1,
+      "reason": "明确识别现行版本为2025修订版",
+      "answer_evidence": "现行制度《XX证券费用报销管理办法(2025修订版)》",
+      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md 返回标题含2025修订版",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "答案中写明“旧版(2022)审批线：单笔≥8000元 → 部门总经理审批”，并说明“2022版已被2025修订版废止”。",
-      "id": "old-threshold-status",
-      "reason": "正确指出2022版8000元审批线已废止，旧值与废止状态均明确。",
-      "score": 25.0,
-      "source": "llm_judge",
-      "trace_evidence": "轨迹中get_policy_doc返回02_expense_reimbursement_2022_deprecated.md，第二条提及8000元审批线，第四条声明不得作为现行审批依据。"
+      "id": "current-threshold-amount",
+      "value": 1,
+      "reason": "明确给出现行部门总经理审批线10000元",
+      "answer_evidence": "部门总经理审批线：新版10000元（AR-03）",
+      "trace_evidence": "get_policy_doc 03_authorization_management.md 附件二显示AR-03金额区间为10000-50000元",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "答案中写明“2025修订版不再在正文列示审批金额，统一按《XX证券授权管理办法》(XX证综规〔2025〕丙号)附件二执行”。",
-      "id": "cross-reference",
-      "reason": "完整说明2025修订版报销办法通过授权管理办法附件二取得现行审批金额，制度关系清晰。",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "轨迹中get_policy_doc返回01_expense_reimbursement_2025.md，第五条明确审批权限统一按授权管理办法附件二执行。"
+      "id": "old-threshold-status-amount",
+      "value": 1,
+      "reason": "明确给出旧版审批线8000元",
+      "answer_evidence": "旧版制度...单笔报销金额达到8000元的，应提交部门总经理审批（第二条）",
+      "trace_evidence": "get_policy_doc 02_expense_reimbursement_2022_deprecated.md 第二条写明8000元",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "答案中说明“区间[8000, 10000)：旧版要求部门总经理审批，现行仅需部门经理+财务复核……会将本区间内合规报销误判”及“审计建议……审批规则配置进行版本基线审查”。",
-      "id": "risk-explanation",
-      "reason": "具体解释了[8000,10000)和[30000,50000)区间的误判风险，并给出实证案例与版本校验建议，风险及建议均具体。",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": ""
+      "id": "old-threshold-status-status",
+      "value": 1,
+      "reason": "明确说明旧版废止，不再适用",
+      "answer_evidence": "该版制度已于2025年1月1日起废止...不得作为现行审批依据（第四条；2025修订版第十四条）",
+      "trace_evidence": "02文档第四条声明审批金额已被替代，01文档第十四条可佐证",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "答案按背景、新旧对比、误判风险、实证案例、建议结构化叙述，且submitted_json中anomaly_ids、record_ids与内容一致。",
+      "id": "cross-reference-expense",
+      "value": 1,
+      "reason": "正确引用费用报销办法第五条",
+      "answer_evidence": "现行制度《XX证券费用报销管理办法(2025修订版)》第五条...",
+      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md 第五条写明按附件二执行",
+      "source": "llm_judge"
+    },
+    {
+      "id": "cross-reference-relation",
+      "value": 1,
+      "reason": "正确说明第五条将金额授权给附件二",
+      "answer_evidence": "现行金额交叉引用依据：2025修订版第五条->授权管理办法附件二",
+      "trace_evidence": "01文档第五条指向授权管理办法附件二，03文档附件二提供审批表",
+      "source": "llm_judge"
+    },
+    {
+      "id": "cross-reference-authorization",
+      "value": 1,
+      "reason": "明确引用附件二中的现行金额",
+      "answer_evidence": "《XX证券授权管理办法》附件二费用报销审批权限表...AR-03: >=10000...部门总经理",
+      "trace_evidence": "get_policy_doc 03_authorization_management.md 返回附件二完整表格，含AR-03等",
+      "source": "llm_judge"
+    },
+    {
+      "id": "risk-explanation-risk",
+      "value": 1,
+      "reason": "具体说明使用8000元旧线会导致过度审批和误判",
+      "answer_evidence": "以记录R004233为例...旧版视角下的违规在现行制度下完全合规...8000-10000元区间旧版错误要求部门总经理审批（过度审批）",
+      "trace_evidence": "tool_trace列出该记录金额9990元，审批实际tier为AR-02",
+      "source": "llm_judge"
+    },
+    {
+      "id": "risk-explanation-control",
+      "value": 1,
+      "reason": "提出可执行的版本校验措施",
+      "answer_evidence": "制度检索锁定...交叉引用完整性校验...版本生效日期校验...审批线差异告警...定期制度清理",
+      "trace_evidence": "无直接工具调用，但answer内容完整",
+      "source": "llm_judge"
+    },
+    {
       "id": "report-shape",
-      "reason": "以审计说明形式提交，事实、规则、判断和建议一致，字段之间无冲突。",
-      "score": 5.0,
-      "source": "llm_judge",
-      "trace_evidence": "提交的anomaly_ids为VERSION_TRAP_DEPRECATED_APPROVAL_LINE，record_ids为R004233，与叙述中的版本陷阱和案例记录完全吻合。"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "",
-      "score_cap": 20,
+      "value": 1,
+      "reason": "以审计说明形式提交，事实、规则、判断和建议表达完整且一致",
+      "answer_evidence": "全文分四部分：新旧审批线、对比与交叉引用、使用旧版可能误判、版本校验措施；未发现矛盾",
+      "trace_evidence": "候选提交字段一致，无冲突",
       "source": "llm_judge"
     },
     {
-      "id": "deprecated-policy-as-current",
-      "triggered": false,
-      "reason": "",
-      "score_cap": 40,
-      "source": "llm_judge"
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 305.77,
+    "expected_anomaly_ids": [],
     "actual_anomaly_ids": [
-      "VERSION_TRAP_DEPRECATED_APPROVAL_LINE"
+      "VN-001"
     ],
+    "anomaly_metrics": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "count_exact": false,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": null,
     "actual_record_ids": [
       "R004233"
     ],
-    "anomaly_metrics": {
-      "actual_types": {},
-      "count_exact": false,
-      "expected_types": {},
-      "f1": 0.0,
-      "precision": 0.0,
-      "recall": 0.0
-    },
-    "citation_count": 6,
-    "elapsed_seconds": 129.736,
-    "expected_anomaly_ids": [],
-    "expected_record_ids": null,
     "record_metrics": null,
-    "required_citations": [
-      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
-      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount"
-    ],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
-    "trap_tokens_in_conclusion": [
-      "VERSION_TRAP_DEPRECATED_APPROVAL_LINE"
-    ],
-    "unknown_record_ids": []
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 9,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第五条、第十四条"
+      },
+      {
+        "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+        "clause_no": "第一条、第二条、第四条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T22:25:58+08:00",
-  "group": "codex-baseline",
   "judge": {
-    "attempt": 1,
-    "confidence": 1.0,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "候选答案准确识别并解释了旧版审批线导致的版本陷阱，所有评分项均获得满分，证据充分且表述符合审计说明形式。",
     "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "所有检查项均满足，候选提交完整且准确地完成了版本陷阱审计说明的要求。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 2094,
-      "completion_tokens_details": {
-        "reasoning_tokens": 1355
-      },
-      "prompt_cache_hit_tokens": 1152,
-      "prompt_cache_miss_tokens": 4528,
-      "prompt_tokens": 5680,
-      "prompt_tokens_details": {
-        "cached_tokens": 1152
-      },
-      "total_tokens": 7774
-    }
+      "prompt_tokens": 8337,
+      "completion_tokens": 1861,
+      "total_tokens": 10198,
+      "prompt_cache_hit_tokens": 8320,
+      "prompt_cache_miss_tokens": 17
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 8337,
+          "completion_tokens": 1861,
+          "total_tokens": 10198,
+          "prompt_tokens_details": {
+            "cached_tokens": 8320
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 871
+          },
+          "prompt_cache_hit_tokens": 8320,
+          "prompt_cache_miss_tokens": 17
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 10
+      }
+    ]
   },
-  "passed": true,
-  "run_path": "runs/gate4_formal/codex-baseline/L3-010",
-  "task_id": "L3-010"
+  "run_path": "runs/gate4_formal/codex-baseline/L3-010"
 }

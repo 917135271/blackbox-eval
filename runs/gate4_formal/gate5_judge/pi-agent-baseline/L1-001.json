@@ -1,0 +1,151 @@
+{
+  "group": "pi-agent-baseline",
+  "task_id": "L1-001",
+  "case_family": "policy_and_version",
+  "category": "policy_qa",
+  "graded_at": "2026-07-21T21:06:57+08:00",
+  "checklist_passed": 8,
+  "checklist_total": 8,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "current-threshold-amount",
+      "value": 1,
+      "reason": "候选答案明确给出了10000元",
+      "answer_evidence": "大于等于10000元（含）且小于50000元时，需要部门总经理审批",
+      "trace_evidence": "get_policy_doc('03_authorization_management.md')返回附件二AR-03档位区间为大于等于10000元且小于50000元，审批角色为部门总经理",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-threshold-inclusive",
+      "value": 1,
+      "reason": "候选答案明确说明了达到10000元即适用",
+      "answer_evidence": "大于等于10000元（含）",
+      "trace_evidence": "同上，附件二明确区间包含左端点",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-version",
+      "value": 1,
+      "reason": "候选答案明确识别现行版本为2025修订版",
+      "answer_evidence": "现行制度为《XX证券费用报销管理办法(2025修订版)》",
+      "trace_evidence": "list_policy_docs返回含01_expense_reimbursement_2025.md，且在get_policy_doc中获取了该文档",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-expense-rule",
+      "value": 1,
+      "reason": "候选答案引用了费用报销办法第五条",
+      "answer_evidence": "引用《XX证券费用报销管理办法(2025修订版)》第五条",
+      "trace_evidence": "get_policy_doc('01_expense_reimbursement_2025.md')返回第五条内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-authorization",
+      "value": 1,
+      "reason": "候选答案引用了授权管理办法附件二",
+      "answer_evidence": "引用《XX证券授权管理办法》附件二",
+      "trace_evidence": "get_policy_doc('03_authorization_management.md')返回附件二内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-cross-reference",
+      "value": 1,
+      "reason": "候选答案说明了审批金额由第五条指向附件二取得",
+      "answer_evidence": "该条款将审批金额的具体标准委托至授权管理办法附件二",
+      "trace_evidence": "01_expense_reimbursement_2025.md第五条：统一按《XX证券授权管理办法》附件二执行",
+      "source": "llm_judge"
+    },
+    {
+      "id": "old-value-control",
+      "value": 1,
+      "reason": "候选答案明确排除了旧版8000元审批线",
+      "answer_evidence": "旧版8000元部门总经理审批线已失效，不得继续适用",
+      "trace_evidence": "get_policy_doc('02_expense_reimbursement_2022_deprecated.md')返回第四条：审批金额已被后续制度替代，不得作为现行审批依据",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 99.569,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": null,
+    "actual_record_ids": [
+      "R004207",
+      "R004233"
+    ],
+    "record_metrics": null,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 7,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第五条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选答案准确给出了现行部门总经理审批金额10000元，引用了正确的制度条款，并排除了旧版8000元，所有检查项均通过。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 5230,
+      "completion_tokens": 2234,
+      "total_tokens": 7464,
+      "prompt_cache_hit_tokens": 5120,
+      "prompt_cache_miss_tokens": 110
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 5230,
+          "completion_tokens": 2234,
+          "total_tokens": 7464,
+          "prompt_tokens_details": {
+            "cached_tokens": 5120
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1531
+          },
+          "prompt_cache_hit_tokens": 5120,
+          "prompt_cache_miss_tokens": 110
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 7
+      }
+    ]
+  },
+  "run_path": "runs/gate4_formal/pi-agent-baseline/L1-001"
+}

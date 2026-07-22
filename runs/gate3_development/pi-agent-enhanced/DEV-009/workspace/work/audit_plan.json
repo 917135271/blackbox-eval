@@ -1,0 +1,44 @@
+{
+  "task_scope": "核查R900008与R900009是否为重复报销（同日同额同费用类型）",
+  "audit_period": "根据两条记录的实际日期确定",
+  "policy_questions": [
+    "什么是重复报销？制度如何定义重复报销（同一发票多次报销）？",
+    "不同发票但同日同额同类型的两个报销是否构成重复报销？"
+  ],
+  "data_questions": [
+    "R900008与R900009的详情：日期、金额、费用类型、发票号、员工、部门、审批状态",
+    "两条记录是否关联同一张发票？",
+    "两条记录的发票号是否相同或存在交叉使用？"
+  ],
+  "required_fields": ["record_id", "expense_date", "amount", "expense_type", "invoice_no", "employee_id", "department_id", "status", "approvals"],
+  "evidence_requirements": [
+    "R900008完整详情含发票信息",
+    "R900009完整详情含发票信息",
+    "重复报销相关制度条款"
+  ],
+  "execution_steps": [
+    "1. 获取R900008和R900009详情",
+    "2. 检索重复报销制度条款",
+    "3. 比对发票号是否相同",
+    "4. 若不同发票 → 无异常；若同发票 → 重复报销",
+    "5. false-positive review（紧凑模式）",
+    "6. evidence-coverage-check",
+    "7. 写入final_result.json",
+    "8. result-validator",
+    "9. validate + submit"
+  ],
+  "complexity_score": 1,
+  "complexity_reasons": [
+    "仅两条已知记录的单规则核查",
+    "无需聚合/分组/批处理",
+    "无需版本检查",
+    "仅需比对发票号"
+  ],
+  "subagent_plan": "无；complexity=1，主上下文处理",
+  "stopping_conditions": [
+    "明确两条记录的发票号是否相同",
+    "不同发票 → 判定无异常并停止",
+    "同发票 → 确认重复报销"
+  ],
+  "unresolved_items": []
+}

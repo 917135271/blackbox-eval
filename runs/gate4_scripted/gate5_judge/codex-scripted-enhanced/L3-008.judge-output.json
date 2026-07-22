@@ -1,0 +1,134 @@
+{
+  "checklist": [
+    {
+      "id": "travel-dimensions-policy",
+      "value": 1,
+      "reason": "明确提及差旅住宿适用《XX证券差旅费管理办法》。",
+      "answer_evidence": "差旅住宿适用《XX证券差旅费管理办法》（XX证行规〔2025〕丁号）",
+      "trace_evidence": "工具调用获取04_travel_expense.md并返回内容。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "travel-dimensions-job-level",
+      "value": 1,
+      "reason": "明确提及差旅住宿按员工职级区分。",
+      "answer_evidence": "差旅住宿标准按「职级 × 城市档位」二维矩阵确定：职级分员工级、经理级、部门负责人级、高管级四档",
+      "trace_evidence": "工具返回04_travel_expense.md第三条和第四条显示按员工职级和城市档位确定。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "travel-dimensions-city-tier",
+      "value": 1,
+      "reason": "明确提及差旅住宿按城市档位区分。",
+      "answer_evidence": "城市档位分一类、二类、三类三档",
+      "trace_evidence": "同上，第三条和第四条显示城市档位。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-policy",
+      "value": 1,
+      "reason": "明确提及培训住宿适用《XX证券培训费管理办法》。",
+      "answer_evidence": "培训住宿适用《XX证券培训费管理办法》（XX证人规〔2025〕戊号）",
+      "trace_evidence": "工具调用获取05_training_expense.md并返回内容。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-tier-a",
+      "value": 1,
+      "reason": "回答明确给出了一类城市培训住宿标准为500元/人/晚，单位正确。",
+      "answer_evidence": "回答中“一类城市：500元/人/晚”。",
+      "trace_evidence": "工具get_policy_doc(05_training_expense.md)返回第五条表格中一类城市500元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-tier-b",
+      "value": 1,
+      "reason": "回答明确给出了二类城市培训住宿标准为420元/人/晚，单位正确。",
+      "answer_evidence": "回答中“二类城市：420元/人/晚”。",
+      "trace_evidence": "工具get_policy_doc(05_training_expense.md)返回第五条表格中二类城市420元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-tier-c",
+      "value": 1,
+      "reason": "回答明确给出了三类城市培训住宿标准为350元/人/晚，单位正确。",
+      "answer_evidence": "回答中“三类城市：350元/人/晚”。",
+      "trace_evidence": "工具get_policy_doc(05_training_expense.md)返回第五条表格中三类城市350元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-scenario",
+      "value": 1,
+      "reason": "回答给出了明确的一类城市档位和员工级、经理级等差旅职级对照，满足要求。",
+      "answer_evidence": "回答中“以一类城市为例：员工级差旅450元 vs 培训500元……经理级差旅650元……”，城市档位和职级均明确。",
+      "trace_evidence": "工具get_policy_doc(04_travel_expense.md)返回第四条表格中员工级一类城市450元，证实对照可查。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-travel-value",
+      "value": 1,
+      "reason": "候选提交给出的一类城市员工级450元等与《差旅费管理办法》第四条一致",
+      "answer_evidence": "第四点以一类城市为例列出员工级差旅450元、经理级650元等",
+      "trace_evidence": "get_policy_doc(04_travel_expense.md)返回文本中包含第四条住宿标准表，员工级一类450元等",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-training-value",
+      "value": 1,
+      "reason": "候选提交给出的培训住宿一类500、二类420、三类350与《培训费管理办法》第五条一致",
+      "answer_evidence": "第三点明确列出培训住宿一二三类城市标准分别为500元、420元、350元",
+      "trace_evidence": "get_policy_doc(05_training_expense.md)返回文本中第五条表格一类城市500元、二类420元、三类350元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-same-tier",
+      "value": 1,
+      "reason": "候选提交明确以一类城市为例进行数值对照，培训与差旅数值均基于一类城市",
+      "answer_evidence": "第四点开头“以一类城市为例”，并列出培训500元与该城市各职级差旅数值",
+      "trace_evidence": "轨迹中制度文档一类城市定义一致，无冲突",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-mixing-scenario",
+      "value": 1,
+      "reason": "候选提交引用《差旅费管理办法》第七条和《培训费管理办法》第六条，明确区分场景并禁止混用",
+      "answer_evidence": "第五点引用条例并说明差旅住宿对应公务出差，培训住宿对应学习培训，业务性质不同",
+      "trace_evidence": "04_travel_expense.md第七条明确培训期间住宿不适用本办法住宿表；05_training_expense.md第六条明确不得与差旅住宿标准混用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-mixing-dimensions",
+      "value": 1,
+      "reason": "答案明确区分了差旅按职级和城市、培训仅按城市",
+      "answer_evidence": "二、标准维度比较：差旅住宿标准按「职级 × 城市档位」二维矩阵确定；培训住宿标准仅按「城市档位」一维确定",
+      "trace_evidence": "trace中获取04_travel_expense.md第三条显示按职级和城市档位，获取05_training_expense.md第五条显示仅按城市档位",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-mixing-conclusion",
+      "value": 1,
+      "reason": "答案明确作出不得混用结论",
+      "answer_evidence": "五、为什么不能混用：2.《XX证券培训费管理办法》第六条明确规定：「培训住宿标准仅适用于培训期间住宿，不得与差旅住宿标准混用」",
+      "trace_evidence": "trace中获取05_training_expense.md第六条明确禁止混用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "comparison-evidence-travel",
+      "value": 0,
+      "reason": "候选提交的citations仅包含第四条和第七条，缺少第三条",
+      "answer_evidence": "citations字段中只有第四、七条，答案文本未明确引用第三条",
+      "trace_evidence": "工具获取了04_travel_expense.md，其中包含第三条，但最终提交未引用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "comparison-evidence-training",
+      "value": 1,
+      "reason": "答案引用了第五、六条",
+      "answer_evidence": "citations字段包含第五条和第六条；答案文本明确引用「依据《XX证券培训费管理办法》第五条」和第六条",
+      "trace_evidence": "trace中获取05_training_expense.md，包含第五、六条",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交准确识别了差旅和培训住宿的适用制度、标准维度及区分，满足所有检查项。；候选答案准确给出了培训住宿三类城市标准，并提供了明确的对照场景，全部检查项通过。；候选提交准确比较了差旅与培训住宿的适用制度、标准维度和数值，所列标准与制度完全一致，并正确说明了同一城市档位下的数值对照和禁止混用的理由。；候选答案准确比较了两套标准的维度差异，明确禁止混用，但差旅制度引用遗漏第三条，略有不足。",
+  "confidence": 0.975
+}

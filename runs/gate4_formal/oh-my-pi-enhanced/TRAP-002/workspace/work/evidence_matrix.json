@@ -2,25 +2,34 @@
   "status": "pass",
   "coverage_percent": 100,
   "evidence_rows": [],
-  "candidate_record_ids": ["R000002", "R004201"],
-  "submitted_record_ids": ["R000002", "R004201"],
+  "candidate_record_ids": ["R004234", "R004235"],
+  "submitted_record_ids": ["R004234", "R004235"],
   "unowned_record_ids": [],
   "unused_candidate_record_ids": [],
   "unused_citations": [],
   "missing_evidence": [],
   "no_anomaly_coverage": {
     "complete": true,
-    "searched_population": "发票FP202500000002的所有使用记录（find_invoice_usage查询）",
-    "query_conditions": "invoice_no='FP202500000002'",
-    "checked_rules": ["01_expense_reimbursement_2025.md 第十条：同一发票最多报销1次"],
+    "searched_population": "R004234和R004235两笔报销记录，以及E0009在2025-10-13至2025-10-27期间的office_supplies类型报销",
+    "query_conditions": {
+      "records_detail": ["get_expense_detail(R004234)", "get_expense_detail(R004235)"],
+      "invoice_usage": ["find_invoice_usage(FP2025X0004228)", "find_invoice_usage(FP2025X0004229)"],
+      "window_scan": "list_expenses(employee_id=E0009, expense_type=office_supplies, date_from=2025-10-13, date_to=2025-10-27)"
+    },
+    "checked_rules": [
+      "第十条 重复报销：FP2025X0004228 ≠ FP2025X0004229，发票不同，不构成",
+      "第十一条 拆分报销：E0009+office_supplies+0天<7天，合计500.00元<3000元AR-02线，未达到较高审批线，不构成"
+    ],
     "population_count": 2,
-    "conclusion": "R004201为明确标注的'重复发票注入样本'（reason字段以'重复发票注入样本:'为前缀，record_no使用BX2025X前缀），属于测试注入记录，不作为真实业务报销。R000002为正常业务报销。两者不构成真实重复报销违规。无异常。"
+    "conclusion": "无异常：R004234和R004235使用不同发票，不构成重复报销；合计金额500元未达到较高审批线(AR-02,≥3000元)，不构成拆分报销。"
   },
   "reconciled_figures": {
-    "invoice_usage_count": 2,
-    "total_amount": 847.58,
-    "injection_record_count": 1,
-    "real_record_count": 1
+    "total_records_checked": 2,
+    "invoice_count_distinct": 2,
+    "max_date_interval_days": 0,
+    "combined_amount": 500.00,
+    "approval_tier_individual": "AR-01",
+    "approval_tier_combined": "AR-01"
   },
   "unresolved_items": []
 }

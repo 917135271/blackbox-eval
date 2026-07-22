@@ -1,0 +1,191 @@
+{
+  "group": "pi-agent-baseline",
+  "task_id": "L2-013",
+  "case_family": "record_audit",
+  "category": "policy_data_comparison",
+  "graded_at": "2026-07-21T21:07:28+08:00",
+  "checklist_passed": 11,
+  "checklist_total": 11,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "候选答案明确判定“构成超标准报销异常”，无矛盾表述。",
+      "answer_evidence": "“构成超标准报销异常”",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "anomaly-type-count-rule-type",
+      "value": 1,
+      "reason": "发现规则类型完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "anomaly-type-count-count",
+      "value": 1,
+      "reason": "发现数量完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r004223",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "引用了费用报销办法第十二条，符合超标准总则条款。",
+      "answer_evidence": "citations 引用了 01_expense_reimbursement_2025.md 第十二条",
+      "trace_evidence": "get_policy_doc 获取到第十二条“无专项审批时，报销金额不得超过对应制度标准的1.0倍”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-training",
+      "value": 1,
+      "reason": "引用了培训费管理办法第二条，明确3500元标准。",
+      "answer_evidence": "citations 引用了 05_training_expense.md 第二条",
+      "trace_evidence": "get_policy_doc 获取到第二条“培训课程费按人次控制，每人每期不超过3500元”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-type",
+      "value": 1,
+      "reason": "费用类型识别为 training_fee，正确。",
+      "answer_evidence": "“费用类型为training_fee（培训课程费）”",
+      "trace_evidence": "get_expense_detail 结果显示 expense_type: training_fee",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "报销金额识别为 3700 元，正确。",
+      "answer_evidence": "“报销金额3700元”",
+      "trace_evidence": "get_expense_detail 结果显示 amount: 3700.0",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-limit",
+      "value": 1,
+      "reason": "标准 3500 元与超标 200 元比较正确。",
+      "answer_evidence": "“适用标准...每人每期不超过3500元，实际3700元超出标准200元”",
+      "trace_evidence": "get_policy_doc 第二条标准 3500 元，get_expense_detail 金额 3700 元，比对正确",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 114.429,
+    "expected_anomaly_ids": [
+      "OVERSTD-001"
+    ],
+    "actual_anomaly_ids": [
+      "L2-013-001"
+    ],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {
+        "OVERSTD": 1
+      },
+      "actual_types": {
+        "OVERSTD": 1
+      }
+    },
+    "expected_record_ids": [
+      "R004223"
+    ],
+    "actual_record_ids": [
+      "R004223"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 2,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十二条"
+      },
+      {
+        "doc_id": "05_training_expense.md",
+        "clause_no": "第二条"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选提交完全满足所有检查项：明确判定超标准，正确引用制度条款，费用类型、金额、标准及比较均准确无误。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 4936,
+      "completion_tokens": 1746,
+      "total_tokens": 6682,
+      "prompt_cache_hit_tokens": 4864,
+      "prompt_cache_miss_tokens": 72
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4936,
+          "completion_tokens": 1746,
+          "total_tokens": 6682,
+          "prompt_tokens_details": {
+            "cached_tokens": 4864
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1159
+          },
+          "prompt_cache_hit_tokens": 4864,
+          "prompt_cache_miss_tokens": 72
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 6
+      }
+    ]
+  },
+  "run_path": "runs/gate4_formal/pi-agent-baseline/L2-013"
+}

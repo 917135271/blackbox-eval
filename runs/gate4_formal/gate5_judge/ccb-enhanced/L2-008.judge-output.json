@@ -1,34 +1,54 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "audit-conclusion",
-      "score": 20,
-      "reason": "结论明确识别为拆分报销，异常类型正确。",
-      "answer_evidence": "候选回答明确指出“该行为符合拆分报销规避审批权限的认定标准，构成拆分报销异常”，异常ID为SPLIT-001。",
-      "trace_evidence": "工具调用获取R004212和R004213详情，确认同一员工(E0009)同一费用类型(travel_lodging)5天内两笔各5100元，合计10200元，符合拆分报销特征。"
+      "value": 1,
+      "reason": "answer明确认定构成拆分报销且无矛盾表述",
+      "answer_evidence": "构成Article 11规定的拆分规避审批行为",
+      "trace_evidence": "最终答案明确表述",
+      "source": "llm_judge"
     },
     {
-      "id": "policy-basis",
-      "score": 15,
-      "reason": "正确引用费用报销管理办法第十一条（对应评测条款6.2）和授权管理办法附件二，条款有效且直接支持结论。",
-      "answer_evidence": "citations中引用了“第十一条”(01_expense_reimbursement_2025.md)和“附件二”(03_authorization_management.md)。",
-      "trace_evidence": "工具调用获取了01_expense_reimbursement_2025.md和03_authorization_management.md全文，第十一条明确7天内拆分规避审批的规则，附件二定义了AR-02/AR-03审批线。"
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "引用拆分报销规则条款",
+      "answer_evidence": "citations中包含01_expense_reimbursement_2025.md#第十一条",
+      "trace_evidence": "工具调用get_policy_doc获取该文档,内容包含第十一条",
+      "source": "llm_judge"
     },
     {
-      "id": "case-reasoning",
-      "score": 20,
-      "reason": "完整计算并说明7天窗口内合计10200元，超过10000元审批线，单笔与合计审批档位对比清晰。",
-      "answer_evidence": "候选回答说明“两笔报销...合计金额10200元已达到AR-03审批档位(10000-50000元)”，并指出单笔在AR-02档位(3000-10000元)。",
-      "trace_evidence": "get_expense_detail返回R004212金额5100元、日期2025-04-10，R004213金额5100元、日期2025-04-15，间隔5天；get_policy_doc确认AR-02(3000-10000)和AR-03(10000-50000)审批线。"
-    }
-  ],
-  "critical_failures": [
+      "id": "policy-basis-authorization",
+      "value": 1,
+      "reason": "引用10000元审批线出处",
+      "answer_evidence": "citations中包含03_authorization_management.md#附件二",
+      "trace_evidence": "工具调用get_policy_doc获取该文档,内容包含附件二审批表",
+      "source": "llm_judge"
+    },
     {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "提交的record_ids均为数据库中存在的R004212和R004213，无虚构或无关记录。"
+      "id": "case-reasoning-window",
+      "value": 1,
+      "reason": "正确计算为7天窗口内(间隔5天)",
+      "answer_evidence": "日期窗口:2025-04-10至2025-04-15,间隔5天,落入7天核查窗口",
+      "trace_evidence": "R004212 expense_date 2025-04-10, R004213 expense_date 2025-04-15,间隔5天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-sum",
+      "value": 1,
+      "reason": "合计金额计算为10200元",
+      "answer_evidence": "合计金额:¥10,200",
+      "trace_evidence": "两笔金额各5100,合计10200",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-threshold",
+      "value": 1,
+      "reason": "合计金额与10000元审批线正确比较,达到AR-03档位",
+      "answer_evidence": "合计¥10,200达到AR-03档位(10,000-50,000)",
+      "trace_evidence": "附件二AR-03下限10000元,合计10200超出",
+      "source": "llm_judge"
     }
   ],
-  "overall_comment": "候选提交准确识别了拆分报销异常，制度引用正确，推理严谨，结论与预期一致。",
+  "overall_comment": "候选提交准确识别拆分报销异常,正确引用制度条款,日期窗口和金额计算无误,结论明确,所有检查项通过。",
   "confidence": 1.0
 }

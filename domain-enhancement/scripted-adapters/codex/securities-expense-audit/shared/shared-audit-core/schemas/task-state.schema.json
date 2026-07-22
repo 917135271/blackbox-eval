@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "task-state.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "phase",
+    "scope",
+    "budget",
+    "completed_steps",
+    "pending_steps",
+    "unresolved_items",
+    "submission_status"
+  ],
+  "properties": {
+    "task_id": {"type": "string", "minLength": 1},
+    "phase": {"type": "string", "minLength": 1},
+    "scope": {"type": "object"},
+    "budget": {"type": "object"},
+    "completed_steps": {"type": "array", "items": {"type": "string"}},
+    "pending_steps": {"type": "array", "items": {"type": "string"}},
+    "unresolved_items": {"type": "array"},
+    "submission_status": {
+      "type": "string",
+      "enum": ["not_submitted", "repair_required", "accepted", "rejected"]
+    }
+  }
+}

@@ -2,26 +2,26 @@
   "status": "pass",
   "coverage_percent": 100,
   "evidence_rows": [],
-  "candidate_record_ids": ["R000002","R000005","R000020","R000028","R000037","R000055","R004201","R004202","R004203","R004204","R004205","R004206"],
-  "submitted_record_ids": ["R000002","R000005","R000020","R000028","R000037","R000055","R004201","R004202","R004203","R004204","R004205","R004206"],
+  "candidate_record_ids": ["R004236", "R004237"],
+  "submitted_record_ids": ["R004236", "R004237"],
   "unowned_record_ids": [],
   "unused_candidate_record_ids": [],
   "unused_citations": [],
   "missing_evidence": [],
   "no_anomaly_coverage": {
     "complete": true,
-    "searched_population": "全部发票重复使用记录：通过find_reused_invoices(min_usage_count=2)发现6张发票(FP202500000002, FP202500000005, FP202500000020, FP202500000028, FP202500000037, FP202500000055)各被2条报销记录使用，共计12条记录",
-    "query_conditions": "find_reused_invoices(min_usage_count=2), get_expense_detail逐条获取全部12条记录详情",
-    "checked_rules": ["01_expense_reimbursement_2025.md 第十条：同一发票最多报销1次"],
-    "population_count": 12,
-    "conclusion": "6条R0042XX记录reason字段均标注「重复发票注入样本」，为测试注入记录，非真实业务违规。原记录R0000XX为正常业务报销，各仅使用发票一次。十二条记录均不构成真实异常。"
+    "searched_population": "员工E0010(闭想)在2025-09-24至2025-10-16期间的所有travel_lodging类型报销记录",
+    "query_conditions": "employee_id=E0010, expense_type=travel_lodging, date_from=2025-09-24, date_to=2025-10-16",
+    "checked_rules": ["拆分报销 — 01_expense_reimbursement_2025.md 第十一条"],
+    "population_count": 2,
+    "conclusion": "R004236(2025-10-01)与R004237(2025-10-09)费用发生日期间隔为8天,超过制度第十一条规定的7天阈值,不构成拆分报销。合计金额¥10,400虽达到AR-03较高审批线¥10,000,但7天条件不满足,制度不触发拆分核查。"
   },
   "reconciled_figures": {
-    "total_records_investigated": 12,
-    "original_records": 6,
-    "injection_sample_records": 6,
-    "reused_invoices": 6,
-    "anomalies_found": 0
+    "record_count": 2,
+    "total_amount": 10400.0,
+    "date_interval_days": 8,
+    "threshold_days": 7,
+    "threshold_amount": 10000.0
   },
   "unresolved_items": []
 }

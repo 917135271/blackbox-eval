@@ -1,0 +1,213 @@
+{
+  "group": "opencode-scripted-enhanced",
+  "task_id": "L2-013",
+  "case_family": "record_audit",
+  "category": "policy_data_comparison",
+  "graded_at": "2026-07-22T00:59:45+08:00",
+  "checklist_passed": 11,
+  "checklist_total": 11,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "答案明确表述'R004223超标准'，无矛盾。",
+      "answer_evidence": "提交答案：'R004223超标准：培训费3700元超标准3500元'",
+      "trace_evidence": "无工具调用痕迹，结论直接来自候选答案。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "anomaly-type-count-rule-type",
+      "value": 1,
+      "reason": "发现规则类型完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "anomaly-type-count-count",
+      "value": 1,
+      "reason": "发现数量完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r004223",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "引用中包含费用报销办法第十二条。",
+      "answer_evidence": "citations数组中有{'doc_id': '01_expense_reimbursement_2025.md', 'clause_no': '第十二条'}",
+      "trace_evidence": "无工具调用痕迹，引用来自候选提交的citations字段。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-training",
+      "value": 1,
+      "reason": "引用中包含培训费管理办法第二条。",
+      "answer_evidence": "citations数组中有{'doc_id': '05_training_expense.md', 'clause_no': '第二条'}",
+      "trace_evidence": "无工具调用痕迹，引用来自候选提交的citations字段。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-type",
+      "value": 1,
+      "reason": "答案明确指出费用为培训费。",
+      "answer_evidence": "答案称'培训费3700元'，识别为培训费。",
+      "trace_evidence": "无工具调用痕迹，答案文本本身即证据。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "正确识别报销金额为3700元",
+      "answer_evidence": "答案中明确说明培训费3700元，证据矩阵事实也列出3700.00元",
+      "trace_evidence": "无工具调用记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-limit",
+      "value": 1,
+      "reason": "正确说明标准3500元且超出200元",
+      "answer_evidence": "答案中写明超标准3500元，证据矩阵引用第二条标准并指出超出200元",
+      "trace_evidence": "无工具调用记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 202.563,
+    "expected_anomaly_ids": [
+      "OVERSTD-001"
+    ],
+    "actual_anomaly_ids": [
+      "ANO-L2013-001"
+    ],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {
+        "OVERSTD": 1
+      },
+      "actual_types": {
+        "OVERSTD": 1
+      }
+    },
+    "expected_record_ids": [
+      "R004223"
+    ],
+    "actual_record_ids": [
+      "R004223"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 3,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十二条"
+      },
+      {
+        "doc_id": "05_training_expense.md",
+        "clause_no": "第二条"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选提交准确识别了超标准异常，并提供了相关制度引用，所有检查项均通过。；金额与标准识别均正确，结论无误",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 3625,
+      "completion_tokens": 1729,
+      "total_tokens": 5354,
+      "prompt_cache_hit_tokens": 1280,
+      "prompt_cache_miss_tokens": 2345
+    },
+    "batch_count": 2,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 1909,
+          "completion_tokens": 1256,
+          "total_tokens": 3165,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 857
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 1141
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 1716,
+          "completion_tokens": 473,
+          "total_tokens": 2189,
+          "prompt_tokens_details": {
+            "cached_tokens": 512
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 304
+          },
+          "prompt_cache_hit_tokens": 512,
+          "prompt_cache_miss_tokens": 1204
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 2
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/opencode-scripted-enhanced/L2-013"
+}

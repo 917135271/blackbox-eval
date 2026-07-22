@@ -1,0 +1,233 @@
+{
+  "task": "2025全年单笔超标准专项扫描",
+  "audit_period": "2025-01-01 至 2025-12-31",
+  "global_exclusion": "special_approval=1 (全部记录special_approval=0，无排除)",
+  "total_expense_types_scanned": 6,
+  "total_full_population": 4240,
+  "total_anomalies": 6,
+  "summary": {
+    "office_supplies": {
+      "full_count": 694,
+      "anomalies": 1,
+      "record_ids": [
+        "R004221"
+      ]
+    },
+    "communication": {
+      "full_count": 640,
+      "anomalies": 1,
+      "record_ids": [
+        "R004222"
+      ]
+    },
+    "travel_lodging": {
+      "full_count": 883,
+      "anomalies": 1,
+      "record_ids": [
+        "R004225"
+      ]
+    },
+    "business_entertainment": {
+      "full_count": 675,
+      "anomalies": 1,
+      "record_ids": [
+        "R004224"
+      ]
+    },
+    "training_fee": {
+      "full_count": 578,
+      "anomalies": 1,
+      "record_ids": [
+        "R004223"
+      ]
+    },
+    "local_transport": {
+      "full_count": 770,
+      "anomalies": 1,
+      "record_ids": [
+        "R004226"
+      ]
+    }
+  },
+  "all_anomaly_record_ids": [
+    "R004221",
+    "R004222",
+    "R004225",
+    "R004224",
+    "R004223",
+    "R004226"
+  ],
+  "detailed_results": {
+    "office_supplies": {
+      "rule": "单笔金额 > 600元",
+      "policy": {
+        "doc_id": "07_office_communication.md",
+        "clause_no": "第二条"
+      },
+      "full_count": 694,
+      "candidate_count": 1,
+      "anomaly_record_ids": [
+        "R004221"
+      ],
+      "details": [
+        {
+          "record_id": "R004221",
+          "employee_id": "E0007",
+          "department_id": "D007",
+          "expense_date": "2025-01-24",
+          "amount": 650.0,
+          "reason": "项目资料及办公耗材采购",
+          "city_tier": null
+        }
+      ]
+    },
+    "communication": {
+      "rule": "单笔金额 > 300元",
+      "policy": {
+        "doc_id": "07_office_communication.md",
+        "clause_no": "第三条"
+      },
+      "full_count": 640,
+      "candidate_count": 1,
+      "anomaly_record_ids": [
+        "R004222"
+      ],
+      "details": [
+        {
+          "record_id": "R004222",
+          "employee_id": "E0008",
+          "department_id": "D008",
+          "expense_date": "2025-03-20",
+          "amount": 330.0,
+          "reason": "业务通讯费",
+          "city_tier": null
+        }
+      ]
+    },
+    "travel_lodging": {
+      "rule": "每夜间单价(amount/nights) > 城市职级标准",
+      "policy": {
+        "doc_id": "04_travel_expense.md",
+        "clause_no": "第四条"
+      },
+      "standards": {
+        "员工级-一类": 450,
+        "员工级-二类": 380,
+        "员工级-三类": 300,
+        "经理级-一类": 650,
+        "经理级-二类": 550,
+        "经理级-三类": 450,
+        "部门负责人级-一类": 850,
+        "部门负责人级-二类": 700,
+        "部门负责人级-三类": 600,
+        "高管级-一类": 1100,
+        "高管级-二类": 900,
+        "高管级-三类": 750
+      },
+      "full_count": 883,
+      "candidate_count": 1,
+      "anomaly_record_ids": [
+        "R004225"
+      ],
+      "details": [
+        {
+          "record_id": "R004225",
+          "employee_id": "E0007",
+          "employee_level": "部门负责人级",
+          "department_id": "D007",
+          "expense_date": "2025-08-15",
+          "amount": 900.0,
+          "nights": 1,
+          "per_night": 900.0,
+          "city_tier": "一类",
+          "standard": 850,
+          "excess": 50.0,
+          "reason": "项目现场住宿费"
+        }
+      ]
+    },
+    "business_entertainment": {
+      "rule": "amount > 5000 或 amount/participants > 300",
+      "policy": {
+        "doc_id": "06_business_entertainment.md",
+        "clause_no": "第二条,第三条"
+      },
+      "full_count": 675,
+      "candidate_count": 1,
+      "anomaly_record_ids": [
+        "R004224"
+      ],
+      "details": [
+        {
+          "record_id": "R004224",
+          "employee_id": "E0010",
+          "department_id": "D010",
+          "expense_date": "2025-07-18",
+          "amount": 700.0,
+          "participants": 2,
+          "per_person": 350.0,
+          "violations": [
+            "人均350.0 > 300"
+          ],
+          "reason": "客户交流活动招待费",
+          "city_tier": null
+        }
+      ]
+    },
+    "training_fee": {
+      "rule": "单笔金额 > 3500元",
+      "policy": {
+        "doc_id": "05_training_expense.md",
+        "clause_no": "第二条"
+      },
+      "full_count": 578,
+      "candidate_count": 1,
+      "anomaly_record_ids": [
+        "R004223"
+      ],
+      "details": [
+        {
+          "record_id": "R004223",
+          "employee_id": "E0009",
+          "department_id": "D009",
+          "expense_date": "2025-05-18",
+          "amount": 3700.0,
+          "reason": "外部专业培训课程费",
+          "city_tier": null
+        }
+      ]
+    },
+    "local_transport": {
+      "rule": "每日单价(amount/days) > 包干标准",
+      "policy": {
+        "doc_id": "04_travel_expense.md",
+        "clause_no": "第六条"
+      },
+      "standards": {
+        "一类": 120,
+        "二类": 100,
+        "三类": 80
+      },
+      "full_count": 770,
+      "candidate_count": 1,
+      "anomaly_record_ids": [
+        "R004226"
+      ],
+      "details": [
+        {
+          "record_id": "R004226",
+          "employee_id": "E0008",
+          "department_id": "D008",
+          "expense_date": "2025-10-16",
+          "amount": 92.0,
+          "days": 1,
+          "per_day": 92.0,
+          "city_tier": "三类",
+          "standard": 80,
+          "excess": 12.0,
+          "reason": "市内业务交通费"
+        }
+      ]
+    }
+  }
+}

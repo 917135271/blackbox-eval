@@ -1,0 +1,26 @@
+{
+  "decision": "pass",
+  "challenged_findings": [
+    {
+      "anomaly_id": "ANOM-001",
+      "challenge": "是否存在豁免或系统默认包含财务复核",
+      "result": "三笔记录special_approval均为0,无豁免;每笔仅一条审批记录(A004209/A004219/A004220),均只有部门经理角色无财务复核,违规确认"
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "challenge": "两笔是否属于同一事项拆分,10400仅超出AR-03线400元是否边界豁免",
+      "result": "同一员工/同类型/4天间隔/同酒店/同理由,符合第十一条拆分核查条件;合计10400≥AR-03线10000,无专项审批,违规确认"
+    }
+  ],
+  "supporting_evidence": [
+    "三笔审批链查询均仅返回一条AR-02部门经理审批,无财务复核角色",
+    "R004219与R004220间隔4天,均travel_lodging,均安程酒店,均项目现场住宿费"
+  ],
+  "opposing_evidence": [],
+  "exceptions_or_boundaries": [
+    "ANOM-002: 合计10400仅超出AR-03线400元,但政策第十一条以'达到'为条件无浮动范围,且无特殊审批"
+  ],
+  "required_changes": [],
+  "rationale": "所有发现经过反向验证,无豁免适用,无边界豁免,无证据冲突,确认为真实异常",
+  "unresolved_conflicts": []
+}

@@ -1,0 +1,38 @@
+{
+  "status": "pass",
+  "coverage_pct": 100,
+  "record_ids": ["R000028", "R004204"],
+  "evidence_rows": [
+    {
+      "record_ids": ["R000028", "R004204"],
+      "anomaly_id": "AN-RA-CASE-001-001",
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
+      ],
+      "facts": [
+        "发票FP202500000028在R000028和R004204中被重复使用,usage_count=2",
+        "R000028: E0036张林, D010, 通讯费165.58元, 2025-03-09",
+        "R004204: E0036张林, D010, 通讯费165.58元, 2025-05-10"
+      ],
+      "fact_evidence": {
+        "status": "pass",
+        "pass_count": 3,
+        "total_count": 3,
+        "evidence": [
+          {"source": "find_invoice_usage", "key": "FP202500000028", "status": "pass"},
+          {"source": "get_expense_detail", "key": "R000028", "status": "pass"},
+          {"source": "get_expense_detail", "key": "R004204", "status": "pass"}
+        ]
+      },
+      "rule_evidence": {
+        "status": "pass",
+        "pass_count": 1,
+        "total_count": 1,
+        "evidence": [
+          {"source": "search_policy", "key": "同一发票 最多报销 重复报销", "status": "pass"}
+        ]
+      },
+      "status": "pass"
+    }
+  ]
+}

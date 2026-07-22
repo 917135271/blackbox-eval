@@ -1,0 +1,37 @@
+{
+  "decision": "pass",
+  "challenged_findings": [
+    {
+      "anomaly_id": "ANOM-001",
+      "challenge": "发票FP202500000028重复使用是否可能为合法补报或更正?",
+      "response": "排除。两份记录(R000028和R004204)均为approved状态,分别在不同月份独立审批通过,均无special_approval豁免,不属于更正或补报场景。制度第十条明确'同一发票最多报销1次',无例外条款。",
+      "outcome": "confirmed"
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "challenge": "月度上限300元是否可能有豁免?两笔记录是否可能因特殊审批而豁免?",
+      "response": "排除。R000028和R002127的special_approval均为0,无专项审批豁免。制度第十二条规定'无专项审批时,报销金额不得超过对应制度标准的1.0倍'。两笔合计449.52元超过300元上限。R000028(3月9日)与R002127(3月17日)相隔8天,不触发第十一条7天拆分核查,但月度上限违规独立成立。",
+      "outcome": "confirmed"
+    }
+  ],
+  "supporting_evidence": [
+    "R000028: amount=165.58, expense_date=2025-03-09, special_approval=0",
+    "R002127: amount=283.94, expense_date=2025-03-17, special_approval=0",
+    "R004204: amount=165.58, expense_date=2025-05-10, special_approval=0",
+    "March 2025 total: 165.58 + 283.94 = 449.52 > 300"
+  ],
+  "opposing_evidence": [],
+  "exceptions_or_boundaries": {
+    "checked": ["special_approval", "7-day split window", "60-day timing", "department budget", "approval tier"],
+    "results": {
+      "special_approval": "none found on any record",
+      "split_window": "8 days, not within 7-day window for Article 11",
+      "timing": "R000028: 57 days, within 60-day limit",
+      "budget": "D010 cumulative 139,536.39 + 165.58 + 283.94 = 139,985.91 < 164,500 annual budget",
+      "approval_tier": "All amounts < 3000, AR-01 sufficient"
+    }
+  },
+  "required_changes": [],
+  "rationale": "两项异常均有明确制度支撑且无例外条件。发票重复使用是绝对禁止条款;月度上限违规有明确算术事实支持且无专项审批豁免。",
+  "unresolved_conflicts": []
+}

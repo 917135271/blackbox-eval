@@ -1,119 +1,152 @@
 {
+  "group": "oh-my-pi-enhanced",
+  "task_id": "L3-006",
   "case_family": "policy_and_version",
-  "case_score": 77.5,
-  "case_score_raw": 77.5,
   "category": "version_trap",
-  "criteria": [
+  "graded_at": "2026-07-21T21:05:57+08:00",
+  "checklist_passed": 7,
+  "checklist_total": 8,
+  "checklist_pass_rate": 87.5,
+  "checklist": [
     {
-      "answer_evidence": "根据《XX证券授权管理办法》附件二AR-03档，单笔金额大于等于10000元且小于50000元",
       "id": "current-value",
-      "reason": "明确指出现行部门总经理审批线为10000元",
-      "score": 30.0,
-      "source": "llm_judge",
-      "trace_evidence": "调用get_policy_doc获取03_authorization_management.md，返回AR-03: 大于等于10000元且小于50000元，部门总经理"
+      "value": 1,
+      "reason": "候选答案明确给出2025修订版现行值为10000元。",
+      "answer_evidence": "答案中写道：\"单笔报销金额≥10,000元且<50,000元时，必要审批角色为部门总经理。\"",
+      "trace_evidence": "工具调用 get_policy_doc 03_authorization_management.md 显示附件二 AR-03 为 \"大于等于10000元且小于50000元\"。",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "2022版已被2025修订版第十四条正式废止，且2022版自身声明仅作制度沿革留档、审批金额已失效。",
-      "id": "deprecated-value",
-      "reason": "正确指出旧版已废止，但未明确提及废止金额8000元",
-      "score": 12.5,
-      "source": "llm_judge",
-      "trace_evidence": "调用get_policy_doc获取02_expense_reimbursement_2022_deprecated.md，其中旧版规定8000元部门总经理审批，且声明废止。"
+      "id": "deprecated-value-amount",
+      "value": 0,
+      "reason": "候选答案未明确给出2022版审批线8000元。",
+      "answer_evidence": "答案全文未出现\"8000\"或\"八千元\"等表述。",
+      "trace_evidence": "工具调用 get_policy_doc 02_expense_reimbursement_2022_deprecated.md 显示第二条记载\"单笔报销金额达到8000元的\"，但候选答案未引用该金额。",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "费用报销审批线应采用2025修订版（XX证财规〔2025〕甲号），而非2022版。",
+      "id": "deprecated-value-status",
+      "value": 1,
+      "reason": "候选答案明确说明2022版已废止。",
+      "answer_evidence": "答案中写道：\"2022版：已废止（废止依据：2025修订版第十四条；2022版第一条、第四条自述存档且金额已替代）\"。",
+      "trace_evidence": "工具调用 get_policy_excerpt 01_expense_reimbursement_2025.md 第十四条明确废止旧版；02文档第一条、第四条声明存档和替代。",
+      "source": "llm_judge"
+    },
+    {
       "id": "applicable-version",
-      "reason": "明确选择2025修订版，并说明2022版已废止的理由",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "轨迹中查阅了01和02文档，确认2025为现行版，2022已废止。"
+      "value": 1,
+      "reason": "候选答案正确选择2025修订版并说明了施行日期和废止旧版的时间适用关系。",
+      "answer_evidence": "答案第一段：\"应采用《XX证券费用报销管理办法（2025修订版）》（XX证财规〔2025〕甲号），自2025年1月1日起施行。原《XX证券费用报销管理办法（2022版）》已被第十四条明确废止。\"",
+      "trace_evidence": "工具调用 get_policy_doc 01_expense_reimbursement_2025.md 第十四条明确自2025年1月1日施行并废止旧版。",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "citations中包含01_expense_reimbursement_2025.md的第五条和第十四条。",
-      "id": "two-version-evidence",
-      "reason": "提供了2025版文档引用，但未引用2022版文档",
-      "score": 10.0,
-      "source": "llm_judge",
-      "trace_evidence": "轨迹中调用了02_expense_reimbursement_2022_deprecated.md，但未在答案或citations中提供该文档引用。"
+      "id": "two-version-evidence-current",
+      "value": 1,
+      "reason": "候选答案引用了2025修订版第十四条作为现行效力依据。",
+      "answer_evidence": "citations 中引用 01_expense_reimbursement_2025.md 第十四条，答案提及\"已被第十四条明确废止\"。",
+      "trace_evidence": "工具调用 get_policy_excerpt 01_expense_reimbursement_2025.md 返回第十四条关于废止的内容。",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "",
+      "id": "two-version-evidence-deprecated",
+      "value": 1,
+      "reason": "候选答案引用了2022版第一条、第四条说明其废止状态。",
+      "answer_evidence": "citations 中引用 02_expense_reimbursement_2022_deprecated.md 第一条、第四条，答案提及\"2022版第一条、第四条自述存档\"。",
+      "trace_evidence": "工具调用 get_policy_doc 02_expense_reimbursement_2022_deprecated.md 第一条声明仅存档，第四条声明金额已替代。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-version-evidence-amount",
+      "value": 1,
+      "reason": "候选答案引用了授权管理办法附件二中的AR-03档位作为10000元审批依据。",
+      "answer_evidence": "citations 中引用 03_authorization_management.md 附件二，答案提及\"附件二「费用报销审批权限表」档位AR-03\"。",
+      "trace_evidence": "工具调用 get_policy_doc 03_authorization_management.md 附件二显示 AR-03 为\"大于等于10000元且小于50000元\"。",
+      "source": "llm_judge"
+    },
+    {
       "id": "submission",
+      "value": 1,
       "reason": "统一提交已接受且Schema有效",
-      "score": 5.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "未提交任何record_id",
-      "score_cap": 20,
-      "source": "llm_judge"
-    },
-    {
-      "id": "deprecated-policy-as-current",
-      "triggered": false,
-      "reason": "未使用废止制度形成现行适用结论，明确采用2025版",
-      "score_cap": 40,
-      "source": "llm_judge"
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 409.126,
+    "expected_anomaly_ids": [],
     "actual_anomaly_ids": [],
-    "actual_record_ids": [],
     "anomaly_metrics": {
-      "actual_types": {},
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
       "count_exact": true,
       "expected_types": {},
-      "f1": 1.0,
-      "precision": 1.0,
-      "recall": 1.0
+      "actual_types": {}
     },
-    "citation_count": 3,
-    "elapsed_seconds": 208.569,
-    "expected_anomaly_ids": [],
     "expected_record_ids": null,
+    "actual_record_ids": [],
     "record_metrics": null,
-    "required_citations": [
-      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
-      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount",
-      "document:01_expense_reimbursement_2025.md",
-      "document:02_expense_reimbursement_2022_deprecated.md"
-    ],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
     "trap_tokens_in_conclusion": [],
-    "unknown_record_ids": []
+    "citation_count": 6,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十四条"
+      },
+      {
+        "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+        "clause_no": "第一条、第二条、第四条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T22:31:58+08:00",
-  "group": "oh-my-pi-enhanced",
   "judge": {
-    "attempt": 1,
-    "confidence": 0.95,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "回答正确采用2025修订版，部门总经理审批线准确，但未明确提及旧版8000元废止金额，且缺少旧版文档引用。",
     "status": "ok",
+    "confidence": 0.99,
+    "overall_comment": "候选答案准确给出了现行审批线、版本适用性和废止状态，并引用了正确的制度依据，但未明确提及2022版8000元具体金额，导致该检查项未通过。其余检查项均满足要求。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 2873,
-      "completion_tokens_details": {
-        "reasoning_tokens": 2270
-      },
-      "prompt_cache_hit_tokens": 1024,
-      "prompt_cache_miss_tokens": 2770,
-      "prompt_tokens": 3794,
-      "prompt_tokens_details": {
-        "cached_tokens": 1024
-      },
-      "total_tokens": 6667
-    }
+      "prompt_tokens": 6578,
+      "completion_tokens": 2924,
+      "total_tokens": 9502,
+      "prompt_cache_hit_tokens": 6528,
+      "prompt_cache_miss_tokens": 50
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 6578,
+          "completion_tokens": 2924,
+          "total_tokens": 9502,
+          "prompt_tokens_details": {
+            "cached_tokens": 6528
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1934
+          },
+          "prompt_cache_hit_tokens": 6528,
+          "prompt_cache_miss_tokens": 50
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 7
+      }
+    ]
   },
-  "passed": true,
-  "run_path": "runs/gate4_formal/oh-my-pi-enhanced/L3-006",
-  "task_id": "L3-006"
+  "run_path": "runs/gate4_formal/oh-my-pi-enhanced/L3-006"
 }

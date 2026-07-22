@@ -1,0 +1,94 @@
+{
+  "checklist": [
+    {
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "候选提交将R000002和R004201归入同一异常ID DUP-INV000002，符合预期。",
+      "answer_evidence": "answer中record_ids列表包含R000002和R004201，anomaly_ids中的DUP-INV000002对应这两个记录。",
+      "trace_evidence": "find_reused_invoices返回INV000002的record_ids为[\"R000002\",\"R004201\"]，get_expense_detail对R000002和R004201均有调用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "候选提交将R000005和R004202归入同一异常ID DUP-INV000005，符合预期。",
+      "answer_evidence": "answer中record_ids列表包含R000005和R004202，anomaly_ids中的DUP-INV000005对应这两个记录。",
+      "trace_evidence": "find_reused_invoices返回INV000005的record_ids为[\"R000005\",\"R004202\"]，get_expense_detail对R000005和R004202均有调用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "候选提交将R000020和R004203归入同一异常ID DUP-INV000020，符合预期。",
+      "answer_evidence": "answer中record_ids列表包含R000020和R004203，anomaly_ids中的DUP-INV000020对应这两个记录。",
+      "trace_evidence": "find_reused_invoices返回INV000020的record_ids为[\"R000020\",\"R004203\"]，get_expense_detail对R000020和R004203均有调用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 1,
+      "reason": "候选提交将R000028和R004204归入同一异常ID DUP-INV000028，符合预期。",
+      "answer_evidence": "answer中record_ids列表包含R000028和R004204，anomaly_ids中的DUP-INV000028对应这两个记录。",
+      "trace_evidence": "find_reused_invoices返回INV000028的record_ids为[\"R000028\",\"R004204\"]，get_expense_detail对R000028和R004204均有调用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 1,
+      "reason": "候选提交将R000037和R004205归为同一发现组，证据矩阵中确认分组。",
+      "answer_evidence": "候选提交record_ids包含R000037和R004205，anomaly_id为DUP-INV000037。",
+      "trace_evidence": "find_reused_invoices返回INV000037的record_ids包含R000037和R004205。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 1,
+      "reason": "候选提交将R000055和R004206归为同一发现组，证据矩阵中确认分组。",
+      "answer_evidence": "候选提交record_ids包含R000055和R004206，anomaly_id为DUP-INV000055。",
+      "trace_evidence": "find_reused_invoices返回INV000055的record_ids包含R000055和R004206。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "使用find_reused_invoices对全年所有发票进行全量扫描，未抽样。",
+      "answer_evidence": "候选提交说明“使用find_reused_invoices工具对2025年度全部4,234张发票进行usage_count统计”。",
+      "trace_evidence": "工具调用find_reused_invoices未限制日期，list_invoices获取全部发票，覆盖全年数据。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-invoice-key",
+      "value": 1,
+      "reason": "以invoice_id作为重复判断键，筛选usage_count>1的发票。",
+      "answer_evidence": "候选提交说明“按invoice_id识别重复使用的发票”。",
+      "trace_evidence": "find_reused_invoices基于invoice_no分组，返回usage_count>1的发票。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-grouping",
+      "value": 1,
+      "reason": "重复记录按发票分组，每张重复发票形成一项发现，共6项发现",
+      "answer_evidence": "候选提交中anomaly_ids有6个，每个对应一张重复发票，如DUP-INV000002对应发票INV000002；evidence_matrix中每个anomaly_id关联两个record_ids",
+      "trace_evidence": "find_reused_invoices返回6张usage_count=2的发票，每张发票关联两个record_ids，如INV000002关联R000002和R004201",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 1,
+      "reason": "中间扫描结果为6组重复发票，最终提交6项发现，数量一致",
+      "answer_evidence": "候选提交answer中提到“共发现6张发票存在重复报销”，anomaly_ids长度为6",
+      "trace_evidence": "find_reused_invoices结果：has_next: false，invoices数组包含6条重复发票，如INV000002、INV000005等",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis",
+      "value": 1,
+      "reason": "引用了制度第十条，查询条件筛选usage_count>1，对应“同一发票在不同报销单中重复出现”",
+      "answer_evidence": "candidate_submission的citations包含{doc_id: 01_expense_reimbursement_2025.md, clause_no: 第十条}；answer中引用第十条内容并说明查询方法",
+      "trace_evidence": "search_policy检索到第十条，get_policy_excerpt返回第十条内容：“同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。”；find_reused_invoices筛选usage_count>1的发票",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交完全满足检查项要求，所有发现分组与预期一致，扫描方法、制度依据均正确。；所有检查项均通过：重复发票分组准确，全量扫描覆盖全年数据，重复判断键为invoice_id。；所有检查项均通过，扫描方法正确，分组合理，数量一致，制度依据充分且落实到查询条件。",
+  "confidence": 1.0
+}

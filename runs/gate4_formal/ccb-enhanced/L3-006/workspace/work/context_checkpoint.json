@@ -1,31 +1,151 @@
 {
-  "artifact_paths": [],
+  "artifact_paths": [
+    "final_submission.json",
+    "submission_receipt.json",
+    "traces/context_events.jsonl",
+    "traces/events.jsonl",
+    "traces/subagents.jsonl",
+    "traces/tool_calls.jsonl",
+    "work/artifact_index.json",
+    "work/audit_plan.json",
+    "work/context_checkpoint.json",
+    "work/decision_log.jsonl",
+    "work/evidence_index.json",
+    "work/evidence_matrix.json",
+    "work/final_result.json",
+    "work/policy_applicability.json",
+    "work/report_draft.json",
+    "work/task_state.json",
+    "work/validation_report.json"
+  ],
   "compacted": false,
-  "context_usage_percent": 40.0,
-  "created_at": 1784205392.8642557,
-  "estimation_method": "reported_tokens",
+  "context_usage_percent": 0.0,
+  "created_at": 1784644442.6661458,
+  "estimation_method": "outer_runner_finalization",
   "retained_state": {
     "applicable_policies": [
       "01_expense_reimbursement_2025.md",
+      "02_expense_reimbursement_2022_deprecated.md",
       "03_authorization_management.md"
     ],
-    "artifact_index": "work/artifact_index.json",
-    "audit_plan": "work/audit_plan.json",
-    "constraints": "no anomaly, 2025 revision applies, department GM AR-03: >=10000 and <50000",
-    "evidence_matrix": "work/evidence_matrix.json",
-    "evidence_status": "pass_100pct",
-    "excluded_policies": [
-      "02_expense_reimbursement_2022_deprecated.md (已废止)"
+    "artifact_index": [
+      "final_submission.json",
+      "submission_receipt.json",
+      "traces/context_events.jsonl",
+      "traces/events.jsonl",
+      "traces/subagents.jsonl",
+      "traces/tool_calls.jsonl",
+      "work/artifact_index.json",
+      "work/audit_plan.json",
+      "work/context_checkpoint.json",
+      "work/decision_log.jsonl",
+      "work/evidence_index.json",
+      "work/evidence_matrix.json",
+      "work/final_result.json",
+      "work/policy_applicability.json",
+      "work/report_draft.json",
+      "work/task_state.json",
+      "work/validation_report.json"
     ],
-    "final_result": "work/final_result.json",
-    "policy_applicability": "work/policy_applicability.json",
+    "audit_plan": {
+      "complexity": {
+        "reasons": [
+          "政策版本陷阱: 2022 vs 2025两个版本需要对比",
+          "但所有证据均来自可直接读取的政策文档，无需数据库查询、聚合或批量分析",
+          "仅涉及一个业务规则（审批线），属于单规则政策事实问题",
+          "校准为复杂度0-1：纯政策事实问题，无数据查询需求"
+        ],
+        "score": 1,
+        "subagent_plan": {
+          "planned": false,
+          "reason": "复杂度0-1，所有证据来自可直接读取的政策文档，无需数据查询、聚合或专业角色介入，主智能体紧凑模式足够"
+        }
+      },
+      "data_questions": [],
+      "evidence_requirements": [
+        "2025修订版第十四条（废止条款）",
+        "2025修订版第五条（授权委托条款）",
+        "2022版第一、二、四条（废止声明与历史金额）",
+        "授权管理办法第二条及附件二 AR-03（现行审批线）"
+      ],
+      "execution_steps": [
+        {
+          "action": "policy-version-check",
+          "description": "检查2022版与2025修订版的效力状态、施行日期、废止关系",
+          "step": 1
+        },
+        {
+          "action": "evidence-coverage-check",
+          "description": "确认证据覆盖所有政策问题",
+          "step": 2
+        },
+        {
+          "action": "audit-report",
+          "description": "撰写审计报告",
+          "step": 3
+        },
+        {
+          "action": "result-validator",
+          "description": "校验结果格式",
+          "step": 4
+        },
+        {
+          "action": "validate_audit_result + submit_audit_result",
+          "description": "验证并提交",
+          "step": 5
+        }
+      ],
+      "policy_questions": [
+        "2022版与2025修订版的效力状态如何？哪个为现行有效版本？",
+        "2025修订版是否明确废止2022版？废止依据在哪一条？",
+        "2025修订版正文是否直接列示部门总经理审批金额？如否，审批金额指向哪个文件的哪个部分？",
+        "《授权管理办法》附件二中部门总经理对应的审批线（金额区间）是什么？",
+        "2022版中部门总经理审批线与现行版本是否存在差异？"
+      ],
+      "question": "请判断费用报销审批线应采用2022版还是2025修订版，指出部门总经理审批线，并提供新旧版本效力状态及现行金额出处。",
+      "required_fields": [
+        "policy_version",
+        "validity_status",
+        "department_gm_approval_threshold",
+        "approval_amount_source"
+      ],
+      "scope": {
+        "audit_object": "费用报销审批制度版本",
+        "organization_scope": "XX证券全部门",
+        "period": "2022-2025版本过渡期",
+        "policies_in_scope": [
+          "01_expense_reimbursement_2025.md - XX证券费用报销管理办法(2025修订版)",
+          "02_expense_reimbursement_2022_deprecated.md - XX证券费用报销管理办法(2022版)",
+          "03_authorization_management.md - XX证券授权管理办法"
+        ]
+      },
+      "stopping_conditions": [
+        "明确2025修订版为现行有效版本",
+        "明确2022版已废止",
+        "明确部门总经理审批线金额区间及出处",
+        "evidence_matrix coverage达到100%",
+        "validation_report通过"
+      ],
+      "task_id": "L3-006",
+      "task_type": "version_trap",
+      "unresolved_items": []
+    },
+    "constraints": [
+      "isolated GATE3 workspace",
+      "formal answer assets prohibited",
+      "outer runner timeout enforced"
+    ],
+    "evidence_status": "pass",
     "record_ids": [],
-    "remaining_budget": "sufficient",
-    "submission_status": "ready_to_validate",
-    "task": "L3-006",
-    "unresolved_items": [],
-    "validation_report": "work/validation_report.json"
+    "remaining_budget": {
+      "elapsed_seconds": 274.214,
+      "remaining_seconds": 625.786,
+      "timeout_seconds": 900
+    },
+    "submission_status": "accepted",
+    "task": "你正在执行 GATE4 正式证券费用审计评测，当前为领域增强组。\n\n任务ID：L3-006\n题型：version_trap\n问题：请判断费用报销审批线应采用2022版还是2025修订版，指出部门总经理审批线，并提供新旧版本效力状态及现行金额出处。\n\n必须遵循已安装的证券费用审计 Skills；先规划并记录Checkpoint，再按触发条件调查、复核、校验并通过统一工具提交。若复杂度至少为2且存在符合路由规则的角色，必须先授权原生子智能体，并在角色结束后登记结构化摘要和产物。\n\n\n要求：\n1. 必须查询制度和只读业务库后作答，可以使用 Shell、Python、SQLite 和当前工作区临时文件。\n2. 只处理当前独立任务。禁止读取 ground_truth、cases.json、Rubric、判卷代码、历史答案、其他任务或候选轨迹，也不得访问与题目无关的互联网。\n3. anomaly_ids 必须与审计发现一一对应、稳定且类型明确；不得为了迎合未知答案猜测隐藏编号。record_ids 必须完整、准确且只覆盖本题范围。\n4. 有异常时，record_ids 只包含参与本题所问违规的记录，不含累计计算背景、有效豁免或无关规则记录；无异常时仍保留题目直接核查或结论覆盖的记录，并在 answer 中明确写“无异常”。\n5. 必须维护 work/final_result.json、work/evidence_matrix.json 和 work/validation_report.json 三个预置文件。对应Schema的绝对路径分别是 /runtime-schemas/final_result.schema.json、/runtime-schemas/evidence_matrix.schema.json 和 /runtime-schemas/validation_report.schema.json；当前工作区兼容路径分别是 /workspace/runtime-schemas/final_result.schema.json、/workspace/runtime-schemas/evidence_matrix.schema.json 和 /workspace/runtime-schemas/validation_report.schema.json。当前目录已经是 /workspace，禁止拼成 /workspace/workspace，也禁止把 .schema.json 猜成普通 .json。\n6. 先调用 audit_control.validate_audit_result；取得 valid=true 后，再以 result_path=\"work/final_result.json\" 调用 audit_control.submit_audit_result。不得把完整结果直接打印出来代替提交。\n7. 提交成功后最终只输出 GATE4_TASK_PASS；无法提交时只输出 GATE4_TASK_FAIL。\n",
+    "unresolved_items": []
   },
-  "stage": "validation_ready",
+  "stage": "submission_ready",
   "task_id": "L3-006"
 }

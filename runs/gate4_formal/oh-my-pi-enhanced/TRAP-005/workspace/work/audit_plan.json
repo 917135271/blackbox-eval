@@ -1,59 +1,88 @@
 {
   "task_id": "TRAP-005",
   "task_type": "clean_but_suspicious",
-  "question": "请核查TRAP-005涉及的记录是否构成异常,正确时应说明无异常",
-  "audit_scope": {
-    "records": "R004233, R004234, R004235, R004236, R004237, R004238, R004239, R004240",
-    "description": "八条标注为'陷阱样本'的记录,涉及接近阈值、边界日期、拆分窗口外等可疑但合规的场景",
-    "period": "2025-07-01 to 2025-10-30",
-    "organization": "XX证券各部门"
-  },
+  "audit_object": "R004239, R004240",
+  "audit_period": "2025-10-25 to 2025-10-26",
+  "organization_scope": "E0008 杨丹, D008 合规风控部",
+  "expense_type": "business_entertainment",
+  "requested_deliverable": "核查是否构成重复报销、拆分报销或业务招待费超标准",
   "policy_questions": [
-    "Article 7: R004238的报销延迟60天是否超过60天期限",
-    "Article 10: R004234/R004235同日同额是否构成重复报销",
-    "Article 11: R004236/R004237相隔8天是否构成拆分报销; R004239/R004240相邻日期同类型是否构成拆分报销; R004234/R004235同日同类型合计是否触发更高审批线",
-    "Article 12: R004233住宿费9990元是否超过差旅住宿标准; R004236/R004237住宿费5200元是否超过差旅住宿标准; R004234/R004235办公费合计是否超过月度上限; R004238通讯费是否超过月度上限; R004239/R004240招待费是否超过单次/人均标准"
+    {
+      "rule": "重复报销",
+      "clause": "01_expense_reimbursement_2025.md 第十条",
+      "check": "同一发票是否在不同报销单中重复出现"
+    },
+    {
+      "rule": "拆分报销",
+      "clause": "01_expense_reimbursement_2025.md 第十一条",
+      "check": "同一员工、同一费用类型在7天内出现2笔及以上报销，合计金额是否达到较高审批线"
+    },
+    {
+      "rule": "拆分报销（招待专项）",
+      "clause": "06_business_entertainment.md 第四条",
+      "check": "同一客户拜访或同一会议安排是否拆分为多个报销事项"
+    },
+    {
+      "rule": "业务招待费超标准",
+      "clause": "06_business_entertainment.md 第二条、第三条",
+      "check": "单次活动费用是否超5000元；人均是否超300元"
+    }
   ],
   "data_questions": [
-    "核实每位员工的职级与差旅住宿标准对应关系",
-    "核实每条记录的发票号、日期、金额、参与人数等信息",
-    "计算拆分检查的7天窗口边界"
-  ],
-  "required_fields": [
-    "record_id, employee_id, employee_level, position_role, expense_date, reimburse_date, expense_type, amount, invoice_no, invoice_id, vendor_name, city_tier, nights, days, participants, special_approval, budget_year, status, approver_role, tier_id"
+    {
+      "field": "invoice_no",
+      "purpose": "检查两笔记录是否使用同一发票"
+    },
+    {
+      "field": "expense_date",
+      "purpose": "计算两笔记录日期间隔是否在7天内"
+    },
+    {
+      "field": "amount, participants",
+      "purpose": "计算人均金额和合计金额"
+    },
+    {
+      "field": "reason",
+      "purpose": "判断是否同一客户拜访或同一事项"
+    },
+    {
+      "field": "employee_id, expense_type",
+      "purpose": "确认同一员工、同一费用类型"
+    }
   ],
   "evidence_requirements": [
-    "每条陷阱样本记录的完整详情",
-    "适用的政策条款原文及生效日期",
-    "职级与住宿标准映射关系",
-    "日期计算证明（延迟天数、相隔天数）"
+    "R004239和R004240的完整详情（含发票、审批）",
+    "各发票的使用次数确认",
+    "01_expense_reimbursement_2025.md 第十条、第十一条",
+    "06_business_entertainment.md 第二条、第三条、第四条",
+    "03_authorization_management.md 附件二审批线"
   ],
   "execution_steps": [
-    "1. 获取全部8条陷阱样本记录详情",
-    "2. 政策版本检查:确认2025版费用报销管理办法为适用政策",
-    "3. 逐条对照政策规则分析每条记录",
-    "4. 证据覆盖率检查",
-    "5. 误报复核",
-    "6. 编写审计报告",
-    "7. 结果校验与提交"
+    "获取R004239和R004240详情",
+    "检查发票唯一性",
+    "获取适用政策条款",
+    "逐规则比对：重复报销、拆分报销、招待费超标准",
+    "形成初步结论",
+    "证据覆盖检查",
+    "独立复核（false-positive-review触发：no-anomaly结论需要二次审查）",
+    "撰写审计报告",
+    "结果校验与提交"
   ],
-  "complexity": {
-    "score": 3,
-    "reasons": [
-      "涉及多个政策规则(第7、10、11、12条)",
-      "涉及金额阈值和日期边界判断",
-      "需要多表关联查询(员工职级映射)"
-    ]
-  },
+  "complexity": 3,
+  "complexity_reasons": [
+    "涉及两个及以上业务规则（重复报销、拆分报销、招待费超标准）",
+    "涉及聚合比较（两笔记录对比、金额合计、人均计算）",
+    "涉及阈值和日期边界（7天窗口、3000元审批线、300元人均、5000元单次）"
+  ],
   "subagent_plan": {
-    "use_subagent": false,
-    "reason": "任务为8条已知记录的逐条核查,策略明确,可在主智能体中以内联模式完成"
+    "selected": false,
+    "reason": "仅2条记录，数据分析和政策检索均可由主智能体直接完成。独立复核阶段按false-positive-review触发条件使用independent_reviewer。"
   },
   "stopping_conditions": [
-    "所有8条记录均完成逐条政策合规性分析",
-    "证据矩阵覆盖率100%",
-    "误报复核通过",
-    "校验结果为valid=true"
+    "所有三个规则均已逐条核查并得出明确结论",
+    "证据覆盖率达100%",
+    "独立复核通过",
+    "validate_audit_result返回valid=true"
   ],
   "unresolved_items": []
 }

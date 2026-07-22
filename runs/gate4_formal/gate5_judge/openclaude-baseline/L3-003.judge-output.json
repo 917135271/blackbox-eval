@@ -1,53 +1,182 @@
 {
-  "criteria": [
+  "checklist": [
     {
-      "id": "all-anomaly-ids",
-      "score": 0,
-      "reason": "候选 anomaly_ids 仅包含 ANOM-STD-001/002/003 三个超标准异常，缺失预期中的三个，达不到 partial 门槛。",
-      "answer_evidence": "候选 anomaly_ids: [\"ANOM-SPLIT-001\",…,\"ANOM-STD-001\",\"ANOM-STD-002\",\"ANOM-STD-003\",…] 仅含 3 个超标准 ID。",
-      "trace_evidence": "工具调用仅针对 office_supplies/communication/training_fee 阈值查询，未覆盖全部超标准类型。"
+      "id": "finding-type-count-count",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "answer states '共发现58项异常', not 6",
+      "trace_evidence": "anomaly_ids list contains 58 entries",
+      "source": "llm_judge"
     },
     {
-      "id": "all-record-ids",
-      "score": 0,
-      "reason": "提交的 record_ids 仅包含 R004221/R004222/R004223，缺失 R004224/R004225/R004226，且混入 26 条无关记录。",
-      "answer_evidence": "候选 record_ids 共 29 条，缺失 3 条预期记录，大量无关记录。",
-      "trace_evidence": "工具查询返回超标准记录仅 R004221/R004222/R004223，未出现 R004224 等。"
+      "id": "all-record-ids-include-r004224",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交record_ids不包含R004224",
+      "trace_evidence": "candidate_submission.record_ids列表中缺少'R004224'",
+      "source": "llm_judge"
     },
     {
-      "id": "full-scan-method",
-      "score": 8,
-      "reason": "执行了全年按类型的批量查询，但未按差旅办法进行职级与城市标准比对，扫描范围不完整。",
-      "answer_evidence": "答案声称完成全年超标准扫描，但仅列出办公/通讯/培训超标，缺少差旅住宿超标记录。",
-      "trace_evidence": "轨迹中 list_expenses 分页拉取所有 expense_type，但仅对 office_supplies>600、communication>300、training_fee>3500 查询，未进行 travel_lodging 标准比对。"
+      "id": "all-record-ids-include-r004225",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids列表中未包含R004225",
+      "trace_evidence": "trace中无提及R004225，且最终提交的record_ids缺失R004225",
+      "source": "llm_judge"
     },
     {
-      "id": "policy-basis",
-      "score": 6,
-      "reason": "引用了费用报销管理办法第十二条及相关专项标准，但未涵盖差旅住宿标准，制度落实不完整。",
-      "answer_evidence": "答案引用《费用报销管理办法》第十二条及《办公通讯》《培训费》标准，未提差旅住宿标准。",
-      "trace_evidence": "查询条件 office_supplies>600 等对应制度，但未查询 travel_lodging 按职级/城市标准。"
+      "id": "all-record-ids-include-r004226",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids列表中未包含R004226",
+      "trace_evidence": "trace中无提及R004226，且最终提交的record_ids缺失R004226",
+      "source": "llm_judge"
     },
     {
-      "id": "false-positive-control",
-      "score": 0,
-      "reason": "将拆分报销和重复报销等其他规则异常混入超标准扫描结果，存在大量实质误报。",
-      "answer_evidence": "答案将 ANOM-SPLIT-/ANOM-DUP- 异常作为超标准扫描发现列出。",
-      "trace_evidence": "工具调用使用了 find_reused_invoices 和拆分分析，导致最终集合包含 26 条无关记录。"
+      "id": "all-record-ids-no-extra",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "提交的record_ids包含R000081等超出预期范围的记录，总数58条，超出预期6条",
+      "trace_evidence": "tool_trace中list_expenses扫描了额外记录，如office_supplies仅返回R004221，但提交了其他记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选L3-003-A01关联record_ids [\"R004221\"]，事实为办公用品超标准",
+      "trace_evidence": "get_expense_detail R004221确认记录存在",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选L3-003-A02关联record_ids [\"R004222\"]，通讯费用超标准",
+      "trace_evidence": "get_expense_detail R004222",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选L3-003-A03关联record_ids [\"R004223\"]，培训费超标准",
+      "trace_evidence": "get_expense_detail R004223",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids列表中未包含R004224",
+      "trace_evidence": "工具调用未获取R004224的详情",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids列表中未包含R004225",
+      "trace_evidence": "工具调用未获取R004225的详情",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids列表中未包含R004226",
+      "trace_evidence": "工具调用未获取R004226的详情",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选答案声明扫描全部4240条记录，并说明逐类型扫描方法",
+      "trace_evidence": "工具轨迹包含summarize_expenses获取全量统计和多次list_expenses覆盖全部类别",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-approval",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交的answer中未明确说明排除专项审批的步骤，仅引用了制度第十二条，扫描方法描述未包含专项审批过滤。",
+      "trace_evidence": "工具调用中未出现对special_approval字段的查询或过滤；差旅住宿扫描仅按金额和住宿标准筛选，未检查专项审批状态。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-office",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "办公用品按单笔600元口径核查：'筛选单笔金额>600元的记录'。",
+      "trace_evidence": "list_expenses (expense_type='office_supplies', min_amount=600) 仅返回一条记录R004221（金额650）。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-communication",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "通讯费用按单笔300元口径核查：'筛选单笔金额>300元的记录'。",
+      "trace_evidence": "list_expenses (expense_type='communication', min_amount=300) 仅返回一条记录R004222（金额330）。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-training",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "培训课程费按单次3500元口径核查：'筛选单笔金额>3500元的记录'。",
+      "trace_evidence": "list_expenses (expense_type='training_fee', min_amount=3500) 仅返回一条记录R004223（金额3700）。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-entertainment",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "业务招待费(business_entertainment):按《业务招待费管理办法》第二条单次不超过5000元,扫描无发现。人均超300元需参与者人数,本题不做逐笔核实。",
+      "trace_evidence": "使用list_expenses查询business_entertainment且min_amount=5000，未获取participant_count等字段，未核查人均标准。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-travel",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "差旅住宿(travel_lodging):...逐笔获取nights(晚数)、city_tier(城市档位)、position_role(职级),计算每晚安额=amount/nights,与标准表比对",
+      "trace_evidence": "get_expense_detail调用返回的record中包含employee_level、city_tier、nights等字段，例如R004207：employee_level: D1, city_tier: A, 金额5200, 晚数7等，并进行了每晚金额计算。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-transport",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "答案描述市内交通扫描方法：按《差旅费管理办法》第六条每天包干标准,逐笔获取days和city_tier比对",
+      "trace_evidence": "工具调用中get_expense_detail对市内交通记录显示city_tier和days字段",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交58项异常，中间统计58条，与期望6条不一致",
+      "trace_evidence": "candidate_evidence_matrix有58行，实际提交58个record_ids",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "citations include {\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十二条\"}",
+      "trace_evidence": "get_policy_doc for 01_expense_reimbursement_2025.md retrieved, answer references it.",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-special",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "子条款引用: 04_travel_expense 第四条/第六条, 05_training_expense 第二条, 06_business_entertainment 第二条, 07_office_communication 第二条/第三条",
+      "trace_evidence": "工具调用 get_policy_doc 结果包含 04、05、06、07 号文档完整文本，候选提交 answer 明确列出各费用类型对应的专项标准条款。",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "未发现不存在于数据库的 record_id。"
-    },
-    {
-      "id": "partial-scan-presented-as-complete",
-      "triggered": false,
-      "reason": "虽然扫描范围不完整，但确实读取了全年数据，并非仅检查部分月份或样例记录。"
-    }
-  ],
-  "overall_comment": "候选仅覆盖 3 条超标准记录，遗漏差旅住宿超标；将拆分、重复等异常混入，导致严重误报；制度依据不完整。",
-  "confidence": 1.0
+  "overall_comment": "",
+  "confidence": 0.8000000000000002
 }
