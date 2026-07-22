@@ -1,10 +1,17 @@
 {
-  "dataset_id": "securities-expense-audit-formal-15-v8",
-  "rubric_version": "atomic-binary-checklist-v6",
+  "dataset_id": "securities-expense-audit-formal-15-v9",
+  "rubric_version": "atomic-binary-checklist-v7",
   "case_count": 15,
   "source": {
     "evals": "data/evals.json",
-    "ground_truth": "data/ground_truth.yaml"
+    "ground_truth": "data/ground_truth.yaml",
+    "replacement_cases": "data/formal_case_rubric/replacement_cases.yaml"
+  },
+  "replacements": {
+    "L1-001": "PV-CASE-001",
+    "L2-003": "RA-CASE-001",
+    "L2-008": "RA-CASE-002",
+    "L3-010": "RR-CASE-001"
   },
   "case_family_counts": {
     "clean_trap": 3,
@@ -15,33 +22,54 @@
   },
   "cases": [
     {
-      "id": "L1-001",
-      "source_task_id": "L1-001",
-      "level": "L1",
-      "category": "policy_qa",
+      "id": "PV-CASE-001",
+      "source_task_id": "PV-CASE-001",
+      "level": "L2",
+      "category": "policy_data_comparison",
       "case_family": "policy_and_version",
-      "prompt": "请依据现行制度判断单笔费用为2999.99元、3000元、9999.99元、10000元、50000元和200000元时分别需要哪些审批角色，并说明费用报销办法与授权管理办法的交叉引用关系。另请说明2022版8000元和30000元审批线是否仍适用，以及误用旧线会影响哪些金额区间。",
-      "selection_reason": "现行审批线基础题，验证制度事实与版本意识",
+      "prompt": "请以R004233为线索，结合现行制度、历史制度和业务数据，核查该笔费用的审批路径及费用标准适用是否正确。请返回核查涉及的record_id、审计结论、关键计算、现行制度依据，并说明继续使用历史审批线会造成什么判断偏差；如存在异常，再返回发现ID。",
+      "selection_reason": "9990元现行审批边界案例，验证数据事实、交叉引用和旧版误判识别",
       "ground_truth_refs": [
-        "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
+        "record:R004233",
+        "trap:TRAP-001",
         "document:01_expense_reimbursement_2025.md",
-        "clause:01_expense_reimbursement_2025.md#第五条",
+        "clause:01_expense_reimbursement_2025.md#第五条、第十二条、第十四条",
+        "document:02_expense_reimbursement_2022_deprecated.md",
+        "clause:02_expense_reimbursement_2022_deprecated.md#第一条、第二条、第四条",
         "document:03_authorization_management.md",
-        "clause:03_authorization_management.md#附件二"
+        "clause:03_authorization_management.md#附件二",
+        "document:04_travel_expense.md",
+        "clause:04_travel_expense.md#第三条"
       ],
       "expected_output": {
-        "scoring_kind": "expected_facts",
+        "scoring_kind": "no_anomaly",
         "expected_facts": [
-          "现行部门总经理审批线为10000元"
+          "R004233金额为9990元，适用AR-02，由部门经理审批并经财务复核，不需要部门总经理审批",
+          "R004233为X1级员工一类城市住宿10晚，限额为11000元，9990元未超标准",
+          "2025现行部门总经理审批线为10000元，2022版8000元线已废止",
+          "继续使用8000元旧线会把8000元至10000元以下的合规审批错误升级"
         ],
+        "expected_record_ids": [
+          "R004233"
+        ],
+        "expected_reason": "R004233低于现行10000元部门总经理审批线且低于11000元住宿限额，现有AR-02审批路径正确；旧8000元线会造成错误升级",
+        "expected_anomaly_ids": [],
         "required_citations": [
           {
             "doc_id": "01_expense_reimbursement_2025.md",
-            "clause_no": "第五条"
+            "clause_no": "第五条、第十二条、第十四条"
+          },
+          {
+            "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+            "clause_no": "第一条、第二条、第四条"
           },
           {
             "doc_id": "03_authorization_management.md",
             "clause_no": "附件二"
+          },
+          {
+            "doc_id": "04_travel_expense.md",
+            "clause_no": "第三条"
           }
         ]
       },
@@ -54,129 +82,193 @@
         "normalization": "equal_item_ratio",
         "checklist": [
           {
-            "id": "current-version",
-            "check": "采用2025修订版及现行授权制度",
-            "metric": "policy",
-            "evaluation_mode": "hybrid",
-            "expected": "2025修订版为现行版本",
-            "evidence_sources": [
-              "final_answer",
-              "tool_trace"
-            ],
-            "pass_condition": "明确识别现行版本，且未把2022版作为有效依据",
-            "fail_condition": "未完全满足通过条件：明确识别现行版本，且未把2022版作为有效依据"
-          },
-          {
-            "id": "tier-ar01",
-            "check": "2999.99元适用AR-01部门经理审批",
-            "metric": "conclusion",
-            "evaluation_mode": "hybrid",
-            "expected": {
-              "amount": 2999.99,
-              "role": "部门经理"
-            },
-            "evidence_sources": [
-              "final_answer"
-            ],
-            "pass_condition": "金额区间和审批角色均正确",
-            "fail_condition": "未完全满足通过条件：金额区间和审批角色均正确"
-          },
-          {
-            "id": "tier-ar02-lower",
-            "check": "3000元进入AR-02并经部门经理和财务复核",
-            "metric": "conclusion",
-            "evaluation_mode": "hybrid",
-            "expected": {
-              "amount": 3000,
-              "roles": [
-                "部门经理",
-                "财务复核"
-              ]
-            },
-            "evidence_sources": [
-              "final_answer"
-            ],
-            "pass_condition": "正确处理3000元下边界及两个必要角色",
-            "fail_condition": "未完全满足通过条件：正确处理3000元下边界及两个必要角色"
-          },
-          {
-            "id": "tier-ar02-upper",
-            "check": "9999.99元仍属于AR-02",
-            "metric": "conclusion",
-            "evaluation_mode": "hybrid",
-            "expected": {
-              "amount": 9999.99,
-              "roles": [
-                "部门经理",
-                "财务复核"
-              ]
-            },
-            "evidence_sources": [
-              "final_answer"
-            ],
-            "pass_condition": "正确处理10000元以下的上边界",
-            "fail_condition": "未完全满足通过条件：正确处理10000元以下的上边界"
-          },
-          {
-            "id": "tier-ar03",
-            "check": "10000元进入AR-03部门总经理审批",
-            "metric": "conclusion",
-            "evaluation_mode": "hybrid",
-            "expected": {
-              "amount": 10000,
-              "role": "部门总经理"
-            },
-            "evidence_sources": [
-              "final_answer"
-            ],
-            "pass_condition": "正确处理10000元包含边界",
-            "fail_condition": "未完全满足通过条件：正确处理10000元包含边界"
-          },
-          {
-            "id": "tier-ar04",
-            "check": "50000元进入AR-04分管副总审批",
-            "metric": "conclusion",
-            "evaluation_mode": "hybrid",
-            "expected": {
-              "amount": 50000,
-              "role": "分管副总"
-            },
-            "evidence_sources": [
-              "final_answer"
-            ],
-            "pass_condition": "正确处理50000元包含边界",
-            "fail_condition": "未完全满足通过条件：正确处理50000元包含边界"
-          },
-          {
-            "id": "tier-ar05",
-            "check": "200000元进入AR-05总经理办公会审批",
-            "metric": "conclusion",
-            "evaluation_mode": "hybrid",
-            "expected": {
-              "amount": 200000,
-              "role": "总经理办公会"
-            },
-            "evidence_sources": [
-              "final_answer"
-            ],
-            "pass_condition": "正确处理200000元包含边界",
-            "fail_condition": "未完全满足通过条件：正确处理200000元包含边界"
-          },
-          {
-            "id": "cross-reference-expense",
-            "check": "引用费用报销办法第五条",
-            "metric": "policy",
-            "evaluation_mode": "hybrid",
-            "expected": "01_expense_reimbursement_2025.md#第五条",
+            "id": "record-r004233",
+            "check": "结果包含线索记录R004233",
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": "R004233",
             "evidence_sources": [
               "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "准确引用费用报销办法第五条",
-            "fail_condition": "未完全满足通过条件：准确引用费用报销办法第五条"
+            "pass_condition": "提交的record_ids包含R004233",
+            "fail_condition": "未完全满足通过条件：提交的record_ids包含R004233",
+            "deterministic_rule": "expected-record-present"
           },
           {
-            "id": "cross-reference-authorization",
+            "id": "record-set-no-extra",
+            "check": "结果不包含本题范围外的记录",
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "R004233"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "pass_condition": "提交的record_ids仅包含R004233",
+            "fail_condition": "未完全满足通过条件：提交的record_ids仅包含R004233",
+            "deterministic_rule": "no-unexpected-records"
+          },
+          {
+            "id": "no-anomaly",
+            "check": "不提交实质异常发现",
+            "metric": "false_positive",
+            "evaluation_mode": "deterministic",
+            "expected": {
+              "anomaly_ids": []
+            },
+            "evidence_sources": [
+              "submitted_json",
+              "final_answer"
+            ],
+            "pass_condition": "未提交任何异常发现ID",
+            "fail_condition": "未完全满足通过条件：未提交任何异常发现ID",
+            "deterministic_rule": "no-anomaly-ids"
+          },
+          {
+            "id": "record-amount",
+            "check": "识别R004233金额为9990元",
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": 9990,
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "pass_condition": "答案与工具证据均支持金额为9990元",
+            "fail_condition": "未完全满足通过条件：答案与工具证据均支持金额为9990元"
+          },
+          {
+            "id": "current-tier",
+            "check": "判断9990元适用现行AR-02",
+            "metric": "conclusion",
+            "evaluation_mode": "hybrid",
+            "expected": "AR-02",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "pass_condition": "明确判断9990元属于大于等于3000元且小于10000元的AR-02",
+            "fail_condition": "未完全满足通过条件：明确判断9990元属于大于等于3000元且小于10000元的AR-02"
+          },
+          {
+            "id": "current-roles",
+            "check": "说明AR-02需要部门经理审批并经财务复核",
+            "metric": "conclusion",
+            "evaluation_mode": "hybrid",
+            "expected": [
+              "部门经理",
+              "财务复核"
+            ],
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "pass_condition": "两个必要审批环节均说明且未错误加入部门总经理",
+            "fail_condition": "未完全满足通过条件：两个必要审批环节均说明且未错误加入部门总经理"
+          },
+          {
+            "id": "approval-trace",
+            "check": "核对R004233实际审批记录与AR-02一致",
+            "metric": "evidence",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "tier_id": "AR-02",
+              "approver_role": "部门经理"
+            },
+            "evidence_sources": [
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "pass_condition": "工具轨迹或工作产物核实实际tier_id为AR-02且部门经理已审批",
+            "fail_condition": "未完全满足通过条件：工具轨迹或工作产物核实实际tier_id为AR-02且部门经理已审批"
+          },
+          {
+            "id": "lodging-calculation",
+            "check": "按X1级一类城市10晚计算住宿限额11000元",
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "nightly_limit": 1100,
+              "nights": 10,
+              "total_limit": 11000
+            },
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "pass_condition": "职级、城市、晚数、单晚标准和总限额均正确",
+            "fail_condition": "未完全满足通过条件：职级、城市、晚数、单晚标准和总限额均正确"
+          },
+          {
+            "id": "lodging-conclusion",
+            "check": "判断9990元未超过11000元住宿限额",
+            "metric": "conclusion",
+            "evaluation_mode": "hybrid",
+            "expected": "no_overstandard",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "pass_condition": "明确给出未超住宿标准结论且无矛盾表述",
+            "fail_condition": "未完全满足通过条件：明确给出未超住宿标准结论且无矛盾表述"
+          },
+          {
+            "id": "current-version",
+            "check": "采用2025修订版和现行授权制度",
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "2025现行",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "pass_condition": "明确识别现行版本且未把2022版作为有效依据",
+            "fail_condition": "未完全满足通过条件：明确识别现行版本且未把2022版作为有效依据"
+          },
+          {
+            "id": "legacy-status",
+            "check": "说明2022版8000元审批线已废止",
+            "metric": "false_positive",
+            "evaluation_mode": "llm",
+            "expected": 8000,
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "pass_condition": "正确给出旧值并明确其已废止、不得作为现行判断依据",
+            "fail_condition": "未完全满足通过条件：正确给出旧值并明确其已废止、不得作为现行判断依据"
+          },
+          {
+            "id": "legacy-impact",
+            "check": "说明误用8000元线会错误升级8000元至10000元以下记录",
+            "metric": "reasoning",
+            "evaluation_mode": "llm",
+            "expected": "8000<=amount<10000",
+            "evidence_sources": [
+              "final_answer"
+            ],
+            "pass_condition": "准确说明受影响区间和错误升级方向，并联系R004233说明",
+            "fail_condition": "未完全满足通过条件：准确说明受影响区间和错误升级方向，并联系R004233说明"
+          },
+          {
+            "id": "policy-expense",
+            "check": "引用费用报销办法第五条、第十二条和第十四条中的适用依据",
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "01_expense_reimbursement_2025.md#第五条、第十二条、第十四条",
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "pass_condition": "引用覆盖审批交叉引用、不得超标准和旧版废止依据",
+            "fail_condition": "未完全满足通过条件：引用覆盖审批交叉引用、不得超标准和旧版废止依据"
+          },
+          {
+            "id": "policy-authorization",
             "check": "引用授权管理办法附件二",
             "metric": "policy",
             "evaluation_mode": "hybrid",
@@ -185,52 +277,21 @@
               "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "准确引用授权管理办法附件二",
-            "fail_condition": "未完全满足通过条件：准确引用授权管理办法附件二"
+            "pass_condition": "准确引用AR-02和10000元审批线出处",
+            "fail_condition": "未完全满足通过条件：准确引用AR-02和10000元审批线出处"
           },
           {
-            "id": "cross-reference-relation",
-            "check": "说明正文通过交叉引用适用附件二金额",
-            "metric": "reasoning",
+            "id": "policy-travel",
+            "check": "引用差旅办法X1级一类城市住宿标准",
+            "metric": "policy",
             "evaluation_mode": "hybrid",
-            "expected": "费用报销办法第五条交叉引用授权管理办法附件二",
+            "expected": "04_travel_expense.md#第三条",
             "evidence_sources": [
-              "final_answer",
+              "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "准确说明两份现行制度之间的引用关系",
-            "fail_condition": "未完全满足通过条件：准确说明两份现行制度之间的引用关系"
-          },
-          {
-            "id": "legacy-threshold-status",
-            "check": "说明2022版8000元和30000元审批线均已失效",
-            "metric": "false_positive",
-            "evaluation_mode": "llm",
-            "expected": [
-              8000,
-              30000
-            ],
-            "evidence_sources": [
-              "final_answer",
-              "tool_trace"
-            ],
-            "pass_condition": "两个旧值及其失效状态均说明正确",
-            "fail_condition": "未完全满足通过条件：两个旧值及其失效状态均说明正确"
-          },
-          {
-            "id": "legacy-threshold-impact",
-            "check": "说明误用旧线会错误升级8000至9999.99元和30000至49999.99元区间",
-            "metric": "reasoning",
-            "evaluation_mode": "llm",
-            "expected": [
-              "8000-9999.99",
-              "30000-49999.99"
-            ],
-            "evidence_sources": [
-              "final_answer"
-            ],
-            "pass_condition": "两个受影响金额区间及错误升级方向均说明正确",
-            "fail_condition": "未完全满足通过条件：两个受影响金额区间及错误升级方向均说明正确"
+            "pass_condition": "准确引用支持1100元每晚标准的条款",
+            "fail_condition": "未完全满足通过条件：准确引用支持1100元每晚标准的条款"
           },
           {
             "id": "submission",
@@ -244,10 +305,17 @@
             "pass_condition": "提交回执状态为accepted且Schema校验通过",
             "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
           }
+        ],
+        "critical_failures": [
+          {
+            "id": "substantive-false-positive",
+            "check": "将无异常案例提交为实质异常",
+            "deterministic_rule": "unexpected-anomaly-reported",
+            "score_cap": 40
+          }
         ]
       },
-      "source_prompt": "现行制度下,单笔费用报销达到多少金额需要部门总经理审批?",
-      "prompt_change_reason": "使题面明确覆盖适用版本、制度证据和旧值排除要求"
+      "replaces": "L1-001"
     },
     {
       "id": "L3-006",
@@ -670,25 +738,29 @@
       "prompt_change_reason": "补充可客观评分的标准维度、数值和对照要求"
     },
     {
-      "id": "L2-003",
-      "source_task_id": "L2-003",
+      "id": "RA-CASE-001",
+      "source_task_id": "RA-CASE-001",
       "level": "L2",
       "category": "policy_data_comparison",
       "case_family": "record_audit",
-      "prompt": "请以R000020为线索，结合现行制度和业务数据核查相关费用记录是否存在异常。请返回核查涉及的record_id集合、审计结论、关键事实和制度依据；如存在异常，再返回发现ID。",
-      "selection_reason": "重复报销单案，验证跨记录证据关联",
+      "prompt": "请以R000028为线索，结合现行制度和业务数据核查相关费用记录是否存在异常。请返回核查涉及的record_id集合、审计结论、关键事实和制度依据；如存在异常，再返回发现ID。",
+      "selection_reason": "新重复发票组合，验证从单一线索追查完整发票使用记录",
       "ground_truth_refs": [
-        "ground_truth:DUP-003",
-        "record:R000020",
-        "record:R004203",
+        "ground_truth:DUP-004",
+        "record:R000028",
+        "record:R004204",
         "document:01_expense_reimbursement_2025.md",
         "clause:01_expense_reimbursement_2025.md#第十条"
       ],
       "expected_output": {
         "scoring_kind": "finding_type_count",
+        "expected_facts": [
+          "R000028和R004204使用同一发票INV000028且金额均为165.58元",
+          "同一发票在两条已审批报销记录中重复使用，构成一项重复报销风险"
+        ],
         "expected_record_ids": [
-          "R000020",
-          "R004203"
+          "R000028",
+          "R004204"
         ],
         "expected_findings_by_type": {
           "DUP": 1
@@ -711,18 +783,18 @@
         "checklist": [
           {
             "id": "audit-conclusion",
-            "check": "异常结论：在answer中明确判断本案构成重复报销",
+            "check": "明确判断本案构成重复报销",
             "metric": "conclusion",
             "evaluation_mode": "hybrid",
             "expected": "重复报销",
             "evidence_sources": [
               "final_answer"
             ],
-            "pass_condition": "answer明确认定构成重复报销且无矛盾表述",
-            "fail_condition": "未完全满足通过条件：answer明确认定构成重复报销且无矛盾表述"
+            "pass_condition": "明确认定构成重复报销且无矛盾表述",
+            "fail_condition": "未完全满足通过条件：明确认定构成重复报销且无矛盾表述"
           },
           {
-            "id": "anomaly-type-count-rule-type",
+            "id": "anomaly-type",
             "check": "发现类型为DUP",
             "metric": "conclusion",
             "evaluation_mode": "deterministic",
@@ -736,7 +808,7 @@
             "deterministic_rule": "anomaly-rule-type-exact"
           },
           {
-            "id": "anomaly-type-count-count",
+            "id": "anomaly-count",
             "check": "发现数量为1",
             "metric": "conclusion",
             "evaluation_mode": "deterministic",
@@ -750,31 +822,31 @@
             "deterministic_rule": "anomaly-count-exact"
           },
           {
-            "id": "record-set-include-r000020",
-            "check": "结果包含应核查记录 R000020",
+            "id": "record-r000028",
+            "check": "结果包含R000028",
             "metric": "evidence",
             "evaluation_mode": "deterministic",
-            "expected": "R000020",
+            "expected": "R000028",
             "evidence_sources": [
               "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "提交的record_ids包含R000020",
-            "fail_condition": "未完全满足通过条件：提交的record_ids包含R000020",
+            "pass_condition": "提交的record_ids包含R000028",
+            "fail_condition": "未完全满足通过条件：提交的record_ids包含R000028",
             "deterministic_rule": "expected-record-present"
           },
           {
-            "id": "record-set-include-r004203",
-            "check": "结果包含应核查记录 R004203",
+            "id": "record-r004204",
+            "check": "结果包含R004204",
             "metric": "evidence",
             "evaluation_mode": "deterministic",
-            "expected": "R004203",
+            "expected": "R004204",
             "evidence_sources": [
               "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "提交的record_ids包含R004203",
-            "fail_condition": "未完全满足通过条件：提交的record_ids包含R004203",
+            "pass_condition": "提交的record_ids包含R004204",
+            "fail_condition": "未完全满足通过条件：提交的record_ids包含R004204",
             "deterministic_rule": "expected-record-present"
           },
           {
@@ -783,57 +855,86 @@
             "metric": "evidence",
             "evaluation_mode": "deterministic",
             "expected": [
-              "R000020",
-              "R004203"
+              "R000028",
+              "R004204"
             ],
             "evidence_sources": [
               "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "提交的record_ids除R000020, R004203外没有其他记录",
-            "fail_condition": "未完全满足通过条件：提交的record_ids除R000020, R004203外没有其他记录",
+            "pass_condition": "提交的record_ids除R000028、R004204外没有其他记录",
+            "fail_condition": "未完全满足通过条件：提交的record_ids除R000028、R004204外没有其他记录",
             "deterministic_rule": "no-unexpected-records"
           },
           {
+            "id": "same-invoice",
+            "check": "核实两条记录使用同一发票INV000028",
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": "INV000028",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "pass_condition": "明确识别同一发票在两条记录中重复使用",
+            "fail_condition": "未完全满足通过条件：明确识别同一发票在两条记录中重复使用"
+          },
+          {
+            "id": "same-amount",
+            "check": "核实两条记录金额均为165.58元",
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": 165.58,
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "pass_condition": "两条记录的金额事实均准确",
+            "fail_condition": "未完全满足通过条件：两条记录的金额事实均准确"
+          },
+          {
+            "id": "approved-records",
+            "check": "核实两条记录均为已审批状态",
+            "metric": "evidence",
+            "evaluation_mode": "hybrid",
+            "expected": "approved",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "pass_condition": "工具证据支持两条记录均为approved",
+            "fail_condition": "未完全满足通过条件：工具证据支持两条记录均为approved"
+          },
+          {
+            "id": "invoice-usage-investigation",
+            "check": "通过发票反查获得完整使用记录",
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": [
+              "R000028",
+              "R004204"
+            ],
+            "evidence_sources": [
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "pass_condition": "在结论前使用发票查询或等价数据查询确认完整使用集合",
+            "fail_condition": "未完全满足通过条件：在结论前使用发票查询或等价数据查询确认完整使用集合"
+          },
+          {
             "id": "policy-basis",
-            "check": "制度依据：引用01_expense_reimbursement_2025.md 第十条并说明其适用性",
+            "check": "引用现行费用报销办法第十条",
             "metric": "policy",
             "evaluation_mode": "hybrid",
-            "expected": "01_expense_reimbursement_2025.md 第十条",
+            "expected": "01_expense_reimbursement_2025.md#第十条",
             "evidence_sources": [
               "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "条款有效且直接支持结论",
-            "fail_condition": "未完全满足通过条件：条款有效且直接支持结论"
-          },
-          {
-            "id": "case-reasoning-same-invoice",
-            "check": "说明两条记录使用同一发票",
-            "metric": "reasoning",
-            "evaluation_mode": "hybrid",
-            "expected": "同一invoice_id",
-            "evidence_sources": [
-              "final_answer",
-              "tool_trace",
-              "workspace_artifact"
-            ],
-            "pass_condition": "明确识别同一发票被重复使用",
-            "fail_condition": "未完全满足通过条件：明确识别同一发票被重复使用"
-          },
-          {
-            "id": "case-reasoning-amount",
-            "check": "说明两条记录对应金额均为669.5元",
-            "metric": "reasoning",
-            "evaluation_mode": "hybrid",
-            "expected": 669.5,
-            "evidence_sources": [
-              "final_answer",
-              "tool_trace",
-              "workspace_artifact"
-            ],
-            "pass_condition": "金额669.5元与记录一致",
-            "fail_condition": "未完全满足通过条件：金额669.5元与记录一致"
+            "pass_condition": "条款有效且直接支持同一发票最多报销一次的结论",
+            "fail_condition": "未完全满足通过条件：条款有效且直接支持同一发票最多报销一次的结论"
           },
           {
             "id": "submission",
@@ -858,21 +959,21 @@
           }
         ]
       },
-      "source_prompt": "结合制度和业务数据,核查以R000020为线索的重复报销异常,返回异常ID和记录ID集合。",
-      "prompt_change_reason": "使题面明确要求案件事实和制度证据"
+      "replaces": "L2-003"
     },
     {
-      "id": "L2-008",
-      "source_task_id": "L2-008",
-      "level": "L2",
+      "id": "RA-CASE-002",
+      "source_task_id": "RA-CASE-002",
+      "level": "L3",
       "category": "policy_data_comparison",
       "case_family": "record_audit",
-      "prompt": "请以R004212为线索，结合现行制度和业务数据核查相关费用记录是否存在异常。请返回核查涉及的record_id集合、审计结论、关键事实和制度依据；如存在异常，再返回发现ID。",
-      "selection_reason": "拆分报销双记录案例，验证窗口和合计金额",
+      "prompt": "请以R004209为线索，结合现行制度和业务数据核查相关费用记录是否存在异常。请返回核查涉及的record_id集合、审计结论、关键事实和制度依据；如存在异常，再返回发现ID。",
+      "selection_reason": "三笔拆分组合，验证滑动窗口、完整记录集合和现行审批线",
       "ground_truth_refs": [
-        "ground_truth:SPLIT-003",
-        "record:R004212",
-        "record:R004213",
+        "ground_truth:SPLIT-002",
+        "record:R004209",
+        "record:R004210",
+        "record:R004211",
         "document:01_expense_reimbursement_2025.md",
         "clause:01_expense_reimbursement_2025.md#第十一条",
         "document:03_authorization_management.md",
@@ -880,9 +981,16 @@
       ],
       "expected_output": {
         "scoring_kind": "finding_type_count",
+        "expected_facts": [
+          "三条记录属于同一员工E0008和同一费用类型travel_lodging",
+          "费用日期为2025-02-26、2025-02-28和2025-03-02，首尾相隔4天",
+          "三笔金额均为3400元，合计10200元，达到现行10000元较高审批线",
+          "三张发票不同，异常依据是7天内同类费用聚合达到审批线而非重复发票"
+        ],
         "expected_record_ids": [
-          "R004212",
-          "R004213"
+          "R004209",
+          "R004210",
+          "R004211"
         ],
         "expected_findings_by_type": {
           "SPLIT": 1
@@ -909,18 +1017,18 @@
         "checklist": [
           {
             "id": "audit-conclusion",
-            "check": "异常结论：在answer中明确判断本案构成拆分报销",
+            "check": "明确判断本案构成拆分报销风险",
             "metric": "conclusion",
             "evaluation_mode": "hybrid",
             "expected": "拆分报销",
             "evidence_sources": [
               "final_answer"
             ],
-            "pass_condition": "answer明确认定构成拆分报销且无矛盾表述",
-            "fail_condition": "未完全满足通过条件：answer明确认定构成拆分报销且无矛盾表述"
+            "pass_condition": "明确认定构成拆分报销风险且无矛盾表述",
+            "fail_condition": "未完全满足通过条件：明确认定构成拆分报销风险且无矛盾表述"
           },
           {
-            "id": "anomaly-type-count-rule-type",
+            "id": "anomaly-type",
             "check": "发现类型为SPLIT",
             "metric": "conclusion",
             "evaluation_mode": "deterministic",
@@ -934,7 +1042,7 @@
             "deterministic_rule": "anomaly-rule-type-exact"
           },
           {
-            "id": "anomaly-type-count-count",
+            "id": "anomaly-count",
             "check": "发现数量为1",
             "metric": "conclusion",
             "evaluation_mode": "deterministic",
@@ -948,31 +1056,45 @@
             "deterministic_rule": "anomaly-count-exact"
           },
           {
-            "id": "record-set-include-r004212",
-            "check": "结果包含应核查记录 R004212",
+            "id": "record-r004209",
+            "check": "结果包含R004209",
             "metric": "evidence",
             "evaluation_mode": "deterministic",
-            "expected": "R004212",
+            "expected": "R004209",
             "evidence_sources": [
               "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "提交的record_ids包含R004212",
-            "fail_condition": "未完全满足通过条件：提交的record_ids包含R004212",
+            "pass_condition": "提交的record_ids包含R004209",
+            "fail_condition": "未完全满足通过条件：提交的record_ids包含R004209",
             "deterministic_rule": "expected-record-present"
           },
           {
-            "id": "record-set-include-r004213",
-            "check": "结果包含应核查记录 R004213",
+            "id": "record-r004210",
+            "check": "结果包含R004210",
             "metric": "evidence",
             "evaluation_mode": "deterministic",
-            "expected": "R004213",
+            "expected": "R004210",
             "evidence_sources": [
               "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "提交的record_ids包含R004213",
-            "fail_condition": "未完全满足通过条件：提交的record_ids包含R004213",
+            "pass_condition": "提交的record_ids包含R004210",
+            "fail_condition": "未完全满足通过条件：提交的record_ids包含R004210",
+            "deterministic_rule": "expected-record-present"
+          },
+          {
+            "id": "record-r004211",
+            "check": "结果包含R004211",
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": "R004211",
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "pass_condition": "提交的record_ids包含R004211",
+            "fail_condition": "未完全满足通过条件：提交的record_ids包含R004211",
             "deterministic_rule": "expected-record-present"
           },
           {
@@ -981,60 +1103,74 @@
             "metric": "evidence",
             "evaluation_mode": "deterministic",
             "expected": [
-              "R004212",
-              "R004213"
+              "R004209",
+              "R004210",
+              "R004211"
             ],
             "evidence_sources": [
               "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "提交的record_ids除R004212, R004213外没有其他记录",
-            "fail_condition": "未完全满足通过条件：提交的record_ids除R004212, R004213外没有其他记录",
+            "pass_condition": "提交的record_ids除三条目标记录外没有其他记录",
+            "fail_condition": "未完全满足通过条件：提交的record_ids除三条目标记录外没有其他记录",
             "deterministic_rule": "no-unexpected-records"
           },
           {
-            "id": "policy-basis-expense",
-            "check": "引用费用报销办法第十一条",
-            "metric": "policy",
-            "evaluation_mode": "hybrid",
-            "expected": "01_expense_reimbursement_2025.md#第十一条",
-            "evidence_sources": [
-              "submitted_json",
-              "tool_trace"
-            ],
-            "pass_condition": "引用拆分报销规则条款",
-            "fail_condition": "未完全满足通过条件：引用拆分报销规则条款"
-          },
-          {
-            "id": "policy-basis-authorization",
-            "check": "引用授权管理办法附件二",
-            "metric": "policy",
-            "evaluation_mode": "hybrid",
-            "expected": "03_authorization_management.md#附件二",
-            "evidence_sources": [
-              "submitted_json",
-              "tool_trace"
-            ],
-            "pass_condition": "引用10000元审批线出处",
-            "fail_condition": "未完全满足通过条件：引用10000元审批线出处"
-          },
-          {
-            "id": "case-reasoning-window",
-            "check": "说明两条记录位于7天窗口内",
+            "id": "same-employee-type",
+            "check": "核实三条记录属于E0008且均为travel_lodging",
             "metric": "reasoning",
             "evaluation_mode": "hybrid",
-            "expected": 7,
+            "expected": {
+              "employee_id": "E0008",
+              "expense_type": "travel_lodging"
+            },
             "evidence_sources": [
               "final_answer",
               "tool_trace",
               "workspace_artifact"
             ],
-            "pass_condition": "正确计算为7天窗口内",
-            "fail_condition": "未完全满足通过条件：正确计算为7天窗口内"
+            "pass_condition": "员工和费用类型两个聚合维度均正确",
+            "fail_condition": "未完全满足通过条件：员工和费用类型两个聚合维度均正确"
           },
           {
-            "id": "case-reasoning-sum",
-            "check": "说明窗口内合计金额为10200元",
+            "id": "window-dates",
+            "check": "列明三笔费用日期并计算首尾相隔4天",
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": [
+              "2025-02-26",
+              "2025-02-28",
+              "2025-03-02"
+            ],
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "pass_condition": "三个日期完整且正确判断位于7天窗口内",
+            "fail_condition": "未完全满足通过条件：三个日期完整且正确判断位于7天窗口内"
+          },
+          {
+            "id": "amounts",
+            "check": "列明三笔金额均为3400元",
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": [
+              3400,
+              3400,
+              3400
+            ],
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "pass_condition": "三笔金额完整准确",
+            "fail_condition": "未完全满足通过条件：三笔金额完整准确"
+          },
+          {
+            "id": "sum",
+            "check": "计算窗口内合计金额为10200元",
             "metric": "reasoning",
             "evaluation_mode": "hybrid",
             "expected": 10200,
@@ -1043,22 +1179,77 @@
               "tool_trace",
               "workspace_artifact"
             ],
-            "pass_condition": "合计金额计算为10200元",
-            "fail_condition": "未完全满足通过条件：合计金额计算为10200元"
+            "pass_condition": "合计金额计算正确",
+            "fail_condition": "未完全满足通过条件：合计金额计算正确"
           },
           {
-            "id": "case-reasoning-threshold",
-            "check": "说明10200元达到并超过10000元审批线",
+            "id": "threshold",
+            "check": "将10200元与现行10000元较高审批线正确比较",
             "metric": "reasoning",
             "evaluation_mode": "hybrid",
             "expected": 10000,
             "evidence_sources": [
               "final_answer",
+              "tool_trace"
+            ],
+            "pass_condition": "明确说明合计达到较高审批线",
+            "fail_condition": "未完全满足通过条件：明确说明合计达到较高审批线"
+          },
+          {
+            "id": "distinct-invoices",
+            "check": "说明三张发票不同，排除重复发票规则",
+            "metric": "false_positive",
+            "evaluation_mode": "hybrid",
+            "expected": "three_distinct_invoices",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "pass_condition": "正确区分拆分报销与重复报销，不报告DUP",
+            "fail_condition": "未完全满足通过条件：正确区分拆分报销与重复报销，不报告DUP"
+          },
+          {
+            "id": "policy-expense",
+            "check": "引用费用报销办法第十一条",
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "01_expense_reimbursement_2025.md#第十一条",
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "pass_condition": "引用7天聚合及达到较高审批线的拆分核查规则",
+            "fail_condition": "未完全满足通过条件：引用7天聚合及达到较高审批线的拆分核查规则"
+          },
+          {
+            "id": "policy-authorization",
+            "check": "引用授权管理办法附件二",
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "03_authorization_management.md#附件二",
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "pass_condition": "引用现行10000元较高审批线出处",
+            "fail_condition": "未完全满足通过条件：引用现行10000元较高审批线出处"
+          },
+          {
+            "id": "window-investigation",
+            "check": "通过员工、费用类型和日期范围查询获得完整三记录窗口",
+            "metric": "evidence",
+            "evaluation_mode": "hybrid",
+            "expected": [
+              "R004209",
+              "R004210",
+              "R004211"
+            ],
+            "evidence_sources": [
               "tool_trace",
               "workspace_artifact"
             ],
-            "pass_condition": "将合计金额与10000元审批线正确比较",
-            "fail_condition": "未完全满足通过条件：将合计金额与10000元审批线正确比较"
+            "pass_condition": "在结论前完成等价的窗口查询并保留完整记录结果",
+            "fail_condition": "未完全满足通过条件：在结论前完成等价的窗口查询并保留完整记录结果"
           },
           {
             "id": "submission",
@@ -1083,8 +1274,7 @@
           }
         ]
       },
-      "source_prompt": "结合制度和业务数据,核查以R004212为线索的拆分报销异常,返回异常ID和记录ID集合。",
-      "prompt_change_reason": "使题面明确要求日期、合计金额和制度证据"
+      "replaces": "L2-008"
     },
     {
       "id": "L2-013",
@@ -4376,35 +4566,48 @@
       "prompt_change_reason": "删除不可见TRAP总数要求，明确发现ID和五类规则的可复算统计口径"
     },
     {
-      "id": "L3-010",
-      "source_task_id": "L3-010",
+      "id": "RR-CASE-001",
+      "source_task_id": "RR-CASE-001",
       "level": "L3",
       "category": "audit_report",
       "case_family": "retrieval_and_report",
-      "prompt": "请形成一段制度版本风险审计说明：列明2022版与2025现行审批线及效力状态，按金额区间说明继续使用旧版会产生哪些错误升级或漏升级风险，并给出可执行的版本校验控制。结论必须引用费用报销办法与授权管理办法的现行交叉依据。",
-      "selection_reason": "制度版本风险报告，验证审计表达",
+      "prompt": "请以R000465为线索，调查同一员工相邻日期的同类费用记录，并形成一段制度版本风险审计说明。请返回完整record_id集合，判断按现行制度是否构成异常，说明历史制度可能造成的不同结论、关键计算、制度依据和可执行控制；如存在异常，再返回发现ID。",
+      "selection_reason": "四记录版本边界报告，验证当前口径下不误报及旧版审批线风险解释",
       "ground_truth_refs": [
-        "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
-        "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount",
+        "record:R000465",
+        "record:R000561",
+        "record:R000888",
+        "record:R001354",
         "document:01_expense_reimbursement_2025.md",
-        "clause:01_expense_reimbursement_2025.md#第五条、第十四条",
+        "clause:01_expense_reimbursement_2025.md#第十一条、第十二条、第十四条",
         "document:02_expense_reimbursement_2022_deprecated.md",
         "clause:02_expense_reimbursement_2022_deprecated.md#第一条、第二条、第四条",
         "document:03_authorization_management.md",
-        "clause:03_authorization_management.md#附件二"
+        "clause:03_authorization_management.md#附件二",
+        "document:05_training_expense.md",
+        "clause:05_training_expense.md#第二条"
       ],
       "expected_output": {
-        "scoring_kind": "llm_rubric",
-        "rubric_assertions": [
-          "必须指出2025修订版现行部门总经理审批线为10000元。",
-          "必须指出2022版8000元审批线已废止。",
-          "必须说明报销办法通过授权管理办法附件二取得现行审批金额。",
-          "不得把旧版条款作为当前审批依据。"
+        "scoring_kind": "no_anomaly",
+        "expected_facts": [
+          "四条记录属于同一员工E0041和同一费用类型training_fee，费用日期从2025-12-18至2025-12-25，首尾相隔7天",
+          "四笔金额为2157.72元、2917.45元、2606.07元和2083.49元，合计9764.73元",
+          "9764.73元低于2025现行10000元较高审批线，不构成拆分规避审批",
+          "9764.73元高于已废止的2022版8000元线，误用旧线会产生拆分报销误报",
+          "四笔课程费分别未超过每人每期3500元标准，且发票互不相同"
         ],
+        "expected_record_ids": [
+          "R000465",
+          "R000561",
+          "R000888",
+          "R001354"
+        ],
+        "expected_reason": "四笔同类费用虽然处于7天窗口内，但合计9764.73元低于现行10000元审批线；旧8000元线已废止，不能据此报告异常",
+        "expected_anomaly_ids": [],
         "required_citations": [
           {
             "doc_id": "01_expense_reimbursement_2025.md",
-            "clause_no": "第五条、第十四条"
+            "clause_no": "第十一条、第十二条、第十四条"
           },
           {
             "doc_id": "02_expense_reimbursement_2022_deprecated.md",
@@ -4413,6 +4616,10 @@
           {
             "doc_id": "03_authorization_management.md",
             "clause_no": "附件二"
+          },
+          {
+            "doc_id": "05_training_expense.md",
+            "clause_no": "第二条"
           }
         ]
       },
@@ -4425,45 +4632,192 @@
         "normalization": "equal_item_ratio",
         "checklist": [
           {
-            "id": "current-version",
-            "check": "说明2025修订版为现行版本",
-            "metric": "conclusion",
+            "id": "no-anomaly",
+            "check": "不提交实质异常发现",
+            "metric": "false_positive",
+            "evaluation_mode": "deterministic",
+            "expected": {
+              "anomaly_ids": []
+            },
+            "evidence_sources": [
+              "submitted_json",
+              "final_answer"
+            ],
+            "pass_condition": "未提交任何异常发现ID",
+            "fail_condition": "未完全满足通过条件：未提交任何异常发现ID",
+            "deterministic_rule": "no-anomaly-ids"
+          },
+          {
+            "id": "record-r000465",
+            "check": "结果包含R000465",
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": "R000465",
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "pass_condition": "提交的record_ids包含R000465",
+            "fail_condition": "未完全满足通过条件：提交的record_ids包含R000465",
+            "deterministic_rule": "expected-record-present"
+          },
+          {
+            "id": "record-r000561",
+            "check": "结果包含R000561",
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": "R000561",
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "pass_condition": "提交的record_ids包含R000561",
+            "fail_condition": "未完全满足通过条件：提交的record_ids包含R000561",
+            "deterministic_rule": "expected-record-present"
+          },
+          {
+            "id": "record-r000888",
+            "check": "结果包含R000888",
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": "R000888",
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "pass_condition": "提交的record_ids包含R000888",
+            "fail_condition": "未完全满足通过条件：提交的record_ids包含R000888",
+            "deterministic_rule": "expected-record-present"
+          },
+          {
+            "id": "record-r001354",
+            "check": "结果包含R001354",
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": "R001354",
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "pass_condition": "提交的record_ids包含R001354",
+            "fail_condition": "未完全满足通过条件：提交的record_ids包含R001354",
+            "deterministic_rule": "expected-record-present"
+          },
+          {
+            "id": "record-set-no-extra",
+            "check": "结果不包含本题范围外的记录",
+            "metric": "evidence",
+            "evaluation_mode": "deterministic",
+            "expected": [
+              "R000465",
+              "R000561",
+              "R000888",
+              "R001354"
+            ],
+            "evidence_sources": [
+              "submitted_json",
+              "tool_trace"
+            ],
+            "pass_condition": "提交的record_ids仅包含四条目标记录",
+            "fail_condition": "未完全满足通过条件：提交的record_ids仅包含四条目标记录",
+            "deterministic_rule": "no-unexpected-records"
+          },
+          {
+            "id": "same-employee-type",
+            "check": "核实四条记录属于E0041且均为training_fee",
+            "metric": "reasoning",
             "evaluation_mode": "hybrid",
-            "expected": "2025修订版",
+            "expected": {
+              "employee_id": "E0041",
+              "expense_type": "training_fee"
+            },
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "pass_condition": "员工和费用类型两个聚合维度均正确",
+            "fail_condition": "未完全满足通过条件：员工和费用类型两个聚合维度均正确"
+          },
+          {
+            "id": "window-dates",
+            "check": "识别费用日期从2025-12-18至2025-12-25且首尾相隔7天",
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": {
+              "date_from": "2025-12-18",
+              "date_to": "2025-12-25",
+              "span_days": 7
+            },
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "pass_condition": "日期边界完整且按费用发生日期正确计算7天窗口",
+            "fail_condition": "未完全满足通过条件：日期边界完整且按费用发生日期正确计算7天窗口"
+          },
+          {
+            "id": "amount-list",
+            "check": "列明四笔金额",
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": [
+              2157.72,
+              2917.45,
+              2606.07,
+              2083.49
+            ],
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "pass_condition": "四笔金额与对应记录完整一致",
+            "fail_condition": "未完全满足通过条件：四笔金额与对应记录完整一致"
+          },
+          {
+            "id": "amount-sum",
+            "check": "计算四笔合计9764.73元",
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": 9764.73,
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "pass_condition": "合计金额计算正确",
+            "fail_condition": "未完全满足通过条件：合计金额计算正确"
+          },
+          {
+            "id": "current-threshold",
+            "check": "采用现行10000元较高审批线",
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": 10000,
             "evidence_sources": [
               "final_answer",
               "tool_trace"
             ],
-            "pass_condition": "明确识别现行版本及其效力",
-            "fail_condition": "未完全满足通过条件：明确识别现行版本及其效力"
+            "pass_condition": "正确引用并采用现行10000元线",
+            "fail_condition": "未完全满足通过条件：正确引用并采用现行10000元线"
           },
           {
-            "id": "current-threshold-gm",
-            "check": "给出现行部门总经理审批线10000元",
+            "id": "current-conclusion",
+            "check": "判断9764.73元低于现行线，不构成拆分规避审批",
             "metric": "conclusion",
             "evaluation_mode": "hybrid",
-            "expected": 10000,
+            "expected": "no_split",
             "evidence_sources": [
               "final_answer"
             ],
-            "pass_condition": "正确给出10000元包含边界",
-            "fail_condition": "未完全满足通过条件：正确给出10000元包含边界"
+            "pass_condition": "明确给出无拆分异常结论且无矛盾表述",
+            "fail_condition": "未完全满足通过条件：明确给出无拆分异常结论且无矛盾表述"
           },
           {
-            "id": "current-threshold-vp",
-            "check": "给出现行分管副总审批线50000元",
-            "metric": "conclusion",
-            "evaluation_mode": "hybrid",
-            "expected": 50000,
-            "evidence_sources": [
-              "final_answer"
-            ],
-            "pass_condition": "正确给出50000元包含边界",
-            "fail_condition": "未完全满足通过条件：正确给出50000元包含边界"
-          },
-          {
-            "id": "legacy-threshold-gm",
-            "check": "给出2022版部门总经理审批线8000元",
+            "id": "legacy-threshold",
+            "check": "识别2022版旧审批线为8000元",
             "metric": "policy",
             "evaluation_mode": "hybrid",
             "expected": 8000,
@@ -4471,50 +4825,75 @@
               "final_answer",
               "tool_trace"
             ],
-            "pass_condition": "正确给出旧版8000元审批线",
-            "fail_condition": "未完全满足通过条件：正确给出旧版8000元审批线"
-          },
-          {
-            "id": "legacy-threshold-vp",
-            "check": "给出2022版分管副总审批线30000元",
-            "metric": "policy",
-            "evaluation_mode": "hybrid",
-            "expected": 30000,
-            "evidence_sources": [
-              "final_answer",
-              "tool_trace"
-            ],
-            "pass_condition": "正确给出旧版30000元审批线",
-            "fail_condition": "未完全满足通过条件：正确给出旧版30000元审批线"
+            "pass_condition": "正确给出旧值及其历史版本来源",
+            "fail_condition": "未完全满足通过条件：正确给出旧值及其历史版本来源"
           },
           {
             "id": "legacy-status",
-            "check": "说明2022版审批金额已被替代且不得作为现行依据",
+            "check": "说明2022版8000元线已废止，不得作为现行依据",
             "metric": "false_positive",
             "evaluation_mode": "llm",
-            "expected": "旧版已废止",
+            "expected": "deprecated",
             "evidence_sources": [
               "final_answer",
               "tool_trace"
             ],
-            "pass_condition": "明确排除旧版金额的现行适用性",
-            "fail_condition": "未完全满足通过条件：明确排除旧版金额的现行适用性"
+            "pass_condition": "明确排除旧线的现行适用性",
+            "fail_condition": "未完全满足通过条件：明确排除旧线的现行适用性"
           },
           {
-            "id": "cross-reference-expense",
-            "check": "引用费用报销办法第五条和第十四条",
+            "id": "legacy-impact",
+            "check": "说明误用旧线会将该四记录组合错误报告为拆分报销",
+            "metric": "reasoning",
+            "evaluation_mode": "llm",
+            "expected": "false_positive_under_legacy_threshold",
+            "evidence_sources": [
+              "final_answer"
+            ],
+            "pass_condition": "将9764.73元与8000元比较并准确说明误报方向",
+            "fail_condition": "未完全满足通过条件：将9764.73元与8000元比较并准确说明误报方向"
+          },
+          {
+            "id": "training-standard",
+            "check": "说明四笔课程费分别未超过3500元每人每期标准",
+            "metric": "false_positive",
+            "evaluation_mode": "hybrid",
+            "expected": 3500,
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "pass_condition": "逐笔比较后正确排除培训费超标准",
+            "fail_condition": "未完全满足通过条件：逐笔比较后正确排除培训费超标准"
+          },
+          {
+            "id": "distinct-invoices",
+            "check": "说明四条记录发票互不相同，排除重复报销",
+            "metric": "false_positive",
+            "evaluation_mode": "hybrid",
+            "expected": "four_distinct_invoices",
+            "evidence_sources": [
+              "final_answer",
+              "tool_trace"
+            ],
+            "pass_condition": "通过发票证据正确排除重复报销",
+            "fail_condition": "未完全满足通过条件：通过发票证据正确排除重复报销"
+          },
+          {
+            "id": "policy-expense",
+            "check": "引用现行费用报销办法第十一条、第十二条和第十四条",
             "metric": "policy",
             "evaluation_mode": "hybrid",
-            "expected": "01_expense_reimbursement_2025.md#第五条、第十四条",
+            "expected": "01_expense_reimbursement_2025.md#第十一条、第十二条、第十四条",
             "evidence_sources": [
               "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "准确引用现行办法的交叉引用和废止条款",
-            "fail_condition": "未完全满足通过条件：准确引用现行办法的交叉引用和废止条款"
+            "pass_condition": "引用覆盖拆分核查、超标准和旧版废止依据",
+            "fail_condition": "未完全满足通过条件：引用覆盖拆分核查、超标准和旧版废止依据"
           },
           {
-            "id": "cross-reference-authorization",
+            "id": "policy-authorization",
             "check": "引用授权管理办法附件二",
             "metric": "policy",
             "evaluation_mode": "hybrid",
@@ -4523,60 +4902,55 @@
               "submitted_json",
               "tool_trace"
             ],
-            "pass_condition": "准确引用现行审批金额表",
-            "fail_condition": "未完全满足通过条件：准确引用现行审批金额表"
+            "pass_condition": "准确引用10000元现行审批线出处",
+            "fail_condition": "未完全满足通过条件：准确引用10000元现行审批线出处"
           },
           {
-            "id": "impact-lower-band",
-            "check": "说明8000至9999.99元会被旧线错误升级",
-            "metric": "reasoning",
-            "evaluation_mode": "llm",
-            "expected": "8000-9999.99",
+            "id": "policy-training",
+            "check": "引用培训费办法第二条",
+            "metric": "policy",
+            "evaluation_mode": "hybrid",
+            "expected": "05_training_expense.md#第二条",
             "evidence_sources": [
-              "final_answer"
+              "submitted_json",
+              "tool_trace"
             ],
-            "pass_condition": "明确给出受影响区间及错误升级方向",
-            "fail_condition": "未完全满足通过条件：明确给出受影响区间及错误升级方向"
-          },
-          {
-            "id": "impact-upper-band",
-            "check": "说明30000至49999.99元会被旧线错误升级",
-            "metric": "reasoning",
-            "evaluation_mode": "llm",
-            "expected": "30000-49999.99",
-            "evidence_sources": [
-              "final_answer"
-            ],
-            "pass_condition": "明确给出受影响区间及错误升级方向",
-            "fail_condition": "未完全满足通过条件：明确给出受影响区间及错误升级方向"
-          },
-          {
-            "id": "unaffected-band",
-            "check": "说明10000至29999.99元的新旧必要最高审批角色一致",
-            "metric": "reasoning",
-            "evaluation_mode": "llm",
-            "expected": "10000-29999.99",
-            "evidence_sources": [
-              "final_answer"
-            ],
-            "pass_condition": "正确识别新旧规则在该区间不会改变最高审批角色",
-            "fail_condition": "未完全满足通过条件：正确识别新旧规则在该区间不会改变最高审批角色"
+            "pass_condition": "准确引用3500元课程费标准",
+            "fail_condition": "未完全满足通过条件：准确引用3500元课程费标准"
           },
           {
             "id": "version-control",
-            "check": "提出同时校验生效日期、废止关系和交叉引用目标的控制",
+            "check": "提出校验制度生效日期、废止状态和交叉引用目标的可执行控制",
             "metric": "reasoning",
             "evaluation_mode": "llm",
             "expected": [
               "生效日期",
-              "废止关系",
-              "交叉引用"
+              "废止状态",
+              "交叉引用目标"
             ],
             "evidence_sources": [
               "final_answer"
             ],
-            "pass_condition": "控制措施覆盖版本元数据、废止状态和引用目标，不只是泛泛提出加强管理",
-            "fail_condition": "未完全满足通过条件：控制措施覆盖版本元数据、废止状态和引用目标，不只是泛泛提出加强管理"
+            "pass_condition": "控制措施覆盖三个要素且不是泛泛建议",
+            "fail_condition": "未完全满足通过条件：控制措施覆盖三个要素且不是泛泛建议"
+          },
+          {
+            "id": "independent-investigation",
+            "check": "在结论前完成同员工、同费用类型、日期窗口和发票的独立查询",
+            "metric": "reasoning",
+            "evaluation_mode": "hybrid",
+            "expected": [
+              "employee",
+              "expense_type",
+              "date_window",
+              "invoice"
+            ],
+            "evidence_sources": [
+              "tool_trace",
+              "workspace_artifact"
+            ],
+            "pass_condition": "工具轨迹或工作产物证明完成完整窗口和发票核查，不能仅凭最终答案通过",
+            "fail_condition": "未完全满足通过条件：工具轨迹或工作产物证明完成完整窗口和发票核查，不能仅凭最终答案通过"
           },
           {
             "id": "submission",
@@ -4590,10 +4964,17 @@
             "pass_condition": "提交回执状态为accepted且Schema校验通过",
             "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
           }
+        ],
+        "critical_failures": [
+          {
+            "id": "substantive-false-positive",
+            "check": "将无异常案例提交为实质异常",
+            "deterministic_rule": "unexpected-anomaly-reported",
+            "score_cap": 40
+          }
         ]
       },
-      "source_prompt": "请专门写一段版本陷阱审计说明,解释旧版审批线可能导致的误判。",
-      "prompt_change_reason": "使题面明确覆盖新旧数值、现行依据、误判风险和控制建议"
+      "replaces": "L3-010"
     }
   ]
 }

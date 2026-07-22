@@ -1,0 +1,54 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-RR-CASE-001",
+      "record_ids": ["R000465", "R000561", "R000888", "R001354"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"},
+        {"doc_id": "05_training_expense.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"}
+      ],
+      "facts": [
+        "E0041邓柳在2025-12-18至2025-12-25的7日内提交4笔training_fee报销",
+        "R000465: 2025-12-18, 2157.72元, AR-01, 仅部门经理审批",
+        "R000561: 2025-12-20, 2917.45元, AR-01, 仅部门经理审批",
+        "R000888: 2025-12-23, 2606.07元, AR-01, 仅部门经理审批",
+        "R001354: 2025-12-25, 2083.49元, AR-01, 仅部门经理审批",
+        "7日合计9764.73元, 任意两笔组合均超过AR-02线3000元",
+        "2025版制度第十一条要求7日内同类费用合计达到较高审批线时应重点核查拆分规避审批",
+        "2022版制度无拆分规避条款, 审批线为8000→部门总经理, 该模式在旧版下不会触发异常审查",
+        "4笔发票均为唯一使用, 无重复报销问题",
+        "D005部门年度预算278540.94元, 累计使用433442.76元, 预算使用率155.6%, 已超额"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R000465", "R000561", "R000888", "R001354"],
+  "submitted_record_ids": ["R000465", "R000561", "R000888", "R001354"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "R001894": "2025-12-08距离R000465(12-18)10天, 超出7日窗口, 不参与本次拆分核查"
+  },
+  "reconciled_figures": {
+    "seven_day_total": 9764.73,
+    "seven_day_window": "2025-12-18 to 2025-12-25",
+    "individual_approval_tier": "AR-01",
+    "combined_approval_tier": "AR-02",
+    "key_pairs": [
+      {"pair": "R000465+R000561", "combined": 5075.17, "exceeds_AR02": true},
+      {"pair": "R000465+R000888", "combined": 4763.79, "exceeds_AR02": true},
+      {"pair": "R000561+R000888", "combined": 5523.52, "exceeds_AR02": true},
+      {"pair": "R000888+R001354", "combined": 4689.56, "exceeds_AR02": true}
+    ]
+  },
+  "unresolved_items": []
+}

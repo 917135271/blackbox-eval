@@ -1,0 +1,121 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-PV-CASE-001-001",
+      "record_ids": [
+        "R004233"
+      ],
+      "citations": [
+        {
+          "doc_id": "03_authorization_management.md",
+          "clause_no": "附件二"
+        }
+      ],
+      "facts": {
+        "amount": 9990.0,
+        "tier": "AR-02",
+        "required_roles": [
+          "部门经理",
+          "财务复核"
+        ],
+        "actual_roles": [
+          "部门经理"
+        ],
+        "missing_role": "财务复核",
+        "approver": "E0008"
+      },
+      "evidence_type": "approval_path_missing",
+      "description": "AR-02要求部门经理+财务复核，实际仅有部门经理(E0008)审批，缺失财务复核",
+      "status": "confirmed"
+    },
+    {
+      "anomaly_id": "ANOM-PV-CASE-001-001",
+      "record_ids": [
+        "R004233"
+      ],
+      "citations": [
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第五条"
+        }
+      ],
+      "facts": {
+        "policy_requirement": "费用系统应按附件二自动派生审批角色",
+        "actual_derivation": "AR-02仅派生部门经理，未派生财务复核"
+      },
+      "evidence_type": "system_derivation_failure",
+      "description": "2025版第五条要求系统按附件二派生审批角色，但系统未派生财务复核",
+      "status": "confirmed"
+    },
+    {
+      "anomaly_id": "ANOM-PV-CASE-001-001",
+      "record_ids": [
+        "R004233"
+      ],
+      "citations": [
+        {
+          "doc_id": "04_travel_expense.md",
+          "clause_no": "第四条"
+        }
+      ],
+      "facts": {
+        "employee_level": "X1",
+        "position_role": "分管副总",
+        "travel_grade": "高管级",
+        "city_tier": "A",
+        "standard_per_night": 1100.0,
+        "actual_per_night": 999.0,
+        "nights": 10,
+        "total_amount": 9990.0,
+        "within_standard": true
+      },
+      "evidence_type": "expense_standard_check",
+      "description": "高管级一类城市住宿标准1100元/晚，实际999元/晚，未超标",
+      "status": "cleared"
+    },
+    {
+      "anomaly_id": "ANOM-PV-CASE-001-001",
+      "record_ids": [
+        "R004233"
+      ],
+      "citations": [
+        {
+          "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+          "clause_no": "第二条"
+        }
+      ],
+      "facts": {
+        "deprecated_threshold": 8000,
+        "deprecated_approver": "部门总经理",
+        "current_tier": "AR-02",
+        "current_approver": "部门经理+财务复核",
+        "deviation": "历史线会误判仅需部门总经理，遗漏财务复核要求"
+      },
+      "evidence_type": "historical_comparison",
+      "description": "历史审批线(2022)≥8000需部门总经理，但2025版AR-02要求部门经理+财务复核，继续使用历史线将造成审批角色错配并遗漏财务复核",
+      "status": "confirmed"
+    }
+  ],
+  "candidate_record_ids": [
+    "R004233"
+  ],
+  "submitted_record_ids": [
+    "R004233"
+  ],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true
+  },
+  "reconciled_figures": {
+    "R004233_amount": 9990.0,
+    "R004233_nights": 10,
+    "R004233_per_night": 999.0,
+    "standard_per_night": 1100.0
+  },
+  "unresolved_items": []
+}

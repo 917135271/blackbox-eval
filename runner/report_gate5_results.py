@@ -37,9 +37,9 @@ from formal_eval_plan import (  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 RUN_ROOT = ROOT / "runs" / "gate4_formal"
-GRADES_PATH = RUN_ROOT / "gate5_grades_v6.jsonl"
+GRADES_PATH = RUN_ROOT / "gate5_grades_v7.jsonl"
 CASES_PATH = ROOT / "data" / "formal_case_rubric" / "cases.json"
-OUTPUT = ROOT / "output" / "gate5_v6"
+OUTPUT = ROOT / "output" / "gate5_v7"
 FAMILIES = (
     "policy_and_version",
     "record_audit",
@@ -519,7 +519,7 @@ def human_review_sample(grades: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "checklist_pass_rate": rows_by_key[(group, task_id)].get("checklist_pass_rate", 0.0),
             "reasons": sorted(reasons),
             "grade_path": (
-                RUN_ROOT / "gate5_judge_v6" / group / f"{task_id}.json"
+                RUN_ROOT / "gate5_judge_v7" / group / f"{task_id}.json"
             ).relative_to(ROOT).as_posix(),
             "submission_path": (
                 RUN_ROOT / group / task_id / "workspace" / "final_submission.json"
@@ -582,7 +582,7 @@ def write_typical_trajectories(
                         for item in low
                     ),
                     f"- 完整轨迹：`runs/gate4_formal/{group}/{row['task_id']}/artifacts/trajectory.jsonl`",
-                    f"- 逐项判卷：`runs/gate4_formal/gate5_judge_v6/{group}/{row['task_id']}.json`",
+                    f"- 逐项判卷：`runs/gate4_formal/gate5_judge_v7/{group}/{row['task_id']}.json`",
                     "",
                 ]
     (OUTPUT / "gate5_typical_trajectories.md").write_text(
@@ -816,7 +816,7 @@ def write_reports(
         f"- 已生成{len(review)}条可选质量抽查样本；确定性规则项直接定稿，语义项由Judge判定，抽查结果不修改正式得分。",
         "- Token统计保留为诊断项；在六个框架采集覆盖率和缓存口径完全可比前，不进入效率分和总分。",
         "",
-        "详细材料：`output/gate5_v6/gate5_scores.json`、`output/gate5_v6/gate5_case_checklists.csv`、`output/gate5_v6/gate5_failure_attribution.jsonl`、`output/gate5_v6/gate5_human_review_sample.md`、`output/gate5_v6/gate5_typical_trajectories.md`。",
+        "详细材料：`output/gate5_v7/gate5_scores.json`、`output/gate5_v7/gate5_case_checklists.csv`、`output/gate5_v7/gate5_failure_attribution.jsonl`、`output/gate5_v7/gate5_human_review_sample.md`、`output/gate5_v7/gate5_typical_trajectories.md`。",
     ]
     (OUTPUT / "gate5_final_report.md").write_text("\n".join(lines), encoding="utf-8")
     (OUTPUT / "gate5_gate_report.json").write_text(

@@ -1,0 +1,45 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-001",
+      "record_ids": ["R004233"],
+      "citations": [
+        {"doc_id": "03_authorization_management.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第三条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第五条"}
+      ],
+      "facts": [
+        "R004233金额9990元落入附件二AR-02区间(3000≤金额<10000)，要求审批角色为'部门经理,并经财务复核'",
+        "R004233审批链仅包含一条AR-02审批记录(approval_id=A004233, approver_role=部门经理, approver_employee_id=E0008)，缺少财务复核审批",
+        "通过list_records_missing_approval(required_role=财务复核)查询确认R004233在缺失财务复核列表中",
+        "R004233无特殊审批(special_approval=0)，无豁免适用条件",
+        "2025修订版第十四条明确自2025年1月1日起施行，原2022版同时废止，R004233 expense_date=2025-10-03适用现行制度",
+        "E0012(杨丽华)职级X1/分管副总属高管级，一类城市差旅住宿标准1100元/人/晚",
+        "R004233共10晚，金额9990元，实际999元/晚，低于1100元/晚标准上限，费用标准适用合规",
+        "2022版历史审批线(≥8000元需部门总经理)已废止，若沿用会误判R004233缺少部门总经理审批，而忽略现行AR-02真正缺失的财务复核"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004233"],
+  "submitted_record_ids": ["R004233"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "total_records_checked": 1,
+    "anomalies_found": 1,
+    "amount_checked": 9990,
+    "amount_anomalous": 9990
+  },
+  "unresolved_items": []
+}

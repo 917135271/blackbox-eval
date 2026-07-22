@@ -1,0 +1,93 @@
+{
+  "task_id": "RA-CASE-002",
+  "task_type": "policy_data_comparison",
+  "clue_record": "R004209",
+  "audit_scope": {
+    "primary_record": "R004209",
+    "employee_id": "E0008",
+    "department_id": "D008",
+    "expense_type": "travel_lodging",
+    "business_period": "2025-01-01 to 2025-12-31",
+    "related_scope": "Records related to E0008 self-approval, AR-02 missing financial review, and lodging standard violations"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "Does R004209 have the complete required approval chain per Authorization Management Annex II?",
+      "policy_docs": ["03_authorization_management.md"],
+      "rule": "AR-02 (3000-10000) requires 部门经理 + 财务复核"
+    },
+    {
+      "id": "PQ-02",
+      "question": "Is self-approval (employee approving own expense) compliant with policy?",
+      "policy_docs": ["01_expense_reimbursement_2025.md", "03_authorization_management.md"],
+      "rule": "Article 3 separation of duties: 经办人真实性承诺 vs 部门负责人业务审核"
+    },
+    {
+      "id": "PQ-03",
+      "question": "Does R004209 lodging amount comply with travel expense standards for manager level in Tier A city?",
+      "policy_docs": ["04_travel_expense.md"],
+      "rule": "Manager level Tier A: 650元/晚; no special approval → max 1.0x standard"
+    },
+    {
+      "id": "PQ-04",
+      "question": "Are there other records by E0008 with similar approval or standard violations?",
+      "policy_docs": ["01_expense_reimbursement_2025.md", "03_authorization_management.md", "04_travel_expense.md"],
+      "rule": "Same-employee patterns of missing approvals or standard exceedances"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-01",
+      "question": "What are the full details and approval chain of R004209?",
+      "action": "get_expense_detail(R004209) + list_approvals(R004209)"
+    },
+    {
+      "id": "DQ-02",
+      "question": "Are there other records by E0008 with only self-approval (missing financial review for AR-02 tier)?",
+      "action": "list_records_missing_approval for 财务复核 role, filtered by employee E0008; or list all E0008 records and check approvals"
+    },
+    {
+      "id": "DQ-03",
+      "question": "Are there other travel_lodging records by E0008 exceeding lodging standard?",
+      "action": "list_expenses for E0008, travel_lodging; compute per-night rate"
+    },
+    {
+      "id": "DQ-04",
+      "question": "What is the employee level and department for E0008?",
+      "action": "get_employee(E0008)"
+    }
+  ],
+  "execution_steps": [
+    "1. Complete data collection: get E0008 details, list all E0008 expenses, check approvals",
+    "2. Policy analysis: confirm applicable standards and approval requirements",
+    "3. Identify all anomalous records",
+    "4. Build evidence matrix connecting each anomaly to policy clauses",
+    "5. Run evidence-coverage-check",
+    "6. Run false-positive-review if applicable",
+    "7. Run audit-report",
+    "8. Run result-validator",
+    "9. Validate and submit"
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "Multiple policies involved (travel, reimbursement, authorization)",
+      "Multiple business rules (approval chain, lodging standard, self-approval separation)",
+      "Need to batch-search related records for same-employee patterns",
+      "Date and amount thresholds present"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": true,
+    "role": "data_analyst",
+    "reason_code": "MULTI_RECORD_SCOPE",
+    "task": "Investigate E0008's expense records: list all records, check approval completeness (especially AR-02 records missing financial review), check lodging standard compliance for travel_lodging records in Tier A cities. Save detailed analysis to work/subagents/data_analyst/."
+  },
+  "stopping_conditions": [
+    "All E0008 records examined for approval completeness and standard compliance",
+    "Evidence matrix with 100% coverage",
+    "Validation report passing"
+  ],
+  "unresolved_items": []
+}

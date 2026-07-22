@@ -1,0 +1,53 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-PV-001-001",
+      "record_ids": ["R004233"],
+      "citations": [
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第四条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"}
+      ],
+      "facts": [
+        "R004233金额9990元落入AR-02档位[3000,10000)",
+        "AR-02档位必要审批角色为'部门经理,并经财务复核'",
+        "R004233审批记录仅包含部门经理(E0008/杨丹)审批,缺失财务复核",
+        "list_records_missing_approval(required_role='财务复核')确认R004233在缺失财务复核列表中"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004233"],
+  "submitted_record_ids": ["R004233"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true,
+    "searched_population": "单记录R004233及关联审批、部门预算",
+    "query_conditions": "record_id=R004233, approvals, missing_approval财务复核, employee E0012/E0008, department D008 budget",
+    "checked_rules": ["审批路径完整性(AR-02财务复核)", "住宿费标准(高管级一类城市1100元/晚)", "部门预算(381600)", "历史审批线偏差(2022版8000元线)"],
+    "population_count": 1,
+    "conclusion": "审批路径存在缺失财务复核异常;费用标准、预算均合规;历史2022版审批线已废止不应使用"
+  },
+  "reconciled_figures": {
+    "record_amount": 9990.0,
+    "nights": 10,
+    "avg_per_night": 999.0,
+    "standard_per_night": 1100.0,
+    "within_standard": true,
+    "approval_tier": "AR-02",
+    "required_roles": "部门经理,并经财务复核",
+    "actual_roles": "部门经理",
+    "financial_review_missing": true
+  },
+  "unresolved_items": []
+}

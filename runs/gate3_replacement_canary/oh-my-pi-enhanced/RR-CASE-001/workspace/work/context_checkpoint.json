@@ -1,0 +1,164 @@
+{
+  "artifact_paths": [
+    "final_submission.json",
+    "submission_receipt.json",
+    "traces/context_events.jsonl",
+    "traces/events.jsonl",
+    "traces/native_events.jsonl",
+    "traces/subagents.jsonl",
+    "traces/tool_calls.jsonl",
+    "work/analysis/data_findings.json",
+    "work/artifact_index.json",
+    "work/audit_plan.json",
+    "work/context_checkpoint.json",
+    "work/decision_log.jsonl",
+    "work/evidence_index.json",
+    "work/evidence_matrix.json",
+    "work/final_result.json",
+    "work/independent_review.json",
+    "work/policy_applicability.json",
+    "work/report_draft.json",
+    "work/task_state.json",
+    "work/validation_report.json"
+  ],
+  "compacted": false,
+  "context_usage_percent": 0.0,
+  "created_at": 1784724651.4632318,
+  "estimation_method": "outer_runner_finalization",
+  "retained_state": {
+    "applicable_policies": [
+      "01_expense_reimbursement_2025.md",
+      "03_authorization_management.md"
+    ],
+    "artifact_index": [
+      "final_submission.json",
+      "submission_receipt.json",
+      "traces/context_events.jsonl",
+      "traces/events.jsonl",
+      "traces/native_events.jsonl",
+      "traces/subagents.jsonl",
+      "traces/tool_calls.jsonl",
+      "work/analysis/data_findings.json",
+      "work/artifact_index.json",
+      "work/audit_plan.json",
+      "work/context_checkpoint.json",
+      "work/decision_log.jsonl",
+      "work/evidence_index.json",
+      "work/evidence_matrix.json",
+      "work/final_result.json",
+      "work/independent_review.json",
+      "work/policy_applicability.json",
+      "work/report_draft.json",
+      "work/task_state.json",
+      "work/validation_report.json"
+    ],
+    "audit_plan": {
+      "complexity": {
+        "reasons": [
+          "制度版本差异(2022 vs 2025): +1",
+          "聚合/分组/日期窗口计算: +1",
+          "阈值边界(7天/3000元): +1"
+        ],
+        "score": 3,
+        "subagent_plan": "compact模式,不委派子智能体。范围窄(一员工一规则),主智能体可直接完成"
+      },
+      "data_questions": [
+        {
+          "method": "list_expenses按employee_id+expense_type过滤,计算日期差",
+          "question": "E0041在R000465相邻7天内有多少笔training_fee记录?"
+        },
+        {
+          "method": "比对invoice_no/invoice_id",
+          "question": "各记录是否使用不同发票(排除重复报销)?"
+        },
+        {
+          "method": "Python求和后与3000比较",
+          "question": "合计金额是否达到AR-02较高审批线?"
+        }
+      ],
+      "evidence_requirements": [
+        "R000465及相邻7天内所有E0041 training_fee记录详情",
+        "各记录审批链",
+        "2025版制度第十一条全文",
+        "2022版制度全文(证明无拆分规则)",
+        "附件二审批权限表"
+      ],
+      "execution_steps": [
+        "1. 审计计划 (当前)",
+        "2. 制度版本检查: 2025版Art.11 vs 2022版无拆分规则",
+        "3. 批量数据分析: 7天窗口计算,合计金额与审批线比较",
+        "4. 证据覆盖检查",
+        "5. 误报复核 (边界日期R001354的7天判定)",
+        "6. 审计报告",
+        "7. 结果校验",
+        "8. 统一提交"
+      ],
+      "policy_questions": [
+        {
+          "boundaries": "7天窗口, AR-02审批线(≥3000元)",
+          "question": "2025版制度第十一条拆分报销规则如何适用于R000465相邻记录?",
+          "rule": "同一员工、同一费用类型在7天内出现2笔及以上报销,且合计金额达到较高审批线"
+        },
+        {
+          "question": "2022版制度是否包含拆分报销规则?",
+          "rule": "2022版仅规定单笔审批线(8000/30000),无7天拆分规则"
+        },
+        {
+          "question": "附件二审批权限表中'较高审批线'的具体阈值?",
+          "rule": "AR-01:<3000(部门经理), AR-02:3000-10000(部门经理+财务复核)"
+        }
+      ],
+      "required_fields": [
+        "record_id",
+        "employee_id",
+        "expense_date",
+        "expense_type",
+        "amount",
+        "invoice_no",
+        "special_approval",
+        "status",
+        "approvals"
+      ],
+      "stopping_conditions": [
+        "所有7天内记录已获取并验证",
+        "制度差异已明确对比",
+        "合计金额与审批线比较完成",
+        "证据矩阵100%覆盖",
+        "validate_audit_result返回valid=true"
+      ],
+      "task_scope": {
+        "audit_object": "员工E0041(邓柳)培训费相邻日期同类费用记录",
+        "business_period": "2025-12-08 至 2025-12-25 (R000465相邻7天窗口)",
+        "clue_record": "R000465",
+        "deliverable": "制度版本风险审计说明,含record_ids、异常判断、历史制度差异、关键计算、制度依据和可执行控制",
+        "expense_types": [
+          "training_fee"
+        ],
+        "organization_scope": "员工E0041, 部门D005(机构业务部)",
+        "task_id": "RR-CASE-001"
+      }
+    },
+    "constraints": [
+      "isolated GATE3 workspace",
+      "formal answer assets prohibited",
+      "outer runner timeout enforced"
+    ],
+    "evidence_status": "pass",
+    "record_ids": [
+      "R000465",
+      "R000561",
+      "R000888",
+      "R001354"
+    ],
+    "remaining_budget": {
+      "elapsed_seconds": 331.318,
+      "remaining_seconds": 568.682,
+      "timeout_seconds": 900
+    },
+    "submission_status": "accepted",
+    "task": "你正在执行GATE3新正式题区分度Canary，该运行只用于冻结前验证，不进入正式排名。当前为领域增强组。\n\n任务ID：RR-CASE-001\n题型：audit_report\n问题：请以R000465为线索，调查同一员工相邻日期的同类费用记录，并形成一段制度版本风险审计说明。请返回完整record_id集合，判断按现行制度是否构成异常，说明历史制度可能造成的不同结论、关键计算、制度依据和可执行控制；如存在异常，再返回发现ID。\n\n遵循已安装的证券费用审计Skills，按需使用Checkpoint、子智能体、证据复核和结果校验。\n\n要求：\n1. 必须查询制度和只读业务库后作答，可以使用Shell、Python、SQLite和当前隔离工作区文件。\n2. 禁止读取 ground_truth、cases.json、Rubric、判卷代码、历史答案、其他任务或候选轨迹，也不得访问无关互联网。\n3. 有异常时，record_ids只包含参与本题违规的记录；无异常时仍保留直接核查或结论覆盖的记录，并在answer中明确写“无异常”。\n4. 必须维护work/final_result.json、work/evidence_matrix.json和work/validation_report.json，先取得validate_audit_result的valid=true，再以result_path=\"work/final_result.json\"调用submit_audit_result。\n5. 不得打印最终JSON代替统一提交。提交成功后只输出GATE3_CANARY_PASS；无法提交时只输出GATE3_CANARY_FAIL。\n",
+    "unresolved_items": []
+  },
+  "stage": "submission_ready",
+  "task_id": "RR-CASE-001"
+}

@@ -1,0 +1,30 @@
+{
+  "decision": "pass",
+  "challenged_findings": [
+    {
+      "anomaly_id": "ANOM-PV-001-001",
+      "challenge": "是否AR-02的财务复核可通过其他渠道完成而无需系统审批记录？是否有特殊审批豁免？",
+      "resolution": "确认异常成立。无special_approval标记,审批链仅一条AR-02记录,policy明确要求'部门经理,并经财务复核',list_records_missing_approval亦确认缺失。不存在豁免情形。"
+    }
+  ],
+  "boundary_checks": [
+    {"type": "amount_boundary", "value": 9990, "boundary": "AR-02上限10000(不含)", "result": "pass, not at boundary"},
+    {"type": "expense_standard", "per_night": 999, "standard": 1100, "result": "pass, within standard"},
+    {"type": "historical_2022_line", "value": 9990, "threshold": 8000, "note": "2022版已废止,8000线不再适用"}
+  ],
+  "exception_checks": [
+    {"type": "special_approval", "value": 0, "exempted": false},
+    {"type": "invoice_reuse", "usage_count": 1, "duplicate": false},
+    {"type": "split_claim", "within_7_days": false, "split": false}
+  ],
+  "supporting_evidence": [
+    "list_approvals返回仅一条审批记录(AR-02/部门经理)",
+    "list_records_missing_approval('财务复核')包含R004233",
+    "special_approval=0无特殊审批",
+    "发票FP2025X0004227仅使用1次"
+  ],
+  "opposing_evidence": [],
+  "required_changes": [],
+  "rationale": "R004233在AR-02档位明确需要财务复核,但审批链中仅存在部门经理审批。所有边界和豁免检查均排除误判可能。异常确认。",
+  "unresolved_conflicts": []
+}

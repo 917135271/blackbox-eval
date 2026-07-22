@@ -1,0 +1,63 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-RA002-001",
+      "record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+      "citations": [
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第五条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R004209: 员工E0008(杨丹,职级D1/经理级),差旅住宿费3400元/5晚=680元/晚,A类城市,标准650元/晚,超标150元,special_approval=0",
+        "R004210: 员工E0008(杨丹,职级D1/经理级),差旅住宿费3400元/5晚=680元/晚,A类城市,标准650元/晚,超标150元,special_approval=0",
+        "R004211: 员工E0008(杨丹,职级D1/经理级),差旅住宿费3400元/5晚=680元/晚,A类城市,标准650元/晚,超标150元,special_approval=0",
+        "R004219: 员工E0008(杨丹,职级D1/经理级),差旅住宿费5200元/7晚≈742.86元/晚,A类城市,标准650元/晚,超标650元,special_approval=0",
+        "R004220: 员工E0008(杨丹,职级D1/经理级),差旅住宿费5200元/7晚≈742.86元/晚,A类城市,标准650元/晚,超标650元,special_approval=0"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-RA002-002",
+      "record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "R004209至R004211、R004219至R004220共5笔费用,报销人均为E0008(杨丹,部门经理),审批人同为E0008,审批角色均为部门经理,审批人与经办人为同一人",
+        "费用报销管理办法第三条:费用报销实行经办人真实性承诺、部门负责人业务审核、财务复核和授权审批相结合的管理原则,要求各环节职责分离"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-RA002-003",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"}
+      ],
+      "facts": [
+        "R004209(2025-02-26)、R004210(2025-02-28)、R004211(2025-03-02)三笔报销时间跨度5天,小于7天",
+        "同一员工E0008,同一费用类型travel_lodging",
+        "三笔合计金额3400+3400+3400=10200元,超过10000元AR-03审批线"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+  "submitted_record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {},
+  "unresolved_items": []
+}

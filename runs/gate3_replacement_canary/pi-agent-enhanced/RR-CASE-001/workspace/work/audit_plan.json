@@ -1,0 +1,99 @@
+{
+  "task_id": "RR-CASE-001",
+  "task_type": "audit_report",
+  "clue_record": "R000465",
+  "scope": {
+    "audit_object": "员工E0041（邓柳）相邻日期同类费用（training_fee）记录，以R000465为线索",
+    "expense_type": "training_fee",
+    "business_period": "2025年12月（重点12-08至12-25）",
+    "organization_scope": "部门D005（机构业务部），员工E0041",
+    "deliverable": "制度版本风险审计说明，包含完整record_id集合、异常判定、历史制度差异、关键计算、制度依据、可执行控制"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ1",
+      "question": "现行制度（2025版）第十一条：同一员工同一费用类型在7天内出现2笔及以上报销，合计金额达到附件二较高审批线，是否触发拆分规避审批核查？",
+      "applicable_clauses": ["01_expense_reimbursement_2025 第十一条", "01_expense_reimbursement_2025 第十二条", "03_authorization_management 附件二"],
+      "boundaries": {
+        "window_days": 7,
+        "threshold": "AR-02（3000元）作为较高审批线",
+        "employee": "E0041",
+        "expense_type": "training_fee"
+      }
+    },
+    {
+      "id": "PQ2",
+      "question": "历史制度（2022版）是否有类似拆分规避条款？在相同数据下会得出什么不同结论？",
+      "applicable_clauses": ["02_expense_reimbursement_2022_deprecated 第二条、第三条"],
+      "boundaries": {
+        "thresholds": "8000元（部门总经理）、30000元（分管副总）",
+        "no_explicit_aggregation_rule": true
+      }
+    },
+    {
+      "id": "PQ3",
+      "question": "培训费单项标准：每人每期不超过3500元是否存在超标？",
+      "applicable_clauses": ["05_training_expense 第二条"],
+      "boundaries": {
+        "limit": 3500
+      }
+    },
+    {
+      "id": "PQ4",
+      "question": "是否存在同一发票重复报销？",
+      "applicable_clauses": ["01_expense_reimbursement_2025 第十条"],
+      "boundaries": {}
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ1",
+      "description": "获取E0041所有training_fee记录并按日期排序，识别7天窗口内的记录组",
+      "tables": ["expenses", "invoices", "approvals"],
+      "fields": ["record_id", "expense_date", "amount", "invoice_no", "approval_tier"]
+    },
+    {
+      "id": "DQ2",
+      "description": "核查7天窗口内记录的各发票是否被重复使用",
+      "tables": ["invoices"],
+      "fields": ["invoice_no", "usage_count"]
+    },
+    {
+      "id": "DQ3",
+      "description": "计算7天窗口合计金额并与审批线比较",
+      "computation": "SUM(amount) GROUP BY 7-day sliding window",
+      "thresholds": ["AR-01: 3000", "AR-02: 10000"]
+    }
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "完成审计计划并保存work/audit_plan.json", "status": "done"},
+    {"step": 2, "action": "记录planning_completed checkpoint", "status": "pending"},
+    {"step": 3, "action": "政策版本核查（policy-version-check）", "status": "pending"},
+    {"step": 4, "action": "批量数据分析（batch-expense-analysis）", "status": "pending"},
+    {"step": 5, "action": "完成调查，记录investigation_completed checkpoint", "status": "pending"},
+    {"step": 6, "action": "证据覆盖检查（evidence-coverage-check）", "status": "pending"},
+    {"step": 7, "action": "误报复核（false-positive-review）", "status": "pending"},
+    {"step": 8, "action": "生成审计报告（audit-report）", "status": "pending"},
+    {"step": 9, "action": "结果校验（result-validator）", "status": "pending"},
+    {"step": 10, "action": "验证和提交", "status": "pending"}
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "涉及政策版本对比（2022版 vs 2025版），含生效日期和废止关系",
+      "需要7天滑动窗口聚合计算和分组分析",
+      "涉及金额阈值、日期边界、审批线多级比较"
+    ]
+  },
+  "subagent_plan": {
+    "planned": false,
+    "reason": "数据范围可控（E0041共15条training_fee记录，重点窗口仅4-5条），主智能体可直接完成全部分析"
+  },
+  "stopping_conditions": [
+    "识别出R000465所在7天窗口内所有同类记录",
+    "完成2025版和2022版制度对比分析",
+    "证据覆盖率100%",
+    "validation_report状态为pass"
+  ],
+  "unresolved_items": []
+}

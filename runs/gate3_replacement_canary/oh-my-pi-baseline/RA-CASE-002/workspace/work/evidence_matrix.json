@@ -1,0 +1,76 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-RAC002-001",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "citations": [
+        {"doc_id": "03_authorization_management.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"}
+      ],
+      "facts": [
+        "R004209金额3400元、R004210金额3400元、R004211金额3400元，均落入AR-02档位（≥3000且<10000）",
+        "AR-02档位必要审批角色为'部门经理，并经财务复核'，即需要部门经理审批和财务复核两道审批",
+        "R004209仅有一笔审批记录：审批人E0008（杨丹本人），审批角色为部门经理，无财务复核审批",
+        "R004210仅有一笔审批记录：审批人E0008（杨丹本人），审批角色为部门经理，无财务复核审批",
+        "R004211仅有一笔审批记录：审批人E0008（杨丹本人），审批角色为部门经理，无财务复核审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-RAC002-002",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "citations": [
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第五条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "E0008（杨丹）职级D1，岗位角色为部门经理，对应差旅住宿标准为经理级",
+        "差旅住宿经理级一类城市标准为650元/人/晚",
+        "R004209：5晚×650元=3250元标准上限，实际报销3400元，超出150元",
+        "R004210：5晚×650元=3250元标准上限，实际报销3400元，超出150元",
+        "R004211：5晚×650元=3250元标准上限，实际报销3400元，超出150元",
+        "三笔记录special_approval均为0，无专项审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-RAC002-003",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "第二条"}
+      ],
+      "facts": [
+        "R004209（2月26日）、R004210（2月28日）、R004211（3月2日）为同一员工E0008、同一费用类型travel_lodging",
+        "三笔记录发生在5个日历天内（2025-02-26至2025-03-02），满足7天内出现2笔及以上条件",
+        "三笔合计金额为3400+3400+3400=10200元",
+        "10200元达到AR-03档位（≥10000且<50000），高于单笔AR-02档位（≥3000且<10000）",
+        "三笔记录审批均为AR-02（部门经理），未触发AR-03（部门总经理）审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004209", "R004210", "R004211"],
+  "submitted_record_ids": ["R004209", "R004210", "R004211"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "total_records_audited": 3,
+    "records_with_anomalies": 3,
+    "records_without_anomalies": 0,
+    "unrelated_records": 0
+  },
+  "unresolved_items": []
+}

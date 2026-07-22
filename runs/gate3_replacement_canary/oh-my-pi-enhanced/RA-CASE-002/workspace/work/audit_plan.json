@@ -1,0 +1,92 @@
+{
+  "task_id": "RA-CASE-002",
+  "task_type": "policy_data_comparison",
+  "clue_record": "R004209",
+  "audit_scope": {
+    "audit_object": "以R004209为线索，核查E0008（杨丹）在2025年2-3月的差旅住宿费用是否存在异常",
+    "expense_types": ["travel_lodging"],
+    "business_period": "2025-02-26至2025-03-02",
+    "organization_scope": "E0008（杨丹），D008合规风控部",
+    "deliverable": "核查涉及的record_id集合、审计结论、关键事实、制度依据；如有异常返回发现ID"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "R004209、R004210、R004211三笔差旅住宿是否构成拆分报销（Article 11）？",
+      "rule": "01_expense_reimbursement_2025.md 第十一条：同一员工、同一费用类型7天内2笔及以上，合计金额达到较高审批线",
+      "boundaries": {
+        "date_window": "7天",
+        "individual_tier": "AR-02 (3,000-10,000)",
+        "combined_threshold": "AR-03 (>=10,000)",
+        "combined_amount": "10,200元"
+      }
+    },
+    {
+      "id": "PQ-02",
+      "question": "三笔记录的审批是否完整？AR-02要求'部门经理,并经财务复核'，实际仅有部门经理审批",
+      "rule": "03_authorization_management.md 附件二 AR-02",
+      "boundaries": {
+        "required_roles": ["部门经理", "财务复核"],
+        "actual_roles": ["部门经理"]
+      }
+    },
+    {
+      "id": "PQ-03",
+      "question": "E0008（D1/部门负责人级）的住宿费是否超出A类城市标准？",
+      "rule": "04_travel_expense.md 第四条：部门负责人级A类城市850元/晚",
+      "boundaries": {
+        "standard_per_night": 850,
+        "actual_per_night": 680
+      }
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-01",
+      "question": "E0008在2025-02-19至2025-03-05期间的travel_lodging记录有哪些？",
+      "records": ["R004209", "R004210", "R004211"],
+      "population_count": 3
+    }
+  ],
+  "required_fields": [
+    "record_id", "employee_id", "expense_date", "expense_type", "amount",
+    "city_tier", "nights", "special_approval", "approval tier", "approver",
+    "invoice_no", "reason", "vendor_name"
+  ],
+  "evidence_requirements": [
+    "每笔记录的详细信息和审批链",
+    "三笔记录的时间间隔计算",
+    "合计金额与AR-03阈值比较",
+    "员工级别与住宿标准的映射关系",
+    "每笔记录缺少财务复核的证明"
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "创建审计计划", "artifact": "work/audit_plan.json", "status": "in_progress"},
+    {"step": 2, "action": "制度适用性检查（现行2025制度，无需版本检查）", "artifact": "work/policy_applicability.json"},
+    {"step": 3, "action": "批量数据分析（3笔记录，主代理内联处理）", "artifact": "work/analysis/data_findings.json"},
+    {"step": 4, "action": "证据覆盖检查", "artifact": "work/evidence_matrix.json"},
+    {"step": 5, "action": "误报复核（边界和例外检查）", "artifact": "work/independent_review.json"},
+    {"step": 6, "action": "审计报告", "artifact": "work/report_draft.json"},
+    {"step": 7, "action": "结果校验", "artifact": "work/validation_report.json"},
+    {"step": 8, "action": "提交", "artifact": "work/final_result.json"}
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "涉及3份制度（报销管理、授权管理、差旅费管理）",
+      "需要聚合计算（3笔记录的合计金额）",
+      "涉及2条业务规则（拆分报销+审批完整性）",
+      "涉及阈值和日期边界（7天窗口、AR-03边界）"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "复杂度3但数据范围仅3笔记录，无需复杂SQL，主代理内联处理即可"
+  },
+  "stopping_conditions": [
+    "所有三笔记录的政策适用性和违规判定明确",
+    "证据覆盖率达到100%",
+    "validation_report通过"
+  ],
+  "unresolved_items": []
+}

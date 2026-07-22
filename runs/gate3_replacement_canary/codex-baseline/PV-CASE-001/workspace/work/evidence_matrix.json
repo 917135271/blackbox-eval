@@ -1,0 +1,46 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-PV-CASE-001-01",
+      "record_ids": ["R004233"],
+      "citations": [
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第三条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "R004233金额9990.00元，落入AR-02档位（≥3000且<10000），必要审批角色为「部门经理,并经财务复核」",
+        "R004233审批记录仅含一条：approver E0008（杨丹，部门经理），缺少财务复核审批",
+        "list_records_missing_approval(required_role='财务复核')返回结果包含R004233，系统确认财务复核缺失",
+        "员工E0012杨丽华为X1级分管副总，报销人为高管本人",
+        "住宿标准：高管级一类城市1100元/晚，R004233实际999元/晚（9990÷10晚），在标准内",
+        "发票FP2025X0004227仅使用1次，无重复报销",
+        "E0012在2025-09-26至2025-10-10期间仅此一笔travel_lodging，无拆分规避审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004233"],
+  "submitted_record_ids": ["R004233"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "amount": 9990.0,
+    "nights": 10,
+    "per_night": 999.0,
+    "standard_per_night": 1100.0,
+    "over_standard": false,
+    "budget_remaining": 74504.71
+  },
+  "unresolved_items": []
+}

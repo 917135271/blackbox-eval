@@ -37,8 +37,8 @@ ROOT = Path(__file__).resolve().parents[1]
 RUN_ROOT = ROOT / "runs" / "gate4_formal"
 CASES_PATH = ROOT / "data" / "formal_case_rubric" / "cases.json"
 DB_PATH = ROOT / "data" / "formal_case_rubric" / "expense_formal.db"
-GRADE_ROOT = RUN_ROOT / "gate5_judge_v6"
-GRADES_PATH = RUN_ROOT / "gate5_grades_v6.jsonl"
+GRADE_ROOT = RUN_ROOT / "gate5_judge_v7"
+GRADES_PATH = RUN_ROOT / "gate5_grades_v7.jsonl"
 JUDGE_CHECKLIST_BATCH_SIZE = 4
 TYPE_ALIASES = {
     "DUP": ("DUP", "REUSE", "REPEAT", "重复"),

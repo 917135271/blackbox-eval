@@ -1,0 +1,64 @@
+{
+  "audit_scope": {
+    "task_id": "RA-CASE-002",
+    "clue_record": "R004209",
+    "employee_id": "E0008",
+    "employee_name": "杨丹",
+    "department_id": "D008",
+    "department_name": "合规风控部",
+    "expense_type": "travel_lodging",
+    "period": "2025-02-26 至 2025-12-01",
+    "records_examined": 5
+  },
+  "verified_facts": [
+    "R004209(2025-02-26): 3400元/5晚=680元/晚, Tier A, 经理级标准650元/晚, 超出150元, 仅E0008自审批",
+    "R004210(2025-02-28): 3400元/5晚=680元/晚, Tier A, 经理级标准650元/晚, 超出150元, 仅E0008自审批",
+    "R004211(2025-03-02): 3400元/5晚=680元/晚, Tier A, 经理级标准650元/晚, 超出150元, 仅E0008自审批",
+    "R004219(2025-11-27): 5200元/7晚≈742.86元/晚, Tier A, 经理级标准650元/晚, 超出约650元, 仅E0008自审批",
+    "R004220(2025-12-01): 5200元/7晚≈742.86元/晚, Tier A, 经理级标准650元/晚, 超出约650元, 仅E0008自审批",
+    "员工E0008(杨丹)职级D1为经理级, 部门合规风控部D008, 担任部门经理"
+  ],
+  "applicable_policies": [
+    "01_expense_reimbursement_2025.md (2025-01-01施行)",
+    "03_authorization_management.md (2025-01-01施行)",
+    "04_travel_expense.md (2025版)"
+  ],
+  "findings": [
+    {
+      "anomaly_id": "ANOM-001",
+      "title": "缺少财务复核审批",
+      "records": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+      "policy": "03_authorization_management.md 附件二 AR-02: 3000-10000元须'部门经理,并经财务复核'",
+      "detail": "5笔记录金额均处于AR-02区间, 仅含部门经理审批且审批人均为经办人E0008本人, 缺少财务复核环节",
+      "impact": "审批链条不完整, 缺少独立财务复核"
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "title": "住宿费超出职级标准",
+      "records": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+      "policy": "04_travel_expense.md 第四条: 经理级一类城市650元/人/晚; 第五条: 超标准且无专项审批不得报销超出部分",
+      "detail": "5笔记录每笔均超过经理级一类城市650元/晚标准, 且special_approval=0, 超出部分合计约1750元"
+    },
+    {
+      "anomaly_id": "ANOM-003",
+      "title": "7天内分拆报销规避更高审批",
+      "records": ["R004209", "R004210", "R004211"],
+      "policy": "01_expense_reimbursement_2025.md 第十一条: 同一员工同一类型7天内多笔且合计达较高审批线应核查",
+      "detail": "三笔记录在4天窗口内合计10200元, 达到AR-03线(≥10000元), 应经部门总经理审批但实际仅部门经理自审批"
+    }
+  ],
+  "anomaly_ids": ["ANOM-001", "ANOM-002", "ANOM-003"],
+  "record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+  "citations": [
+    {"doc_id": "03_authorization_management.md", "clause_no": "第二条"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "第五条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第三条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+  ],
+  "answer": "以R004209为线索, 核查员工E0008(杨丹, 合规风控部部门经理)的差旅住宿费记录, 发现以下异常: (1)5笔住宿费记录(R004209/R004210/R004211/R004219/R004220)金额均在3000-10000元区间, 按授权管理办法附件二AR-02档位须经'部门经理,并经财务复核', 但5笔均仅有经办人E0008本人的部门经理审批, 缺少财务复核; (2)5笔记录均超出差旅费管理办法第四条规定的经理级一类城市650元/人/晚标准, 且均无专项审批, 违反第五条及报销管理办法第十二条; (3)其中R004209/R004210/R004211在4天内同一类型合计10200元, 达到AR-03线(≥10000元), 涉嫌违反报销管理办法第十一条拆分规避审批。综上, 5笔记录均存在审批缺失和超标报销异常。",
+  "recommendations": "补充财务复核审批; 超标部分应追回或补充专项审批; 核查是否存在其他类似自审批及拆分报销情况",
+  "limitations": []
+}

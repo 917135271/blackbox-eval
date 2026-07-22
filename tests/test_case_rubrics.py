@@ -32,7 +32,7 @@ def load_validator():
 
 
 class CaseRubricTests(unittest.TestCase):
-    def test_dataset_matches_v6_json_schema(self) -> None:
+    def test_dataset_matches_v7_json_schema(self) -> None:
         jsonschema.validate(
             json.loads(CASES.read_text(encoding="utf-8")),
             json.loads(SCHEMA.read_text(encoding="utf-8")),
@@ -71,7 +71,7 @@ class CaseRubricTests(unittest.TestCase):
         dataset = json.loads(CASES.read_text(encoding="utf-8"))
         for case in dataset["cases"]:
             rubric = case["rubric"]
-            self.assertEqual(dataset["rubric_version"], "atomic-binary-checklist-v6")
+            self.assertEqual(dataset["rubric_version"], "atomic-binary-checklist-v7")
             self.assertEqual(rubric["scoring_method"], "binary_checklist")
             self.assertEqual(rubric["item_result_values"], [0, 1])
             self.assertEqual(rubric["normalization"], "equal_item_ratio")
@@ -90,7 +90,7 @@ class CaseRubricTests(unittest.TestCase):
         dataset = json.loads(CASES.read_text(encoding="utf-8"))
         self.assertEqual(
             sum(len(case["rubric"]["checklist"]) for case in dataset["cases"]),
-            229,
+            249,
         )
         for case in dataset["cases"]:
             item_ids = {item["id"] for item in case["rubric"]["checklist"]}
@@ -157,7 +157,16 @@ class CaseRubricTests(unittest.TestCase):
     def test_positive_and_clean_record_prompts_are_neutral_and_matched(self) -> None:
         dataset = json.loads(CASES.read_text(encoding="utf-8"))
         cases = {case["id"]: case for case in dataset["cases"]}
-        for case_id in ("L2-003", "L2-008", "L2-013", "TRAP-002", "TRAP-003", "TRAP-005"):
+        for case_id in (
+            "PV-CASE-001",
+            "RA-CASE-001",
+            "RA-CASE-002",
+            "RR-CASE-001",
+            "L2-013",
+            "TRAP-002",
+            "TRAP-003",
+            "TRAP-005",
+        ):
             case = cases[case_id]
             prompt = case["prompt"]
             exposed = [record_id for record_id in case["expected_output"]["expected_record_ids"] if record_id in prompt]
@@ -170,8 +179,8 @@ class CaseRubricTests(unittest.TestCase):
         dataset = json.loads(CASES.read_text(encoding="utf-8"))
         hidden_label = re.compile(r"\b(?:DUP|SPLIT|OVERSTD|BUDGET|OVERDUE)-\d{3}\b")
         for case in dataset["cases"]:
-            if case["case_family"] != "clean_trap":
-                self.assertNotIn("expected_anomaly_ids", case["expected_output"])
+            if "expected_anomaly_ids" in case["expected_output"]:
+                self.assertEqual(case["expected_output"]["expected_anomaly_ids"], [])
             for criterion in case["rubric"]["checklist"]:
                 self.assertIsNone(
                     hidden_label.search(json.dumps(criterion, ensure_ascii=False)),
@@ -262,7 +271,7 @@ class CaseRubricTests(unittest.TestCase):
         for case in dataset["cases"]:
             failures = case["rubric"].get("critical_failures", [])
             rules = {failure["deterministic_rule"] for failure in failures}
-            if case["case_family"] == "clean_trap":
+            if case["expected_output"].get("scoring_kind") == "no_anomaly":
                 self.assertIn("unexpected-anomaly-reported", rules, case["id"])
             if case["case_family"] == "full_year_audit" or case["id"] == "L3-009":
                 self.assertIn("record-precision-below", rules, case["id"])
@@ -286,6 +295,34 @@ class CaseRubricTests(unittest.TestCase):
                 "clean_trap",
                 "retrieval_and_report",
             },
+        )
+
+    def test_zero_discrimination_cases_are_replaced_with_new_business_cases(self) -> None:
+        dataset = json.loads(CASES.read_text(encoding="utf-8"))
+        cases = {case["id"]: case for case in dataset["cases"]}
+        replacements = {
+            "L1-001": "PV-CASE-001",
+            "L2-003": "RA-CASE-001",
+            "L2-008": "RA-CASE-002",
+            "L3-010": "RR-CASE-001",
+        }
+        self.assertEqual(dataset["replacements"], replacements)
+        self.assertFalse(set(replacements) & set(cases))
+        self.assertTrue(set(replacements.values()) <= set(cases))
+        for old_id, new_id in replacements.items():
+            self.assertEqual(cases[new_id]["replaces"], old_id)
+        self.assertEqual(cases["PV-CASE-001"]["expected_output"]["expected_record_ids"], ["R004233"])
+        self.assertEqual(
+            cases["RA-CASE-001"]["expected_output"]["expected_record_ids"],
+            ["R000028", "R004204"],
+        )
+        self.assertEqual(
+            cases["RA-CASE-002"]["expected_output"]["expected_record_ids"],
+            ["R004209", "R004210", "R004211"],
+        )
+        self.assertEqual(
+            cases["RR-CASE-001"]["expected_output"]["expected_record_ids"],
+            ["R000465", "R000561", "R000888", "R001354"],
         )
 
 

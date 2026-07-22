@@ -1,0 +1,119 @@
+{
+  "task_id": "RA-CASE-002",
+  "status": "pass",
+  "coverage": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANO-RA-002-001",
+      "pass": false,
+      "record_ids": [
+        "R004209",
+        "R004210",
+        "R004211"
+      ],
+      "facts": [
+        "R004209 AR-02档位3400元仅有部门经理(E0008本人)审批缺失财务复核",
+        "R004210 AR-02档位3400元仅有部门经理(E0008本人)审批缺失财务复核",
+        "R004211 AR-02档位3400元仅有部门经理(E0008本人)审批缺失财务复核"
+      ],
+      "rules": [
+        "授权管理办法附件二:AR-02档位(≥3000,<10000)必要审批角色为'部门经理,并经财务复核'"
+      ],
+      "citations": [
+        {
+          "doc_id": "03_authorization_management.md",
+          "clause_no": "附件二"
+        }
+      ]
+    },
+    {
+      "anomaly_id": "ANO-RA-002-002",
+      "pass": false,
+      "record_ids": [
+        "R004209",
+        "R004210",
+        "R004211"
+      ],
+      "facts": [
+        "E0008在2025-02-26至2025-03-02七天内三笔travel_lodging合计10,200元",
+        "10,200元超过AR-03门槛(10,000元)",
+        "若合并则触发部门总经理审批而非部门经理审批"
+      ],
+      "rules": [
+        "费用报销管理办法第十一条:同一员工同一费用类型在7天内出现2笔及以上报销,且合计金额达到较高审批线的,应重点核查拆分规避审批"
+      ],
+      "citations": [
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第十一条"
+        }
+      ]
+    },
+    {
+      "anomaly_id": null,
+      "pass": true,
+      "record_ids": [
+        "R004209"
+      ],
+      "facts": [
+        "住宿费680元/晚(3400/5),部门负责人级(D1)一类城市标准850元/晚,未超标"
+      ],
+      "rules": [
+        "差旅费管理办法第四条:部门负责人级一类城市住宿标准850元/晚"
+      ],
+      "citations": [
+        {
+          "doc_id": "04_travel_expense.md",
+          "clause_no": "第四条"
+        }
+      ]
+    },
+    {
+      "anomaly_id": null,
+      "pass": true,
+      "record_ids": [
+        "R004209"
+      ],
+      "facts": [
+        "费用报销审批权限按授权管理办法附件二执行"
+      ],
+      "rules": [
+        "费用报销管理办法第五条:审批权限统一按授权管理办法附件二执行"
+      ],
+      "citations": [
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第五条"
+        }
+      ]
+    }
+  ],
+  "records": {
+    "R004209": {
+      "pass": false,
+      "anomaly_ids": [
+        "ANO-RA-002-001",
+        "ANO-RA-002-002"
+      ]
+    },
+    "R004210": {
+      "pass": false,
+      "anomaly_ids": [
+        "ANO-RA-002-001",
+        "ANO-RA-002-002"
+      ]
+    },
+    "R004211": {
+      "pass": false,
+      "anomaly_ids": [
+        "ANO-RA-002-001",
+        "ANO-RA-002-002"
+      ]
+    }
+  },
+  "record_ids": [
+    "R004209",
+    "R004210",
+    "R004211"
+  ]
+}

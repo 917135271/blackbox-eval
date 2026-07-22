@@ -26,6 +26,7 @@ ENHANCEMENT_SUCCESS = PLAN["scoring"]["enhancement_success"]
 SCORE_WEIGHTS = PLAN["scoring"]["total_weights"]
 SCORING_VERSION = str(PLAN["scoring"]["version"])
 FORMAL_DATASET = PLAN["formal_dataset"]
+REPLACEMENT_CANARY = PLAN["replacement_discrimination_canary"]
 
 GROUPS = tuple(str(group) for group in PLAN["groups"])
 BASELINE_GROUPS = tuple(group for group in GROUPS if group.endswith("-baseline"))
@@ -49,6 +50,8 @@ API_KEY_ENV = str(MODEL["api_key_env"])
 DATASET_ID = str(FORMAL_DATASET["dataset_id"])
 RUBRIC_VERSION = str(FORMAL_DATASET["rubric_version"])
 CHECKLIST_ITEM_COUNT = int(FORMAL_DATASET["checklist_item_count"])
+REPLACEMENT_CANARY_CASE_IDS = tuple(str(value) for value in REPLACEMENT_CANARY["case_ids"])
+REPLACEMENT_CANARY_RUN_COUNT = int(REPLACEMENT_CANARY["run_count"])
 
 JUDGE_TIMEOUT_SECONDS = int(JUDGE["timeout_seconds"])
 JUDGE_MAX_TOKENS = int(JUDGE["max_tokens"])
@@ -100,6 +103,10 @@ def validate_plan() -> None:
         raise ValueError("judge consistency sample_rate must be in (0, 1]")
     if JUDGE_AUDIT_REPEAT_COUNT < 2:
         raise ValueError("judge consistency repeat_count must be at least 2")
+    if len(REPLACEMENT_CANARY_CASE_IDS) != 4:
+        raise ValueError("replacement discrimination Canary must contain four cases")
+    if REPLACEMENT_CANARY_RUN_COUNT != len(GROUPS) * len(REPLACEMENT_CANARY_CASE_IDS):
+        raise ValueError("replacement discrimination Canary run_count mismatch")
 
 
 validate_plan()

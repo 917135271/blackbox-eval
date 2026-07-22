@@ -8,7 +8,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 CASES_PATH = ROOT / "data" / "formal_case_rubric" / "cases.json"
-OUTPUT_PATH = ROOT / "output" / "formal_cases_and_rubrics_v6.md"
+OUTPUT_PATH = ROOT / "output" / "formal_cases_and_rubrics_v7.md"
 
 
 def compact(value: Any) -> str:

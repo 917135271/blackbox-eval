@@ -3,19 +3,31 @@
   "$id": "https://example.local/schemas/case-rubric.schema.json",
   "title": "Securities expense audit case-by-case rubric dataset",
   "type": "object",
-  "required": ["dataset_id", "rubric_version", "case_count", "source", "cases"],
+  "required": ["dataset_id", "rubric_version", "case_count", "source", "replacements", "cases"],
   "additionalProperties": false,
   "properties": {
     "dataset_id": {"type": "string", "minLength": 1},
-    "rubric_version": {"const": "atomic-binary-checklist-v6"},
+    "rubric_version": {"const": "atomic-binary-checklist-v7"},
     "case_count": {"const": 15},
     "source": {
       "type": "object",
-      "required": ["evals", "ground_truth"],
+      "required": ["evals", "ground_truth", "replacement_cases"],
       "additionalProperties": false,
       "properties": {
         "evals": {"type": "string"},
-        "ground_truth": {"type": "string"}
+        "ground_truth": {"type": "string"},
+        "replacement_cases": {"type": "string"}
+      }
+    },
+    "replacements": {
+      "type": "object",
+      "required": ["L1-001", "L2-003", "L2-008", "L3-010"],
+      "additionalProperties": false,
+      "properties": {
+        "L1-001": {"const": "PV-CASE-001"},
+        "L2-003": {"const": "RA-CASE-001"},
+        "L2-008": {"const": "RA-CASE-002"},
+        "L3-010": {"const": "RR-CASE-001"}
       }
     },
     "case_family_counts": {
@@ -62,6 +74,7 @@
         "prompt": {"type": "string", "minLength": 1},
         "source_prompt": {"type": "string", "minLength": 1},
         "prompt_change_reason": {"type": "string", "minLength": 1},
+        "replaces": {"type": "string", "pattern": "^[A-Z0-9-]+$"},
         "selection_reason": {"type": "string", "minLength": 1},
         "ground_truth_refs": {
           "type": "array",

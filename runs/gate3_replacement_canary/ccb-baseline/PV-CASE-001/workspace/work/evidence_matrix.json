@@ -1,0 +1,43 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-R004233-001",
+      "record_ids": ["R004233"],
+      "citations": [
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"}
+      ],
+      "facts": [
+        "R004233费用金额9990元,落入AR-02档位(3000≤金额<10000),该档位必要审批角色为'部门经理,并经财务复核'",
+        "R004233审批记录仅包含一条:approval_id=A004233,approver=E0008(杨丹,部门经理,D1级),无财务复核审批记录",
+        "R004233报销人为E0012杨丽华,X1级/分管副总,审批人E0008杨丹为D1级/部门经理,审批人职级低于报销人",
+        "R004233费用类型为travel_lodging,A类城市10晚共9990元,折合999元/晚,低于高管级一类城市标准1100元/晚,费用标准适用正确",
+        "2022历史版制度规定≥8000元需部门总经理审批,若沿用该线,9990元应触发部门总经理审批而非现行AR-02的部门经理审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004233"],
+  "submitted_record_ids": ["R004233"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": false
+  },
+  "reconciled_figures": {
+    "amount": 9990.0,
+    "nights": 10,
+    "per_night": 999.0,
+    "standard_per_night": 1100.0,
+    "within_standard": true
+  },
+  "unresolved_items": []
+}

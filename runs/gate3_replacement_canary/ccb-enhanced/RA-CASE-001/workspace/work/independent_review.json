@@ -1,0 +1,41 @@
+{
+  "decision": "pass",
+  "challenged_findings": [
+    {
+      "anomaly_id": "FIND-001",
+      "challenge": "发票FP202500000028重复使用",
+      "compliant_explanation_attempted": "R004204可能为更正/重报",
+      "rebuttal": "两笔记录费用日期不同(3月9日vs 5月10日)、报销日期不同(5月5日vs 5月18日)、 record_no不同(BX2025000028 vs BX2025X004204)，不符合更正特征。第十条为无条件禁止条款，无例外或豁免机制。special_approval均为0，无专项审批豁免。",
+      "supporting_evidence": [
+        "find_invoice_usage确认FP202500000028 usage_count=2",
+        "find_reused_invoices确认INV000028在全局复用列表中",
+        "两笔记录金额、供应商、事由完全一致",
+        "search_policy全文搜索未发现第十条的任何例外条款"
+      ],
+      "opposing_evidence": [],
+      "boundary_check": {"field": "invoice_no", "value": "FP202500000028", "match_count": 2, "status": "confirmed"},
+      "exceptions_found": [],
+      "resolution": "pass"
+    },
+    {
+      "anomaly_id": "FIND-002",
+      "challenge": "E0036 2025年3月通讯费合计449.52元超300元上限",
+      "compliant_explanation_attempted": "北辰项目和客户服务可能属于业务必需，存在隐性豁免",
+      "rebuttal": "通讯费管理办法第三条为无条件月度上限，无项目类型或业务紧迫性豁免条款。search_policy全文搜索未发现通讯费的例外规定。两笔费用使用不同发票(FP202500000028和FP202500002127)，为独立发生的真实费用，无冲销或更正关系。",
+      "supporting_evidence": [
+        "SQLite查询E0036 2025年3月仅两笔通讯费: 165.58+283.94=449.52",
+        "07_office_communication.md第三条: '每人每月不超过300元'，无例外",
+        "01_expense_reimbursement_2025.md第十二条: '无专项审批时不得超过制度标准1.0倍'",
+        "R000028 special_approval=0, R002127 special_approval=0"
+      ],
+      "opposing_evidence": [],
+      "boundary_check": {"field": "amount_monthly_sum", "value": 449.52, "threshold": 300, "excess": 149.52, "status": "confirmed"},
+      "exceptions_found": [],
+      "resolution": "pass"
+    }
+  ],
+  "required_changes": [],
+  "supplemental_query": null,
+  "rationale": "两项初步发现均通过误报审查。第十条(发票复用)和第三条(通讯费月度上限)均为无条件禁止条款，制度全文中未发现任何例外或豁免规定。所有涉事记录的special_approval=0，无专项审批豁免。数据交叉验证一致。",
+  "unresolved_conflicts": []
+}

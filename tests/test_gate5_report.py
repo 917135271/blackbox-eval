@@ -53,9 +53,9 @@ def test_semantic_case_score_applies_critical_cap() -> None:
 
 
 def test_grade_versions_must_match_current_dataset() -> None:
-    dataset = {"dataset_id": "dataset-v8", "rubric_version": "rubric-v6"}
+    dataset = {"dataset_id": "dataset-v9", "rubric_version": "rubric-v7"}
     report.validate_grade_versions(
-        [{"dataset_id": "dataset-v8", "rubric_version": "rubric-v6"}],
+        [{"dataset_id": "dataset-v9", "rubric_version": "rubric-v7"}],
         dataset,
     )
     with pytest.raises(RuntimeError, match="grade version mismatch"):

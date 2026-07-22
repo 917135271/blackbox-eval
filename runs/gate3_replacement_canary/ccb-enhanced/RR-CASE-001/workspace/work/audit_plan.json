@@ -1,0 +1,89 @@
+{
+  "task_id": "RR-CASE-001",
+  "task_scope": {
+    "clue_record": "R000465",
+    "employee_id": "E0041",
+    "employee_name": "邓柳",
+    "department_id": "D005",
+    "department_name": "机构业务部",
+    "expense_type": "training_fee",
+    "investigation_focus": "同一员工相邻日期的同类费用记录",
+    "audit_period": "2025-12-08 to 2025-12-25",
+    "requested_deliverable": "制度版本风险审计说明，含record_id集合、异常判断、历史制度对比、关键计算、制度依据和可执行控制"
+  },
+  "policy_questions": [
+    {
+      "id": "Q1",
+      "question": "R000465及其相邻日期training_fee记录是否触发2025制度第十一条拆分规避审批规则？",
+      "policy_docs": ["01_expense_reimbursement_2025.md", "03_authorization_management.md", "05_training_expense.md"],
+      "clause": "2025制度第十一条：同一员工同一费用类型7天内2笔及以上且合计达到较高审批线"
+    },
+    {
+      "id": "Q2",
+      "question": "2022旧版制度下相同记录是否会得出不同结论？",
+      "policy_docs": ["02_expense_reimbursement_2022_deprecated.md"],
+      "clause": "2022制度无拆分规避条款，审批线为8000/30000"
+    },
+    {
+      "id": "Q3",
+      "question": "培训费单项标准（每人每期≤3500元）是否被突破？",
+      "policy_docs": ["05_training_expense.md"],
+      "clause": "培训费管理办法第二条"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "D1",
+      "question": "E0041在2025年12月的training_fee记录有哪些？",
+      "answer": "R001894(12-08), R000465(12-18), R000561(12-20), R000888(12-23), R001354(12-25)"
+    },
+    {
+      "id": "D2",
+      "question": "7天窗口内合计金额是否达到较高审批线(AR-02≥3000)？",
+      "calculation": "12-18至12-24窗口: R000465+R000561+R000888 = 2157.72+2917.45+2606.07 = 7681.24 ≥ 3000 (AR-02)"
+    }
+  ],
+  "required_fields": ["record_id", "expense_date", "expense_type", "amount", "approval_tier", "invoice_id", "special_approval"],
+  "evidence_requirements": [
+    "R000465详细记录和审批",
+    "R000561详细记录和审批",
+    "R000888详细记录和审批",
+    "R001354详细记录和审批",
+    "R001894详细记录和审批",
+    "2025费用报销管理办法全文",
+    "2022费用报销管理办法(废止)全文",
+    "授权管理办法附件二",
+    "培训费管理办法"
+  ],
+  "execution_steps": [
+    "1. planning_completed checkpoint",
+    "2. policy-version-check (compare 2025 vs 2022 Article 11/split rules)",
+    "3. batch-expense-analysis (verify 7-day window computation, approval tiers)",
+    "4. investigation_completed checkpoint",
+    "5. evidence-coverage-check",
+    "6. review_ready checkpoint",
+    "7. false-positive-review (exception/exemption boundary check)",
+    "8. audit-report",
+    "9. result-validator",
+    "10. validation_ready checkpoint",
+    "11. validate_audit_result → submit_audit_result"
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "policy version comparison (2025 vs 2022): +1",
+      "three policy documents involved: +1",
+      "aggregation with 7-day window computation: +1"
+    ],
+    "subagent_plan": "none - main agent sufficient for single-rule analysis with direct record retrieval"
+  },
+  "stopping_conditions": [
+    "All training_fee records for E0041 in December 2025 retrieved and verified",
+    "7-day window computation confirmed",
+    "Policy comparison between 2025 and 2022 documented",
+    "Evidence matrix passes with 100% coverage",
+    "Validation report returns valid=true",
+    "Submit returns success"
+  ],
+  "unresolved_items": []
+}

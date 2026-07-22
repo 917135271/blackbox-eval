@@ -1,0 +1,70 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "RR-CASE-001-A001",
+      "record_ids": ["R000465", "R000561", "R000888", "R001354"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "员工E0041（邓柳）在2025年12月18日至12月25日（8天跨度）内发生4笔培训费报销：R000465（12-18,2157.72元）、R000561（12-20,2917.45元）、R000888（12-23,2606.07元）、R001354（12-25,2083.49元），均为同一费用类型training_fee",
+        "任意相邻两笔报销均在7天窗口内：R000465至R000561间隔2天，R000561至R000888间隔3天，R000888至R001354间隔2天",
+        "每笔单独金额均低于3000元，仅触发AR-01审批（部门经理），但R000465+R000561合计5075.17元、R000561+R000888合计5523.52元、R000888+R001354合计4689.56元，均达到AR-02审批线（≥3000元且<10000元，需部门经理+财务复核）",
+        "所有4笔记录special_approval均为0，未履行任何专项审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "RR-CASE-001-A001",
+      "record_ids": ["R000465", "R000561", "R000888", "R001354"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"}
+      ],
+      "facts": [
+        "D005机构业务部年度预算278,540.94元，截至查询时累计已使用433,442.76元，使用率达155.6%，已超过预算额度1.0倍",
+        "4笔记录均发生于预算已超限期间，且special_approval均为0，未履行预算超限后的专项审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "RR-CASE-001-A001",
+      "record_ids": ["R000465", "R000561", "R000888", "R001354"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第一条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第三条"}
+      ],
+      "facts": [
+        "2022版旧制度审批线为8000元（部门总经理）和30000元（分管副总），远高于2025版的3000元AR-02线",
+        "2022版制度无7天反拆分条款（2025版第十一条为新增），因此4笔记录在旧制度下均不会触发拆分规避审批的核查",
+        "旧制度已被《XX证券费用报销管理办法(2025修订版)》第十四条明确废止，不得作为现行审批依据"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R000465", "R000561", "R000888", "R001354"],
+  "submitted_record_ids": ["R000465", "R000561", "R000888", "R001354"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "total_investigated": 5,
+    "total_anomalous": 4,
+    "total_amount_anomalous": 9764.73,
+    "total_monthly_cluster_amount": 11920.81,
+    "budget_usage_rate": "155.6%"
+  },
+  "unresolved_items": []
+}

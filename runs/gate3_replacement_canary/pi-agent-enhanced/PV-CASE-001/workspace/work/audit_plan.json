@@ -1,0 +1,66 @@
+{
+  "task_id": "PV-CASE-001",
+  "task_type": "policy_data_comparison",
+  "clue_record": "R004233",
+  "audit_object": {
+    "record_id": "R004233",
+    "employee_id": "E0012",
+    "department_id": "D008",
+    "expense_type": "travel_lodging",
+    "amount": 9990,
+    "city_tier": "A",
+    "nights": 10,
+    "expense_date": "2025-10-03",
+    "reimburse_date": "2025-10-09",
+    "status": "approved",
+    "special_approval": 0
+  },
+  "scope": {
+    "rule_questions": [
+      "审批路径：R004233金额9990元在现行附件二AR-02(3000-10000)区间，需部门经理+财务复核，实际仅有部门经理审批",
+      "费用标准：travel_lodging A类城市 高管级标准1100元/晚，10晚最高11000元，实际999元/晚，在标准内",
+      "历史制度对比：2022版≥8000需部门总经理，现行AR-02仅需部门经理+财务复核",
+      "拆分规避：9990元接近AR-03下限10000元，需检查7天内同员工同类型记录",
+      "财务复核缺失：AR-02要求财务复核，审批记录中未见"
+    ],
+    "policy_docs": [
+      "01_expense_reimbursement_2025.md (现行)",
+      "02_expense_reimbursement_2022_deprecated.md (历史)",
+      "03_authorization_management.md (附件二审批线)",
+      "04_travel_expense.md (差旅住宿标准)"
+    ],
+    "data_needs": [
+      "R004233完整审批链",
+      "E0012员工职级确认",
+      "7天内同员工travel_lodging记录(拆分检查)",
+      "财务复核缺失检查",
+      "D008部门预算状态"
+    ],
+    "complexity": 3,
+    "complexity_reasons": [
+      "policy_version: 涉及2022历史版与2025现行版对比(+1)",
+      "aggregation: 需查7天拆分窗口(+1)",
+      "thresholds_and_exemptions: 金额接近AR-03下限、财务复核缺失(+1)"
+    ],
+    "subagent_plan": {
+      "use_subagent": true,
+      "role": "data_analyst",
+      "reason_code": "DATE_AMOUNT_BOUNDARY",
+      "task": "核查R004233的拆分规避风险(7天窗口)、财务复核缺失、部门预算状态"
+    }
+  },
+  "execution_steps": [
+    "1. 确认E0012职级和差旅住宿标准适用",
+    "2. 检查审批链完整性(AR-02财务复核)",
+    "3. 检查7天拆分窗口",
+    "4. 对比历史审批线判断偏差",
+    "5. 证据覆盖复核",
+    "6. 审计报告",
+    "7. 结果校验与提交"
+  ],
+  "stopping_conditions": [
+    "所有规则问题有明确结论",
+    "证据矩阵覆盖率100%",
+    "validation_report pass"
+  ]
+}

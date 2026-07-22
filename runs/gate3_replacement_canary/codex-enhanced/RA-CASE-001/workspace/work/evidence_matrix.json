@@ -1,0 +1,71 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-001",
+      "record_ids": [
+        "R000028",
+        "R004204"
+      ],
+      "citations": [
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第十条"
+        }
+      ],
+      "facts": [
+        "发票FP202500000028（INV000028，供应商XX供应商1999，金额165.58元）在R000028（报销日期2025-03-09）和R004204（报销日期2025-05-10）中重复使用，两笔报销事由均为【北辰项目沟通通讯费】，金额相同，员工均为E0036张林",
+        "R000028与R004204均使用同一张发票FP202500000028，违反同一发票最多报销1次的规定",
+        "两笔记录均为approved状态，无专项审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "record_ids": [
+        "R000028",
+        "R002127"
+      ],
+      "citations": [
+        {
+          "doc_id": "07_office_communication.md",
+          "clause_no": "第三条"
+        }
+      ],
+      "facts": [
+        "员工E0036张林2025年3月通讯费报销：R000028（2025-03-09，165.58元）+ R002127（2025-03-17，283.94元）= 449.52元，超过每人每月300元的上限",
+        "两笔记录均为通讯费类型，均无专项审批（special_approval=0）",
+        "两笔记录均为approved状态"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": [
+    "R000028",
+    "R002127",
+    "R004204"
+  ],
+  "submitted_record_ids": [
+    "R000028",
+    "R002127",
+    "R004204"
+  ],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "total_records": 3,
+    "total_anomalies": 2,
+    "total_amount_involved": 615.1,
+    "invoice_reuse_amount": 165.58,
+    "monthly_excess_amount": 149.52
+  },
+  "unresolved_items": []
+}

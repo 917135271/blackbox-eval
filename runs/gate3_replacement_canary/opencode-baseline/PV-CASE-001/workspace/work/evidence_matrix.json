@@ -1,0 +1,41 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "PV-CASE-001-A01",
+      "record_ids": ["R004233"],
+      "citations": [
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"}
+      ],
+      "facts": [
+        "R004233报销金额9990.00元，落入AR-02档位（3000元≤金额<10000元），必要审批角色为'部门经理,并经财务复核'",
+        "R004233实际审批记录仅有1条：审批ID A004233，审批人E0008杨丹，审批角色'部门经理'，缺少财务复核审批角色",
+        "通过list_records_missing_approval查询required_role=财务复核，R004233出现在缺失列表中，系统确认该记录缺失财务复核审批"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004233"],
+  "submitted_record_ids": ["R004233"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "total_records_checked": 1,
+    "total_anomalies_found": 1,
+    "expense_standard_verified": true,
+    "approval_path_verified": false,
+    "budget_check_passed": true,
+    "invoice_duplicate_check_passed": true
+  },
+  "unresolved_items": []
+}

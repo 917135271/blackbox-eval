@@ -1,0 +1,54 @@
+{
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "候选答案明确认定构成重复报销，无矛盾表述",
+      "answer_evidence": "明确表述“构成重复报销风险”",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "same-invoice",
+      "value": 1,
+      "reason": "明确识别发票FP202500000028在R000028和R004204中重复使用",
+      "answer_evidence": "“发票FP202500000028被同一员工...重复用于两笔通讯费报销”",
+      "trace_evidence": "find_invoice_usage查询FP202500000028返回R000028和R004204两条记录，均包含同一发票号",
+      "source": "llm_judge"
+    },
+    {
+      "id": "same-amount",
+      "value": 1,
+      "reason": "工具轨迹显示两条记录金额均为165.58元，事实准确",
+      "answer_evidence": "答案未提及具体金额，但工具轨迹验证了金额",
+      "trace_evidence": "get_expense_detail R000028与R004204均返回amount:165.58",
+      "source": "llm_judge"
+    },
+    {
+      "id": "approved-records",
+      "value": 1,
+      "reason": "工具证据明确支持两条记录均为approved状态",
+      "answer_evidence": "答案未直接提及审批状态，但工具轨迹有充分证据",
+      "trace_evidence": "get_expense_detail R000028 approval_status为approved，R004204同样；list_approvals确认",
+      "source": "llm_judge"
+    },
+    {
+      "id": "invoice-usage-investigation",
+      "value": 1,
+      "reason": "已使用find_invoice_usage反查发票FP202500000028，获得完整使用记录R000028和R004204",
+      "answer_evidence": "candidate submission中record_ids包含R000028和R004204",
+      "trace_evidence": "工具调用find_invoice_usage返回usage_count=2，records包含R000028和R004204",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis",
+      "value": 1,
+      "reason": "引用了01_expense_reimbursement_2025.md第十条，该条款规定同一发票最多报销一次，直接支持结论",
+      "answer_evidence": "citations中包含{\"doc_id\":\"01_expense_reimbursement_2025.md\",\"clause_no\":\"第十条\"}",
+      "trace_evidence": "get_policy_doc获取了该文档，内容包含“同一张发票最多报销一次”（第十条）",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交正确识别了重复报销异常，并使用工具核实了关键事实，所有检查项均满足。；两个检查项均满足通过条件，审计过程完整，制度引用正确",
+  "confidence": 1.0
+}

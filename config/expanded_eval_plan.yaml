@@ -1,7 +1,7 @@
 generated_at: '2026-07-22T00:00:00+08:00'
-status: rubric_v6_ready_requires_gate3_refreeze
+status: rubric_v7_replacement_canary_runs_complete_judge_blocked_http_402
 previous_checkpoint: gate3_six_framework_development_validation_passed
-next_gate: gate3_rubric_v6_canary_and_refreeze
+next_gate: resume_replacement_canary_judge_errors_then_refreeze
 
 model:
   provider: DeepSeek
@@ -17,7 +17,7 @@ judge:
     sample_rate: 0.20
     repeat_count: 2
     disagreement_tiebreaker: true
-    selection_seed: rubric-v6-judge-audit
+    selection_seed: rubric-v7-judge-audit
     minimum_reported_agreement: 0.90
 
 scoring:
@@ -127,9 +127,9 @@ paths:
   shared_audit_core: domain-enhancement/shared-audit-core
 
 formal_dataset:
-  dataset_id: securities-expense-audit-formal-15-v8
-  rubric_version: atomic-binary-checklist-v6
-  checklist_item_count: 229
+  dataset_id: securities-expense-audit-formal-15-v9
+  rubric_version: atomic-binary-checklist-v7
+  checklist_item_count: 249
   case_family_counts:
     policy_and_version: 3
     record_audit: 3
@@ -140,7 +140,7 @@ formal_dataset:
   exclude_categories: [ground_truth_lookup]
 
 governance_revision:
-  previous_gate3_lock_status: invalidated_by_formal_dataset_v8
+  previous_gate3_lock_status: invalidated_by_formal_dataset_v9
   gate2_status: passed_for_all_six_adapters
   gate3_status: prior_adapter_validation_passed_formal_freeze_invalidated
   pi_agent_adapter_status: prior_development_passed_formal_refreeze_required
@@ -153,6 +153,25 @@ governance_revision:
     - traces/context_events.jsonl
     - traces/artifact_manifest.json
     - run_manifest.json
+
+replacement_discrimination_canary:
+  case_ids: [PV-CASE-001, RA-CASE-001, RA-CASE-002, RR-CASE-001]
+  groups: all_twelve_baseline_and_enhanced_groups
+  run_count: 48
+  purpose: verify_replacement_cases_are_not_constant_or_near_constant_before_formal_freeze
+  execution:
+    candidate_runs_completed: 48
+    accepted_submissions: 48
+    initial_timeout_attempts_archived: 2
+    judge_completed: 28
+    judge_errors: 20
+    judge_blocker: HTTP_402_PAYMENT_REQUIRED
+    result_status: incomplete
+  acceptance:
+    minimum_case_score_range: 15
+    minimum_case_score_standard_deviation: 5
+    maximum_full_score_groups_per_case: 9
+    format_success_rate: 1.0
   subagent_protocol:
     authorize_tool: authorize_audit_subagent
     complete_tool: complete_audit_subagent
@@ -166,7 +185,10 @@ governance_revision:
     restricted_search_threshold_percent: 85
     thresholds_must_be_calibrated_in_gate3: false
     thresholds_frozen_for_gate4: true
-  gate4_blocked_until: []
+  gate4_blocked_until:
+    - judge_errors_zero
+    - all_four_cases_pass_dispersion_thresholds
+    - gate3_lock_regenerated_for_dataset_v9
 
 diagnostic_ablation:
   timing: after_formal_main_runs

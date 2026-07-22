@@ -1,0 +1,73 @@
+{
+  "task_id": "PV-CASE-001",
+  "task_type": "policy_data_comparison",
+  "audit_object": "R004233",
+  "audit_period": "2025-10-03 (expense_date) under 2025 policies",
+  "organization_scope": "E0012 (杨丽华, X1, 分管副总), D008 (合规风控部)",
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "R004233的审批路径是否符合现行2025年制度要求？",
+      "rule": "AR-02 (3000-10000) requires 部门经理 + 财务复核",
+      "fields": ["record_id", "amount", "approval tier", "approvers", "approver_roles"]
+    },
+    {
+      "id": "PQ-02",
+      "question": "R004233的住宿费用标准是否符合差旅费管理办法？",
+      "rule": "高管级/一类城市: 1100元/人/晚",
+      "fields": ["employee_level", "city_tier", "nights", "amount", "per_night_rate"]
+    },
+    {
+      "id": "PQ-03",
+      "question": "如果继续使用2022年历史审批线，会造成什么判断偏差？",
+      "rule": "2022年: 8000→部门总经理, 30000→分管副总; 2025年: AR-02(3000-10000)→部门经理+财务复核",
+      "fields": ["amount", "historical_threshold", "current_tier"]
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-01",
+      "description": "确认R004233的完整审批记录",
+      "method": "get_expense_detail + list_approvals"
+    },
+    {
+      "id": "DQ-02",
+      "description": "确认R004233是否在缺少财务复核的记录列表中",
+      "method": "list_records_missing_approval(required_role='财务复核')"
+    }
+  ],
+  "required_fields": ["record_id", "employee_id", "employee_level", "position_role", "amount", "expense_type", "city_tier", "nights", "approval tier", "approver_roles", "special_approval"],
+  "evidence_requirements": [
+    "R004233 record detail with full approvals",
+    "2025 authorization table (AR-02)",
+    "2025 travel lodging rate table (executive/A-tier)",
+    "2022 historical approval thresholds",
+    "Missing financial review confirmation"
+  ],
+  "execution_steps": [
+    "1. audit-query-planner (this file)",
+    "2. policy-version-check: confirm 2025 policies apply, 2022 deprecated",
+    "3. batch-expense-analysis (compact): verify R004233 data, check missing approval",
+    "4. evidence-coverage-check: build matrix",
+    "5. audit-report: draft findings",
+    "6. result-validator: validate",
+    "7. submit_audit_result"
+  ],
+  "complexity": 1,
+  "complexity_reasons": [
+    "Single record clue task",
+    "One rule (approval path) with standard check",
+    "Policy version comparison is contextual, not a separate rule",
+    "No aggregation, joins, or batch filtering needed"
+  ],
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "Complexity 1, single-record clue task. All lookups are direct. Policy comparison is straightforward."
+  },
+  "stopping_conditions": [
+    "All policy questions answered with citations",
+    "Evidence matrix at 100% coverage with status pass",
+    "validation_report passes"
+  ],
+  "unresolved_items": []
+}

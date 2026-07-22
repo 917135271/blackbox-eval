@@ -1,0 +1,54 @@
+{
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "候选最终答案明确认定发票FP202500000028在R000028和R004204中重复报销，构成重复报销，且无矛盾表述。",
+      "answer_evidence": "“一、发票FP202500000028在R000028和R004204中重复报销，违反《XX证券费用报销管理办法(2025修订版)》第十条；”",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "same-invoice",
+      "value": 1,
+      "reason": "候选答案和证据矩阵明确识别同一发票FP202500000028（INV000028）在R000028和R004204中重复使用。",
+      "answer_evidence": "“ANOM-001的事实：发票FP202500000028（INV000028，供应商XX供应商1999，金额165.58元）在R000028和R004204中重复使用”",
+      "trace_evidence": "find_invoice_usage结果：发票FP202500000028关联记录R000028和R004204。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "same-amount",
+      "value": 1,
+      "reason": "候选答案明确两条记录金额均为165.58元，事实准确。",
+      "answer_evidence": "“ANOM-001的事实：发票FP202500000028（INV000028，供应商XX供应商1999，金额165.58元）...两笔报销事由均为...金额相同”",
+      "trace_evidence": "get_expense_detail工具返回R000028和R004204金额均为165.58。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "approved-records",
+      "value": 1,
+      "reason": "候选答案的事实陈述和工具轨迹均证实两条记录为approved状态。",
+      "answer_evidence": "“ANOM-001的事实：两笔记录均为approved状态，无专项审批”",
+      "trace_evidence": "get_expense_detail工具返回R000028和R004204的审批状态均为approved。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "invoice-usage-investigation",
+      "value": 1,
+      "reason": "在结论前使用发票查询确认完整使用集合",
+      "answer_evidence": "答案明确指出R000028和R004204使用同一发票FP202500000028，证据矩阵中列出两记录",
+      "trace_evidence": "工具轨迹中有find_invoice_usage调用，返回了R000028和R004204",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis",
+      "value": 1,
+      "reason": "条款有效且直接支持同一发票最多报销一次",
+      "answer_evidence": "候选答案引用了01_expense_reimbursement_2025.md第十条，并指出违反该条款",
+      "trace_evidence": "工具轨迹中get_policy_excerpt查询费用报销办法，返回了第十条原文",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "所有检查项均通过，候选提交明确识别了重复报销异常，并正确引用了制度依据。；候选提交完全满足两项检查要求",
+  "confidence": 1.0
+}

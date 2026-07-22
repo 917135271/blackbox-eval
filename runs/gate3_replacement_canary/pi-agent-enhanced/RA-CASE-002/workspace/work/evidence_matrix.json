@@ -1,0 +1,85 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-001",
+      "record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+      "citations": [
+        {"doc_id": "03_authorization_management.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第三条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"}
+      ],
+      "facts": [
+        "R004209金额3400元处于AR-02区间(3000-10000)，仅含部门经理审批(A004209,审批人E0008)，缺少财务复核",
+        "R004210金额3400元处于AR-02区间(3000-10000)，仅含部门经理审批(A004210,审批人E0008)，缺少财务复核",
+        "R004211金额3400元处于AR-02区间(3000-10000)，仅含部门经理审批(A004211,审批人E0008)，缺少财务复核",
+        "R004219金额5200元处于AR-02区间(3000-10000)，仅含部门经理审批(A004219,审批人E0008)，缺少财务复核",
+        "R004220金额5200元处于AR-02区间(3000-10000)，仅含部门经理审批(A004220,审批人E0008)，缺少财务复核",
+        "附件二AR-02明确规定必要审批角色为'部门经理,并经财务复核'，5笔记录均缺少财务复核审批",
+        "5笔记录的部门经理审批人均为E0008(杨丹)，即经办人本人，违反第三条经办人与审批人分离原则"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+      "citations": [
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第五条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "E0008(杨丹)职级D1为经理级，一类城市住宿标准为650元/人/晚",
+        "R004209: 3400元/5晚=680元/晚，超出标准30元/晚，合计超出150元",
+        "R004210: 3400元/5晚=680元/晚，超出标准30元/晚，合计超出150元",
+        "R004211: 3400元/5晚=680元/晚，超出标准30元/晚，合计超出150元",
+        "R004219: 5200元/7晚≈742.86元/晚，超出标准约92.86元/晚，合计超出约650元",
+        "R004220: 5200元/7晚≈742.86元/晚，超出标准约92.86元/晚，合计超出约650元",
+        "5笔记录special_approval均为0，无专项审批，第五条和第十二条规定不得报销超出标准部分"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-003",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "第二条"}
+      ],
+      "facts": [
+        "R004209(2025-02-26)、R004210(2025-02-28)、R004211(2025-03-02)为同一员工E0008同一费用类型travel_lodging",
+        "三笔记录报销日期均在7天窗口内(2月26日至3月2日，跨距4天)",
+        "三笔合计金额为3400+3400+3400=10200元，达到AR-03审批线(≥10000元)",
+        "AR-03要求必要审批角色为'部门总经理'，三笔记录均仅由部门经理(E0008本人)审批",
+        "符合第十一条规定的拆分规避审批核查条件"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+  "submitted_record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "total_anomalous_records": 5,
+    "total_anomalies": 3,
+    "amount_reconciliation": {
+      "R004209": {"claimed": 3400, "standard_max": 3250, "excess": 150},
+      "R004210": {"claimed": 3400, "standard_max": 3250, "excess": 150},
+      "R004211": {"claimed": 3400, "standard_max": 3250, "excess": 150},
+      "R004219": {"claimed": 5200, "standard_max": 4550, "excess": 650},
+      "R004220": {"claimed": 5200, "standard_max": 4550, "excess": 650}
+    }
+  },
+  "unresolved_items": []
+}

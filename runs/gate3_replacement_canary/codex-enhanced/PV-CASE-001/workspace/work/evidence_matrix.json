@@ -1,0 +1,48 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-PV-001-001",
+      "record_ids": ["R004233"],
+      "citations": [
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第三条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第五条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条"}
+      ],
+      "facts": [
+        "R004233金额¥9,990落入AR-02区间(≥3,000且<10,000)，AR-02要求审批角色为'部门经理,并经财务复核'",
+        "R004233审批链仅含一条AR-02记录：部门经理(E0008杨丹)于2025-10-09批准，无独立的财务复核审批记录",
+        "list_records_missing_approval('财务复核')确认R004233属于缺少财务复核的记录",
+        "住宿标准：高管级(X1分管副总)/A类城市¥1,100/晚，实际¥999/晚，未超标",
+        "2022旧版审批线≥8,000需部门总经理，已由2025版第十四条废止",
+        "继续使用历史审批线会误判审批级别不足，实际现行AR-02已正确分配部门经理审批级别"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004233"],
+  "submitted_record_ids": ["R004233"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": false,
+    "note": "存在异常，非无异常结论"
+  },
+  "reconciled_figures": {
+    "amount": 9990.0,
+    "nights": 10,
+    "standard_per_night": 1100,
+    "actual_per_night": 999.0,
+    "standard_total": 11000.0
+  },
+  "unresolved_items": []
+}

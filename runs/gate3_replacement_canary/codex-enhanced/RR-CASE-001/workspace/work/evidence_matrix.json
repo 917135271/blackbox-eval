@@ -1,0 +1,59 @@
+{
+  "task_id": "RR-CASE-001",
+  "status": "pass",
+  "coverage_percent": 100,
+  "anomaly_ids": ["ANOM-RR001-001", "ANOM-RR001-002", "ANOM-RR001-003"],
+  "record_ids": ["R000465", "R000561", "R000888", "R001354", "R001894"],
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-RR001-001",
+      "record_ids": ["R000465", "R000561", "R000888", "R001354"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": "E0041邓柳2025年12月4笔training_fee: R000465(12/18 ¥2,157.72), R000561(12/20 ¥2,917.45), R000888(12/23 ¥2,606.07), R001354(12/25 ¥2,083.49). 12/18-12/24窗口3笔合计¥7,681.24, 12/20-12/26窗口3笔合计¥7,607.01, 均触发AR-02(≥¥3,000). 全部仅AR-01审批(E0005部门经理), 缺失财务复核. special_approval均为0",
+      "fact_evidence_passed": true,
+      "rule_evidence_passed": true,
+      "sources": ["get_expense_detail", "list_approvals", "get_policy_doc:01", "get_policy_doc:03"]
+    },
+    {
+      "anomaly_id": "ANOM-RR001-002",
+      "record_ids": ["R000465", "R000561", "R000888", "R001354", "R001894"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"},
+        {"doc_id": "05_training_expense.md", "clause_no": "第二条"},
+        {"doc_id": "05_training_expense.md", "clause_no": "第三条"},
+        {"doc_id": "05_training_expense.md", "clause_no": "第四条"}
+      ],
+      "facts": "5笔training_fee均超制度每日标准: R001894(12/8 ¥2,156.08), R000465(12/18 ¥2,157.72), R000561(12/20 ¥2,917.45), R000888(12/23 ¥2,606.07), R001354(12/25 ¥2,083.49). 内部标准≤¥800/日, 外部标准≤¥1,200/日, 课程费≤¥3,500/人次. R001894与R000465金额仅差¥1.64. 无special_approval",
+      "fact_evidence_passed": true,
+      "rule_evidence_passed": true,
+      "sources": ["get_expense_detail", "get_policy_doc:05"]
+    },
+    {
+      "anomaly_id": "ANOM-RR001-003",
+      "record_ids": ["R000465", "R000561", "R000888", "R001354", "R001894"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"},
+        {"doc_id": "08_budget_management.md", "clause_no": "第三条"}
+      ],
+      "facts": "机构业务部D005年度预算¥278,540.94, 累计报销¥433,442.76, 使用率155.6%, 超过1.0倍预算上限。12月仍在产生培训费报销",
+      "fact_evidence_passed": true,
+      "rule_evidence_passed": true,
+      "sources": ["get_department_budget:D005", "get_policy_doc:08"]
+    }
+  ],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条"},
+    {"doc_id": "05_training_expense.md", "clause_no": "第二条"},
+    {"doc_id": "05_training_expense.md", "clause_no": "第三条"},
+    {"doc_id": "05_training_expense.md", "clause_no": "第四条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二"},
+    {"doc_id": "08_budget_management.md", "clause_no": "第三条"}
+  ]
+}

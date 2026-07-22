@@ -1,0 +1,51 @@
+{
+  "decision": "pass",
+  "challenged_findings": [
+    {
+      "anomaly_id": "AN-RA-CASE-002-001",
+      "finding": "拆分报销（Article 11）",
+      "challenge": "三笔记录有不同发票、不同日期，是否可能为独立住宿？",
+      "resolution": "确认违规。三笔住宿期间重叠（Feb 26的5晚覆盖至约Mar 3，Feb 28的5晚覆盖至约Mar 5），同一酒店无法同时入住多个房间计为独立住宿。三笔为同一连续项目现场住宿拆分为三次报销，合计10,200元触及AR-03线但仅以AR-02审批，规避了部门总经理审批。",
+      "supporting_evidence": [
+        "三笔记录同一员工E0008、同一费用类型、同一事由、同一供应商",
+        "时间连续且重叠：2/26、2/28、3/2，最大间隔4天≤7天",
+        "合计10,200元≥AR-03阈值10,000元"
+      ],
+      "opposing_evidence": [
+        "三笔使用不同发票号码，非重复报销"
+      ],
+      "boundary_check": "10,200 vs 10,000 (AR-03 threshold): 超出200元，边界明确非临界",
+      "status": "confirmed"
+    },
+    {
+      "anomaly_id": "AN-RA-CASE-002-002",
+      "finding": "缺少财务复核（AR-02）",
+      "challenge": "是否存在豁免或替代审批路径？",
+      "resolution": "确认违规。AR-02明确要求'部门经理,并经财务复核'两个角色，三笔记录均仅有部门经理审批，缺少财务复核。special_approval均为0，无豁免适用。",
+      "supporting_evidence": [
+        "三笔记录金额3,400元均属AR-02（3,000-10,000）",
+        "每笔仅有1条审批记录（部门经理/E0008），缺少财务复核",
+        "审批人均为E0008（报销人本人），缺乏独立性"
+      ],
+      "opposing_evidence": [],
+      "boundary_check": "审批角色要求为固定规则，非阈值边界",
+      "status": "confirmed"
+    }
+  ],
+  "exceptions_or_boundaries": [
+    {
+      "type": "AR-03 threshold boundary",
+      "value": "10,200 vs 10,000",
+      "assessment": "非临界（200元差额），不存在边界歧义"
+    },
+    {
+      "type": "7-day window boundary",
+      "value": "4 days (Feb 26 to Mar 2)",
+      "assessment": "远在7天窗口内，不存在边界歧义"
+    }
+  ],
+  "required_changes": [],
+  "supplemental_query": null,
+  "rationale": "两项发现均有明确的制度依据和数据支撑，不存在边界歧义、豁免或例外情况。拆分报销的定价重叠（三次5晚住宿在4天跨度内）在物理上无法解释为独立住宿。财务复核缺失为固定审批要求，无豁免路径。",
+  "unresolved_conflicts": []
+}

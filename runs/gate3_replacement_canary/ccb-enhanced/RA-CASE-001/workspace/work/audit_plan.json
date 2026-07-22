@@ -1,0 +1,110 @@
+{
+  "task_id": "RA-CASE-001",
+  "clue": "R000028",
+  "question": "以R000028为线索，结合现行制度和业务数据核查相关费用记录是否存在异常",
+  "scope": {
+    "audit_object": "R000028及相关费用记录",
+    "expense_types": ["communication"],
+    "employee_id": "E0036",
+    "department_id": "D010",
+    "business_period": "2025年全年，聚焦2025年3月",
+    "organization_scope": "人力资源部(D010)，员工张林(E0036)"
+  },
+  "applicable_policies": [
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "effective_date": "2025-01-01",
+      "key_clauses": ["第七条(60天报销时限)", "第十条(禁止重复报销)", "第十一条(禁止拆分报销)", "第十二条(标准上限)"]
+    },
+    {
+      "doc_id": "07_office_communication.md",
+      "title": "XX证券办公与通讯费用管理办法",
+      "key_clauses": ["第三条(通讯费每人每月不超过300元)"]
+    },
+    {
+      "doc_id": "03_authorization_management.md",
+      "title": "XX证券授权管理办法",
+      "key_clauses": ["附件二(审批权限表AR-01: 0-3000元由部门经理审批)"]
+    },
+    {
+      "doc_id": "08_budget_management.md",
+      "title": "XX证券预算管理办法",
+      "key_clauses": ["第三条(预算1.0倍后不得继续报销)"]
+    }
+  ],
+  "policy_questions": [
+    "R000028报销是否在60天内提交？",
+    "FP202500000028是否被重复使用？",
+    "E0036在2025年3月通讯费是否超过300元月度上限？",
+    "E0036通讯费是否存在7天内拆分报销？",
+    "R000028审批层级是否正确？",
+    "D010部门预算是否超支？"
+  ],
+  "data_questions": [
+    "FP202500000028被哪些记录引用？",
+    "E0036在2025年3月的所有通讯费记录？",
+    "E0036全年通讯费月度分布？",
+    "D010部门预算使用情况？"
+  ],
+  "required_fields": [
+    "record_id", "employee_id", "expense_date", "reimburse_date",
+    "expense_type", "amount", "invoice_no", "status", "reason",
+    "department_id", "annual_budget"
+  ],
+  "evidence_requirements": [
+    "发票FP202500000028的使用记录(至少2条)",
+    "E0036在2025年3月的全部通讯费记录",
+    "R000028和R004204的报销详情",
+    "R002127的报销详情",
+    "D010部门预算汇总",
+    "制度原文引用"
+  ],
+  "execution_steps": [
+    {"step": "planning", "status": "completed", "description": "审计规划"},
+    {"step": "policy_research", "status": "completed", "description": "获取现行制度(报销管理2025、通讯费管理、授权管理、预算管理)"},
+    {"step": "data_collection", "status": "completed", "description": "查询R000028详情、发票使用、E0036全部费用、部门预算"},
+    {"step": "analysis", "status": "completed", "description": "交叉比对制度与数据，识别异常"},
+    {"step": "evidence_check", "status": "pending", "description": "证据覆盖检查"},
+    {"step": "false_positive_review", "status": "pending", "description": "误报审查"},
+    {"step": "report", "status": "pending", "description": "生成审计报告"},
+    {"step": "validation", "status": "pending", "description": "结果校验"},
+    {"step": "submission", "status": "pending", "description": "统一提交"}
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "涉及2项制度(报销管理办法+通讯费管理办法)",
+      "需要聚合查询(月度通讯费合计)",
+      "涉及2条业务规则(重复报销+月度上限)",
+      "涉及阈值判断(300元上限、60天期限)"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "复杂度3，数据已通过直接查询完成收集，无需专业子智能体"
+  },
+  "preliminary_findings": [
+    {
+      "type": "anomaly",
+      "title": "同一发票重复报销",
+      "records": ["R000028", "R004204"],
+      "policy": "费用报销管理办法(2025)第十条",
+      "facts": "发票FP202500000028(金额165.58元)被员工张林(E0036)在R000028(2025-03-09)和R004204(2025-05-10)两次报销中使用，事由和金额完全一致"
+    },
+    {
+      "type": "anomaly",
+      "title": "月度通讯费超标",
+      "records": ["R000028", "R002127"],
+      "policy": "办公与通讯费用管理办法第三条",
+      "facts": "张林(E0036)2025年3月通讯费合计449.52元(R000028:165.58 + R002127:283.94)，超过每人每月300元上限"
+    }
+  ],
+  "stopping_conditions": [
+    "所有与R000028直接相关的规则检查已完成",
+    "证据矩阵覆盖率达到100%",
+    "校验报告valid=true",
+    "提交成功"
+  ],
+  "unresolved_items": []
+}

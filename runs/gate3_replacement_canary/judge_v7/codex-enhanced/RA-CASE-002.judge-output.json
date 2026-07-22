@@ -1,0 +1,86 @@
+{
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "明确认定构成拆分报销风险且无矛盾表述",
+      "answer_evidence": "答案中明确表述R004219与R004220合计10400元达到AR-03审批线，涉嫌违反拆分报销规定",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "same-employee-type",
+      "value": 1,
+      "reason": "员工和费用类型两个聚合维度均正确",
+      "answer_evidence": "答案中提及三笔费用均为E0008杨丹的差旅住宿费，并明确R004219与R004220为同一员工、同一费用类型",
+      "trace_evidence": "get_expense_detail返回三笔记录的employee_id均为E0008，expense_type均为travel_lodging",
+      "source": "llm_judge"
+    },
+    {
+      "id": "window-dates",
+      "value": 0,
+      "reason": "未列明全部三笔日期，也未对三笔记录计算首尾相隔天数",
+      "answer_evidence": "答案仅列出R004219(2025-11-27)与R004220(2025-12-01)的日期，未提及R004209日期，因此未完成三笔日期完整列出和7天窗口判断",
+      "trace_evidence": "工具轨迹中R004209日期为2025-02-26，但候选未在final_answer中引用或进行窗口判断",
+      "source": "llm_judge"
+    },
+    {
+      "id": "amounts",
+      "value": 0,
+      "reason": "三笔金额并非均为3400元",
+      "answer_evidence": "答案中R004209金额3400元，R004219和R004220均为5200元",
+      "trace_evidence": "get_expense_detail返回R004219和R004220的amount均为5200",
+      "source": "llm_judge"
+    },
+    {
+      "id": "sum",
+      "value": 0,
+      "reason": "候选答案未计算预期记录集（R004209/R004210/R004211）的合计金额10200元，只计算了其他记录的合计金额",
+      "answer_evidence": "答案中仅提及R004209(3400)、R004219(5200)、R004220(5200)，未出现10200元合计",
+      "trace_evidence": "工具调用仅对R004209、R004219、R004220执行get_expense_detail，未获取R004210、R004211的金额，无法得出10200元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "threshold",
+      "value": 0,
+      "reason": "未基于正确的记录集合比较，候选答案中比较的是10400元而非预期的10200元与10000元审批线",
+      "answer_evidence": "答案中明确比较的是“合计10400元达到AR-03审批线(10000元)”",
+      "trace_evidence": "工具调用未涵盖R004210和R004211，无法验证10200元是否达到审批线",
+      "source": "llm_judge"
+    },
+    {
+      "id": "distinct-invoices",
+      "value": 1,
+      "reason": "候选答案未报告重复发票异常（DUP），正确区分了拆分报销与重复报销",
+      "answer_evidence": "答案仅报告拆分异常（ANOM-002），未出现重复发票相关内容",
+      "trace_evidence": "工具调用检查了相关发票，未发现重复证据，也未生成重复发票类异常",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-expense",
+      "value": 1,
+      "reason": "引用了费用报销办法第十一条，并明确提及7天内聚合且合计达到较高审批线的拆分核查规则",
+      "answer_evidence": "答案中写明“涉嫌违反《费用报销管理办法》第十一条禁止拆分报销的规定”并描述“间隔仅4天,合计10400元达到AR-03审批线”",
+      "trace_evidence": "工具get_policy_excerpt返回了第十一条内容，且get_policy_doc的完整文本中包含该条规则",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-authorization",
+      "value": 1,
+      "reason": "候选提交明确引用03_authorization_management.md附件二，并在结论中提及10000元较高审批线。",
+      "answer_evidence": "候选答案中：“根据《授权管理办法》附件二应经部门经理审批并经财务复核”和“合计10400元达到AR-03审批线(10000元)”，citations包含“03_authorization_management.md”和“附件二”。",
+      "trace_evidence": "工具轨迹中get_policy_doc(\"03_authorization_management.md\")返回了附件二内容，包含AR-03档位≥10000元的审批线。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "window-investigation",
+      "value": 0,
+      "reason": "候选未通过员工、费用类型和日期范围查询获得预期完整三记录窗口（R004209, R004210, R004211），仅查询了R004219和R004220，轨迹中无窗口查询操作。",
+      "answer_evidence": "候选最终提交的record_ids为[\"R004209\", \"R004219\", \"R004220\"]，缺失R004210和R004211。",
+      "trace_evidence": "工具轨迹中仅对R004209、R004219、R004220进行单条查询，未见针对员工E0008、费用类型travel_lodging和日期范围的窗口查询或对R004210、R004211的任何调用。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交正确识别了拆分报销风险，但未能识别出正确的三笔相关记录（预期为R004209、R004210、R004211），导致日期和金额检查项未通过。；候选提交未按线索R004209正确核查关联记录集，遗漏R004210和R004211，导致金额合计与审批线比较错误，但拆分识别思路正确且未误报重复发票，制度引用符合要求；第一个检查项（引用授权附件二提及10000元审批线）通过；第二个检查项未通过，因候选未通过窗口查询获取预期完整记录窗口，仅用错误记录ID提交。",
+  "confidence": 0.9666666666666667
+}

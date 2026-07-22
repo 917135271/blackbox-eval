@@ -1,0 +1,137 @@
+{
+  "task_id": "RA-CASE-002",
+  "evidence_records": [
+    {
+      "record_id": "R004209",
+      "record_no": "BX2025X004209",
+      "employee_id": "E0008",
+      "employee_name": "杨丹",
+      "employee_level": "D1",
+      "position_role": "部门经理",
+      "department_id": "D008",
+      "department_name": "合规风控部",
+      "expense_date": "2025-02-26",
+      "reimburse_date": "2025-03-04",
+      "expense_type": "travel_lodging",
+      "amount": 3400.00,
+      "city_tier": "A",
+      "nights": 5,
+      "per_night": 680.00,
+      "standard_per_night": 650.00,
+      "standard_total": 3250.00,
+      "excess": 150.00,
+      "reason": "项目现场住宿费",
+      "invoice_no": "FP2025X0004203",
+      "vendor_name": "安程酒店管理有限公司",
+      "status": "approved",
+      "special_approval": 0,
+      "approval_tier": "AR-02",
+      "approver_id": "E0008",
+      "approver_role": "部门经理",
+      "self_approved": true,
+      "financial_review": false
+    },
+    {
+      "record_id": "R004210",
+      "record_no": "BX2025X004210",
+      "employee_id": "E0008",
+      "employee_name": "杨丹",
+      "employee_level": "D1",
+      "position_role": "部门经理",
+      "department_id": "D008",
+      "department_name": "合规风控部",
+      "expense_date": "2025-02-28",
+      "reimburse_date": "2025-03-06",
+      "expense_type": "travel_lodging",
+      "amount": 3400.00,
+      "city_tier": "A",
+      "nights": 5,
+      "per_night": 680.00,
+      "standard_per_night": 650.00,
+      "standard_total": 3250.00,
+      "excess": 150.00,
+      "reason": "项目现场住宿费",
+      "invoice_no": "FP2025X0004204",
+      "vendor_name": "安程酒店管理有限公司",
+      "status": "approved",
+      "special_approval": 0,
+      "approval_tier": "AR-02",
+      "approver_id": "E0008",
+      "approver_role": "部门经理",
+      "self_approved": true,
+      "financial_review": false
+    },
+    {
+      "record_id": "R004211",
+      "record_no": "BX2025X004211",
+      "employee_id": "E0008",
+      "employee_name": "杨丹",
+      "employee_level": "D1",
+      "position_role": "部门经理",
+      "department_id": "D008",
+      "department_name": "合规风控部",
+      "expense_date": "2025-03-02",
+      "reimburse_date": "2025-03-08",
+      "expense_type": "travel_lodging",
+      "amount": 3400.00,
+      "city_tier": "A",
+      "nights": 5,
+      "per_night": 680.00,
+      "standard_per_night": 650.00,
+      "standard_total": 3250.00,
+      "excess": 150.00,
+      "reason": "项目现场住宿费",
+      "invoice_no": "FP2025X0004205",
+      "vendor_name": "安程酒店管理有限公司",
+      "status": "approved",
+      "special_approval": 0,
+      "approval_tier": "AR-02",
+      "approver_id": "E0008",
+      "approver_role": "部门经理",
+      "self_approved": true,
+      "financial_review": false
+    }
+  ],
+  "findings": {
+    "split_claims": {
+      "total_amount": 10200.00,
+      "date_range": "2025-02-26 to 2025-03-02",
+      "calendar_days": 5,
+      "claimed_nights": 15,
+      "nights_possible_in_period": 5,
+      "physical_impossibility": true,
+      "required_tier_if_combined": "AR-03",
+      "actual_tier_used": "AR-02",
+      "required_approver_if_combined": "部门总经理",
+      "actual_approver": "E0008 (self, 部门经理)"
+    },
+    "standard_exceedance": {
+      "standard_per_night": 650,
+      "actual_per_night": 680,
+      "excess_per_night": 30,
+      "excess_per_record": 150,
+      "total_excess": 450,
+      "special_approval": false
+    },
+    "self_approval": {
+      "ar02_requires": "部门经理+财务复核",
+      "actual": "仅E0008自我审批",
+      "financial_review_missing": true
+    }
+  },
+  "policies": {
+    "01_expense_reimbursement_2025.md": {
+      "article_10": {"rule": "同一发票最多报销1次", "violated": false},
+      "article_11": {"rule": "7天内同类报销≥2笔且合计达较高审批线应核查拆分", "violated": true},
+      "article_12": {"rule": "无专项审批不得超过制度标准1.0倍", "violated": true}
+    },
+    "03_authorization_management.md": {
+      "ar02": {"range": "3000-10000", "required": "部门经理+财务复核", "complied": false},
+      "ar03": {"range": "10000-50000", "required": "部门总经理", "should_have_triggered": true}
+    },
+    "04_travel_expense.md": {
+      "article_4": {"standard": "经理级/一类城市/650元/晚", "violated": true},
+      "article_5": {"rule": "超过标准且无专项审批不得报销超出部分", "violated": true}
+    }
+  }
+}

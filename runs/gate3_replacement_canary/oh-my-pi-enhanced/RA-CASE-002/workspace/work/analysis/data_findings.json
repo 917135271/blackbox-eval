@@ -1,0 +1,88 @@
+{
+  "scope": {
+    "employee_id": "E0008",
+    "employee_name": "杨丹",
+    "department_id": "D008",
+    "expense_type": "travel_lodging",
+    "date_range": "2025-02-19 to 2025-03-05",
+    "in_scope_population_count": 3
+  },
+  "candidate_records": [
+    {
+      "record_id": "R004209",
+      "employee_id": "E0008",
+      "expense_date": "2025-02-26",
+      "amount": 3400.0,
+      "nights": 5,
+      "city_tier": "A",
+      "approval_tier": "AR-02",
+      "approver": "E0008",
+      "has_financial_review": false,
+      "special_approval": 0
+    },
+    {
+      "record_id": "R004210",
+      "employee_id": "E0008",
+      "expense_date": "2025-02-28",
+      "amount": 3400.0,
+      "nights": 5,
+      "city_tier": "A",
+      "approval_tier": "AR-02",
+      "approver": "E0008",
+      "has_financial_review": false,
+      "special_approval": 0
+    },
+    {
+      "record_id": "R004211",
+      "employee_id": "E0008",
+      "expense_date": "2025-03-02",
+      "amount": 3400.0,
+      "nights": 5,
+      "city_tier": "A",
+      "approval_tier": "AR-02",
+      "approver": "E0008",
+      "has_financial_review": false,
+      "special_approval": 0
+    }
+  ],
+  "aggregate_results": {
+    "total_amount": 10200.0,
+    "max_date_span_days": 4,
+    "individual_tier": "AR-02",
+    "combined_tier": "AR-03",
+    "lodging_standard_per_night": 850,
+    "actual_per_night": 680,
+    "lodging_exceeds_standard": false
+  },
+  "rule_by_population_coverage": [
+    {
+      "rule": "Article 11 - Split Reimbursement",
+      "population": ["R004209", "R004210", "R004211"],
+      "status": "matched",
+      "detail": "三笔记录在4天内（2/26-3/2），合计10,200元达到AR-03线，触发拆分核查"
+    },
+    {
+      "rule": "AR-02 - Financial Review",
+      "population": ["R004209", "R004210", "R004211"],
+      "status": "matched",
+      "detail": "三笔记录均为AR-02，均缺少财务复核"
+    },
+    {
+      "rule": "Lodging Standard",
+      "population": ["R004209", "R004210", "R004211"],
+      "status": "cleared",
+      "detail": "部门负责人级A类850元/晚，实际680元/晚，未超标"
+    }
+  ],
+  "completed_checks": [
+    "7-day split window check",
+    "AR tier combined threshold check",
+    "Approval completeness check",
+    "Lodging standard check",
+    "Invoice uniqueness check",
+    "Self-approval check"
+  ],
+  "data_quality_issues": [],
+  "limitations": [],
+  "unresolved_items": []
+}

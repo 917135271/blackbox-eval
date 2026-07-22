@@ -1,0 +1,94 @@
+replacement_cases:
+  - id: PV-CASE-001
+    replaces: L1-001
+    level: L2
+    category: policy_data_comparison
+    case_family: policy_and_version
+    selection_reason: 9990元现行审批边界案例，验证数据事实、交叉引用和旧版误判识别
+    prompt: >-
+      请以R004233为线索，结合现行制度、历史制度和业务数据，核查该笔费用的审批路径及费用标准适用是否正确。请返回核查涉及的record_id、审计结论、关键计算、现行制度依据，并说明继续使用历史审批线会造成什么判断偏差；如存在异常，再返回发现ID。
+    ground_truth_refs:
+      - record:R004233
+      - trap:TRAP-001
+    scoring:
+      type: deterministic
+      kind: no_anomaly
+      expected_anomaly_ids: []
+      expected_record_ids: [R004233]
+      expected_facts:
+        - R004233金额为9990元，适用AR-02，由部门经理审批并经财务复核，不需要部门总经理审批
+        - R004233为X1级员工一类城市住宿10晚，限额为11000元，9990元未超标准
+        - 2025现行部门总经理审批线为10000元，2022版8000元线已废止
+        - 继续使用8000元旧线会把8000元至10000元以下的合规审批错误升级
+      expected_reason: R004233低于现行10000元部门总经理审批线且低于11000元住宿限额，现有AR-02审批路径正确；旧8000元线会造成错误升级
+
+  - id: RA-CASE-001
+    replaces: L2-003
+    level: L2
+    category: policy_data_comparison
+    case_family: record_audit
+    selection_reason: 新重复发票组合，验证从单一线索追查完整发票使用记录
+    prompt: >-
+      请以R000028为线索，结合现行制度和业务数据核查相关费用记录是否存在异常。请返回核查涉及的record_id集合、审计结论、关键事实和制度依据；如存在异常，再返回发现ID。
+    ground_truth_refs:
+      - ground_truth:DUP-004
+      - record:R000028
+      - record:R004204
+    scoring:
+      type: deterministic
+      kind: anomaly_id_set
+      expected_anomaly_ids: [DUP-004]
+      expected_record_ids: [R000028, R004204]
+      expected_facts:
+        - R000028和R004204使用同一发票INV000028且金额均为165.58元
+        - 同一发票在两条已审批报销记录中重复使用，构成一项重复报销风险
+
+  - id: RA-CASE-002
+    replaces: L2-008
+    level: L3
+    category: policy_data_comparison
+    case_family: record_audit
+    selection_reason: 三笔拆分组合，验证滑动窗口、完整记录集合和现行审批线
+    prompt: >-
+      请以R004209为线索，结合现行制度和业务数据核查相关费用记录是否存在异常。请返回核查涉及的record_id集合、审计结论、关键事实和制度依据；如存在异常，再返回发现ID。
+    ground_truth_refs:
+      - ground_truth:SPLIT-002
+      - record:R004209
+      - record:R004210
+      - record:R004211
+    scoring:
+      type: deterministic
+      kind: anomaly_id_set
+      expected_anomaly_ids: [SPLIT-002]
+      expected_record_ids: [R004209, R004210, R004211]
+      expected_facts:
+        - 三条记录属于同一员工E0008和同一费用类型travel_lodging
+        - 费用日期为2025-02-26、2025-02-28和2025-03-02，首尾相隔4天
+        - 三笔金额均为3400元，合计10200元，达到现行10000元较高审批线
+        - 三张发票不同，异常依据是7天内同类费用聚合达到审批线而非重复发票
+
+  - id: RR-CASE-001
+    replaces: L3-010
+    level: L3
+    category: audit_report
+    case_family: retrieval_and_report
+    selection_reason: 四记录版本边界报告，验证当前口径下不误报及旧版审批线风险解释
+    prompt: >-
+      请以R000465为线索，调查同一员工相邻日期的同类费用记录，并形成一段制度版本风险审计说明。请返回完整record_id集合，判断按现行制度是否构成异常，说明历史制度可能造成的不同结论、关键计算、制度依据和可执行控制；如存在异常，再返回发现ID。
+    ground_truth_refs:
+      - record:R000465
+      - record:R000561
+      - record:R000888
+      - record:R001354
+    scoring:
+      type: llm_rubric
+      kind: no_anomaly
+      expected_anomaly_ids: []
+      expected_record_ids: [R000465, R000561, R000888, R001354]
+      expected_facts:
+        - 四条记录属于同一员工E0041和同一费用类型training_fee，费用日期从2025-12-18至2025-12-25，首尾相隔7天
+        - 四笔金额为2157.72元、2917.45元、2606.07元和2083.49元，合计9764.73元
+        - 9764.73元低于2025现行10000元较高审批线，不构成拆分规避审批
+        - 9764.73元高于已废止的2022版8000元线，误用旧线会产生拆分报销误报
+        - 四笔课程费分别未超过每人每期3500元标准，且发票互不相同
+      expected_reason: 四笔同类费用虽然处于7天窗口内，但合计9764.73元低于现行10000元审批线；旧8000元线已废止，不能据此报告异常

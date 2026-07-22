@@ -1,0 +1,42 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-RR-CASE-001-001",
+      "record_ids": ["R000465", "R000561", "R000888", "R001354"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第三条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
+      ],
+      "facts": [
+        "员工E0041(邓柳)在2025-12-18至2025-12-25共7天内提交4笔training_fee报销：R000465(12-18, 2157.72元)、R000561(12-20, 2917.45元)、R000888(12-23, 2606.07元)、R001354(12-25, 2083.49元)",
+        "4笔报销均为同一员工(E0041)、同一费用类型(training_fee)、同一审批档位(AR-01,仅部门经理审批)",
+        "7天内任意2笔组合合计金额均超过3000元：R000465+R000561=5075.17元、R000465+R000888=4763.79元、R000465+R001354=4241.21元、R000561+R000888=5523.52元、R000561+R001354=5000.94元、R000888+R001354=4689.56元",
+        "AR-02审批线为单笔≥3000元，需部门经理+财务复核；4笔均未触发AR-02，合计已远超3000元阈值",
+        "4笔发票号FP202500000465、FP202500000561、FP202500000888、FP202500001354均仅使用1次，无发票重复使用",
+        "2022旧版制度仅设单笔8000元(部门总经理)和30000元(分管副总)审批线，无7天聚合规则，因此上述4笔在旧制度下均属合规"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R000465", "R000561", "R000888", "R001354"],
+  "submitted_record_ids": ["R000465", "R000561", "R000888", "R001354"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "total_candidates": 4,
+    "total_submitted": 4,
+    "total_anomalies": 1,
+    "total_evidence_rows": 1
+  },
+  "unresolved_items": []
+}

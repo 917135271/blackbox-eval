@@ -9,11 +9,14 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
+import yaml
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CASES = ROOT / "data" / "formal_case_rubric" / "cases.json"
 DEFAULT_EVALS = ROOT / "data" / "formal_case_rubric" / "evals.json"
 FORMAL_DB = ROOT / "data" / "formal_case_rubric" / "expense_formal.db"
+REPLACEMENT_CASES = ROOT / "data" / "formal_case_rubric" / "replacement_cases.yaml"
 CORPUS_DIR = ROOT / "data" / "corpus"
 EXPECTED_FAMILIES = {
     "policy_and_version": 3,
@@ -23,7 +26,22 @@ EXPECTED_FAMILIES = {
     "retrieval_and_report": 3,
 }
 EXPECTED_CASE_COUNT = sum(EXPECTED_FAMILIES.values())
-NEUTRAL_RECORD_CASES = {"L2-003", "L2-008", "L2-013", "TRAP-002", "TRAP-003", "TRAP-005"}
+REPLACEMENTS = {
+    "L1-001": "PV-CASE-001",
+    "L2-003": "RA-CASE-001",
+    "L2-008": "RA-CASE-002",
+    "L3-010": "RR-CASE-001",
+}
+NEUTRAL_RECORD_CASES = {
+    "PV-CASE-001",
+    "RA-CASE-001",
+    "RA-CASE-002",
+    "RR-CASE-001",
+    "L2-013",
+    "TRAP-002",
+    "TRAP-003",
+    "TRAP-005",
+}
 SUPPORTED_DETERMINISTIC_RULES = {
     "expected-record-present",
     "no-unexpected-records",
@@ -139,6 +157,7 @@ def validate_case(case: dict[str, Any], errors: list[str]) -> None:
             f"{case_id}: prompt leaks anomaly type and outcome",
             errors,
         )
+    is_no_anomaly = case.get("expected_output", {}).get("scoring_kind") == "no_anomaly"
     if case.get("case_family") == "clean_trap":
         clean_item_ids = {str(item.get("id")) for item in checklist}
         require(
@@ -147,6 +166,16 @@ def validate_case(case: dict[str, Any], errors: list[str]) -> None:
             errors,
         )
         require("independent-verification" in clean_item_ids, f"{case_id}: independent verification item missing", errors)
+    if is_no_anomaly:
+        failure_rules = {
+            str(failure.get("deterministic_rule"))
+            for failure in rubric.get("critical_failures", [])
+        }
+        require(
+            "unexpected-anomaly-reported" in failure_rules,
+            f"{case_id}: no-anomaly case must cap substantive false positives",
+            errors,
+        )
     if case.get("case_family") == "full_year_audit" or case_id == "L3-009":
         batch_item_ids = {str(item.get("id")) for item in checklist}
         require(
@@ -351,15 +380,15 @@ def validate_semantics(cases: list[dict[str, Any]], errors: list[str]) -> dict[s
         )
 
     require(
-        sorted(case_map["L2-003"]["expected_output"]["expected_record_ids"])
+        sorted(case_map["RA-CASE-001"]["expected_output"]["expected_record_ids"])
         in facts["duplicate_groups"],
-        "L2-003: record pair is not a duplicate-invoice group",
+        "RA-CASE-001: record pair is not a duplicate-invoice group",
         errors,
     )
     require(
-        sorted(case_map["L2-008"]["expected_output"]["expected_record_ids"])
+        sorted(case_map["RA-CASE-002"]["expected_output"]["expected_record_ids"])
         in facts["split_groups"],
-        "L2-008: record set is not a qualifying 7-day split group",
+        "RA-CASE-002: record set is not a qualifying 7-day split group",
         errors,
     )
     require(
@@ -406,12 +435,47 @@ def validate_semantics(cases: list[dict[str, Any]], errors: list[str]) -> dict[s
     require(not excluded & anomaly_records, "L3-009: excluded clean records overlap recomputed anomalies", errors)
 
     with sqlite3.connect(FORMAL_DB) as connection:
+        connection.row_factory = sqlite3.Row
         existing_records = {str(row[0]) for row in connection.execute("SELECT record_id FROM expense_records")}
         trap_003 = connection.execute(
             "SELECT expense_date, amount FROM expense_records WHERE record_id IN ('R004236', 'R004237') ORDER BY record_id"
         ).fetchall()
         trap_005 = connection.execute(
             "SELECT expense_date, amount, participants, reason FROM expense_records WHERE record_id IN ('R004239', 'R004240') ORDER BY record_id"
+        ).fetchall()
+        pv_case = connection.execute(
+            """
+            SELECT e.record_id, e.amount, e.city_tier, e.nights, emp.employee_level,
+                   a.tier_id, a.approver_role
+            FROM expense_records e
+            JOIN employees emp ON emp.employee_id = e.employee_id
+            LEFT JOIN approvals a ON a.record_id = e.record_id
+            WHERE e.record_id = 'R004233'
+            """
+        ).fetchone()
+        ra_duplicate = connection.execute(
+            """
+            SELECT record_id, invoice_id, amount, status
+            FROM expense_records
+            WHERE record_id IN ('R000028', 'R004204')
+            ORDER BY record_id
+            """
+        ).fetchall()
+        ra_split = connection.execute(
+            """
+            SELECT record_id, employee_id, expense_type, expense_date, amount, invoice_id
+            FROM expense_records
+            WHERE record_id IN ('R004209', 'R004210', 'R004211')
+            ORDER BY expense_date, record_id
+            """
+        ).fetchall()
+        rr_version = connection.execute(
+            """
+            SELECT record_id, employee_id, expense_type, expense_date, amount, invoice_id
+            FROM expense_records
+            WHERE record_id IN ('R000465', 'R000561', 'R000888', 'R001354')
+            ORDER BY expense_date, record_id
+            """
         ).fetchall()
     require(len(trap_003) == 2, "TRAP-003: formal database records are incomplete", errors)
     if len(trap_003) == 2:
@@ -436,6 +500,58 @@ def validate_semantics(cases: list[dict[str, Any]], errors: list[str]) -> dict[s
             "TRAP-005: amounts or participant counts differ from rubric facts",
             errors,
         )
+    require(pv_case is not None, "PV-CASE-001: R004233 is missing", errors)
+    if pv_case is not None:
+        require(
+            float(pv_case["amount"]) == 9990.0
+            and str(pv_case["city_tier"]) == "A"
+            and int(pv_case["nights"]) == 10
+            and str(pv_case["employee_level"]) == "X1"
+            and str(pv_case["tier_id"]) == "AR-02",
+            "PV-CASE-001: amount, lodging dimensions, or approval tier differ from Ground Truth",
+            errors,
+        )
+    require(len(ra_duplicate) == 2, "RA-CASE-001: duplicate records are incomplete", errors)
+    if len(ra_duplicate) == 2:
+        require(
+            len({str(row["invoice_id"]) for row in ra_duplicate}) == 1
+            and [float(row["amount"]) for row in ra_duplicate] == [165.58, 165.58]
+            and all(str(row["status"]) == "approved" for row in ra_duplicate),
+            "RA-CASE-001: invoice, amount, or status facts differ from Ground Truth",
+            errors,
+        )
+    require(len(ra_split) == 3, "RA-CASE-002: split records are incomplete", errors)
+    if len(ra_split) == 3:
+        split_gap = (
+            dt.date.fromisoformat(str(ra_split[-1]["expense_date"]))
+            - dt.date.fromisoformat(str(ra_split[0]["expense_date"]))
+        ).days
+        require(
+            len({str(row["employee_id"]) for row in ra_split}) == 1
+            and len({str(row["expense_type"]) for row in ra_split}) == 1
+            and len({str(row["invoice_id"]) for row in ra_split}) == 3
+            and split_gap == 4
+            and sum(float(row["amount"]) for row in ra_split) == 10200.0,
+            "RA-CASE-002: employee, type, invoice, window, or amount facts differ from Ground Truth",
+            errors,
+        )
+    require(len(rr_version) == 4, "RR-CASE-001: version-risk records are incomplete", errors)
+    if len(rr_version) == 4:
+        version_gap = (
+            dt.date.fromisoformat(str(rr_version[-1]["expense_date"]))
+            - dt.date.fromisoformat(str(rr_version[0]["expense_date"]))
+        ).days
+        version_total = round(sum(float(row["amount"]) for row in rr_version), 2)
+        require(
+            len({str(row["employee_id"]) for row in rr_version}) == 1
+            and len({str(row["expense_type"]) for row in rr_version}) == 1
+            and len({str(row["invoice_id"]) for row in rr_version}) == 4
+            and version_gap == 7
+            and version_total == 9764.73
+            and all(float(row["amount"]) <= 3500 for row in rr_version),
+            "RR-CASE-001: employee, type, invoice, window, sum, or training limits differ from Ground Truth",
+            errors,
+        )
     for case in cases:
         case_id = str(case["id"])
         for record_id in case.get("expected_output", {}).get("expected_record_ids", []):
@@ -451,8 +567,9 @@ def validate(cases_path: Path, evals_path: Path) -> dict[str, Any]:
     evals = json.loads(evals_path.read_text(encoding="utf-8"))
     cases = dataset.get("cases") or []
     errors: list[str] = []
-    require(dataset.get("dataset_id") == "securities-expense-audit-formal-15-v8", "dataset_id must be securities-expense-audit-formal-15-v8", errors)
-    require(dataset.get("rubric_version") == "atomic-binary-checklist-v6", "rubric_version must be atomic-binary-checklist-v6", errors)
+    require(dataset.get("dataset_id") == "securities-expense-audit-formal-15-v9", "dataset_id must be securities-expense-audit-formal-15-v9", errors)
+    require(dataset.get("rubric_version") == "atomic-binary-checklist-v7", "rubric_version must be atomic-binary-checklist-v7", errors)
+    require(dataset.get("replacements") == REPLACEMENTS, "replacement manifest mismatch", errors)
     require(
         dataset.get("case_count") == EXPECTED_CASE_COUNT,
         f"dataset case_count must be {EXPECTED_CASE_COUNT}",
@@ -473,6 +590,16 @@ def validate(cases_path: Path, evals_path: Path) -> dict[str, Any]:
     eval_ids = [task.get("id") for task in evals]
     require(len(case_ids) == len(set(case_ids)), "case ids must be unique", errors)
     require(case_ids == eval_ids, "cases and evals must use identical ordered ids", errors)
+    require(
+        not set(REPLACEMENTS) & set(case_ids),
+        "replaced zero-discrimination case ids must not remain in the formal set",
+        errors,
+    )
+    require(
+        set(REPLACEMENTS.values()) <= set(case_ids),
+        "all four replacement cases must be present",
+        errors,
+    )
     family_counts = Counter(case.get("case_family") for case in cases)
     require(dict(family_counts) == EXPECTED_FAMILIES, f"case family counts must be {EXPECTED_FAMILIES}, got {dict(family_counts)}", errors)
     require(dataset.get("case_family_counts") == dict(sorted(EXPECTED_FAMILIES.items())), "case_family_counts manifest mismatch", errors)
@@ -481,16 +608,27 @@ def validate(cases_path: Path, evals_path: Path) -> dict[str, Any]:
         task["id"]: task
         for task in json.loads((ROOT / "data" / "evals.json").read_text(encoding="utf-8"))
     }
+    replacement_payload = yaml.safe_load(REPLACEMENT_CASES.read_text(encoding="utf-8"))
+    replacement_tasks = {
+        str(task["id"]): task
+        for task in replacement_payload.get("replacement_cases", [])
+    }
     for index, case in enumerate(cases):
         validate_case(case, errors)
-        source = source_tasks.get(case.get("source_task_id"))
+        case_id = str(case.get("id"))
+        source = replacement_tasks.get(case_id) or source_tasks.get(case.get("source_task_id"))
         require(source is not None, f"{case.get('id')}: source task missing", errors)
         if source:
             require(source.get("category") != "ground_truth_lookup", f"{case.get('id')}: ground_truth_lookup must not enter formal set", errors)
-            source_prompt = source["prompt_variants"]["precise"]
-            if case.get("prompt") != source_prompt:
-                require(case.get("source_prompt") == source_prompt, f"{case.get('id')}: changed prompt must preserve source_prompt", errors)
-                require(bool(case.get("prompt_change_reason")), f"{case.get('id')}: changed prompt requires prompt_change_reason", errors)
+            if case_id in replacement_tasks:
+                require(case.get("prompt") == source.get("prompt"), f"{case_id}: replacement prompt differs from source", errors)
+                require(case.get("replaces") in REPLACEMENTS, f"{case_id}: replacement target missing", errors)
+                require(REPLACEMENTS.get(case.get("replaces")) == case_id, f"{case_id}: replacement mapping is inconsistent", errors)
+            else:
+                source_prompt = source["prompt_variants"]["precise"]
+                if case.get("prompt") != source_prompt:
+                    require(case.get("source_prompt") == source_prompt, f"{case.get('id')}: changed prompt must preserve source_prompt", errors)
+                    require(bool(case.get("prompt_change_reason")), f"{case.get('id')}: changed prompt requires prompt_change_reason", errors)
         if case.get("case_family") == "clean_trap":
             prompt = str(case.get("prompt", ""))
             expected_records = case.get("expected_output", {}).get("expected_record_ids", [])

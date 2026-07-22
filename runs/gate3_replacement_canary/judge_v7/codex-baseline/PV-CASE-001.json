@@ -1,0 +1,319 @@
+{
+  "group": "codex-baseline",
+  "dataset_id": "securities-expense-audit-formal-15-v9",
+  "rubric_version": "atomic-binary-checklist-v7",
+  "task_id": "PV-CASE-001",
+  "case_family": "policy_and_version",
+  "category": "policy_data_comparison",
+  "graded_at": "2026-07-22T21:13:10+08:00",
+  "checklist_passed": 14,
+  "checklist_total": 16,
+  "checklist_pass_rate": 87.5,
+  "checklist": [
+    {
+      "id": "record-r004233",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "no-anomaly",
+      "value": 0,
+      "reason": "提交了异常ID",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-amount",
+      "value": 1,
+      "reason": "候选答案明确金额为9990元，工具返回amount=9990.0",
+      "answer_evidence": "“实际报销9990元”",
+      "trace_evidence": "get_expense_detail返回amount: 9990.0",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-tier",
+      "value": 1,
+      "reason": "明确判断9990元属于AR-02区间",
+      "answer_evidence": "“金额9990.00元落入AR-02档位（≥3000且<10000）”",
+      "trace_evidence": "get_policy_doc(03_authorization_management.md)显示AR-02区间≥3000且<10000",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-roles",
+      "value": 1,
+      "reason": "说明了部门经理审批并经财务复核，未错误加入部门总经理",
+      "answer_evidence": "“必要审批角色为「部门经理,并经财务复核」”",
+      "trace_evidence": "get_policy_doc(03_authorization_management.md)显示AR-02角色为“部门经理,并经财务复核”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "approval-trace",
+      "value": 1,
+      "reason": "工具轨迹显示实际tier_id为AR-02，审批角色为部门经理且已审批",
+      "answer_evidence": "“实际审批记录仅含部门经理杨丹（E0008）一条”",
+      "trace_evidence": "get_expense_detail返回approvals: [{\"tier_id\": \"AR-02\", \"approver_role\": \"部门经理\", \"approval_status\": \"approved\"}]",
+      "source": "llm_judge"
+    },
+    {
+      "id": "lodging-calculation",
+      "value": 1,
+      "reason": "职级、城市、晚数、单晚标准和总限额均正确。",
+      "answer_evidence": "“杨丽华（E0012）为X1级分管副总，对应高管级；一类城市住宿标准1100元/晚；实际报销9990元÷10晚=999元/晚，在标准范围内”",
+      "trace_evidence": "get_expense_detail 返回 employee_level='X1', city_tier='A', nights=10；get_policy_doc('04_travel_expense.md') 包含高管级一类城市标准1100元/晚。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "lodging-conclusion",
+      "value": 1,
+      "reason": "明确给出未超住宿标准结论，且无矛盾表述。",
+      "answer_evidence": "“费用标准适用正确”",
+      "trace_evidence": "同 lodging-calculation 的轨迹，计算得 9990÷10=999 元/晚，未超1100元/晚。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-version",
+      "value": 1,
+      "reason": "明确识别2025修订版和现行授权制度，未将2022版作为有效依据。",
+      "answer_evidence": "现行制度依据引用 01_expense_reimbursement_2025.md 和 03_authorization_management.md，并在历史审批线偏差分析中说明2022版已废止。",
+      "trace_evidence": "get_policy_doc('01_expense_reimbursement_2025.md') 返回2025修订版全文；get_policy_doc('03_authorization_management.md') 返回现行附件二审批线；get_policy_doc('02_expense_reimbursement_2022_deprecated.md') 返回内容并明确“不得作为现行审批依据”。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "legacy-status",
+      "value": 1,
+      "reason": "正确给出旧值8000元，并明确其已废止、不得作为现行判断依据。",
+      "answer_evidence": "“2022旧版制度规定≥8000元须部门总经理审批”、“历史审批线在审批层级上给出‘更严格’的假象”、“旧线8000元”",
+      "trace_evidence": "get_policy_doc('02_expense_reimbursement_2022_deprecated.md') 返回第二条“单笔报销金额达到8000元的，应提交部门总经理审批”和第四条“不得作为现行审批依据”。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "legacy-impact",
+      "value": 1,
+      "reason": "准确说明误用8000元线会将8000-10000元记录错误升级至部门总经理审批，并联系R004233说明",
+      "answer_evidence": "候选答案中历史审批线偏差分析指出：2022旧版规定≥8000元须部门总经理，R004233（9990元）会被误判需部门总经理审批，并遗漏财务复核",
+      "trace_evidence": "工具轨迹中无直接相关，证据来自final_answer",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-expense",
+      "value": 0,
+      "reason": "未引用费用报销办法第十二条和第十四条，未覆盖不得超标准和旧版废止依据",
+      "answer_evidence": "候选答案仅引用01_expense_reimbursement_2025.md第五条和第三条，未见第十二条和第十四条",
+      "trace_evidence": "get_policy_excerpt和get_policy_doc获取了01文档，但候选提交未引用第十二条、第十四条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-authorization",
+      "value": 1,
+      "reason": "准确引用授权管理办法附件二，说明AR-02档位和10000元审批线",
+      "answer_evidence": "候选答案引用03_authorization_management.md附件二，给出AR-02≥3000且<10000，必要审批角色为部门经理并经财务复核",
+      "trace_evidence": "get_policy_doc of 03_authorization_management.md返回附件二表格，确认AR-02档位",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-travel",
+      "value": 1,
+      "reason": "准确引用差旅办法第四条，X1级高管一类城市住宿标准1100元/晚",
+      "answer_evidence": "候选答案引用04_travel_expense.md第四条，指出高管级一类城市住宿标准1100元/晚",
+      "trace_evidence": "get_policy_excerpt和get_policy_doc获取04文档，第四条表格显示高管级一类城市1100元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "critical_failures": [
+    {
+      "id": "substantive-false-positive",
+      "check": "将无异常案例提交为实质异常",
+      "score_cap": 40.0,
+      "reason": "实际提交异常数=1"
+    }
+  ],
+  "score_cap": 40.0,
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 212.285,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [
+      "ANOM-PV-CASE-001-01"
+    ],
+    "anomaly_metrics": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "count_exact": false,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": [
+      "R004233"
+    ],
+    "actual_record_ids": [
+      "R004233"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 6,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第五条、第十二条、第十四条"
+      },
+      {
+        "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+        "clause_no": "第一条、第二条、第四条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      },
+      {
+        "doc_id": "04_travel_expense.md",
+        "clause_no": "第三条"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 0.9833333333333334,
+    "overall_comment": "候选提交正确识别了金额、审批档位和所需角色，并核实了实际审批记录的部分内容。尽管其审计结论与预期不一致，但本检查清单仅评估事实核对，所有项目均满足。；候选提交在住宿标准计算、超限判断、现行制度识别和旧线废止说明上均与工具轨迹一致，符合所有检查项通过条件。；候选提交成功说明了旧线影响和授权差旅标准，但缺失费用报销办法第十二条和第十四条的引用，未满足政策完整性要求。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 27324,
+      "completion_tokens": 9166,
+      "total_tokens": 36490,
+      "prompt_cache_hit_tokens": 2048,
+      "prompt_cache_miss_tokens": 25276
+    },
+    "batch_count": 3,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 6870,
+          "completion_tokens": 1965,
+          "total_tokens": 8835,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1541
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 6870
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 6868,
+          "completion_tokens": 1917,
+          "total_tokens": 8785,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1279
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 5844
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 6863,
+          "completion_tokens": 3618,
+          "total_tokens": 10481,
+          "prompt_tokens_details": {
+            "cached_tokens": 512
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 3091
+          },
+          "prompt_cache_hit_tokens": 512,
+          "prompt_cache_miss_tokens": 6351
+        },
+        "finish_reason": "stop",
+        "attempt": 2,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      }
+    ],
+    "consistency_audit": {
+      "sampled_count": 3,
+      "agreement_count": 3,
+      "agreement_rate": 1.0,
+      "disagreement_ids": [],
+      "tied_ids": [],
+      "tiebreak_count": 0,
+      "repeat_count": 2,
+      "batches": [
+        {
+          "model": "deepseek-v4-pro",
+          "usage": {
+            "prompt_tokens": 6723,
+            "completion_tokens": 1666,
+            "total_tokens": 8389,
+            "prompt_tokens_details": {
+              "cached_tokens": 512
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 1249
+            },
+            "prompt_cache_hit_tokens": 512,
+            "prompt_cache_miss_tokens": 6211
+          },
+          "finish_reason": "stop",
+          "attempt": 1,
+          "max_tokens": 4096,
+          "shape_attempt": 1,
+          "criteria_count": 3
+        }
+      ]
+    }
+  },
+  "run_path": "runs/gate3_replacement_canary/codex-baseline/PV-CASE-001"
+}

@@ -27,8 +27,8 @@ from scripted_workflow_core import SCRIPTED_WORKFLOW_VERSION  # noqa: E402
 FORMAL_RUN_ROOT = ROOT / "runs" / "gate4_formal"
 SCRIPTED_RUN_ROOT = ROOT / "runs" / "gate4_scripted"
 CASES_PATH = ROOT / "data" / "formal_case_rubric" / "cases.json"
-OUTPUT_JSON = ROOT / "output" / "gate5_v6" / "scripted_enhancement_comparison.json"
-OUTPUT_MD = ROOT / "output" / "gate5_v6" / "scripted_enhancement_comparison.md"
+OUTPUT_JSON = ROOT / "output" / "gate5_v7" / "scripted_enhancement_comparison.json"
+OUTPUT_MD = ROOT / "output" / "gate5_v7" / "scripted_enhancement_comparison.md"
 FRAMEWORKS = ("ccb", "codex", "openclaude", "opencode", "oh-my-pi", "pi-agent")
 DISPLAY_NAMES = {
     "ccb": "Claude Code Best",
@@ -260,8 +260,8 @@ def build_report() -> dict[str, Any]:
     cases = _load_cases(dataset)
     if len(cases) != FORMAL_TASK_COUNT:
         raise ValueError(f"expected {FORMAL_TASK_COUNT} cases, got {len(cases)}")
-    formal_rows = _load_jsonl(FORMAL_RUN_ROOT / "gate5_grades_v6.jsonl")
-    scripted_rows = _load_jsonl(SCRIPTED_RUN_ROOT / "gate5_grades_v6.jsonl")
+    formal_rows = _load_jsonl(FORMAL_RUN_ROOT / "gate5_grades_v7.jsonl")
+    scripted_rows = _load_jsonl(SCRIPTED_RUN_ROOT / "gate5_grades_v7.jsonl")
     _validate_grade_versions(formal_rows, dataset)
     _validate_grade_versions(scripted_rows, dataset)
     frameworks: list[dict[str, Any]] = []

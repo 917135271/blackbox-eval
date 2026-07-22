@@ -1,0 +1,106 @@
+{
+  "task_id": "RR-CASE-001",
+  "in_scope_population": {
+    "description": "E0041所有training_fee记录",
+    "count": 15,
+    "date_range": "2025-02-10至2025-12-25"
+  },
+  "candidate_analysis": {
+    "window_rule": "7天滑动窗口,同一员工(E0041)同一费用类型(training_fee)",
+    "windows_evaluated": [
+      {
+        "anchor_record": "R001894",
+        "anchor_date": "2025-12-08",
+        "window_end": "2025-12-15",
+        "record_count": 1,
+        "total_amount": 2156.08,
+        "records": ["R001894"],
+        "triggers_split_check": false,
+        "reason": "窗口内仅1笔记录,不满足'2笔及以上'条件"
+      },
+      {
+        "anchor_record": "R000465",
+        "anchor_date": "2025-12-18",
+        "window_end": "2025-12-25",
+        "record_count": 4,
+        "total_amount": 9764.73,
+        "records": ["R000465", "R000561", "R000888", "R001354"],
+        "triggers_split_check": true,
+        "reason": "4笔记录,合计9764.73元,超过AR-02较高审批线3000元"
+      },
+      {
+        "anchor_record": "R000561",
+        "anchor_date": "2025-12-20",
+        "window_end": "2025-12-27",
+        "record_count": 3,
+        "total_amount": 7607.01,
+        "records": ["R000561", "R000888", "R001354"],
+        "triggers_split_check": true,
+        "reason": "3笔记录,合计7607.01元,超过AR-02较高审批线3000元"
+      },
+      {
+        "anchor_record": "R000888",
+        "anchor_date": "2025-12-23",
+        "window_end": "2025-12-30",
+        "record_count": 2,
+        "total_amount": 4689.56,
+        "records": ["R000888", "R001354"],
+        "triggers_split_check": true,
+        "reason": "2笔记录,合计4689.56元,超过AR-02较高审批线3000元"
+      },
+      {
+        "anchor_record": "R001354",
+        "anchor_date": "2025-12-25",
+        "window_end": "2026-01-01",
+        "record_count": 1,
+        "total_amount": 2083.49,
+        "records": ["R001354"],
+        "triggers_split_check": false,
+        "reason": "窗口内仅1笔记录"
+      }
+    ]
+  },
+  "primary_anomaly_window": {
+    "anchor_record": "R000465",
+    "window": "2025-12-18至2025-12-25",
+    "records": ["R000465", "R000561", "R000888", "R001354"],
+    "individual_amounts": {
+      "R000465": 2157.72,
+      "R000561": 2917.45,
+      "R000888": 2606.07,
+      "R001354": 2083.49
+    },
+    "total_amount": 9764.73,
+    "individual_approval_tiers": "全部为AR-01(部门经理)",
+    "aggregated_tier": "AR-02(需部门经理+财务复核)",
+    "key_calculation": "2157.72 + 2917.45 + 2606.07 + 2083.49 = 9764.73 > 3000 (AR-02线)"
+  },
+  "additional_checks": {
+    "invoice_reuse": {
+      "checked": true,
+      "result": "无重复使用",
+      "details": "FP202500000465, FP202500000561, FP202500000888, FP202500001354均为单次使用"
+    },
+    "training_fee_limit": {
+      "checked": true,
+      "limit": 3500,
+      "result": "无超标",
+      "details": "四笔记录均在2157.72-2917.45之间,低于3500上限"
+    },
+    "budget_check": {
+      "note": "D005部门年度预算278540.94元,累计使用433442.76元(155.6%),但预算问题不在本次单规则任务范围内"
+    }
+  },
+  "matched_record_ids": ["R000465", "R000561", "R000888", "R001354"],
+  "completed_checks": [
+    "7天滑动窗口聚合",
+    "发票重复使用",
+    "培训费单项标准",
+    "审批层级对比",
+    "2022版vs2025版制度差异"
+  ],
+  "query_artifacts": ["work/sql/seven_day_window.sql"],
+  "data_quality_issues": [],
+  "limitations": [],
+  "unresolved_items": []
+}

@@ -1,0 +1,79 @@
+{
+  "status": "pass",
+  "coverage_percent": 100.0,
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANOM-001",
+      "record_ids": [
+        "R000028",
+        "R004204"
+      ],
+      "citations": [
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第十条"
+        }
+      ],
+      "facts": [
+        "发票FP202500000028（INV000028）被两条报销记录使用：R000028（2025-03-09，165.58元）和R004204（2025-05-10，165.58元），usage_count=2",
+        "两条记录均属于同一员工E0036（张林），同一费用类型communication，同一发票金额165.58元",
+        "《XX证券费用报销管理办法(2025修订版)》第十条规定：同一发票最多报销1次"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "record_ids": [
+        "R000028",
+        "R002127"
+      ],
+      "citations": [
+        {
+          "doc_id": "07_office_communication.md",
+          "clause_no": "第三条"
+        }
+      ],
+      "facts": [
+        "员工E0036（张林）2025年3月有两笔通讯费报销：R000028（2025-03-09，165.58元）和R002127（2025-03-17，283.94元）",
+        "两笔合计金额为165.58 + 283.94 = 449.52元",
+        "《XX证券办公与通讯费用管理办法》第三条规定：员工通讯费用报销按月控制，每人每月不超过300元",
+        "449.52元 > 300元上限，超额149.52元"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": [
+    "R000028",
+    "R002127",
+    "R004204"
+  ],
+  "submitted_record_ids": [
+    "R000028",
+    "R002127",
+    "R004204"
+  ],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "invoice_usage_FP202500000028": {
+      "reported": 2,
+      "records": [
+        "R000028",
+        "R004204"
+      ]
+    },
+    "monthly_total_E0036_202503": {
+      "reported": 449.52,
+      "cap": 300.0,
+      "excess": 149.52
+    }
+  },
+  "unresolved_items": []
+}

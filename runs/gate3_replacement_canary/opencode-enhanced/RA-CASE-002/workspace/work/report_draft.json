@@ -1,0 +1,70 @@
+{
+  "audit_scope": {
+    "object": "以R004209为线索，核查E0008(杨丹/D008合规风控部)的travel_lodging费用报销记录是否存在审批违规和拆分规避审批行为",
+    "period": "2025年度",
+    "organization": "D008合规风控部，员工E0008",
+    "data_scope": "E0008全部5笔travel_lodging记录：R004209、R004210、R004211、R004219、R004220"
+  },
+  "verified_facts": [
+    "R004209：2025-02-26，travel_lodging，3400元，5晚，A类城市，AR-02档位，仅有部门经理(E0008)审批，无财务复核",
+    "R004210：2025-02-28，travel_lodging，3400元，5晚，A类城市，AR-02档位，仅有部门经理(E0008)审批，无财务复核",
+    "R004211：2025-03-02，travel_lodging，3400元，5晚，A类城市，AR-02档位，仅有部门经理(E0008)审批，无财务复核",
+    "R004219：2025-11-27，travel_lodging，5200元，7晚，A类城市，AR-02档位，仅有部门经理(E0008)审批，无财务复核",
+    "R004220：2025-12-01，travel_lodging，5200元，7晚，A类城市，AR-02档位，仅有部门经理(E0008)审批，无财务复核",
+    "E0008为D008部门经理，五笔记录均为自审(经办人与审批人同一人)",
+    "批次一(R004209/R004210/R004211)在5天窗口内合计10200元，超过AR-03分界线10000元",
+    "批次二(R004219/R004220)在4天窗口内合计10400元，超过AR-03分界线10000元"
+  ],
+  "applicable_policies": [
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二 AR-02", "content": "3000元及以上至10000元以下需部门经理+财务复核双角色审批"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第三条", "content": "费用报销实行经办人真实性承诺、部门负责人业务审核、财务复核和授权审批相结合的管理原则"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条", "content": "同一员工同一费用类型7天内2笔及以上报销且合计达较高审批线的应重点核查拆分规避审批"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "第三条", "content": "各部门应按系统派生结果提交审批"}
+  ],
+  "findings": [
+    {
+      "anomaly_id": "ANOM-001",
+      "title": "AR-02审批档位缺失财务复核",
+      "description": "五笔travel_lodging记录均为AR-02档位(3000-9999元)，按授权管理办法附件二AR-02要求需部门经理+财务复核双审批，但实际仅存在部门经理(E0008)单人审批，且审批人与经办人为同一人，财务复核完全缺失",
+      "record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+      "impact": "审批链不完整，缺失财务复核环节，内部控制失效",
+      "applicable_citations": [
+        {"doc_id": "03_authorization_management.md", "clause_no": "第二条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第三条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "第三条"}
+      ]
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "title": "批次一：7日内同类费用拆分规避审批",
+      "description": "R004209(2月26日/3400元)、R004210(2月28日/3400元)、R004211(3月2日/3400元)为同一员工E0008同一费用类型travel_lodging，5天窗口内(最大4天间隔)合计10200元，超过AR-03分界线10000元。若未拆分应按AR-03档位(部门总经理)审批，但三笔均以AR-02档位自行审批，规避了更高级别审批",
+      "record_ids": ["R004209", "R004210", "R004211"],
+      "impact": "规避AR-03审批级别(部门总经理)，合计金额10200元应经部门总经理审批",
+      "applicable_citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"}
+      ]
+    },
+    {
+      "anomaly_id": "ANOM-003",
+      "title": "批次二：7日内同类费用拆分规避审批",
+      "description": "R004219(11月27日/5200元)、R004220(12月1日/5200元)为同一员工E0008同一费用类型travel_lodging，4天窗口内合计10400元，超过AR-03分界线10000元。若未拆分应按AR-03档位(部门总经理)审批，但两笔均以AR-02档位自行审批，规避了更高级别审批",
+      "record_ids": ["R004219", "R004220"],
+      "impact": "规避AR-03审批级别(部门总经理)，合计金额10400元应经部门总经理审批",
+      "applicable_citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"}
+      ]
+    }
+  ],
+  "anomaly_ids": ["ANOM-001", "ANOM-002", "ANOM-003"],
+  "record_ids": ["R004209", "R004210", "R004211", "R004219", "R004220"],
+  "citations": [
+    {"doc_id": "03_authorization_management.md", "clause_no": "第二条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第三条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "第三条"}
+  ],
+  "answer": "存在异常。以R004209为线索核查发现E0008(杨丹/D008合规风控部部门经理)全部5笔travel_lodging报销记录(R004209/R004210/R004211/R004219/R004220)均存在异常：(1)五笔均为AR-02档位(3000-9999元)但缺失财务复核审批，仅有部门经理自审，违反授权管理办法附件二AR-02双角色审批要求；(2)R004209/R004210/R004211在5天窗口内(2月26日至3月2日)合计10200元，R004219/R004220在4天窗口内(11月27日至12月1日)合计10400元，均为同一员工同一费用类型7天内多笔报销且合计达AR-03审批线(10000元以上)，构成拆分规避审批，违反费用报销管理办法第十一条。",
+  "impact": "五笔报销审批链不完整、内部控制失效，并涉嫌通过拆分规避更高级别审批(部门总经理AR-03档位)",
+  "recommendations": "补全财务复核审批环节，核查两批次拆分是否属于同一事项，对E0008全部travel_lodging记录进行回溯审查",
+  "limitations": ["D1职级与住宿标准档次(经理级/部门负责人级)的映射关系未在现行制度中明确定义，住宿费用标准是否超标未纳入本次判定"]
+}

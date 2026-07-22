@@ -1,0 +1,58 @@
+{
+  "task_id": "PV-CASE-001",
+  "task_scope": {
+    "audit_object": "R004233",
+    "expense_types": ["travel_lodging"],
+    "business_period": "2025-10-03",
+    "organization_scope": "D008 (合规风控部), E0012 (杨丽华, X1/分管副总)",
+    "deliverable": "核查审批路径及费用标准适用是否正确，含record_id、审计结论、关键计算、现行制度依据、历史审批线偏差说明、异常ID(如有)"
+  },
+  "policy_questions": [
+    "现行(2025)授权审批线：AR-02(3000-10000)要求部门经理+财务复核，R004233(¥9,990)的审批路径是否完整满足？",
+    "历史(2022)审批线：≥8000需部门总经理，¥9,990是否构成历史口径差异？",
+    "差旅住宿标准：高管级/A类城市 ¥1,100/晚，R004233(¥999/晚)是否超标？",
+    "继续使用历史审批线(≥8000→部门总经理)会造成什么判断偏差？"
+  ],
+  "data_questions": [
+    "R004233审批链是否包含财务复核？",
+    "E0012在7天内是否有同类型拆分规避审批？",
+    "D008部门预算是否充足？"
+  ],
+  "required_fields": ["record_id", "amount", "employee_level", "city_tier", "nights", "approval_tier", "approver_role", "expense_type", "status"],
+  "evidence_requirements": [
+    "R004233完整报销记录及审批链",
+    "03_authorization_management.md 附件二审批权限表",
+    "04_travel_expense.md 住宿标准表",
+    "01_expense_reimbursement_2025.md 现行制度条款",
+    "02_expense_reimbursement_2022_deprecated.md 历史制度条款",
+    "list_records_missing_approval 财务复核缺失验证"
+  ],
+  "execution_steps": [
+    {"step": "policy_query", "description": "查询现行和历史制度审批线与费用标准", "status": "completed"},
+    {"step": "data_query", "description": "查询R004233完整记录、审批链、7天关联记录", "status": "completed"},
+    {"step": "policy_version_check", "description": "制度版本适用性确认(2022已废止,2025现行有效)", "status": "pending"},
+    {"step": "evidence_matrix", "description": "构建证据矩阵", "status": "pending"},
+    {"step": "false_positive_review", "description": "独立复核初步结论", "status": "pending"},
+    {"step": "audit_report", "description": "生成审计报告", "status": "pending"},
+    {"step": "validation_and_submission", "description": "校验并提交", "status": "pending"}
+  ],
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "政策版本有效期对比(2022废止vs2025现行)",
+      "两项业务规则(审批路径+费用标准)",
+      "金额阈值边界(¥9,990接近AR-02/AR-03分界线¥10,000)"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "复杂度2，主智能体可直接完成所有政策与数据查询分析"
+  },
+  "stopping_conditions": [
+    "所有政策版本适用性确认",
+    "审批路径完整性验证(含财务复核)",
+    "费用标准合规性计算",
+    "历史审批线偏差分析"
+  ],
+  "unresolved_items": []
+}

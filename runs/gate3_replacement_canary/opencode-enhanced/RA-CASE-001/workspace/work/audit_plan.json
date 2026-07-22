@@ -1,0 +1,78 @@
+{
+  "task_id": "RA-CASE-001",
+  "task_scope": {
+    "clue_record": "R000028",
+    "employee_id": "E0036",
+    "department_id": "D010",
+    "expense_type": "communication",
+    "audit_period": "2025-03 to 2025-05"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ1",
+      "question": "Invoice FP202500000028是否被重复报销？",
+      "rule": "01_expense_reimbursement_2025.md 第十条：同一发票最多报销1次",
+      "data_needed": ["发票使用记录", "R000028和R004204的报销明细"]
+    },
+    {
+      "id": "PQ2",
+      "question": "E0036在2025年3月通讯费是否超过月度限额300元？",
+      "rule": "07_office_communication.md 第三条：员工通讯费用报销按月控制，每人每月不超过300元",
+      "data_needed": ["E0036在2025年3月所有通讯费报销记录及金额"]
+    },
+    {
+      "id": "PQ3",
+      "question": "R000028报销是否在费用发生后60天内提交？",
+      "rule": "01_expense_reimbursement_2025.md 第七条",
+      "data_needed": ["R000028 expense_date和reimburse_date"]
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ1",
+      "question": "FP202500000028在哪些报销记录中使用？",
+      "method": "find_invoice_usage"
+    },
+    {
+      "id": "DQ2",
+      "question": "E0036在2025年3月的所有通讯费记录？",
+      "method": "list_expenses with filters"
+    }
+  ],
+  "required_fields": ["record_id", "invoice_no", "amount", "expense_date", "expense_type", "employee_id", "status", "approvals"],
+  "evidence_requirements": [
+    "R000028详细信息和审批链",
+    "R004204详细信息和审批链",
+    "R002127详细信息和审批链",
+    "FP202500000028发票使用记录",
+    "政策07第三条原文",
+    "政策01第十条和第七条原文"
+  ],
+  "execution_steps": [
+    "1. 获取R000028详细信息",
+    "2. 查询FP202500000028发票使用记录",
+    "3. 查询E0036通讯费月度汇总",
+    "4. 核实月度限额是否超标",
+    "5. 核实发票是否重复报销",
+    "6. 生成证据矩阵",
+    "7. 生成审计报告",
+    "8. 结果验证和提交"
+  ],
+  "complexity": 3,
+  "complexity_reasons": [
+    "涉及两个政策文档(01和07)",
+    "需要按月聚合通讯费金额",
+    "涉及两条业务规则(发票重复报销、月度限额)",
+    "涉及金额阈值判断(300元月度限额)"
+  ],
+  "subagent_plan": {
+    "use_subagent": true,
+    "role": "data_analyst",
+    "reason_code": "AGGREGATION_REQUIRED"
+  },
+  "stopping_conditions": [
+    "所有与R000028直接关联的异常均已核实",
+    "证据矩阵coverage达到100%",
+    "validation报告通过"
+  ]
+}

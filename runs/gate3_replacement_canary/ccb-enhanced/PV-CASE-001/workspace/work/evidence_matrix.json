@@ -1,0 +1,61 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [],
+  "candidate_record_ids": ["R004233"],
+  "submitted_record_ids": ["R004233"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": true,
+    "searched_population": {
+      "primary_record": "R004233",
+      "related_window": "E0012 travel_lodging between 2025-09-26 and 2025-10-10",
+      "invoice_check": "INV004227 across all expense_records",
+      "population_count": 1
+    },
+    "query_conditions": {
+      "primary": "SELECT from expense_records WHERE record_id='R004233' with JOINs on employees, departments, approvals",
+      "split_check": "SELECT from expense_records WHERE employee_id='E0012' AND expense_type='travel_lodging' AND expense_date BETWEEN '2025-09-26' AND '2025-10-10'",
+      "invoice_check": "SELECT from expense_records WHERE invoice_id='INV004227'"
+    },
+    "checked_rules": [
+      {
+        "rule": "差旅费管理办法第四条",
+        "check": "住宿标准：高管级一类城市1100元/晚 vs 实际999元/晚",
+        "result": "合规"
+      },
+      {
+        "rule": "授权管理办法附件二AR-02",
+        "check": "审批路径：9990元在AR-02区间(3000-10000)，需部门经理+财务复核",
+        "result": "合规"
+      },
+      {
+        "rule": "2025版报销管理办法第十二条",
+        "check": "无专项审批时报销金额不超过制度标准1.0倍",
+        "result": "合规"
+      },
+      {
+        "rule": "2025版报销管理办法第十条",
+        "check": "发票INV004227无重复使用",
+        "result": "合规"
+      },
+      {
+        "rule": "2025版报销管理办法第十一条",
+        "check": "E0012在7天窗口内无同类型拆分报销",
+        "result": "合规"
+      }
+    ],
+    "conclusion": "无异常。R004233住宿标准(999元/晚)在现行制度标准(1100元/晚)范围内；审批路径AR-02(部门经理+财务复核)符合现行授权管理办法附件二规定。"
+  },
+  "reconciled_figures": {
+    "amount": 9990.0,
+    "nights": 10,
+    "per_night": 999.0,
+    "standard": 1100.0,
+    "approval_tier": "AR-02"
+  },
+  "unresolved_items": []
+}

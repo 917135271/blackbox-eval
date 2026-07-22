@@ -1,0 +1,62 @@
+{
+  "version": "1.0.0",
+  "summary_max_chars": 6000,
+  "max_rejected_attempts_per_role": 2,
+  "roles": {
+    "policy_researcher": {
+      "max_calls": 1,
+      "max_token_budget": 4000,
+      "minimum_complexity": 2,
+      "allowed_reason_codes": [
+        "MULTI_POLICY_VERSION_CHECK",
+        "HISTORICAL_POLICY",
+        "POLICY_CONFLICT",
+        "POLICY_PERIOD_UNCLEAR",
+        "MULTI_CLAUSE_SUPPORT"
+      ]
+    },
+    "data_analyst": {
+      "max_calls": 1,
+      "max_token_budget": 5000,
+      "minimum_complexity": 2,
+      "allowed_reason_codes": [
+        "AGGREGATION_REQUIRED",
+        "MULTI_TABLE_JOIN",
+        "MULTI_RECORD_SCOPE",
+        "DATE_AMOUNT_BOUNDARY",
+        "PYTHON_RECONCILIATION"
+      ]
+    },
+    "independent_reviewer": {
+      "max_calls": 1,
+      "max_token_budget": 4000,
+      "minimum_complexity": 2,
+      "requires_artifacts": [
+        "work/evidence_matrix.json"
+      ],
+      "allowed_reason_codes": [
+        "EXCEPTION_OR_EXEMPTION",
+        "THRESHOLD_BOUNDARY",
+        "HISTORICAL_CROSS_PERIOD",
+        "POLICY_DATA_CONFLICT",
+        "EVIDENCE_GAP",
+        "COMPREHENSIVE_AUDIT",
+        "NO_ANOMALY_RECHECK"
+      ]
+    }
+  },
+  "complexity_limits": {
+    "0-1": {
+      "max_professional_roles": 0,
+      "reviewer_allowed": false
+    },
+    "2-3": {
+      "max_professional_roles": 1,
+      "reviewer_allowed": true
+    },
+    "4-6": {
+      "max_professional_roles": 2,
+      "reviewer_allowed": true
+    }
+  }
+}

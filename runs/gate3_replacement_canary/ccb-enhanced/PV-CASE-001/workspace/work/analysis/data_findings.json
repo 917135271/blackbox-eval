@@ -1,0 +1,66 @@
+{
+  "task_id": "PV-CASE-001",
+  "record_id": "R004233",
+  "in_scope_population": 1,
+  "candidate_count": 0,
+  "matched_record_ids": [],
+  "checked_record_ids": ["R004233"],
+  "calculations": {
+    "per_night_rate": {
+      "amount": 9990.0,
+      "nights": 10,
+      "rate": 999.0,
+      "standard": 1100.0,
+      "standard_source": "差旅费管理办法第四条：高管级一类城市1100元/人/晚",
+      "within_standard": true,
+      "excess": 0
+    },
+    "approval_tier": {
+      "amount": 9990.0,
+      "applicable_tier": "AR-02",
+      "tier_range": "≥3000且<10000",
+      "required_role": "部门经理，并经财务复核",
+      "actual_tier": "AR-02",
+      "actual_role": "部门经理",
+      "match": true
+    }
+  },
+  "completed_checks": [
+    {
+      "check": "expense_standard",
+      "rule": "差旅费管理办法第四条",
+      "result": "pass",
+      "detail": "999元/晚 ≤ 1100元/晚，未超标"
+    },
+    {
+      "check": "approval_path",
+      "rule": "授权管理办法附件二AR-02",
+      "result": "pass",
+      "detail": "9990元在AR-02区间(3000-10000元)，审批记录为AR-02/部门经理，符合现行规则"
+    },
+    {
+      "check": "historical_comparison",
+      "rule": "2022版报销管理办法第二条",
+      "result": "informational",
+      "detail": "历史规则≥8000元需部门总经理审批，现行规则AR-02仅需部门经理+财务复核。继续使用历史审批线会错误判断审批不足"
+    },
+    {
+      "check": "invoice_duplicate",
+      "rule": "2025版报销管理办法第十条",
+      "result": "pass",
+      "detail": "INV004227仅被R004233使用一次，无重复报销"
+    },
+    {
+      "check": "split_claim",
+      "rule": "2025版报销管理办法第十一条",
+      "result": "pass",
+      "detail": "E0012在2025-09-26至2025-10-10期间无其他travel_lodging报销"
+    }
+  ],
+  "anomaly": false,
+  "conclusion": "无异常",
+  "query_artifacts": ["work/sql/query.sql"],
+  "data_quality_issues": [],
+  "limitations": [],
+  "unresolved_items": []
+}

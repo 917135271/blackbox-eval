@@ -1,0 +1,80 @@
+{
+  "task_id": "RA-CASE-001",
+  "task_type": "policy_data_comparison",
+  "audit_object": "R000028 (clue record)",
+  "question": "以R000028为线索，结合现行制度和业务数据核查相关费用记录是否存在异常",
+
+  "scope": {
+    "clue_record": "R000028",
+    "employee_id": "E0036",
+    "department_id": "D010",
+    "expense_type": "communication",
+    "expense_date": "2025-03-09",
+    "amount": 165.58,
+    "budget_year": 2025,
+    "business_period": "2025-03-02 to 2025-03-16 (7-day split window around expense_date); broader 2025 for budget and invoice reuse checks",
+    "organization_scope": "Employee E0036 and related records; Department D010 for budget context"
+  },
+
+  "policy_questions": [
+    "Q1: Does R000028 comply with communication monthly cap (300 yuan/person/month per 07_office_communication.md Art.3)?",
+    "Q2: Does R000028 comply with 60-day reimbursement submission deadline (01_expense_reimbursement_2025.md Art.7)?",
+    "Q3: Is there split-avoidance behavior: same employee E0036, same type 'communication', within 7 days of 2025-03-09, combined amount reaching higher approval line (01_expense_reimbursement_2025.md Art.11)?",
+    "Q4: Is invoice INV000028 / FP202500000028 reused across different records (01_expense_reimbursement_2025.md Art.10)?",
+    "Q5: Is D010 department budget exceeded (08_budget_management.md Art.3)?",
+    "Q6: Is the approval chain correct per authorization management (03_authorization_management.md Attachment 2)?"
+  ],
+
+  "data_questions": [
+    "D1: Query R000028 full detail with approvals",
+    "D2: Query all communication expenses for E0036 in March 2025 (monthly cap check)",
+    "D3: Query all communication expenses for E0036 within 7 days of 2025-03-09 (split check)",
+    "D4: Check invoice FP202500000028 reuse across all records",
+    "D5: Check D010 department budget and cumulative usage",
+    "D6: Get authorization approval tiers for communication expense amounts"
+  ],
+
+  "required_fields": ["record_id", "employee_id", "department_id", "expense_type", "expense_date", "reimburse_date", "amount", "invoice_id", "invoice_no", "status", "special_approval", "approval_chain"],
+
+  "evidence_requirements": [
+    "Policy excerpts for each rule checked",
+    "Query results for all data questions",
+    "Budget snapshot for D010",
+    "Invoice usage report for FP202500000028",
+    "Approval chain for R000028"
+  ],
+
+  "execution_steps": [
+    {"step": "policy_version_check", "action": "Confirm 2025 policy applies; check if any exemptions or special rules for E0036", "stopping_condition": "Applicable policy clauses identified"},
+    {"step": "batch_expense_analysis", "action": "Query related records: E0036 communication in March 2025, 7-day split window, invoice reuse, department budget", "stopping_condition": "All data queries complete with results"},
+    {"step": "evidence_coverage_check", "action": "Map each anomaly/finding to evidence, ensure 100% coverage", "stopping_condition": "evidence_matrix pass with 100% coverage"},
+    {"step": "false_positive_review", "action": "Challenge preliminary findings for boundary issues, exemptions", "stopping_condition": "Review decision resolved"},
+    {"step": "audit_report", "action": "Produce final narrative with findings, policy basis, record_ids", "stopping_condition": "Report complete"},
+    {"step": "result_validation", "action": "Validate schema, citations, consistency", "stopping_condition": "validation_report passes"},
+    {"step": "submit", "action": "Call validate_audit_result then submit_audit_result", "stopping_condition": "Submission accepted"}
+  ],
+
+  "complexity": {
+    "score": 2,
+    "reasons": [
+      "Multiple policies involved (reimbursement, communication, budget, authorization)",
+      "Requires aggregation and batch filtering (split check, monthly cap)",
+      "Threshold and date boundary rules apply",
+      "Single-rule clue-record expansion, not comprehensive audit"
+    ]
+  },
+
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "Complexity 2, single-rule clue-record task; main agent can handle all queries within token budget"
+  },
+
+  "stopping_conditions": [
+    "All 6 policy questions answered with evidence",
+    "evidence_matrix status pass with 100% coverage",
+    "validation_report valid=true",
+    "submit_audit_result accepted"
+  ],
+
+  "unresolved_items": []
+}

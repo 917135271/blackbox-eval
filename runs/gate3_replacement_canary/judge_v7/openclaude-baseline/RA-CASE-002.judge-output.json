@@ -1,0 +1,86 @@
+{
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 0,
+      "reason": "候选结论未认定拆分报销风险，仅指出自审批和缺少财务复核",
+      "answer_evidence": "answer中异常描述为自审批和缺少财务复核，未提及拆分",
+      "trace_evidence": "工具调用中虽获取了第十一条拆分内容，但最终答案未采用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "same-employee-type",
+      "value": 0,
+      "reason": "未核实三条记录属于E0008且为travel_lodging",
+      "answer_evidence": "answer和record_ids仅涉及R004209，未涵盖R004210、R004211",
+      "trace_evidence": "工具调用仅get_expense_detail for R004209，未查询R004210、R004211",
+      "source": "llm_judge"
+    },
+    {
+      "id": "window-dates",
+      "value": 0,
+      "reason": "未列明三笔费用日期，未计算首尾相隔天数",
+      "answer_evidence": "answer中未提供任何日期信息",
+      "trace_evidence": "未调用工具获取R004210和R004211的expense_date",
+      "source": "llm_judge"
+    },
+    {
+      "id": "amounts",
+      "value": 0,
+      "reason": "未列明三笔金额均为3400元",
+      "answer_evidence": "answer仅提及R004209金额3400，未提及其他两笔",
+      "trace_evidence": "仅R004209的get_expense_detail显示金额3400，未获取其他记录金额",
+      "source": "llm_judge"
+    },
+    {
+      "id": "sum",
+      "value": 0,
+      "reason": "候选答案未计算三笔记录合计金额，仅聚焦R004209单笔。",
+      "answer_evidence": "最终答案未提及任何合计金额。",
+      "trace_evidence": "工具调用仅获取了R004209的详情，未查询R004210和R004211。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "threshold",
+      "value": 0,
+      "reason": "候选答案未将任何合计金额与10000元较高审批线比较。",
+      "answer_evidence": "最终答案未提及合计金额或审批线比较。",
+      "trace_evidence": "工具调用中未进行相关计算或比较。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "distinct-invoices",
+      "value": 0,
+      "reason": "候选答案未讨论三张发票是否不同，未正确区分拆分与重复报销。",
+      "answer_evidence": "最终答案未提及发票信息或拆分/重复问题。",
+      "trace_evidence": "工具仅查询了R004209的发票，未获取R004210和R004211的发票信息。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-expense",
+      "value": 0,
+      "reason": "候选引用中未包含费用报销办法第十一条。",
+      "answer_evidence": "提交的引用列表无第十一条。",
+      "trace_evidence": "工具调用中虽检索了第十一条内容，但候选答案未引用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-authorization",
+      "value": 1,
+      "reason": "候选提交在citations中包含了03_authorization_management.md附件二，即10000元较高审批线的出处。",
+      "answer_evidence": "candidate_submission的citations字段包含{\"doc_id\": \"03_authorization_management.md\", \"clause_no\": \"附件二\"}，且answer中提到“根据授权管理办法附件二”。",
+      "trace_evidence": "工具调用get_policy_doc获取了03_authorization_management.md全文，其附件二定义了审批档位，10000元是AR-02与AR-03的分界，即较高审批线。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "window-investigation",
+      "value": 0,
+      "reason": "候选提交仅返回R004209，未通过员工、费用类型和日期范围查询获取R004210和R004211，未完成等价的窗口查询。",
+      "answer_evidence": "candidate_submission的record_ids仅包含R004209，missing_count为2。",
+      "trace_evidence": "tool_trace_summary中仅包含get_expense_detail for R004209、R004219、R004220，无针对E0008+travel_lodging+日期范围的查询，也未获取R004210和R004211。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选未识别拆分报销异常，未按要求核查R004209的关联记录R004210和R004211，所有检查项不满足预期；候选答案完全忽略了拆分报销异常，未核查三笔记录的聚合情况，因此所有检查项均未通过。；候选提交虽然引用了授权管理办法附件二，但完全忽略了拆分异常的窗口调查要求，只关注了单记录的自审批和复核缺失，导致漏掉核心拆分异常。",
+  "confidence": 0.9666666666666667
+}
