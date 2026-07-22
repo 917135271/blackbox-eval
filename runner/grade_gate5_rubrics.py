@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import os
@@ -20,6 +21,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from formal_eval_plan import (  # noqa: E402
     GROUPS,
+    JUDGE_AUDIT_REPEAT_COUNT,
+    JUDGE_AUDIT_SAMPLE_RATE,
+    JUDGE_AUDIT_SELECTION_SEED,
+    JUDGE_AUDIT_TIEBREAKER,
     JUDGE_MAX_TOKENS,
     JUDGE_RETRIES,
     JUDGE_TIMEOUT_SECONDS,
@@ -32,8 +37,8 @@ ROOT = Path(__file__).resolve().parents[1]
 RUN_ROOT = ROOT / "runs" / "gate4_formal"
 CASES_PATH = ROOT / "data" / "formal_case_rubric" / "cases.json"
 DB_PATH = ROOT / "data" / "formal_case_rubric" / "expense_formal.db"
-GRADE_ROOT = RUN_ROOT / "gate5_judge"
-GRADES_PATH = RUN_ROOT / "gate5_grades.jsonl"
+GRADE_ROOT = RUN_ROOT / "gate5_judge_v6"
+GRADES_PATH = RUN_ROOT / "gate5_grades_v6.jsonl"
 JUDGE_CHECKLIST_BATCH_SIZE = 4
 TYPE_ALIASES = {
     "DUP": ("DUP", "REUSE", "REPEAT", "重复"),
@@ -277,6 +282,24 @@ def deterministic_criterion(
         actual_records = diagnostics["actual_record_ids"]
         passed = len(actual_records) == len(set(actual_records))
         reason = "record_ids没有重复项" if passed else "record_ids存在重复项"
+    elif deterministic_rule in {"record-recall-at-least", "record-precision-at-least"}:
+        metric_name = deterministic_rule.removeprefix("record-").removesuffix("-at-least")
+        threshold = float(criterion["expected"])
+        metrics = diagnostics.get("record_metrics") or {}
+        actual = float(metrics.get(metric_name, 0.0))
+        passed = actual + 1e-9 >= threshold
+        reason = f"record_id{metric_name}={actual:.3f}，阈值={threshold:.3f}"
+    elif deterministic_rule in {"anomaly-recall-at-least", "anomaly-precision-at-least"}:
+        metric_name = deterministic_rule.removeprefix("anomaly-").removesuffix("-at-least")
+        threshold = float(criterion["expected"])
+        actual = float(diagnostics["anomaly_metrics"].get(metric_name, 0.0))
+        passed = actual + 1e-9 >= threshold
+        reason = f"异常发现{metric_name}={actual:.3f}，阈值={threshold:.3f}"
+    elif deterministic_rule == "excluded-records-absent":
+        excluded = {str(item) for item in criterion["expected"]}
+        included = sorted(excluded & set(diagnostics["actual_record_ids"]))
+        passed = not included
+        reason = "未包含合规边界记录" if passed else f"误报合规边界记录：{included}"
     elif criterion_id == "submission":
         passed = bool(diagnostics["submission_accepted"] and diagnostics["schema_valid"])
         reason = "统一提交已接受且Schema有效" if passed else "未形成被接受的统一提交"
@@ -321,6 +344,43 @@ def deterministic_criterion(
     }
 
 
+def evaluate_critical_failures(
+    case: dict[str, Any],
+    diagnostics: dict[str, Any],
+) -> tuple[list[dict[str, Any]], float | None]:
+    triggered: list[dict[str, Any]] = []
+    for definition in case["rubric"].get("critical_failures", []):
+        rule = str(definition["deterministic_rule"])
+        hit = False
+        detail = ""
+        if rule == "unexpected-anomaly-reported":
+            hit = bool(diagnostics["actual_anomaly_ids"])
+            detail = f"实际提交异常数={len(diagnostics['actual_anomaly_ids'])}"
+        elif rule == "record-precision-below":
+            threshold = float(definition["expected"])
+            actual = float((diagnostics.get("record_metrics") or {}).get("precision", 0.0))
+            hit = actual + 1e-9 < threshold
+            detail = f"record_id precision={actual:.3f}，下限={threshold:.3f}"
+        elif rule == "anomaly-precision-below":
+            threshold = float(definition["expected"])
+            actual = float(diagnostics["anomaly_metrics"].get("precision", 0.0))
+            hit = actual + 1e-9 < threshold
+            detail = f"异常发现precision={actual:.3f}，下限={threshold:.3f}"
+        else:
+            raise ValueError(f"unsupported critical failure rule: {rule}")
+        if hit:
+            triggered.append(
+                {
+                    "id": definition["id"],
+                    "check": definition["check"],
+                    "score_cap": float(definition["score_cap"]),
+                    "reason": detail,
+                }
+            )
+    score_cap = min((item["score_cap"] for item in triggered), default=None)
+    return triggered, score_cap
+
+
 def checklist_pass_rate(checklist: list[dict[str, Any]]) -> tuple[int, int, float]:
     passed_count = sum(int(item.get("value", 0)) for item in checklist)
     total_count = len(checklist)
@@ -343,7 +403,8 @@ def build_judge_messages(
 2. 不得因文风、篇幅或候选异常ID命名不同而扣分，只评价事实、范围、制度、证据和推理。
 3. 工具调用过并不自动代表结论正确；候选自写的evidence_matrix也不能替代事实核验。
 4. answer_evidence和trace_evidence必须简短引用可核查内容，不得输出思维链。
-5. 部分客观检查项是规则程序判为0后提交复核的。你可以依据题意和证据将其改判为1，但仍只能输出0或1。
+5. 如果检查项的evidence_sources不包含final_answer，仅凭最终答案复述事实不得判1，必须存在对应工具轨迹或工作产物。
+6. 所有确定性集合、数量和阈值项目均由规则程序最终裁决，不会提交给你复核。
 只输出一个JSON对象，不要Markdown。"""
     payload = {
         "case": {
@@ -606,11 +667,54 @@ def judge_criteria_batch(
     )
 
 
+def selected_for_consistency_audit(group: str, task_id: str, criterion_id: str) -> bool:
+    material = f"{JUDGE_AUDIT_SELECTION_SEED}:{group}:{task_id}:{criterion_id}".encode()
+    bucket = int.from_bytes(hashlib.sha256(material).digest()[:8], "big") / 2**64
+    return bucket < JUDGE_AUDIT_SAMPLE_RATE
+
+
+def merge_consistency_votes(
+    initial_rows: list[dict[str, Any]],
+    repeated_runs: list[list[dict[str, Any]]],
+) -> tuple[dict[str, Any], dict[str, int], list[str]]:
+    initial_by_id = {row["id"]: row for row in initial_rows}
+    repeated_by_run = [{row["id"]: row for row in rows} for rows in repeated_runs]
+    disagreements: list[str] = []
+    majority_values: dict[str, int] = {}
+    tied_ids: list[str] = []
+    audited_ids = sorted(repeated_by_run[0]) if repeated_by_run else []
+    agreements = 0
+    for criterion_id in audited_ids:
+        values = [int(initial_by_id[criterion_id]["value"])] + [
+            int(run[criterion_id]["value"]) for run in repeated_by_run
+        ]
+        if len(set(values)) == 1:
+            agreements += 1
+        else:
+            disagreements.append(criterion_id)
+        ones = sum(values)
+        zeros = len(values) - ones
+        if ones == zeros:
+            tied_ids.append(criterion_id)
+        else:
+            majority_values[criterion_id] = 1 if ones > zeros else 0
+    metadata = {
+        "sampled_count": len(audited_ids),
+        "agreement_count": agreements,
+        "agreement_rate": round(agreements / len(audited_ids), 6) if audited_ids else None,
+        "disagreement_ids": disagreements,
+        "tied_ids": tied_ids,
+    }
+    return metadata, majority_values, tied_ids
+
+
 def grade_one(
     judge: DeepSeekJudge,
     case: dict[str, Any],
     group: str,
     existing_record_ids: set[str],
+    dataset_id: str,
+    rubric_version: str,
 ) -> dict[str, Any]:
     task_id = case["id"]
     base = RUN_ROOT / group / task_id
@@ -632,15 +736,10 @@ def grade_one(
         for criterion in case["rubric"]["checklist"]
         if (row := deterministic_criterion(criterion, diagnostics)) is not None
     ]
-    deterministic_by_id = {row["id"]: row for row in deterministic_rows}
     criteria_to_score = [
         criterion
         for criterion in case["rubric"]["checklist"]
         if criterion["evaluation_mode"] != "deterministic"
-        or (
-            criterion["id"] in deterministic_by_id
-            and int(deterministic_by_id[criterion["id"]]["value"]) == 0
-        )
     ]
     missing_submission = receipt.get("status") != "accepted" or not submission
     judge_meta: dict[str, Any] = {}
@@ -692,6 +791,82 @@ def grade_one(
                     if isinstance(value, (int, float)):
                         total_usage[name] += value
 
+        audit_criteria = [
+            criterion
+            for criterion in criteria_to_score
+            if selected_for_consistency_audit(group, task_id, criterion["id"])
+        ]
+        repeated_runs: list[list[dict[str, Any]]] = []
+        audit_metadata: list[dict[str, Any]] = []
+        for _repeat in range(1, JUDGE_AUDIT_REPEAT_COUNT):
+            repeated_rows: list[dict[str, Any]] = []
+            for start in range(0, len(audit_criteria), JUDGE_CHECKLIST_BATCH_SIZE):
+                criteria_batch = audit_criteria[start : start + JUDGE_CHECKLIST_BATCH_SIZE]
+                rows, _critical, _confidence, _comment, metadata_rows = judge_criteria_batch(
+                    judge,
+                    case,
+                    criteria_batch,
+                    submission,
+                    evidence_matrix,
+                    validation_report,
+                    diagnostics,
+                    tool_summary,
+                )
+                repeated_rows.extend(rows)
+                audit_metadata.extend(metadata_rows)
+                for metadata in metadata_rows:
+                    for name, value in metadata.get("usage", {}).items():
+                        if isinstance(value, (int, float)):
+                            total_usage[name] += value
+            repeated_runs.append(repeated_rows)
+
+        consistency, majority_values, tied_ids = merge_consistency_votes(
+            llm_rows,
+            repeated_runs,
+        )
+        tiebreak_rows: list[dict[str, Any]] = []
+        if tied_ids and JUDGE_AUDIT_TIEBREAKER:
+            definitions_by_id = {criterion["id"]: criterion for criterion in audit_criteria}
+            tied_criteria = [definitions_by_id[criterion_id] for criterion_id in tied_ids]
+            for start in range(0, len(tied_criteria), JUDGE_CHECKLIST_BATCH_SIZE):
+                criteria_batch = tied_criteria[start : start + JUDGE_CHECKLIST_BATCH_SIZE]
+                rows, _critical, _confidence, _comment, metadata_rows = judge_criteria_batch(
+                    judge,
+                    case,
+                    criteria_batch,
+                    submission,
+                    evidence_matrix,
+                    validation_report,
+                    diagnostics,
+                    tool_summary,
+                )
+                tiebreak_rows.extend(rows)
+                audit_metadata.extend(metadata_rows)
+                for metadata in metadata_rows:
+                    for name, value in metadata.get("usage", {}).items():
+                        if isinstance(value, (int, float)):
+                            total_usage[name] += value
+            majority_values.update({row["id"]: int(row["value"]) for row in tiebreak_rows})
+        rows_by_id = {row["id"]: row for row in llm_rows}
+        repeated_by_id = {
+            row["id"]: row
+            for repeated in repeated_runs
+            for row in repeated
+        }
+        tiebreak_by_id = {row["id"]: row for row in tiebreak_rows}
+        for criterion_id, value in majority_values.items():
+            selected = tiebreak_by_id.get(criterion_id) or repeated_by_id.get(criterion_id)
+            if selected is not None and int(rows_by_id[criterion_id]["value"]) != value:
+                rows_by_id[criterion_id] = {
+                    **selected,
+                    "value": value,
+                    "source": "llm_judge_consensus",
+                }
+        llm_rows = [rows_by_id[row["id"]] for row in llm_rows]
+        consistency["tiebreak_count"] = len(tiebreak_rows)
+        consistency["repeat_count"] = JUDGE_AUDIT_REPEAT_COUNT
+        consistency["batches"] = audit_metadata
+
         confidence = (
             sum(batch_confidences) / len(batch_confidences)
             if batch_confidences
@@ -703,6 +878,7 @@ def grade_one(
             "usage": dict(total_usage),
             "batch_count": len(batch_metadata),
             "batches": batch_metadata,
+            "consistency_audit": consistency,
         }
         parsed = {
             "checklist": llm_rows,
@@ -713,8 +889,11 @@ def grade_one(
     criteria_by_id.update({row["id"]: row for row in llm_rows})
     criteria = [criteria_by_id[item["id"]] for item in case["rubric"]["checklist"]]
     passed_count, total_count, final_score = checklist_pass_rate(criteria)
+    critical_failures, score_cap = evaluate_critical_failures(case, diagnostics)
     result = {
         "group": group,
+        "dataset_id": dataset_id,
+        "rubric_version": rubric_version,
         "task_id": task_id,
         "case_family": case["case_family"],
         "category": case["category"],
@@ -723,6 +902,8 @@ def grade_one(
         "checklist_total": total_count,
         "checklist_pass_rate": final_score,
         "checklist": criteria,
+        "critical_failures": critical_failures,
+        "score_cap": score_cap,
         "diagnostics": diagnostics,
         "judge": {
             "status": "not_required" if missing_submission else "ok",
@@ -772,7 +953,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--reset", action="store_true")
     parser.add_argument("--only-errors", action="store_true")
     parser.add_argument("--reapply-rules", action="store_true")
-    parser.add_argument("--rejudge-rule-failures", action="store_true")
     return parser.parse_args()
 
 
@@ -819,7 +999,12 @@ def reapply_rules(
             )
         passed_count, total_count, pass_rate = checklist_pass_rate(row.get("checklist", []))
         row.pop("case_score_raw", None)
-        row.pop("critical_failures", None)
+        critical_failures, score_cap = evaluate_critical_failures(
+            case,
+            row.get("diagnostics", {}),
+        )
+        row["critical_failures"] = critical_failures
+        row["score_cap"] = score_cap
         row["checklist_passed"] = passed_count
         row["checklist_total"] = total_count
         row["checklist_pass_rate"] = pass_rate
@@ -868,19 +1053,7 @@ def main() -> int:
             if task_id not in selected_tasks:
                 continue
             old = existing.get((group, task_id))
-            if old and args.rejudge_rule_failures:
-                criteria_by_id = {
-                    item["id"]: item
-                    for item in old.get("checklist", [])
-                }
-                has_rule_failure = any(
-                    item.get("source") == "rule"
-                    and int(item.get("value", 0)) == 0
-                    for item in criteria_by_id.values()
-                )
-                if not has_rule_failure:
-                    continue
-            elif old and not args.only_errors and not args.reset:
+            if old and not args.only_errors and not args.reset:
                 continue
             if old and args.only_errors and old.get("judge", {}).get("status") != "error":
                 continue
@@ -895,7 +1068,15 @@ def main() -> int:
     errors: list[dict[str, Any]] = []
     with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
         future_map = {
-            pool.submit(grade_one, judge, cases[task_id], group, record_ids): (group, task_id)
+            pool.submit(
+                grade_one,
+                judge,
+                cases[task_id],
+                group,
+                record_ids,
+                str(dataset["dataset_id"]),
+                str(dataset["rubric_version"]),
+            ): (group, task_id)
             for group, task_id in pending
         }
         for future in as_completed(future_map):

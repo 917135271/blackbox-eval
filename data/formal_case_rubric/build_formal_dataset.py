@@ -43,20 +43,20 @@ RULES = {
 }
 
 PROMPT_OVERRIDES = {
-    "L1-001": "现行制度下，单笔费用报销达到多少金额需要部门总经理审批？请说明适用版本、金额边界及费用报销办法与授权管理办法中的制度依据，并说明旧版审批线是否仍适用。",
+    "L1-001": "请依据现行制度判断单笔费用为2999.99元、3000元、9999.99元、10000元、50000元和200000元时分别需要哪些审批角色，并说明费用报销办法与授权管理办法的交叉引用关系。另请说明2022版8000元和30000元审批线是否仍适用，以及误用旧线会影响哪些金额区间。",
     "L3-006": "请判断费用报销审批线应采用2022版还是2025修订版，指出部门总经理审批线，并提供新旧版本效力状态及现行金额出处。",
     "L3-008": "分别比较差旅住宿和培训住宿的适用制度、标准维度和数值。请列出培训住宿一、二、三类城市标准，并至少举一个同城市档位下与某职级差旅标准的数值对照，说明为什么不能混用。",
     "L3-001": "请对全年数据做重复报销专项扫描，按重复发票组生成稳定的发现ID，返回全部发现ID和关联record_id集合，并说明全量扫描方法和制度依据。",
     "L3-003": "请对全年数据做单笔或单次即可确认的超标准专项扫描，返回全部发现ID和关联record_id集合，并说明各费用类型的计算口径、全量扫描方法和制度依据。办公用品和通讯费用本题只识别单笔自身已经超过月度上限的明确异常，不评价多笔记录的月度累计超限。",
     "L3-004": "请对全年数据做超预算专项扫描。按reimburse_date和record_id依次累计部门已批准费用，每个超预算部门形成1项发现，以首次使累计支出超过年度预算且无专项审批的记录作为关键record_id。请返回全部发现ID和关键record_id集合，并说明计算方法和制度依据。",
-    "L2-003": "结合制度和业务数据，核查以R000020为线索的重复报销异常，返回发现ID和record_id集合，并说明关键业务事实和制度依据。",
-    "L2-008": "结合制度和业务数据，核查以R004212为线索的拆分报销异常，返回发现ID和record_id集合，并说明日期窗口、合计金额和制度依据。",
-    "L2-013": "结合制度和业务数据，核查以R004223为线索的超标准异常，返回发现ID和record_id集合，并说明费用类型、金额、适用标准和制度依据。",
-    "TRAP-002": "请核查R004234和R004235是否构成重复报销或拆分报销。必须核对发票是否相同及7天内合计金额；若不构成异常，请明确说明无异常、原因和制度依据。",
-    "TRAP-003": "请核查R004236和R004237是否构成7天内拆分报销。必须按费用发生日期计算间隔并核对合计金额；若不构成异常，请明确说明无异常、原因和制度依据。",
-    "TRAP-005": "请核查R004239和R004240是否构成重复报销、拆分报销或业务招待费超标准。必须核对发票、日期、单次金额和人均金额；若不构成异常，请明确说明无异常、原因和制度依据。",
+    "L2-003": "请以R000020为线索，结合现行制度和业务数据核查相关费用记录是否存在异常。请返回核查涉及的record_id集合、审计结论、关键事实和制度依据；如存在异常，再返回发现ID。",
+    "L2-008": "请以R004212为线索，结合现行制度和业务数据核查相关费用记录是否存在异常。请返回核查涉及的record_id集合、审计结论、关键事实和制度依据；如存在异常，再返回发现ID。",
+    "L2-013": "请以R004223为线索，结合现行制度和业务数据核查相关费用记录是否存在异常。请返回核查涉及的record_id集合、审计结论、关键事实和制度依据；如存在异常，再返回发现ID。",
+    "TRAP-002": "请以R004234为线索，结合现行制度和业务数据核查相关费用记录是否存在异常。请返回核查涉及的record_id集合、审计结论、关键事实和制度依据；如存在异常，再返回发现ID。",
+    "TRAP-003": "请以R004236为线索，结合现行制度和业务数据核查相关费用记录是否存在异常。请返回核查涉及的record_id集合、审计结论、关键事实和制度依据；如存在异常，再返回发现ID。",
+    "TRAP-005": "请以R004239为线索，结合现行制度和业务数据核查相关费用记录是否存在异常。请返回核查涉及的record_id集合、审计结论、关键事实和制度依据；如存在异常，再返回发现ID。",
     "L3-009": "请基于全年数据形成费用异常审计摘要，覆盖重复报销、拆分报销、超标准、超预算和超期报销五类规则。发现口径为：重复报销按重复发票组计1项；拆分报销按同一员工、同一费用类型7天窗口聚合组计1项；超标准只计单笔或单次即可确认的异常，办公用品和通讯费用不评价多笔月度累计；超预算按部门计1项，以按reimburse_date和record_id累计时首次使累计支出超过预算且无专项审批的记录作为关键记录；超期报销按记录计1项。请按规则类型生成稳定的发现ID，说明各类发现数量，在record_ids中返回全部异常发现涉及的记录，并在审计说明中至少逐类给出一个发现与record_id的对应示例，同时说明制度依据、影响和建议；不得把仅接近阈值但实际合规的记录计入异常。",
-    "L3-010": "请专门写一段版本陷阱审计说明，列明新旧审批线及其效力状态，说明现行金额的交叉引用依据、使用旧版可能造成的误判，并提出版本校验措施。",
+    "L3-010": "请形成一段制度版本风险审计说明：列明2022版与2025现行审批线及效力状态，按金额区间说明继续使用旧版会产生哪些错误升级或漏升级风险，并给出可执行的版本校验控制。结论必须引用费用报销办法与授权管理办法的现行交叉依据。",
 }
 
 PROMPT_CHANGE_REASONS = {
@@ -69,9 +69,9 @@ PROMPT_CHANGE_REASONS = {
     "L2-003": "使题面明确要求案件事实和制度证据",
     "L2-008": "使题面明确要求日期、合计金额和制度证据",
     "L2-013": "使题面明确要求适用标准和制度证据",
-    "TRAP-002": "原题只给不可见TRAP标签，补充候选可查询的record_id和核查边界",
-    "TRAP-003": "原题只给不可见TRAP标签，补充候选可查询的record_id和核查边界",
-    "TRAP-005": "原题只给不可见TRAP标签，补充候选可查询的record_id和核查边界",
+    "TRAP-002": "以单一线索记录替代不可见TRAP标签，并与有异常单案统一中性句式，避免泄露结论和核查维度",
+    "TRAP-003": "以单一线索记录替代不可见TRAP标签，并与有异常单案统一中性句式，避免泄露结论和核查维度",
+    "TRAP-005": "以单一线索记录替代不可见TRAP标签，并与有异常单案统一中性句式，避免泄露结论和核查维度",
     "L3-009": "删除不可见TRAP总数要求，明确发现ID和五类规则的可复算统计口径",
     "L3-010": "使题面明确覆盖新旧数值、现行依据、误判风险和控制建议",
 }
@@ -348,17 +348,51 @@ def load_rubric_templates() -> dict[str, list[dict[str, Any]]]:
 
 def rubric_for_task(
     task_id: str,
+    family: str,
     templates: dict[str, list[dict[str, Any]]],
 ) -> dict[str, Any]:
     checklist = templates.get(task_id)
     if checklist is None:
         raise ValueError(f"missing checklist rubric for {task_id}")
-    return {
+    rubric = {
         "scoring_method": "binary_checklist",
         "item_result_values": [0, 1],
         "normalization": "equal_item_ratio",
         "checklist": checklist,
     }
+    critical_failures: list[dict[str, Any]] = []
+    if family == "clean_trap":
+        critical_failures.append(
+            {
+                "id": "substantive-false-positive",
+                "check": "将无异常案例提交为实质异常",
+                "deterministic_rule": "unexpected-anomaly-reported",
+                "score_cap": 40,
+            }
+        )
+    if family in {"record_audit", "full_year_audit"} or task_id == "L3-009":
+        critical_failures.append(
+            {
+                "id": "severe-record-overreporting",
+                "check": "提交记录集合精确率低于50%",
+                "deterministic_rule": "record-precision-below",
+                "expected": 0.5,
+                "score_cap": 50,
+            }
+        )
+    if family == "full_year_audit" or task_id == "L3-009":
+        critical_failures.append(
+            {
+                "id": "severe-finding-overreporting",
+                "check": "提交异常发现的类型与数量精确率低于50%",
+                "deterministic_rule": "anomaly-precision-below",
+                "expected": 0.5,
+                "score_cap": 50,
+            }
+        )
+    if critical_failures:
+        rubric["critical_failures"] = critical_failures
+    return rubric
 
 
 def build_dataset() -> tuple[dict[str, Any], list[dict[str, Any]]]:
@@ -384,7 +418,7 @@ def build_dataset() -> tuple[dict[str, Any], list[dict[str, Any]]]:
         )
         source_prompt = task["prompt_variants"]["precise"]
         prompt = PROMPT_OVERRIDES.get(task_id, source_prompt)
-        rubric = rubric_for_task(task_id, rubric_templates)
+        rubric = rubric_for_task(task_id, family, rubric_templates)
 
         case = {
             "id": task_id,
@@ -415,8 +449,8 @@ def build_dataset() -> tuple[dict[str, Any], list[dict[str, Any]]]:
 
     counts = Counter(case["case_family"] for case in cases)
     dataset = {
-        "dataset_id": "securities-expense-audit-formal-15-v7",
-        "rubric_version": "atomic-binary-checklist-v5",
+        "dataset_id": "securities-expense-audit-formal-15-v8",
+        "rubric_version": "atomic-binary-checklist-v6",
         "case_count": len(cases),
         "source": {"evals": "data/evals.json", "ground_truth": "data/ground_truth.yaml"},
         "case_family_counts": dict(sorted(counts.items())),

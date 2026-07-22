@@ -11,6 +11,7 @@ from collections import Counter
 from pathlib import Path
 
 import yaml
+import jsonschema
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,6 +20,7 @@ BUILD_DB = ROOT / "data" / "formal_case_rubric" / "build_formal_db.py"
 CASES = ROOT / "data" / "formal_case_rubric" / "cases.json"
 EVALS = ROOT / "data" / "formal_case_rubric" / "evals.json"
 VALIDATOR = ROOT / "runner" / "validate_case_rubrics.py"
+SCHEMA = ROOT / "schemas" / "case-rubric.schema.json"
 
 
 def load_validator():
@@ -30,6 +32,12 @@ def load_validator():
 
 
 class CaseRubricTests(unittest.TestCase):
+    def test_dataset_matches_v6_json_schema(self) -> None:
+        jsonschema.validate(
+            json.loads(CASES.read_text(encoding="utf-8")),
+            json.loads(SCHEMA.read_text(encoding="utf-8")),
+        )
+
     def test_generated_case_dataset_is_current(self) -> None:
         completed = subprocess.run(
             [sys.executable, str(BUILD), "--check"],
@@ -63,12 +71,11 @@ class CaseRubricTests(unittest.TestCase):
         dataset = json.loads(CASES.read_text(encoding="utf-8"))
         for case in dataset["cases"]:
             rubric = case["rubric"]
-            self.assertEqual(dataset["rubric_version"], "atomic-binary-checklist-v5")
+            self.assertEqual(dataset["rubric_version"], "atomic-binary-checklist-v6")
             self.assertEqual(rubric["scoring_method"], "binary_checklist")
             self.assertEqual(rubric["item_result_values"], [0, 1])
             self.assertEqual(rubric["normalization"], "equal_item_ratio")
             self.assertNotIn("max_score", rubric)
-            self.assertNotIn("critical_failures", rubric)
             self.assertNotIn("pass_score", rubric)
             for item in rubric["checklist"]:
                 self.assertNotIn("anchors", item)
@@ -79,22 +86,16 @@ class CaseRubricTests(unittest.TestCase):
                 self.assertTrue(item["pass_condition"])
                 self.assertTrue(item["fail_condition"])
 
-    def test_high_cardinality_expectations_are_split_into_atomic_checks(self) -> None:
+    def test_checklists_are_bounded_and_batch_precision_recall_are_balanced(self) -> None:
         dataset = json.loads(CASES.read_text(encoding="utf-8"))
         self.assertEqual(
             sum(len(case["rubric"]["checklist"]) for case in dataset["cases"]),
-            292,
+            229,
         )
         for case in dataset["cases"]:
             item_ids = {item["id"] for item in case["rubric"]["checklist"]}
             self.assertIn("submission", item_ids, case["id"])
-            self.assertTrue(
-                {"record-set", "all-record-ids", "record-scope"}.isdisjoint(item_ids),
-                case["id"],
-            )
-            for record_id in case["expected_output"].get("expected_record_ids", []):
-                suffix = f"include-{record_id.lower()}"
-                self.assertTrue(any(item_id.endswith(suffix) for item_id in item_ids), case["id"])
+            self.assertLessEqual(len(item_ids), 30, case["id"])
             self.assertFalse(
                 any(
                     item.get("deterministic_rule") == "record-ids-unique"
@@ -102,20 +103,21 @@ class CaseRubricTests(unittest.TestCase):
                 ),
                 case["id"],
             )
-        comprehensive = next(case for case in dataset["cases"] if case["id"] == "L3-009")
-        comprehensive_ids = {item["id"] for item in comprehensive["rubric"]["checklist"]}
-        for rule_type in ("dup", "split", "overstd", "budget", "overdue"):
-            self.assertIn(f"representative-evidence-{rule_type}", comprehensive_ids)
+            if case["case_family"] == "full_year_audit" or case["id"] == "L3-009":
+                self.assertTrue(all(not item_id.startswith("all-record-ids-include-") for item_id in item_ids), case["id"])
+                for prefix in ("record-recall", "record-precision", "finding-recall", "finding-precision"):
+                    self.assertTrue({f"{prefix}-50", f"{prefix}-80", f"{prefix}-100"} <= item_ids, case["id"])
 
     def test_comprehensive_case_requires_complete_record_evidence(self) -> None:
         dataset = json.loads(CASES.read_text(encoding="utf-8"))
         case = next(item for item in dataset["cases"] if item["id"] == "L3-009")
-        expected_records = case["expected_output"]["expected_record_ids"]
-        self.assertEqual(len(expected_records), 44)
+        self.assertEqual(len(case["expected_output"]["expected_record_ids"]), 44)
+        self.assertEqual(len(case["rubric"]["checklist"]), 27)
         item_ids = {item["id"] for item in case["rubric"]["checklist"]}
-        for record_id in expected_records:
-            self.assertIn(f"all-record-ids-include-{record_id.lower()}", item_ids)
-        self.assertIn("all-record-ids-no-extra", item_ids)
+        self.assertFalse(any(item_id.startswith("all-record-ids-include-") for item_id in item_ids))
+        self.assertIn("clean-boundary-control", item_ids)
+        for rule_type in ("dup", "split", "overstd", "budget", "overdue"):
+            self.assertIn(f"representative-evidence-{rule_type}", item_ids)
 
     def test_full_year_methods_are_case_specific_atomic_checks(self) -> None:
         dataset = json.loads(CASES.read_text(encoding="utf-8"))
@@ -129,14 +131,16 @@ class CaseRubricTests(unittest.TestCase):
             actual = {item["id"] for item in cases[case_id]["rubric"]["checklist"]}
             self.assertTrue(required <= actual, case_id)
 
-    def test_reverse_checks_require_process_evidence(self) -> None:
+    def test_clean_cases_use_one_nonduplicative_process_check(self) -> None:
         dataset = json.loads(CASES.read_text(encoding="utf-8"))
         for case in dataset["cases"]:
             if case["case_family"] != "clean_trap":
                 continue
-            for item in case["rubric"]["checklist"]:
-                if item["id"].startswith("reverse-check-"):
-                    self.assertIn("数据来源或计算过程", item["pass_condition"])
+            item_ids = {item["id"] for item in case["rubric"]["checklist"]}
+            self.assertFalse(any(item_id.startswith("reverse-check-") for item_id in item_ids))
+            self.assertIn("independent-verification", item_ids)
+            process = next(item for item in case["rubric"]["checklist"] if item["id"] == "independent-verification")
+            self.assertNotIn("final_answer", process["evidence_sources"])
 
     def test_formal_database_is_current_and_has_no_answer_labels(self) -> None:
         completed = subprocess.run(
@@ -150,13 +154,17 @@ class CaseRubricTests(unittest.TestCase):
         )
         self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
 
-    def test_trap_prompts_expose_the_records_to_audit(self) -> None:
+    def test_positive_and_clean_record_prompts_are_neutral_and_matched(self) -> None:
         dataset = json.loads(CASES.read_text(encoding="utf-8"))
-        for case in dataset["cases"]:
-            if case["case_family"] != "clean_trap":
-                continue
-            for record_id in case["expected_output"]["expected_record_ids"]:
-                self.assertIn(record_id, case["prompt"], case["id"])
+        cases = {case["id"]: case for case in dataset["cases"]}
+        for case_id in ("L2-003", "L2-008", "L2-013", "TRAP-002", "TRAP-003", "TRAP-005"):
+            case = cases[case_id]
+            prompt = case["prompt"]
+            exposed = [record_id for record_id in case["expected_output"]["expected_record_ids"] if record_id in prompt]
+            self.assertEqual(len(exposed), 1, case_id)
+            self.assertNotIn("若不构成异常", prompt)
+            self.assertNotIn("必须核对", prompt)
+            self.assertNotRegex(prompt, r"重复报销异常|拆分报销异常|超标准异常")
 
     def test_rubrics_do_not_expose_or_require_internal_anomaly_labels(self) -> None:
         dataset = json.loads(CASES.read_text(encoding="utf-8"))
@@ -227,7 +235,7 @@ class CaseRubricTests(unittest.TestCase):
         self.assertIn("case-specific-reason-sum", trap_003_ids)
         self.assertIn("case-specific-reason-threshold", trap_003_ids)
         self.assertIn("case-specific-reason-business-context", trap_005_ids)
-        self.assertIn("reverse-check-date-window", trap_005_ids)
+        self.assertIn("independent-verification", trap_005_ids)
         self.assertTrue(
             any(
                 citation["doc_id"] == "06_business_entertainment.md"
@@ -244,9 +252,21 @@ class CaseRubricTests(unittest.TestCase):
             mapping_ids = {
                 item["id"]
                 for item in cases[case_id]["rubric"]["checklist"]
-                if item["id"].startswith("finding-record-mapping-group-")
+                if item["id"] == "finding-record-mapping-sample"
             }
-            self.assertEqual(len(mapping_ids), len(expected_groups), case_id)
+            self.assertTrue(expected_groups, case_id)
+            self.assertEqual(mapping_ids, {"finding-record-mapping-sample"}, case_id)
+
+    def test_material_false_positives_have_score_caps(self) -> None:
+        dataset = json.loads(CASES.read_text(encoding="utf-8"))
+        for case in dataset["cases"]:
+            failures = case["rubric"].get("critical_failures", [])
+            rules = {failure["deterministic_rule"] for failure in failures}
+            if case["case_family"] == "clean_trap":
+                self.assertIn("unexpected-anomaly-reported", rules, case["id"])
+            if case["case_family"] == "full_year_audit" or case["id"] == "L3-009":
+                self.assertIn("record-precision-below", rules, case["id"])
+                self.assertIn("anomaly-precision-below", rules, case["id"])
 
     def test_policy_pass_conditions_do_not_render_python_dicts(self) -> None:
         dataset = json.loads(CASES.read_text(encoding="utf-8"))

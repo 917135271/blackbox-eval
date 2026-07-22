@@ -22,6 +22,7 @@ import run_gate3_development as runtime  # noqa: E402
 from formal_eval_plan import (  # noqa: E402
     FORMAL_TASK_COUNT,
     MODEL_NAME,
+    PLAN,
     TASK_TIMEOUT_SECONDS,
 )
 

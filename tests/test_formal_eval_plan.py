@@ -19,6 +19,11 @@ def test_formal_plan_is_internally_consistent() -> None:
     assert plan.FORMAL_RUN_COUNT == 180
     assert plan.DEVELOPMENT_RUN_COUNT == 144
     assert plan.TIME_HARD_MAX_SECONDS == plan.TASK_TIMEOUT_SECONDS
+    assert plan.SCORING_VERSION == "gate5-scoring-v3"
+    assert plan.JUDGE_AUDIT_SAMPLE_RATE == 0.20
+    assert plan.JUDGE_AUDIT_REPEAT_COUNT == 2
+    assert plan.DATASET_ID == "securities-expense-audit-formal-15-v8"
+    assert plan.RUBRIC_VERSION == "atomic-binary-checklist-v6"
 
 
 def test_display_names_exactly_cover_configured_frameworks() -> None:

@@ -23,6 +23,7 @@ EXPECTED_FAMILIES = {
     "retrieval_and_report": 3,
 }
 EXPECTED_CASE_COUNT = sum(EXPECTED_FAMILIES.values())
+NEUTRAL_RECORD_CASES = {"L2-003", "L2-008", "L2-013", "TRAP-002", "TRAP-003", "TRAP-005"}
 SUPPORTED_DETERMINISTIC_RULES = {
     "expected-record-present",
     "no-unexpected-records",
@@ -30,6 +31,16 @@ SUPPORTED_DETERMINISTIC_RULES = {
     "anomaly-count-exact",
     "anomaly-type-count-exact",
     "no-anomaly-ids",
+    "record-recall-at-least",
+    "record-precision-at-least",
+    "anomaly-recall-at-least",
+    "anomaly-precision-at-least",
+    "excluded-records-absent",
+}
+SUPPORTED_CRITICAL_FAILURE_RULES = {
+    "unexpected-anomaly-reported",
+    "record-precision-below",
+    "anomaly-precision-below",
 }
 
 TRAVEL_LIMITS = {
@@ -55,6 +66,7 @@ def validate_case(case: dict[str, Any], errors: list[str]) -> None:
     require(rubric.get("normalization") == "equal_item_ratio", f"{case_id}: checklist items must be equally weighted", errors)
     require("pass_score" not in rubric, f"{case_id}: case-level pass threshold is not allowed", errors)
     require(len(checklist) >= 6, f"{case_id}: at least six atomic checklist items required", errors)
+    require(len(checklist) <= 30, f"{case_id}: checklist must not exceed 30 items", errors)
     require(
         all("points" not in item and "weight" not in item for item in checklist),
         f"{case_id}: checklist items must not contain points or weights",
@@ -110,6 +122,57 @@ def validate_case(case: dict[str, Any], errors: list[str]) -> None:
         require(
             re.search(r"\b(?:DUP|SPLIT|OVERSTD|BUDGET|OVERDUE)-\d{3}\b", rubric_text) is None,
             f"{case_id}/{item_id}: rubric must not require hidden internal anomaly labels",
+            errors,
+        )
+    if case_id in NEUTRAL_RECORD_CASES:
+        prompt = str(case.get("prompt", ""))
+        exposed = [
+            record_id
+            for record_id in case.get("expected_output", {}).get("expected_record_ids", [])
+            if record_id in prompt
+        ]
+        require(len(exposed) == 1, f"{case_id}: prompt must expose exactly one seed record", errors)
+        require("若不构成异常" not in prompt, f"{case_id}: prompt leaks clean outcome", errors)
+        require("必须核对" not in prompt, f"{case_id}: prompt leaks audit dimensions", errors)
+        require(
+            re.search(r"(?:重复报销|拆分报销|超标准)异常", prompt) is None,
+            f"{case_id}: prompt leaks anomaly type and outcome",
+            errors,
+        )
+    if case.get("case_family") == "clean_trap":
+        clean_item_ids = {str(item.get("id")) for item in checklist}
+        require(
+            not any(item_id.startswith("reverse-check-") for item_id in clean_item_ids),
+            f"{case_id}: duplicated reverse-check items are not allowed",
+            errors,
+        )
+        require("independent-verification" in clean_item_ids, f"{case_id}: independent verification item missing", errors)
+    if case.get("case_family") == "full_year_audit" or case_id == "L3-009":
+        batch_item_ids = {str(item.get("id")) for item in checklist}
+        require(
+            not any(item_id.startswith("all-record-ids-include-") for item_id in batch_item_ids),
+            f"{case_id}: per-record recall expansion is not allowed",
+            errors,
+        )
+        for prefix in ("record-recall", "record-precision", "finding-recall", "finding-precision"):
+            require(
+                {f"{prefix}-50", f"{prefix}-80", f"{prefix}-100"} <= batch_item_ids,
+                f"{case_id}: balanced {prefix} thresholds missing",
+                errors,
+            )
+    critical_failures = rubric.get("critical_failures") or []
+    critical_ids = [item.get("id") for item in critical_failures]
+    require(len(critical_ids) == len(set(critical_ids)), f"{case_id}: duplicate critical failure ids", errors)
+    for failure in critical_failures:
+        failure_id = failure.get("id", "<missing>")
+        require(
+            failure.get("deterministic_rule") in SUPPORTED_CRITICAL_FAILURE_RULES,
+            f"{case_id}/{failure_id}: unsupported critical failure rule",
+            errors,
+        )
+        require(
+            isinstance(failure.get("score_cap"), (int, float)) and 0 <= float(failure["score_cap"]) <= 100,
+            f"{case_id}/{failure_id}: score_cap must be in 0..100",
             errors,
         )
     refs = [str(ref) for ref in case.get("ground_truth_refs", [])]
@@ -388,8 +451,8 @@ def validate(cases_path: Path, evals_path: Path) -> dict[str, Any]:
     evals = json.loads(evals_path.read_text(encoding="utf-8"))
     cases = dataset.get("cases") or []
     errors: list[str] = []
-    require(dataset.get("dataset_id") == "securities-expense-audit-formal-15-v7", "dataset_id must be securities-expense-audit-formal-15-v7", errors)
-    require(dataset.get("rubric_version") == "atomic-binary-checklist-v5", "rubric_version must be atomic-binary-checklist-v5", errors)
+    require(dataset.get("dataset_id") == "securities-expense-audit-formal-15-v8", "dataset_id must be securities-expense-audit-formal-15-v8", errors)
+    require(dataset.get("rubric_version") == "atomic-binary-checklist-v6", "rubric_version must be atomic-binary-checklist-v6", errors)
     require(
         dataset.get("case_count") == EXPECTED_CASE_COUNT,
         f"dataset case_count must be {EXPECTED_CASE_COUNT}",
@@ -429,8 +492,12 @@ def validate(cases_path: Path, evals_path: Path) -> dict[str, Any]:
                 require(case.get("source_prompt") == source_prompt, f"{case.get('id')}: changed prompt must preserve source_prompt", errors)
                 require(bool(case.get("prompt_change_reason")), f"{case.get('id')}: changed prompt requires prompt_change_reason", errors)
         if case.get("case_family") == "clean_trap":
-            for record_id in case.get("expected_output", {}).get("expected_record_ids", []):
-                require(record_id in case.get("prompt", ""), f"{case.get('id')}: trap prompt must expose {record_id}", errors)
+            prompt = str(case.get("prompt", ""))
+            expected_records = case.get("expected_output", {}).get("expected_record_ids", [])
+            exposed = [record_id for record_id in expected_records if record_id in prompt]
+            require(len(exposed) == 1, f"{case.get('id')}: trap prompt must expose exactly one seed record", errors)
+            require("若不构成异常" not in prompt, f"{case.get('id')}: trap prompt leaks the clean conclusion", errors)
+            require("必须核对" not in prompt, f"{case.get('id')}: trap prompt leaks audit dimensions", errors)
         task = evals[index]
         require(task.get("scoring", {}).get("type") == "case_rubric", f"{case.get('id')}: eval scoring must reference case rubric", errors)
         require(task.get("prompt_variants") == {"precise": case.get("prompt")}, f"{case.get('id')}: runnable prompt mismatch", errors)

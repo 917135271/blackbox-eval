@@ -22,8 +22,10 @@ EXPERIMENT = PLAN["experiment"]
 MODEL = PLAN["model"]
 JUDGE = PLAN["judge"]
 EFFICIENCY = PLAN["scoring"]["efficiency"]
+ENHANCEMENT_SUCCESS = PLAN["scoring"]["enhancement_success"]
 SCORE_WEIGHTS = PLAN["scoring"]["total_weights"]
 SCORING_VERSION = str(PLAN["scoring"]["version"])
+FORMAL_DATASET = PLAN["formal_dataset"]
 
 GROUPS = tuple(str(group) for group in PLAN["groups"])
 BASELINE_GROUPS = tuple(group for group in GROUPS if group.endswith("-baseline"))
@@ -44,10 +46,19 @@ TASK_TIMEOUT_SECONDS = int(EXPERIMENT["task_timeout_seconds"])
 MODEL_NAME = str(MODEL["name"])
 MODEL_BASE_URL = str(MODEL["base_url"]).rstrip("/")
 API_KEY_ENV = str(MODEL["api_key_env"])
+DATASET_ID = str(FORMAL_DATASET["dataset_id"])
+RUBRIC_VERSION = str(FORMAL_DATASET["rubric_version"])
+CHECKLIST_ITEM_COUNT = int(FORMAL_DATASET["checklist_item_count"])
 
 JUDGE_TIMEOUT_SECONDS = int(JUDGE["timeout_seconds"])
 JUDGE_MAX_TOKENS = int(JUDGE["max_tokens"])
 JUDGE_RETRIES = int(JUDGE["retries"])
+JUDGE_CONSISTENCY = JUDGE["consistency_audit"]
+JUDGE_AUDIT_SAMPLE_RATE = float(JUDGE_CONSISTENCY["sample_rate"])
+JUDGE_AUDIT_REPEAT_COUNT = int(JUDGE_CONSISTENCY["repeat_count"])
+JUDGE_AUDIT_TIEBREAKER = bool(JUDGE_CONSISTENCY["disagreement_tiebreaker"])
+JUDGE_AUDIT_SELECTION_SEED = str(JUDGE_CONSISTENCY["selection_seed"])
+JUDGE_MINIMUM_AGREEMENT = float(JUDGE_CONSISTENCY["minimum_reported_agreement"])
 
 TIME_TARGET_SECONDS = float(EFFICIENCY["time_target_seconds"])
 TIME_HARD_MAX_SECONDS = float(EFFICIENCY["time_hard_max_seconds"])
@@ -56,6 +67,11 @@ TOKEN_HARD_MAX = int(EFFICIENCY["token_hard_max"])
 QUALITY_WEIGHT = float(SCORE_WEIGHTS["rubric_quality"])
 STABILITY_WEIGHT = float(SCORE_WEIGHTS["stability"])
 EFFICIENCY_WEIGHT = float(SCORE_WEIGHTS["efficiency"])
+MINIMUM_Q_GAIN = float(ENHANCEMENT_SUCCESS["minimum_q_gain"])
+IMPROVABLE_FAMILY_BASELINE_CEILING = float(ENHANCEMENT_SUCCESS["improvable_family_baseline_ceiling"])
+MINIMUM_IMPROVABLE_FAMILIES_IMPROVED = int(ENHANCEMENT_SUCCESS["minimum_improvable_families_improved"])
+MINIMUM_FAMILY_GAIN = float(ENHANCEMENT_SUCCESS["minimum_family_gain"])
+MAXIMUM_KEY_FAMILY_DECLINE = float(ENHANCEMENT_SUCCESS["maximum_key_family_decline"])
 
 FORMAL_RUN_COUNT = len(GROUPS) * FORMAL_TASK_COUNT
 DEVELOPMENT_RUN_COUNT = len(GROUPS) * DEVELOPMENT_TASK_COUNT
@@ -78,8 +94,12 @@ def validate_plan() -> None:
         raise ValueError("scoring total weights must sum to 1")
     if PLAN["scoring"]["evidence_diagnostics"].get("included_in_total") is not False:
         raise ValueError("evidence diagnostics must not be counted twice in Total")
-    if SCORING_VERSION != "gate5-scoring-v2":
+    if SCORING_VERSION != "gate5-scoring-v3":
         raise ValueError("unsupported scoring version")
+    if not 0 < JUDGE_AUDIT_SAMPLE_RATE <= 1:
+        raise ValueError("judge consistency sample_rate must be in (0, 1]")
+    if JUDGE_AUDIT_REPEAT_COUNT < 2:
+        raise ValueError("judge consistency repeat_count must be at least 2")
 
 
 validate_plan()

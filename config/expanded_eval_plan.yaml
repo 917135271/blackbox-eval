@@ -1,7 +1,7 @@
-generated_at: '2026-07-21T10:45:37+08:00'
-status: gate3_all_six_frameworks_passed_and_frozen
+generated_at: '2026-07-22T00:00:00+08:00'
+status: rubric_v6_ready_requires_gate3_refreeze
 previous_checkpoint: gate3_six_framework_development_validation_passed
-next_gate: gate4_twelve_group_formal_evaluation
+next_gate: gate3_rubric_v6_canary_and_refreeze
 
 model:
   provider: DeepSeek
@@ -13,9 +13,15 @@ judge:
   timeout_seconds: 180
   max_tokens: 4096
   retries: 4
+  consistency_audit:
+    sample_rate: 0.20
+    repeat_count: 2
+    disagreement_tiebreaker: true
+    selection_seed: rubric-v6-judge-audit
+    minimum_reported_agreement: 0.90
 
 scoring:
-  version: gate5-scoring-v2
+  version: gate5-scoring-v3
   total_weights:
     rubric_quality: 0.75
     stability: 0.15
@@ -34,6 +40,12 @@ scoring:
     time_hard_max_seconds: 900
     token_target: 50000
     token_hard_max: 1000000
+  enhancement_success:
+    minimum_q_gain: 5
+    improvable_family_baseline_ceiling: 95
+    minimum_improvable_families_improved: 2
+    minimum_family_gain: 1
+    maximum_key_family_decline: 5
 
 experiment:
   framework_count: 6
@@ -115,9 +127,9 @@ paths:
   shared_audit_core: domain-enhancement/shared-audit-core
 
 formal_dataset:
-  dataset_id: securities-expense-audit-formal-15-v7
-  rubric_version: atomic-binary-checklist-v5
-  checklist_item_count: 292
+  dataset_id: securities-expense-audit-formal-15-v8
+  rubric_version: atomic-binary-checklist-v6
+  checklist_item_count: 229
   case_family_counts:
     policy_and_version: 3
     record_audit: 3
@@ -128,9 +140,10 @@ formal_dataset:
   exclude_categories: [ground_truth_lookup]
 
 governance_revision:
+  previous_gate3_lock_status: invalidated_by_formal_dataset_v8
   gate2_status: passed_for_all_six_adapters
-  gate3_status: passed_for_all_six_adapters
-  pi_agent_adapter_status: gate3_development_passed
+  gate3_status: prior_adapter_validation_passed_formal_freeze_invalidated
+  pi_agent_adapter_status: prior_development_passed_formal_refreeze_required
   outer_runner_is_authoritative: true
   native_hooks_are_supplementary: true
   required_event_streams:

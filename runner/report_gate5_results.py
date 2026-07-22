@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
+import math
 import statistics
 import sys
 from collections import Counter, defaultdict
@@ -17,6 +18,12 @@ from formal_eval_plan import (  # noqa: E402
     EFFICIENCY_WEIGHT,
     FORMAL_TASK_COUNT,
     GROUPS,
+    IMPROVABLE_FAMILY_BASELINE_CEILING,
+    MAXIMUM_KEY_FAMILY_DECLINE,
+    MINIMUM_FAMILY_GAIN,
+    MINIMUM_IMPROVABLE_FAMILIES_IMPROVED,
+    MINIMUM_Q_GAIN,
+    JUDGE_MINIMUM_AGREEMENT,
     QUALITY_WEIGHT,
     SCORING_VERSION,
     STABILITY_WEIGHT,
@@ -30,9 +37,9 @@ from formal_eval_plan import (  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 RUN_ROOT = ROOT / "runs" / "gate4_formal"
-GRADES_PATH = RUN_ROOT / "gate5_grades.jsonl"
+GRADES_PATH = RUN_ROOT / "gate5_grades_v6.jsonl"
 CASES_PATH = ROOT / "data" / "formal_case_rubric" / "cases.json"
-OUTPUT = ROOT / "output"
+OUTPUT = ROOT / "output" / "gate5_v6"
 FAMILIES = (
     "policy_and_version",
     "record_audit",
@@ -71,6 +78,24 @@ def load_jsonl(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def validate_grade_versions(grades: list[dict[str, Any]], dataset: dict[str, Any]) -> None:
+    expected_dataset = dataset.get("dataset_id")
+    expected_rubric = dataset.get("rubric_version")
+    mismatches = [
+        row
+        for row in grades
+        if row.get("dataset_id") != expected_dataset
+        or row.get("rubric_version") != expected_rubric
+    ]
+    if mismatches:
+        sample = mismatches[0]
+        raise RuntimeError(
+            "grade version mismatch: "
+            f"expected {expected_dataset}/{expected_rubric}, got "
+            f"{sample.get('dataset_id')}/{sample.get('rubric_version')}"
+        )
+
+
 def framework(group: str) -> str:
     return group.rsplit("-", 1)[0]
 
@@ -89,6 +114,26 @@ def linear_lower_score(value: float, target: float, hard_max: float) -> float:
     if value >= hard_max:
         return 0.0
     return 100.0 * (hard_max - value) / (hard_max - target)
+
+
+def mean_ci_95(values: list[float]) -> tuple[float, float]:
+    if len(values) < 2:
+        value = values[0] if values else 0.0
+        return value, value
+    mean = statistics.mean(values)
+    margin = 1.96 * statistics.stdev(values) / math.sqrt(len(values))
+    return max(0.0, mean - margin), min(100.0, mean + margin)
+
+
+def proportion_ci_95(successes: int, total: int) -> tuple[float, float] | None:
+    if total <= 0:
+        return None
+    z = 1.96
+    p = successes / total
+    denominator = 1 + z * z / total
+    center = (p + z * z / (2 * total)) / denominator
+    margin = z * math.sqrt(p * (1 - p) / total + z * z / (4 * total * total)) / denominator
+    return max(0.0, center - margin), min(1.0, center + margin)
 
 
 def extract_tokens(group: str, path: Path) -> int | None:
@@ -166,7 +211,9 @@ def semantic_case_score(grade: dict[str, Any], case: dict[str, Any]) -> float:
     if not definitions:
         return 0.0
     passed = sum(int(results.get(item_id, {}).get("value", 0)) for item_id in definitions)
-    return 100.0 * passed / len(definitions)
+    raw_score = 100.0 * passed / len(definitions)
+    score_cap = grade.get("score_cap")
+    return min(raw_score, float(score_cap)) if isinstance(score_cap, (int, float)) else raw_score
 
 
 def stability_valid(group: str, task_id: str, grade: dict[str, Any]) -> bool:
@@ -218,6 +265,7 @@ def build_group_scores(
             for family in FAMILIES
         }
         q = statistics.mean(semantic_scores.values())
+        q_ci_low, q_ci_high = mean_ci_95(list(semantic_scores.values()))
         checklist_hit_rate = statistics.mean(
             float(row.get("checklist_pass_rate", 0.0)) for row in selected
         )
@@ -291,9 +339,19 @@ def build_group_scores(
             and row.get("diagnostics", {}).get("trap_false_positive") is True
             for row in selected
         )
+        judge_audited = sum(
+            int(row.get("judge", {}).get("consistency_audit", {}).get("sampled_count") or 0)
+            for row in selected
+        )
+        judge_agreements = sum(
+            int(row.get("judge", {}).get("consistency_audit", {}).get("agreement_count") or 0)
+            for row in selected
+        )
+        judge_agreement_ci = proportion_ci_95(judge_agreements, judge_audited)
         result[group] = {
             "display_name": display_group(group),
             "Q": round(q, 3),
+            "Q_ci95": [round(q_ci_low, 3), round(q_ci_high, 3)],
             "S": round(s, 3),
             "F": round(f, 3),
             "Total": round(total, 3),
@@ -318,6 +376,12 @@ def build_group_scores(
             "average_tokens": round(average_tokens) if average_tokens is not None else None,
             "token_coverage": f"{measured_tokens}/{FORMAL_TASK_COUNT}",
             "subagent_raw_leakage": subagent_raw_leakage(group),
+            "judge_consistency": {
+                "sampled_count": judge_audited,
+                "agreement_count": judge_agreements,
+                "agreement_rate": round(100 * judge_agreements / judge_audited, 3) if judge_audited else None,
+                "agreement_ci95": [round(100 * value, 3) for value in judge_agreement_ci] if judge_agreement_ci else None,
+            },
         }
     return result
 
@@ -338,13 +402,29 @@ def enhancement_analysis(scores: dict[str, dict[str, Any]]) -> dict[str, Any]:
             )
             for family in FAMILIES
         }
+        improvable_families = [
+            family
+            for family in FAMILIES
+            if baseline["family_scores"][family] < IMPROVABLE_FAMILY_BASELINE_CEILING
+        ]
+        improved_improvable_families = [
+            family
+            for family in improvable_families
+            if family_delta[family] >= MINIMUM_FAMILY_GAIN
+        ]
+        no_key_regression = all(
+            value >= -MAXIMUM_KEY_FAMILY_DECLINE for value in family_delta.values()
+        )
         result[name] = {
             "Q_delta": round(enhanced["Q"] - baseline["Q"], 3),
             "Total_delta": round(enhanced["Total"] - baseline["Total"], 3),
             "positive_family_count": sum(value > 0 for value in family_delta.values()),
+            "improvable_families": improvable_families,
+            "improved_improvable_families": improved_improvable_families,
             "family_delta": family_delta,
-            "meets_uplift_standard": enhanced["Q"] - baseline["Q"] >= 8
-            and sum(value > 0 for value in family_delta.values()) >= 4,
+            "meets_uplift_standard": enhanced["Q"] - baseline["Q"] >= MINIMUM_Q_GAIN
+            and len(improved_improvable_families) >= MINIMUM_IMPROVABLE_FAMILIES_IMPROVED
+            and no_key_regression,
         }
     return result
 
@@ -439,7 +519,7 @@ def human_review_sample(grades: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "checklist_pass_rate": rows_by_key[(group, task_id)].get("checklist_pass_rate", 0.0),
             "reasons": sorted(reasons),
             "grade_path": (
-                RUN_ROOT / "gate5_judge" / group / f"{task_id}.json"
+                RUN_ROOT / "gate5_judge_v6" / group / f"{task_id}.json"
             ).relative_to(ROOT).as_posix(),
             "submission_path": (
                 RUN_ROOT / group / task_id / "workspace" / "final_submission.json"
@@ -502,7 +582,7 @@ def write_typical_trajectories(
                         for item in low
                     ),
                     f"- 完整轨迹：`runs/gate4_formal/{group}/{row['task_id']}/artifacts/trajectory.jsonl`",
-                    f"- 逐项判卷：`runs/gate4_formal/gate5_judge/{group}/{row['task_id']}.json`",
+                    f"- 逐项判卷：`runs/gate4_formal/gate5_judge_v6/{group}/{row['task_id']}.json`",
                     "",
                 ]
     (OUTPUT / "gate5_typical_trajectories.md").write_text(
@@ -522,6 +602,29 @@ def write_reports(
     OUTPUT.mkdir(parents=True, exist_ok=True)
     ranking = sorted(scores, key=lambda group: scores[group]["Total"], reverse=True)
     enhanced_ranking = [group for group in ranking if group.endswith("-enhanced")]
+    successful_enhancements = [
+        DISPLAY_NAMES[name]
+        for name, result in uplift.items()
+        if result["meets_uplift_standard"]
+    ]
+    uplift_summary = (
+        f"达到增强成功标准的框架为：{'、'.join(successful_enhancements)}。"
+        if successful_enhancements
+        else "本轮没有框架同时满足Q增益、可改善题族增益和关键题族无明显回退三项条件。"
+    )
+    best_enhanced = enhanced_ranking[0]
+    best_ci = scores[best_enhanced]["Q_ci95"]
+    overlapping_enhanced = [
+        group
+        for group in enhanced_ranking
+        if scores[group]["Q_ci95"][1] >= best_ci[0]
+        and scores[group]["Q_ci95"][0] <= best_ci[1]
+    ]
+    ranking_caveat = (
+        "Q的95%区间与最高组重叠的增强配置包括："
+        + "、".join(display_group(group) for group in overlapping_enhanced)
+        + "；这些配置只列为同一领先层级，不宣称严格先后。"
+    )
     baseline_ranking = [group for group in ranking if group.endswith("-baseline")]
     expected_grade_count = len(GROUPS) * len(cases)
     framework_count = len({framework(group) for group in GROUPS})
@@ -539,12 +642,17 @@ def write_reports(
         "checks": {
             "all_tasks_graded": len(grades) == expected_grade_count,
             "judge_errors_zero": all(row.get("judge", {}).get("status") != "error" for row in grades),
+            "judge_consistency_meets_floor": all(
+                score["judge_consistency"]["agreement_rate"] is not None
+                and score["judge_consistency"]["agreement_rate"] >= 100 * JUDGE_MINIMUM_AGREEMENT
+                for score in scores.values()
+            ),
             "case_rubrics_applied": all(len(row.get("checklist", [])) >= 4 for row in grades),
             "optional_audit_sample_generated": bool(review),
         },
         "scoring_formula": "Total = 0.75Q + 0.15S + 0.10F",
         "scoring_definition": {
-            "Q": "逐题Rubric非格式项中各检查项等权归一化得分，不设置关键错误封顶",
+            "Q": "逐题Rubric非格式项等权归一化得分，精确率与召回率对称计分，并保留关键错误封顶",
             "S": "按时、成功提交、Schema有效且进程正常的任务比例",
             "F": "单题中位耗时得分",
             "evidence_diagnostics": "仅用于解释Q，不重复进入Total",
@@ -628,17 +736,19 @@ def write_reports(
         "",
         f"{expected_grade_count}条正式结果已按逐题冻结Rubric完成规则预判和DeepSeek Judge评分，Judge错误为0。当前结果可以用于比较{framework_count}个框架在统一DeepSeek后端下的基线能力、领域增强效果和运行稳定性。",
         "",
-        f"增强组综合得分最高的是 **{display_group(enhanced_ranking[0])}**，Total={scores[enhanced_ranking[0]]['Total']:.2f}，Q={scores[enhanced_ranking[0]]['Q']:.2f}。但是，{framework_count}个增强组均未达到“Q提升至少8分且至少四类题型改善”的预设增强成功标准，因此本轮不能宣称现有Skills增强包已经稳定产生显著收益。",
+        f"增强组观察总分最高的是 **{display_group(best_enhanced)}**，Total={scores[best_enhanced]['Total']:.2f}，Q={scores[best_enhanced]['Q']:.2f}。{uplift_summary}{ranking_caveat}",
         "",
         "## 总分排名",
         "",
-        "| 排名 | 组别 | Total | Q业务质量 | S稳定性 | F时效 | Checklist平均命中率 | 超时 |",
-        "| ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |",
+        "| 观察排名 | 组别 | Total | Q业务质量 | Q 95%区间 | S稳定性 | F时效 | Judge复判一致率 | 超时 |",
+        "| ---: | --- | ---: | ---: | --- | ---: | ---: | ---: | ---: |",
     ]
     for index, group in enumerate(ranking, 1):
         score = scores[group]
+        agreement = score["judge_consistency"]["agreement_rate"]
+        agreement_text = f"{agreement:.1f}%" if agreement is not None else "N/A"
         lines.append(
-            f"| {index} | {display_group(group)} | {score['Total']:.2f} | {score['Q']:.2f} | {score['S']:.2f} | {score['F']:.2f} | {score['checklist_hit_rate']:.2f}% | {score['timeouts']} |"
+            f"| {index} | {display_group(group)} | {score['Total']:.2f} | {score['Q']:.2f} | {score['Q_ci95'][0]:.2f}–{score['Q_ci95'][1]:.2f} | {score['S']:.2f} | {score['F']:.2f} | {agreement_text} | {score['timeouts']} |"
         )
     lines += [
         "",
@@ -702,11 +812,11 @@ def write_reports(
         "",
         f"- {expected_grade_count}/{expected_grade_count}条均有逐项Rubric结果，Judge错误0。",
         f"- 本轮超时任务为{timeout_count}条；Schema成功率和任务完成率按全部{expected_grade_count}条任务分别统计。",
-        "- 预设增强收益标准无人满足；部分增强组超时超过1题。",
-        f"- 已生成{len(review)}条可选质量抽查样本；按本轮口径，规则与Judge冲突时以Judge为准，抽查结果不修改正式得分。",
+        f"- 增强成功标准：{uplift_summary}",
+        f"- 已生成{len(review)}条可选质量抽查样本；确定性规则项直接定稿，语义项由Judge判定，抽查结果不修改正式得分。",
         "- Token统计保留为诊断项；在六个框架采集覆盖率和缓存口径完全可比前，不进入效率分和总分。",
         "",
-        "详细材料：`output/gate5_scores.json`、`output/gate5_case_checklists.csv`、`output/gate5_failure_attribution.jsonl`、`output/gate5_human_review_sample.md`、`output/gate5_typical_trajectories.md`。",
+        "详细材料：`output/gate5_v6/gate5_scores.json`、`output/gate5_v6/gate5_case_checklists.csv`、`output/gate5_v6/gate5_failure_attribution.jsonl`、`output/gate5_v6/gate5_human_review_sample.md`、`output/gate5_v6/gate5_typical_trajectories.md`。",
     ]
     (OUTPUT / "gate5_final_report.md").write_text("\n".join(lines), encoding="utf-8")
     (OUTPUT / "gate5_gate_report.json").write_text(
@@ -733,6 +843,7 @@ def write_reports(
 def main() -> int:
     grades = load_jsonl(GRADES_PATH)
     dataset = load_json(CASES_PATH)
+    validate_grade_versions(grades, dataset)
     cases = {case["id"]: case for case in dataset["cases"]}
     expected_grade_count = len(GROUPS) * len(cases)
     if len(grades) != expected_grade_count:

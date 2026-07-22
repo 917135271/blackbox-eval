@@ -3,6 +3,8 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
+import pytest
+
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "runner" / "report_gate5_results.py"
 SPEC = importlib.util.spec_from_file_location("report_gate5_results", MODULE_PATH)
@@ -44,6 +46,25 @@ def test_semantic_case_score_excludes_format() -> None:
     assert report.semantic_case_score(grade, case) == 100
 
 
+def test_semantic_case_score_applies_critical_cap() -> None:
+    case = {"rubric": {"checklist": [{"id": "business", "metric": "conclusion"}]}}
+    grade = {"checklist": [{"id": "business", "value": 1}], "score_cap": 40}
+    assert report.semantic_case_score(grade, case) == 40
+
+
+def test_grade_versions_must_match_current_dataset() -> None:
+    dataset = {"dataset_id": "dataset-v8", "rubric_version": "rubric-v6"}
+    report.validate_grade_versions(
+        [{"dataset_id": "dataset-v8", "rubric_version": "rubric-v6"}],
+        dataset,
+    )
+    with pytest.raises(RuntimeError, match="grade version mismatch"):
+        report.validate_grade_versions(
+            [{"dataset_id": "dataset-v7", "rubric_version": "rubric-v5"}],
+            dataset,
+        )
+
+
 def test_evidence_metric_is_equal_item_pass_rate() -> None:
     case = {
         "rubric": {
@@ -80,10 +101,11 @@ def test_report_has_no_case_pass_count() -> None:
     assert "通过题数" not in source
 
 
-def test_gate_report_describes_v5_equal_weight_scoring() -> None:
+def test_gate_report_describes_v6_scoring_with_caps() -> None:
     source = MODULE_PATH.read_text(encoding="utf-8")
-    assert "各检查项等权归一化得分，不设置关键错误封顶" in source
-    assert "归一化得分，保留关键错误封顶" not in source
+    assert "保留关键错误封顶" in source
+    assert "不设置关键错误封顶" not in source
+    assert "规则与Judge冲突时以Judge为准" not in source
 
 
 def test_typical_trajectory_uses_binary_checklist_value() -> None:

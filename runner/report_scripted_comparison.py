@@ -27,8 +27,8 @@ from scripted_workflow_core import SCRIPTED_WORKFLOW_VERSION  # noqa: E402
 FORMAL_RUN_ROOT = ROOT / "runs" / "gate4_formal"
 SCRIPTED_RUN_ROOT = ROOT / "runs" / "gate4_scripted"
 CASES_PATH = ROOT / "data" / "formal_case_rubric" / "cases.json"
-OUTPUT_JSON = ROOT / "output" / "scripted_enhancement_comparison.json"
-OUTPUT_MD = ROOT / "output" / "scripted_enhancement_comparison.md"
+OUTPUT_JSON = ROOT / "output" / "gate5_v6" / "scripted_enhancement_comparison.json"
+OUTPUT_MD = ROOT / "output" / "gate5_v6" / "scripted_enhancement_comparison.md"
 FRAMEWORKS = ("ccb", "codex", "openclaude", "opencode", "oh-my-pi", "pi-agent")
 DISPLAY_NAMES = {
     "ccb": "Claude Code Best",
@@ -62,9 +62,27 @@ def _load_json(path: Path) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
 
 
-def _load_cases() -> dict[str, dict[str, Any]]:
-    payload = _load_json(CASES_PATH)
-    return {str(case["id"]): case for case in payload.get("cases", [])}
+def _load_dataset() -> dict[str, Any]:
+    return _load_json(CASES_PATH)
+
+
+def _load_cases(dataset: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {str(case["id"]): case for case in dataset.get("cases", [])}
+
+
+def _validate_grade_versions(rows: list[dict[str, Any]], dataset: dict[str, Any]) -> None:
+    expected = (dataset.get("dataset_id"), dataset.get("rubric_version"))
+    mismatches = [
+        row
+        for row in rows
+        if (row.get("dataset_id"), row.get("rubric_version")) != expected
+    ]
+    if mismatches:
+        actual = (
+            mismatches[0].get("dataset_id"),
+            mismatches[0].get("rubric_version"),
+        )
+        raise ValueError(f"grade version mismatch: expected {expected}, got {actual}")
 
 
 def _p95(values: list[float]) -> float:
@@ -101,7 +119,9 @@ def _semantic_ids(case: dict[str, Any]) -> set[str]:
 def _semantic_case_score(row: dict[str, Any], case: dict[str, Any]) -> float:
     ids = _semantic_ids(case)
     values = _criterion_map(row)
-    return 100.0 * sum(values.get(item_id, 0) for item_id in ids) / len(ids) if ids else 0.0
+    raw_score = 100.0 * sum(values.get(item_id, 0) for item_id in ids) / len(ids) if ids else 0.0
+    score_cap = row.get("score_cap")
+    return min(raw_score, float(score_cap)) if isinstance(score_cap, (int, float)) else raw_score
 
 
 def _validate_group_rows(
@@ -236,11 +256,14 @@ def _case_rows(
 
 
 def build_report() -> dict[str, Any]:
-    cases = _load_cases()
+    dataset = _load_dataset()
+    cases = _load_cases(dataset)
     if len(cases) != FORMAL_TASK_COUNT:
         raise ValueError(f"expected {FORMAL_TASK_COUNT} cases, got {len(cases)}")
-    formal_rows = _load_jsonl(FORMAL_RUN_ROOT / "gate5_grades.jsonl")
-    scripted_rows = _load_jsonl(SCRIPTED_RUN_ROOT / "gate5_grades.jsonl")
+    formal_rows = _load_jsonl(FORMAL_RUN_ROOT / "gate5_grades_v6.jsonl")
+    scripted_rows = _load_jsonl(SCRIPTED_RUN_ROOT / "gate5_grades_v6.jsonl")
+    _validate_grade_versions(formal_rows, dataset)
+    _validate_grade_versions(scripted_rows, dataset)
     frameworks: list[dict[str, Any]] = []
     for framework in FRAMEWORKS:
         baseline = _group_metrics(f"{framework}-baseline", formal_rows, FORMAL_RUN_ROOT, cases)

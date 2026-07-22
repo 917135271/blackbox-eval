@@ -7,7 +7,7 @@
   "additionalProperties": false,
   "properties": {
     "dataset_id": {"type": "string", "minLength": 1},
-    "rubric_version": {"const": "atomic-binary-checklist-v5"},
+    "rubric_version": {"const": "atomic-binary-checklist-v6"},
     "case_count": {"const": 15},
     "source": {
       "type": "object",
@@ -94,8 +94,28 @@
         "checklist": {
           "type": "array",
           "minItems": 4,
+          "maxItems": 30,
           "items": {"$ref": "#/$defs/checkItem"}
+        },
+        "critical_failures": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/criticalFailure"}
         }
+      }
+    },
+    "criticalFailure": {
+      "type": "object",
+      "required": ["id", "check", "deterministic_rule", "score_cap"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+        "check": {"type": "string", "minLength": 1},
+        "deterministic_rule": {
+          "enum": ["unexpected-anomaly-reported", "record-precision-below", "anomaly-precision-below"]
+        },
+        "expected": {"type": "number", "minimum": 0, "maximum": 1},
+        "score_cap": {"type": "number", "minimum": 0, "maximum": 100}
       }
     },
     "checkItem": {
@@ -126,7 +146,12 @@
             "anomaly-count-exact",
             "anomaly-type-count-exact",
             "no-anomaly-ids",
-            "record-ids-unique"
+            "record-ids-unique",
+            "record-recall-at-least",
+            "record-precision-at-least",
+            "anomaly-recall-at-least",
+            "anomaly-precision-at-least",
+            "excluded-records-absent"
           ]
         },
         "expected": {},

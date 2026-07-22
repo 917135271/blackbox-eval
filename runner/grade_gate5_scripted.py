@@ -19,8 +19,8 @@ RUN_ROOT = ROOT / "runs" / "gate4_scripted"
 
 def configure() -> None:
     grader.RUN_ROOT = RUN_ROOT
-    grader.GRADE_ROOT = RUN_ROOT / "gate5_judge"
-    grader.GRADES_PATH = RUN_ROOT / "gate5_grades.jsonl"
+    grader.GRADE_ROOT = RUN_ROOT / "gate5_judge_v6"
+    grader.GRADES_PATH = RUN_ROOT / "gate5_grades_v6.jsonl"
     grader.GROUPS = SCRIPTED_GROUPS
 
 

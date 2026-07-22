@@ -40,6 +40,9 @@ class Gate4RunnerTests(unittest.TestCase):
         if os.environ.get("GATE3_BUILDING_FREEZE") == "1":
             self.skipTest("GATE3 report is validating inputs before replacing the stale freeze")
         runner = load_runner()
+        freeze_status = runner.PLAN["governance_revision"]["previous_gate3_lock_status"]
+        if str(freeze_status).startswith("invalidated_by_"):
+            self.skipTest("formal dataset changed and must complete GATE3 refreeze before GATE4")
         freeze = runner.verify_frozen_configuration()
         self.assertEqual(freeze["formal_task_count_per_group"], 15)
         self.assertEqual(freeze["task_timeout_seconds"], 900)

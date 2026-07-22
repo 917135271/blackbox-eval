@@ -55,23 +55,18 @@ def test_generic_anomaly_id_infers_single_rule_from_answer() -> None:
     assert metrics["f1"] == 1.0
 
 
-def test_only_failed_deterministic_criterion_needs_judge() -> None:
+def test_all_deterministic_criteria_are_final_and_skip_judge() -> None:
     criteria = [
         {"id": "record-set", "evaluation_mode": "deterministic"},
         {"id": "submission", "evaluation_mode": "deterministic"},
         {"id": "reasoning", "evaluation_mode": "hybrid"},
     ]
-    deterministic = {
-        "record-set": {"id": "record-set", "value": 0, "source": "rule"},
-        "submission": {"id": "submission", "value": 1, "source": "rule"},
-    }
     selected = [
         criterion
         for criterion in criteria
         if criterion["evaluation_mode"] != "deterministic"
-        or deterministic[criterion["id"]]["value"] == 0
     ]
-    assert [item["id"] for item in selected] == ["record-set", "reasoning"]
+    assert [item["id"] for item in selected] == ["reasoning"]
 
 
 def test_deterministic_submission_score() -> None:
@@ -266,6 +261,94 @@ def test_atomic_anomaly_type_and_count_checks_are_independent() -> None:
     )
     assert rule_type and rule_type["value"] == 1
     assert count and count["value"] == 0
+
+
+def test_precision_and_recall_threshold_rules_are_symmetric() -> None:
+    diagnostics = {
+        "record_metrics": {"precision": 0.75, "recall": 0.5},
+        "anomaly_metrics": {"precision": 0.5, "recall": 0.75},
+    }
+    checks = {
+        "record-precision-at-least": 1,
+        "record-recall-at-least": 0,
+        "anomaly-precision-at-least": 0,
+        "anomaly-recall-at-least": 1,
+    }
+    for rule, expected_value in checks.items():
+        result = grader.deterministic_criterion(
+            {
+                "id": rule,
+                "evaluation_mode": "deterministic",
+                "deterministic_rule": rule,
+                "expected": 0.7,
+            },
+            diagnostics,
+        )
+        assert result and result["value"] == expected_value
+
+
+def test_one_missing_and_one_extra_record_have_symmetric_band_cost() -> None:
+    expected = [f"R{i}" for i in range(6)]
+    missing_metrics = grader.set_metrics(expected, expected[:-1])
+    extra_metrics = grader.set_metrics(expected, [*expected, "RX"])
+
+    def band_hits(metrics):
+        return sum(
+            metrics[name] + 1e-9 >= threshold
+            for name in ("precision", "recall")
+            for threshold in (0.5, 0.8, 1.0)
+        )
+
+    assert band_hits(missing_metrics) == 5
+    assert band_hits(extra_metrics) == 5
+
+
+def test_spray_submission_triggers_precision_cap() -> None:
+    failures, cap = grader.evaluate_critical_failures(
+        {
+            "rubric": {
+                "critical_failures": [
+                    {
+                        "id": "severe-record-overreporting",
+                        "check": "多报",
+                        "deterministic_rule": "record-precision-below",
+                        "expected": 0.5,
+                        "score_cap": 50,
+                    }
+                ]
+            }
+        },
+        {
+            "actual_anomaly_ids": [],
+            "record_metrics": grader.set_metrics(
+                [f"R{i}" for i in range(6)],
+                [f"R{i}" for i in range(60)],
+            ),
+            "anomaly_metrics": {"precision": 1.0},
+        },
+    )
+    assert failures and cap == 50
+
+
+def test_material_false_positive_triggers_score_cap() -> None:
+    case = {
+        "rubric": {
+            "critical_failures": [
+                {
+                    "id": "substantive-false-positive",
+                    "check": "误报",
+                    "deterministic_rule": "unexpected-anomaly-reported",
+                    "score_cap": 40,
+                }
+            ]
+        }
+    }
+    failures, cap = grader.evaluate_critical_failures(
+        case,
+        {"actual_anomaly_ids": ["ANOM-1"]},
+    )
+    assert [failure["id"] for failure in failures] == ["substantive-false-positive"]
+    assert cap == 40
 
 
 def test_no_anomaly_ids_rule_is_binary() -> None:
