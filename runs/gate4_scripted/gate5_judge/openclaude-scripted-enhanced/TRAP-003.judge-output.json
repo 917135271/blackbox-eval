@@ -1,0 +1,94 @@
+{
+  "checklist": [
+    {
+      "id": "clean-conclusion",
+      "value": 1,
+      "reason": "明确无异常且无矛盾表述",
+      "answer_evidence": "“无异常。R004236…与R004237…不构成7天内拆分报销异常。”",
+      "trace_evidence": "提交的 anomaly_ids 为空",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-gap",
+      "value": 1,
+      "reason": "日期间隔计算为8天",
+      "answer_evidence": "“费用发生日期间隔为8天”",
+      "trace_evidence": "工具返回 expense_date 分别为 2025-10-01 和 2025-10-09，间隔 8 天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-window",
+      "value": 1,
+      "reason": "正确应用7天窗口边界",
+      "answer_evidence": "“不满足…7天内出现2笔及以上报销…因此不构成…异常。”",
+      "trace_evidence": "政策摘要明确第十一条规定 7 天窗口",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 0,
+      "reason": "未在答案中说明合计金额10400元",
+      "answer_evidence": "答案中无合计金额表述",
+      "trace_evidence": "工具调用显示 R004236 金额 5200，R004237 金额 5200，合计 10400，但候选未计算",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 0,
+      "reason": "候选答案未明确说明10400元达到10000元审批线，仅提到时间窗口不满足，未同时说明金额条件满足。",
+      "answer_evidence": "候选答案仅说明间隔8天，不满足7天前提，未提及合计金额或审批线。",
+      "trace_evidence": "轨迹获取了两笔记录金额5200和5200，合计10400，且政策附件二表明10000为较高审批线，但答案未引用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-gap",
+      "value": 0,
+      "reason": "工具轨迹提供了日期数据来源，但未包含日期间隔的计算过程或明确结论。",
+      "answer_evidence": "候选答案声称间隔8天，但计算过程未在轨迹中体现。",
+      "trace_evidence": "get_expense_detail 返回 expense_date: 2025-10-01 和 2025-10-09，无直接计算。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-window",
+      "value": 1,
+      "reason": "工具轨迹通过政策摘录明确显示了7天边界，且间隔计算为8天，正确应用了窗口。",
+      "answer_evidence": "候选答案明确说明间隔8天超过7天。",
+      "trace_evidence": "get_policy_excerpt 返回第十一条：‘同一员工、同一费用类型在7天内出现2笔及以上报销’，7天窗口边界明确。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 0,
+      "reason": "轨迹未包含合计金额的计算过程或明确结论，候选答案也未说明总金额为10400元。",
+      "answer_evidence": "候选答案未提及合计金额或10400元数字。",
+      "trace_evidence": "get_expense_detail 返回 amount: 5200.0 两笔，但无合计计算步骤。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 0,
+      "reason": "候选答案未明确核验并说明合计金额10400元达到10000元审批线，未满足pass_condition中“证明正确说明金额条件满足”的要求。",
+      "answer_evidence": "答案仅说明间隔8天，未提及两笔金额合计达到审批线。",
+      "trace_evidence": "get_expense_detail获取两笔金额均为5200元，但未见工具输出或后续计算明确合计10400元并与10000元审批线比较。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "候选答案准确引用了01_expense_reimbursement_2025.md第十一条。",
+      "answer_evidence": "citations字段包含{\"clause_no\": \"第十一条\", \"doc_id\": \"01_expense_reimbursement_2025.md\"}。",
+      "trace_evidence": "get_policy_excerpt成功获取了第十一条全文。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 0,
+      "reason": "候选答案的正式引用中缺少03_authorization_management.md附件二，即使evidence_matrix提及但未出现在citations中。",
+      "answer_evidence": "提交的citations仅有一条，缺少对03_authorization_management.md附件二的引用。",
+      "trace_evidence": "get_policy_doc成功获取了03_authorization_management.md内容，但未纳入最终答案的引用。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "结论正确，但缺少对合计金额的明确计算，未完全满足提示要求。；候选提交正确识别无异常，但未明确满足所有核查要求：未说明金额条件满足、轨迹中缺乏日期间隔和合计金额的计算证据，仅窗口边界证明充分。；候选答案正确识别时间间隔超7天且无异常，但未显式核验说明金额条件满足而不构成拆分，且遗漏了附件二的明确引用。",
+  "confidence": 0.9
+}

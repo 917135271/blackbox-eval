@@ -1,46 +1,78 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "clean-conclusion",
-      "score": 30,
-      "reason": "答案明确判断为无异常，且无矛盾表述。",
-      "answer_evidence": "answer: '无异常', anomaly_ids: []",
-      "trace_evidence": ""
+      "value": 1,
+      "reason": "明确回答无异常，无矛盾表述。",
+      "answer_evidence": "答案开头“无异常”，anomaly_ids为空。",
+      "trace_evidence": "不计。",
+      "source": "llm_judge"
     },
     {
-      "id": "record-scope",
-      "score": 0,
-      "reason": "核查的记录集合完全错误，未包含预期记录 R004234 和 R004235，而是列出了 12 条无关的重复发票记录。",
-      "answer_evidence": "record_ids: ['R000002', 'R004201', 'R000005', 'R004202', 'R000020', 'R004203', 'R000028', 'R004204', 'R000037', 'R004205', 'R000055', 'R004206']",
-      "trace_evidence": "find_reused_invoices 调用返回了重复发票记录，候选逐一核查了这些记录，但未涉及目标记录 R004234 或 R004235。"
+      "id": "case-specific-reason-invoice",
+      "value": 1,
+      "reason": "准确指出两笔记录发票不同。",
+      "answer_evidence": "“两笔记录使用不同发票（FP2025X0004228 vs FP2025X0004229）”。",
+      "trace_evidence": "get_expense_detail返回R004234、R004235的发票号不同；list_invoices确认发票独立。",
+      "source": "llm_judge"
     },
     {
-      "id": "case-specific-reason",
-      "score": 0,
-      "reason": "最终答案未说明本题合规原因（different invoices and total below approval line）。",
-      "answer_evidence": "answer 仅 '无异常'，无原因说明。",
-      "trace_evidence": ""
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "正确计算7天内合计500元。",
+      "answer_evidence": "“合计金额500.00元”。",
+      "trace_evidence": "get_expense_detail显示两笔均为250元，日期均为2025-10-20。",
+      "source": "llm_judge"
     },
     {
-      "id": "reverse-check",
-      "score": 0,
-      "reason": "未核查本题边界条件记录 R004234 和 R004235，轨迹中无针对本题的反向验证。",
-      "answer_evidence": "",
-      "trace_evidence": "轨迹中未调用 get_expense_detail for R004234 或 R004235。"
+      "id": "case-specific-reason-threshold",
+      "value": 0,
+      "reason": "未直接说明500元未达到10000元审批线，仅提到3000元。",
+      "answer_evidence": "“合计金额未达到《授权管理办法》附件二较高审批线（AR-02档为≥3000元）”，未提及10000元。",
+      "trace_evidence": "附件二文档中包含AR-03档10000元线，但答案未引用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-invoice",
+      "value": 1,
+      "reason": "工具轨迹独立验证发票不同。",
+      "answer_evidence": "不计。",
+      "trace_evidence": "list_invoices分别查询FP2025X0004228和FP2025X0004229，均只关联一条记录，发票号不同。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "轨迹数据证明合计500元。",
+      "answer_evidence": "不计。",
+      "trace_evidence": "R004234和R004235的amount均为250.0，expense_date均为2025-10-20。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 1,
+      "reason": "轨迹中包含审批线文档和金额数据，可推算出未达10000元。",
+      "answer_evidence": "不计。",
+      "trace_evidence": "get_policy_doc返回附件二，含AR-03档≥10000元；两笔合计500元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用制度依据。",
+      "answer_evidence": "citations含{ doc_id: 01_expense_reimbursement_2025.md, clause_no: 第十条 } 和 第十一条。",
+      "trace_evidence": "get_policy_excerpt返回第十条、第十一条原文。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "准确引用附件二。",
+      "answer_evidence": "citations含{ doc_id: 03_authorization_management.md, clause_no: 附件二 }。",
+      "trace_evidence": "get_policy_doc返回附件二内容。",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "提交的 record_ids 均在数据库中存在，无虚构记录。"
-    },
-    {
-      "id": "trap-false-positive",
-      "triggered": false,
-      "reason": "答案未将合规记录判为异常。"
-    }
-  ],
-  "overall_comment": "候选误将重复发票记录当作核查对象，导致完全偏离题目要求的记录范围，且未说明合规原因。结论虽为无异常，但核查过程与题目要求不符。",
+  "overall_comment": "结论正确，但未按预期明确比较10000元审批线，仅比较3000元导致一项扣分，其余均满足。",
   "confidence": 1.0
 }

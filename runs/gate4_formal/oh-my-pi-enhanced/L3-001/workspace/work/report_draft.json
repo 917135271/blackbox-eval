@@ -1,113 +1,104 @@
 {
   "audit_scope": {
-    "object": "XX证券2025年全年费用报销重复报销专项扫描",
-    "period": "2025-01-01 至 2025-12-31",
-    "organization": "XX证券所有部门",
-    "data_source": "费用报销系统(approved状态记录)",
-    "in_scope_count": 4240,
+    "audit_object": "2025年度全量费用报销记录",
+    "audit_period": "2025-01-01 至 2025-12-31",
+    "organization_scope": "XX证券各部门、分支机构及全体员工",
+    "data_scope": "全部approved状态报销记录，覆盖全部6种费用类型（差旅住宿、培训费、业务招待、办公用品、通讯费、本地交通），共计4240条",
     "rule": "第十条 同一发票最多报销1次"
   },
   "verified_facts": [
-    "全年共扫描4,240条已批准报销记录",
-    "发现6张发票(FP202500000002, FP202500000005, FP202500000020, FP202500000028, FP202500000037, FP202500000055)分别被2条不同报销记录使用",
-    "涉及12条报销记录,均为approved状态,special_approval=0",
-    "每对重复记录:同一员工,同一部门,相同金额,同一发票",
-    "重复报销涉及4个部门:信息技术部(2对),合规风控部(2对),财务管理部(1对),人力资源部(1对)",
-    "第二笔记录(R004201-R004206)事由均标注'重复发票注入样本:',金额合计¥2,432.18"
+    "使用find_reused_invoices工具以min_usage_count=2扫描全量发票，返回6张被重复使用的发票",
+    "每张发票均被2条不同的approved报销记录引用，共涉及12条记录",
+    "逐条获取record detail验证：每组重复记录的invoice_no、amount、employee、reason完全一致",
+    "所有12条记录均为approved状态，special_approval均为0（无特殊审批豁免）",
+    "共覆盖5种费用类型：office_supplies、local_transport、travel_lodging、communication、business_entertainment",
+    "涉及5个部门：D008合规风控部、D007信息技术部、D009财务管理部、D010人力资源部",
+    "涉及5名员工：E0050姚瑜、E0022刘冬梅、E0028杜丹、E0036张林、E0027唐静、E0020陈洋"
   ],
   "applicable_policies": [
     {
       "doc_id": "01_expense_reimbursement_2025.md",
       "clause_no": "第十条",
-      "content": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。"
+      "content": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的，应认定为重复报销风险。"
     }
   ],
   "findings": [
     {
-      "anomaly_id": "DUP-001",
-      "invoice": "FP202500000002",
-      "records": [
+      "anomaly_id": "DUP-FP202500000002",
+      "description": "发票FP202500000002被重复报销",
+      "record_ids": [
         "R000002",
         "R004201"
       ],
       "amount": 423.79,
-      "employee": "E0050姚瑜",
-      "department": "D008合规风控部",
-      "type": "office_supplies"
+      "employee": "E0050 姚瑜",
+      "detail": "同一张办公用品发票在报销单BX2025000002（2025-09-09）和BX2025X004201（2025-02-18）中各报销一次"
     },
     {
-      "anomaly_id": "DUP-002",
-      "invoice": "FP202500000005",
-      "records": [
+      "anomaly_id": "DUP-FP202500000005",
+      "description": "发票FP202500000005被重复报销",
+      "record_ids": [
         "R000005",
         "R004202"
       ],
       "amount": 88.83,
-      "employee": "E0022刘冬梅",
-      "department": "D007信息技术部",
-      "type": "local_transport"
+      "employee": "E0022 刘冬梅",
+      "detail": "同一张本地交通发票在报销单BX2025000005（2025-08-05）和BX2025X004202（2025-03-18）中各报销一次"
     },
     {
-      "anomaly_id": "DUP-003",
-      "invoice": "FP202500000020",
-      "records": [
+      "anomaly_id": "DUP-FP202500000020",
+      "description": "发票FP202500000020被重复报销",
+      "record_ids": [
         "R000020",
         "R004203"
       ],
       "amount": 669.5,
-      "employee": "E0028杜丹",
-      "department": "D009财务管理部",
-      "type": "travel_lodging"
+      "employee": "E0028 杜丹",
+      "detail": "同一张差旅住宿发票在报销单BX2025000020（2025-02-28）和BX2025X004203（2025-04-18）中各报销一次"
     },
     {
-      "anomaly_id": "DUP-004",
-      "invoice": "FP202500000028",
-      "records": [
+      "anomaly_id": "DUP-FP202500000028",
+      "description": "发票FP202500000028被重复报销",
+      "record_ids": [
         "R000028",
         "R004204"
       ],
       "amount": 165.58,
-      "employee": "E0036张林",
-      "department": "D010人力资源部",
-      "type": "communication"
+      "employee": "E0036 张林",
+      "detail": "同一张通讯费发票在报销单BX2025000028（2025-05-05）和BX2025X004204（2025-05-18）中各报销一次"
     },
     {
-      "anomaly_id": "DUP-005",
-      "invoice": "FP202500000037",
-      "records": [
+      "anomaly_id": "DUP-FP202500000037",
+      "description": "发票FP202500000037被重复报销",
+      "record_ids": [
         "R000037",
         "R004205"
       ],
       "amount": 84.72,
-      "employee": "E0027唐静",
-      "department": "D007信息技术部",
-      "type": "local_transport"
+      "employee": "E0027 唐静",
+      "detail": "同一张本地交通发票在报销单BX2025000037（2025-04-20）和BX2025X004205（2025-07-25）中各报销一次"
     },
     {
-      "anomaly_id": "DUP-006",
-      "invoice": "FP202500000055",
-      "records": [
+      "anomaly_id": "DUP-FP202500000055",
+      "description": "发票FP202500000055被重复报销",
+      "record_ids": [
         "R000055",
         "R004206"
       ],
       "amount": 999.76,
-      "employee": "E0020陈洋",
-      "department": "D008合规风控部",
-      "type": "business_entertainment"
+      "employee": "E0020 陈洋",
+      "detail": "同一张业务招待发票在报销单BX2025000055（2025-05-10）和BX2025X004206（2025-08-24）中各报销一次"
     }
   ],
-  "impact": "6张发票重复报销,超额支付¥2,432.18",
-  "recommendations": [
-    "追回重复报销金额",
-    "加强发票查重机制"
-  ],
+  "impact": "6张发票被重复报销，涉及重复支出¥2432.18，分布在5种费用类型和5个部门",
+  "recommendations": "对6组重复报销启动追回程序，核实实际业务发生次数，追回多报销款项；核查系统是否存在发票查重缺陷",
   "anomaly_ids": [
-    "DUP-001",
-    "DUP-002",
-    "DUP-003",
-    "DUP-004",
-    "DUP-005",
-    "DUP-006"
+    "DUP-FP202500000002",
+    "DUP-FP202500000005",
+    "DUP-FP202500000020",
+    "DUP-FP202500000028",
+    "DUP-FP202500000037",
+    "DUP-FP202500000055"
   ],
   "record_ids": [
     "R000002",
@@ -129,6 +120,6 @@
       "clause_no": "第十条"
     }
   ],
-  "answer": "全年重复报销专项扫描发现6项异常,涉及6张发票被重复使用,共12条报销记录。每张发票被2条不同报销记录使用,违反第十条'同一发票最多报销1次'规定。所有记录special_approval=0,无有效豁免。异常ID: DUP-001至DUP-006,对应记录分别为: DUP-001(R000002,R004201),DUP-002(R000005,R004202),DUP-003(R000020,R004203),DUP-004(R000028,R004204),DUP-005(R000037,R004205),DUP-006(R000055,R004206)。",
-  "limitations": []
+  "answer": "【全量扫描方法】使用find_reused_invoices工具以min_usage_count=2扫描全年全部报销记录中的发票复用情况，对返回的每条重复发票组逐条获取record detail验证发票编号、金额、事由、员工、状态和特殊审批字段。扫描范围覆盖全年全部6种费用类型、全部approved报销记录共计4240条。\n\n【制度依据】XX证券费用报销管理办法(2025修订版)(XX证财规〔2025〕甲号)第十条：同一发票最多报销1次。发现同一发票在不同报销单中重复出现的，应认定为重复报销风险。\n\n【发现】全年共发现6组重复报销异常：\nDUP-FP202500000002: 办公用品发票FP202500000002（¥423.79）被员工姚瑜(E0050)在R000002和R004201两次报销\nDUP-FP202500000005: 本地交通发票FP202500000005（¥88.83）被员工刘冬梅(E0022)在R000005和R004202两次报销\nDUP-FP202500000020: 差旅住宿发票FP202500000020（¥669.50）被员工杜丹(E0028)在R000020和R004203两次报销\nDUP-FP202500000028: 通讯费发票FP202500000028（¥165.58）被员工张林(E0036)在R000028和R004204两次报销\nDUP-FP202500000037: 本地交通发票FP202500000037（¥84.72）被员工唐静(E0027)在R000037和R004205两次报销\nDUP-FP202500000055: 业务招待发票FP202500000055（¥999.76）被员工陈洋(E0020)在R000055和R004206两次报销\n\n共计6组异常，涉及12条报销记录，重复支出合计¥2432.18。所有记录均为approved状态且无special_approval豁免。",
+  "limitations": "扫描仅覆盖已通过系统审批的记录（approved状态），不包括rejected、pending等状态的记录"
 }

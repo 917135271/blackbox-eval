@@ -1,0 +1,70 @@
+{
+  "checklist": [
+    {
+      "id": "threshold-amount",
+      "value": 1,
+      "reason": "答案中明确给出部门总经理审批线为10000元（AR-03：10000元（含）至50000元，部门总经理）",
+      "answer_evidence": "答案中“AR-03：10000元（含）至50000元，部门总经理”",
+      "trace_evidence": "get_policy_doc 03_authorization_management.md 返回附件二：“AR-03 | 大于等于10000元且小于50000元 | 部门总经理”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "threshold-inclusive",
+      "value": 1,
+      "reason": "答案中明确说明包含10000元边界（10000元（含））",
+      "answer_evidence": "答案中“10000元（含）”",
+      "trace_evidence": "附件二审批权限表显示“大于等于10000元”，包含边界",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-first",
+      "value": 1,
+      "reason": "答案识别第一跳制度和条款：2025版《XX证券费用报销管理办法》第五条未直接列示审批金额",
+      "answer_evidence": "答案中“2025版《XX证券费用报销管理办法》第五条未直接列示审批金额”",
+      "trace_evidence": "调用get_policy_doc('01_expense_reimbursement_2025.md')，返回第五条内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-relation",
+      "value": 1,
+      "reason": "答案明确说明制度间交叉引用：第五条统一指向《授权管理办法》附件二执行",
+      "answer_evidence": "答案中“统一指向《XX证券授权管理办法》附件二执行”",
+      "trace_evidence": "费用报销办法第五条文本：“统一按《XX证券授权管理办法》附件二执行”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-second",
+      "value": 1,
+      "reason": "答案完成第二跳检索：获取并列出附件二完整审批档位",
+      "answer_evidence": "答案中列出附件二AR-01至AR-05五个档位",
+      "trace_evidence": "调用get_policy_doc('03_authorization_management.md')，返回附件二内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-expense",
+      "value": 1,
+      "reason": "候选提交明确引用费用报销办法第五条",
+      "answer_evidence": "citations中包含{'doc_id': '01_expense_reimbursement_2025.md', 'clause_no': '第五条'}",
+      "trace_evidence": "get_policy_doc调用记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-authorization",
+      "value": 1,
+      "reason": "候选提交明确引用授权管理办法附件二",
+      "answer_evidence": "citations中包含{'doc_id': '03_authorization_management.md', 'clause_no': '附件二'}",
+      "trace_evidence": "get_policy_doc调用记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-premature-stop",
+      "value": 1,
+      "reason": "轨迹证明在获取费用报销办法后继续检索授权管理办法，未因首份制度未列金额而提前结束",
+      "answer_evidence": "答案中体现交叉引用过程",
+      "trace_evidence": "工具调用顺序：get_policy_doc 01_expense... 后接 get_policy_doc 03_authorization...，随后还调用了旧版文档和列表",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交正确通过交叉引用从费用报销办法第五条追踪到授权管理办法附件二，完整列出审批档位并明确部门总经理审批线为10000元（含边界），检索完整，引用准确。",
+  "confidence": 1.0
+}

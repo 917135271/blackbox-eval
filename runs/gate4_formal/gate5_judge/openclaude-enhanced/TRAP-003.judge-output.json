@@ -1,39 +1,94 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "clean-conclusion",
-      "score": 30,
-      "reason": "明确判断无异常，anomaly_ids为空，答案无矛盾",
-      "answer_evidence": "candidate_submission.answer: '无异常'，anomaly_ids: []",
-      "trace_evidence": "evidence_matrix中no_anomaly_coverage.reason: '两笔间隔8天>7天窗口,不触发拆分核查'"
+      "value": 1,
+      "reason": "候选答案明确判断无异常，无矛盾表述",
+      "answer_evidence": "候选答案开头：无异常。",
+      "trace_evidence": "无轨迹异常",
+      "source": "llm_judge"
     },
     {
-      "id": "case-specific-reason",
-      "score": 25,
-      "reason": "完整说明outside aggregation window：日期间隔8天>7天，不触发拆分",
-      "answer_evidence": "evidence_matrix中no_anomaly_coverage.reason明确提及'两笔间隔8天>7天窗口,不触发拆分核查'",
-      "trace_evidence": "get_expense_detail(R004236/R004237)获取日期，结合search_policy查得的第十一条拆分窗口（7天）计算间隔8天"
+      "id": "case-specific-reason-gap",
+      "value": 1,
+      "reason": "日期间隔计算为8天",
+      "answer_evidence": "R004236（费用发生日期2025-10-01）与R004237（费用发生日期2025-10-09）的费用发生日期间隔为8天",
+      "trace_evidence": "get_expense_detail显示expense_date分别为2025-10-01和2025-10-09，间隔8天",
+      "source": "llm_judge"
     },
     {
-      "id": "reverse-check",
-      "score": 15,
-      "reason": "轨迹中核对日期间隔、拆分窗口、差旅标准，完成反向核查",
-      "answer_evidence": "evidence_matrix记载'date_gap_days:8, policy_split_window_days:7'，并核查标准、审批等",
-      "trace_evidence": "list_expenses, get_expense_detail(R004236,R004237)获取日期；search_policy确认第十一条；计算间隔8天"
+      "id": "case-specific-reason-window",
+      "value": 1,
+      "reason": "正确应用7天窗口边界",
+      "answer_evidence": "超过《XX证券费用报销管理办法(2025修订版)》第十一条规定的7天窗口",
+      "trace_evidence": "search_policy结果片段：同一员工、同一费用类型在7天内出现2笔及以上报销...",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "准确计算合计金额10400元",
+      "answer_evidence": "两笔报销合计金额10400元",
+      "trace_evidence": "get_expense_detail显示每笔amount为5200.0",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 1,
+      "reason": "正确说明金额条件满足但时间窗口条件不满足",
+      "answer_evidence": "合计金额10400元虽达到AR-03审批线，但因日期间隔已超7天，不构成拆分报销",
+      "trace_evidence": "get_policy_doc获取03_authorization_management.md附件二，AR-03档位10000（含）至50000元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-gap",
+      "value": 1,
+      "reason": "工具轨迹包含日期数据，可计算间隔为8天",
+      "answer_evidence": "无特定answer证据",
+      "trace_evidence": "get_expense_detail结果expense_date: 2025-10-01与2025-10-09",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-window",
+      "value": 1,
+      "reason": "工具轨迹获取第十一条，明确7天窗口",
+      "answer_evidence": "无特定answer证据",
+      "trace_evidence": "search_policy结果包含第十一条关于7天窗口的说明",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "工具轨迹显示两笔日记账金额均为5200，合计10400",
+      "answer_evidence": "无特定answer证据",
+      "trace_evidence": "get_expense_detail: amount: 5200.0 (两次)",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 1,
+      "reason": "工具轨迹获取附件二，证实10400进入AR-03档但时间窗口不满足",
+      "answer_evidence": "无特定answer证据",
+      "trace_evidence": "get_policy_doc (03_authorization_management.md) 附件二表格：AR-03 大于等于10000元且小于50000元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用01_expense_reimbursement_2025.md#第十一条",
+      "answer_evidence": "citations中包含{\"clause_no\": \"第十一条\", \"doc_id\": \"01_expense_reimbursement_2025.md\"}",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 0,
+      "reason": "候选citations中未包含03_authorization_management.md#附件二的引用",
+      "answer_evidence": "citations字段仅一条，无该引用",
+      "trace_evidence": "无该引用",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "record_ids均为预期数据库记录，无伪造"
-    },
-    {
-      "id": "trap-false-positive",
-      "triggered": false,
-      "reason": "未将合规记录判为异常，结论正确"
-    }
-  ],
-  "overall_comment": "候选正确识别无异常，充分核查拆分窗口并给出合理合规原因，无关键错误。",
-  "confidence": 1.0
+  "overall_comment": "除缺少制度依据03_authorization_management.md#附件二的引用外，其他核查项均通过。",
+  "confidence": 0.91
 }

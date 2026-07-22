@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -36,6 +37,8 @@ class Gate4RunnerTests(unittest.TestCase):
         self.assertIn("禁止把 .schema.json 猜成普通 .json", prompt)
 
     def test_frozen_configuration_is_current(self) -> None:
+        if os.environ.get("GATE3_BUILDING_FREEZE") == "1":
+            self.skipTest("GATE3 report is validating inputs before replacing the stale freeze")
         runner = load_runner()
         freeze = runner.verify_frozen_configuration()
         self.assertEqual(freeze["formal_task_count_per_group"], 15)
@@ -50,8 +53,15 @@ class Gate4RunnerTests(unittest.TestCase):
 
     def test_full_summary_targets_all_groups_and_tasks(self) -> None:
         runner = load_runner()
-        self.assertEqual(len(runner.GROUPS), 10)
+        self.assertEqual(len(runner.GROUPS), 12)
         self.assertEqual(len(runner.load_tasks([])), 15)
+
+    def test_formal_mount_policy_exposes_only_runnable_assets(self) -> None:
+        runner = load_runner()
+        policy = runner.formal_mount_policy()
+        self.assertTrue(policy["required_present"])
+        self.assertTrue(policy["hidden_absent"])
+        self.assertIn("expense_formal.db", "\n".join(policy["sources"]))
 
 
 if __name__ == "__main__":

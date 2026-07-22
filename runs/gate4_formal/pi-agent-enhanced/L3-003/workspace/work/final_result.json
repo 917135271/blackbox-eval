@@ -1,0 +1,28 @@
+{
+  "anomaly_ids": [
+    "ANOM-L3-003-01",
+    "ANOM-L3-003-02",
+    "ANOM-L3-003-03",
+    "ANOM-L3-003-04",
+    "ANOM-L3-003-05",
+    "ANOM-L3-003-06"
+  ],
+  "record_ids": [
+    "R004221",
+    "R004222",
+    "R004223",
+    "R004224",
+    "R004225",
+    "R004226"
+  ],
+  "answer": "2025年全年超标准专项扫描完成，共扫描差旅住宿费883条、市内交通包干770条、业务招待费675条、培训费578条、办公用品694条、通讯费用640条，合计4240条记录。发现6条单笔/单次即可确认的超标准异常：\n\n1. ANOM-L3-003-01 差旅住宿费超标（R004225）：E0007李丽娟，D1级/A类城市，单晚900元>850元标准；\n2. ANOM-L3-003-02 市内交通包干超标（R004226）：E0008杨丹，C类城市，单日92元>80元标准；\n3. ANOM-L3-003-03 业务招待费人均超标（R004224）：E0010闭想，700元/2人=350元/人>300元标准；\n4. ANOM-L3-003-04 培训课程费超标（R004223）：E0009张婷，3700元>3500元标准；\n5. ANOM-L3-003-05 办公用品超标（R004221）：E0007李丽娟，650元>600元月度上限（单笔自身超限）；\n6. ANOM-L3-003-06 通讯费用超标（R004222）：E0008杨丹，330元>300元月度上限（单笔自身超限）。\n\n计算口径说明：\n- 差旅住宿费：单晚金额=amount/nights，按employee_level和city_tier对照《差旅费管理办法》第四条标准表判定；\n- 市内交通包干：单日金额=amount/days，按city_tier对照《差旅费管理办法》第六条标准判定；\n- 业务招待费：单次金额对比5000元上限，人均=amount/participants对比300元上限；\n- 培训费：课程费对比3500元/人/期上限（住宿及每日标准因数据库字段缺失未检查）；\n- 办公用品：单笔金额直接对比600元月度上限（不累计月度）；\n- 通讯费用：单笔金额直接对比300元月度上限（不累计月度）。\n\n全量扫描方法：通过SQLite对expense_records表执行WHERE条件过滤，JOIN employees表获取职级，排除special_approval=1和除数为0的记录，每条记录的阈值判定使用CASE条件精确匹配employee_level×city_tier组合。制度依据为《XX证券费用报销管理办法(2025修订版)》第十二条（无专项审批时不得超过制度标准1.0倍）及各专项管理办法对应条款。",
+  "citations": [
+    {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "第六条"},
+    {"doc_id": "05_training_expense.md", "clause_no": "第二条"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第三条"},
+    {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+    {"doc_id": "07_office_communication.md", "clause_no": "第三条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+  ]
+}

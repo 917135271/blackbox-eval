@@ -1,32 +1,95 @@
 {
-  "task_id": "L1-001",
+  "analysis_date": "2026-07-21",
+  "question": "Current department general manager (部门总经理) approval threshold for single expense reimbursement",
   "applicable_policies": [
     {
       "doc_id": "01_expense_reimbursement_2025.md",
       "title": "XX证券费用报销管理办法(2025修订版)",
-      "clause": "第五条",
-      "effective_date": "2025-01-01",
+      "doc_number": "XX证财规〔2025〕甲号",
       "status": "current",
-      "role": "Delegates specific approval amounts to 授权管理办法 附件二"
+      "effective_date": "2025-01-01",
+      "applicable_clauses": [
+        {
+          "clause_no": "第五条",
+          "role": "delegation",
+          "reason": "Delegates all single-expense approval thresholds to 03_authorization_management.md Annex II. Does not specify amounts directly in this document.",
+          "text_summary": "单笔费用报销的审批权限,不在本办法正文列示具体金额,统一按《XX证券授权管理办法》附件二执行。费用系统应按附件二自动派生审批角色。"
+        },
+        {
+          "clause_no": "第十四条",
+          "role": "repeal",
+          "reason": "Effective 2025-01-01; simultaneously repeals the 2022 version (02_expense_reimbursement_2022_deprecated.md).",
+          "text_summary": "本办法自二〇二五年一月一日起施行。原《XX证券费用报销管理办法(2022版)》同时废止。"
+        }
+      ]
     },
     {
       "doc_id": "03_authorization_management.md",
       "title": "XX证券授权管理办法",
-      "clause": "第二条 附件二 AR-03",
-      "effective_date": "current",
+      "doc_number": "XX证综规〔2025〕丙号",
       "status": "current",
-      "role": "Specifies: ≥10,000元 and <50,000元 → 部门总经理"
+      "effective_date": "2025-01-01",
+      "applicable_clauses": [
+        {
+          "clause_no": "第二条",
+          "role": "scope",
+          "reason": "Establishes that Annex II amounts are the currently effective approval lines for expense reimbursement system role derivation.",
+          "text_summary": "本办法附件二适用于费用报销系统自动派生审批角色,相关金额为现行有效审批线。"
+        },
+        {
+          "clause_no": "附件二 AR-03",
+          "role": "threshold",
+          "reason": "Defines the department general manager (部门总经理) approval tier: single expense amount ≥ 10,000 yuan and < 50,000 yuan.",
+          "text_summary": "AR-03: 大于等于10000元且小于50000元 → 部门总经理"
+        },
+        {
+          "clause_no": "第五条",
+          "role": "effective_date",
+          "reason": "Effective date of the Authorization Management Rules: January 1, 2025.",
+          "text_summary": "本办法自二〇二五年一月一日起施行。"
+        }
+      ]
     }
   ],
   "excluded_policies": [
     {
       "doc_id": "02_expense_reimbursement_2022_deprecated.md",
       "title": "XX证券费用报销管理办法(2022版)",
-      "reason": "已废止。2025修订版第十四条明确废止2022版。2022版第四条标注'审批金额已被后续制度替代,不得作为现行审批依据'。",
-      "exclusion_type": "repealed"
+      "doc_number": "XX证财规〔2022〕乙号",
+      "status": "deprecated",
+      "exclusion_reason": "Explicitly deprecated. Article 1 states it is retained only as a historical record and the 2025 version governs. Article 4 states its approval amounts have been superseded and must not be used as a current basis. Article 14 of the 2025 version formally repealed it effective 2025-01-01.",
+      "old_threshold_noted": "Article 2 previously set department GM approval at ≥ 8,000 yuan — this is NOT applicable under current rules."
     }
   ],
-  "policy_timeline": "2025-01-01起,2025修订版生效,2022版废止。授权管理办法附件二为现行有效审批线。",
-  "applicability_decision": "现行制度下,审批金额按授权管理办法附件二执行",
+  "policy_relationships": [
+    {
+      "type": "delegation",
+      "from": { "doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条" },
+      "to": { "doc_id": "03_authorization_management.md", "clause_no": "附件二" },
+      "description": "2025 expense rules delegate all approval amount thresholds to Authorization Management Annex II."
+    },
+    {
+      "type": "repeal_and_replace",
+      "repealed": { "doc_id": "02_expense_reimbursement_2022_deprecated.md" },
+      "replaced_by": { "doc_id": "01_expense_reimbursement_2025.md" },
+      "effective_date": "2025-01-01",
+      "description": "2025 version (Art. 14) repealed the 2022 version effective 2025-01-01."
+    }
+  ],
+  "conclusion": {
+    "current_threshold": {
+      "role": "部门总经理 (Department General Manager)",
+      "amount_range": "大于等于10,000元且小于50,000元",
+      "amount_range_en": "≥ 10,000 yuan and < 50,000 yuan",
+      "tier_code": "AR-03"
+    },
+    "old_threshold_not_applicable": {
+      "role": "部门总经理 (Department General Manager)",
+      "amount": "≥ 8,000 yuan",
+      "source": "02_expense_reimbursement_2022_deprecated.md Article 2",
+      "status": "DEPRECATED — must not be used"
+    },
+    "governing_chain": "01_expense_reimbursement_2025.md Art. 5 → 03_authorization_management.md Annex II AR-03"
+  },
   "unresolved_items": []
 }

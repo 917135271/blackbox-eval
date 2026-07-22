@@ -1,0 +1,174 @@
+{
+  "group": "opencode-scripted-enhanced",
+  "task_id": "L3-006",
+  "case_family": "policy_and_version",
+  "category": "version_trap",
+  "graded_at": "2026-07-22T00:59:09+08:00",
+  "checklist_passed": 7,
+  "checklist_total": 8,
+  "checklist_pass_rate": 87.5,
+  "checklist": [
+    {
+      "id": "current-value",
+      "value": 1,
+      "reason": "明确给出部门总经理审批线≥10000元",
+      "answer_evidence": "部门总经理审批线：单笔金额≥10,000元且<50,000元",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-value-amount",
+      "value": 0,
+      "reason": "未明确给出2022版金额8000元",
+      "answer_evidence": "未提及8000元，仅说明旧版废止",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-value-status",
+      "value": 1,
+      "reason": "明确说明2022版已废止",
+      "answer_evidence": "2022版：已废止，原《XX证券费用报销管理办法(2022版)》同时废止（第十四条）",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "applicable-version",
+      "value": 1,
+      "reason": "选择2025修订版并说明施行日期与废止关系",
+      "answer_evidence": "应采用2025修订版（《XX证券费用报销管理办法(2025修订版)》...自2025年1月1日起施行）",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-version-evidence-current",
+      "value": 1,
+      "reason": "明确引用2025修订版第十四条并说明现行有效",
+      "answer_evidence": "“2025修订版：现行有效，自2025年1月1日起施行（第十四条）”",
+      "trace_evidence": "无工具调用过程",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-version-evidence-deprecated",
+      "value": 1,
+      "reason": "明确引用2022版废止依据（第十四条及第一条、第四条）",
+      "answer_evidence": "“2022版：已废止...（第十四条）...（第一条、第四条）”",
+      "trace_evidence": "无工具调用过程",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-version-evidence-amount",
+      "value": 1,
+      "reason": "明确引用附件二中的10000元审批档位",
+      "answer_evidence": "“单笔金额≥10,000元...引自...附件二”",
+      "trace_evidence": "无工具调用过程",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 108.955,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": null,
+    "actual_record_ids": [],
+    "record_metrics": null,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 5,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十四条"
+      },
+      {
+        "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+        "clause_no": "第一条、第二条、第四条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 0.975,
+    "overall_comment": "候选回答未明确给出2022版具体金额8000元，仅提及废止，故该项扣分；其余三项均满足要求。；候选提交完整引用所需制度条款，明确现行版本、废止版本及金额出处，所有检查项均满足。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 4185,
+      "completion_tokens": 2031,
+      "total_tokens": 6216,
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 2777
+    },
+    "batch_count": 2,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 2122,
+          "completion_tokens": 784,
+          "total_tokens": 2906,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 470
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 1354
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 2063,
+          "completion_tokens": 1247,
+          "total_tokens": 3310,
+          "prompt_tokens_details": {
+            "cached_tokens": 640
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 985
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 1423
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 3
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/opencode-scripted-enhanced/L3-006"
+}

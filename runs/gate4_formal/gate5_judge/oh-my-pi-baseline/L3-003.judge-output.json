@@ -1,35 +1,174 @@
 {
-  "scores": [
+  "checklist": [
     {
-      "id": "all-anomaly-ids",
-      "score": 0,
-      "answer_evidence": "candidate submission anomaly_ids includes ANOM-STD-001..006 but also 82 other anomaly ids of unrelated types (budget, dup, late, split).",
-      "trace_evidence": "N/A"
+      "id": "finding-type-count-count",
+      "value": 0,
+      "reason": "候选提交仅发现3个异常，期望发现6个。",
+      "answer_evidence": "候选提交 anomaly_ids: [\"ANO-001\", \"ANO-002\", \"ANO-003\"], record_ids: [\"R004221\", \"R004222\", \"R004223\"]。",
+      "trace_evidence": "工具调用仅返回并处理了R004221、R004222、R004223的超标记录。",
+      "source": "llm_judge"
     },
     {
-      "id": "all-record-ids",
-      "score": 0,
-      "answer_evidence": "candidate submission record_ids includes R004221..226 but also 1319 unrelated records from other anomaly types.",
-      "trace_evidence": "N/A"
+      "id": "all-record-ids-include-r004224",
+      "value": 0,
+      "reason": "提交的record_ids不含R004224。",
+      "answer_evidence": "候选提交 record_ids: [\"R004221\", \"R004222\", \"R004223\"]。",
+      "trace_evidence": "无任何工具调用涉及R004224。",
+      "source": "llm_judge"
     },
     {
-      "id": "full-scan-method",
-      "score": 15,
-      "answer_evidence": "matrix shows query of all expense types across full year with comparisons to standards.",
-      "trace_evidence": "N/A"
+      "id": "all-record-ids-include-r004225",
+      "value": 0,
+      "reason": "提交的record_ids不含R004225。",
+      "answer_evidence": "同上。",
+      "trace_evidence": "无任何工具调用涉及R004225。",
+      "source": "llm_judge"
     },
     {
-      "id": "policy-basis",
-      "score": 10,
-      "answer_evidence": "citations include 费用报销管理办法第十二条 and facts list specific standard limits for each expense type.",
-      "trace_evidence": "N/A"
+      "id": "all-record-ids-include-r004226",
+      "value": 0,
+      "reason": "提交的record_ids不含R004226。",
+      "answer_evidence": "同上。",
+      "trace_evidence": "无任何工具调用涉及R004226。",
+      "source": "llm_judge"
     },
     {
-      "id": "false-positive-control",
-      "score": 0,
-      "answer_evidence": "submission includes anomalies ANOM-BUDGET-*, ANOM-DUP-*, etc., mixing other rules.",
-      "trace_evidence": "N/A"
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "ANO-001明确关联R004221。",
+      "answer_evidence": "\"ANO-001 (R004221): 办公用品报销650元...\"",
+      "trace_evidence": "get_expense_detail(R004221)详情。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "ANO-002明确关联R004222。",
+      "answer_evidence": "\"ANO-002 (R004222): 通讯费用报销330元...\"",
+      "trace_evidence": "get_expense_detail(R004222)详情。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "ANO-003明确关联R004223。",
+      "answer_evidence": "\"ANO-003 (R004223): 培训课程费报销3700元...\"",
+      "trace_evidence": "get_expense_detail(R004223)详情。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 0,
+      "reason": "R004224未被任何发现关联。",
+      "answer_evidence": "候选答案未提及R004224。",
+      "trace_evidence": "无。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 0,
+      "reason": "R004225未被任何发现关联。",
+      "answer_evidence": "候选答案未提及R004225。",
+      "trace_evidence": "无。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 0,
+      "reason": "R004226未被任何发现关联。",
+      "answer_evidence": "候选答案未提及R004226。",
+      "trace_evidence": "无。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "工具调用覆盖全年各费用类型，阈值筛选实现了全量排查。",
+      "answer_evidence": "\"扫描方法: 按费用类型分类, 逐条比对单笔记录金额与对应政策标准。\"",
+      "trace_evidence": "summarize_expenses获取全局统计，各费用类型list_expenses使用阈值筛选，未限定日期范围。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-approval",
+      "value": 0,
+      "reason": "未发现排除已有专项审批记录的证据。",
+      "answer_evidence": "答案中未提及special_approval或排除专项审批。",
+      "trace_evidence": "get_expense_detail虽返回approvals，但未用于过滤。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-office",
+      "value": 1,
+      "reason": "办公用品核查单笔超600元口径。",
+      "answer_evidence": "\"办公用品报销650元, 超过...每人每月600元上限\"",
+      "trace_evidence": "list_expenses(office_supplies, min_amount=600)",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-communication",
+      "value": 1,
+      "reason": "通讯费用核查单笔超300元口径。",
+      "answer_evidence": "\"通讯费用报销330元, 超过...每人每月300元上限\"",
+      "trace_evidence": "list_expenses(communication, min_amount=300)",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-training",
+      "value": 1,
+      "reason": "培训课程费核查单次超3500元口径。",
+      "answer_evidence": "\"培训课程费报销3700元, 超过...每人每期3500元上限\"",
+      "trace_evidence": "list_expenses(training_fee, min_amount=3500)",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-entertainment",
+      "value": 0,
+      "reason": "未核查业务招待费人均300元标准。",
+      "answer_evidence": "答案声称检查人均，但未提供具体计算过程。",
+      "trace_evidence": "list_expenses(business_entertainment, min_amount=5000)返回空，后续未获取参与人数并计算人均。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-travel",
+      "value": 0,
+      "reason": "仅提及职级与城市档位，未明确使用住宿晚数",
+      "answer_evidence": "“差旅住宿费计算每晚均价与职级×城市档位标准比对”未出现“晚数”",
+      "trace_evidence": "工具调用中未见提取住宿晚数字段",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-transport",
+      "value": 0,
+      "reason": "仅提及每日均价与城市档位，未明确使用出差天数",
+      "answer_evidence": "“市内交通费计算每日均价与城市档位标准比对”未出现“出差天数”",
+      "trace_evidence": "工具调用中未见提取出差天数字段",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 0,
+      "reason": "最终提交仅3项发现，与预期6条不一致",
+      "answer_evidence": "提交发现3笔，record_ids仅3个",
+      "trace_evidence": "actual_record_ids仅3个，missing_count=3",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 0,
+      "reason": "未引用费用报销办法第十二条超标准总则条款",
+      "answer_evidence": "citations中无01_expense_reimbursement_2025.md",
+      "trace_evidence": "仅引用07、05，缺失01",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-special",
+      "value": 0,
+      "reason": "缺失差旅费管理办法(04)和业务招待费管理办法(06)的引用",
+      "answer_evidence": "citations仅有07和05，未覆盖04与06",
+      "trace_evidence": "已引用07、05，但未引用04、06",
+      "source": "llm_judge"
     }
   ],
-  "total": 25
+  "overall_comment": "候选提交遗漏了记录R004224、R004225、R004226，且未排除专项审批记录，业务招待费人均标准核查缺失，发现数量不符。；候选提交在扫描方法上未完整使用住宿晚数和出差天数，发现数量与预期差距大，且制度引用缺失总则及多项专项标准，所有检查项均不通过。",
+  "confidence": 0.925
 }

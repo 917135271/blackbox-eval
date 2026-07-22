@@ -1,138 +1,201 @@
 {
+  "group": "oh-my-pi-enhanced",
+  "task_id": "L2-008",
   "case_family": "record_audit",
-  "case_score": 90.0,
-  "case_score_raw": 90.0,
   "category": "policy_data_comparison",
-  "criteria": [
+  "graded_at": "2026-07-21T21:06:14+08:00",
+  "checklist_passed": 12,
+  "checklist_total": 12,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
     {
-      "answer_evidence": "提交答案：anomaly_ids: [\"SPLIT-001\"]，结论为拆分报销。",
       "id": "audit-conclusion",
-      "reason": "正确识别拆分报销行为，但提交的异常ID（SPLIT-001）与预期（SPLIT-003）不符，故未达满分。",
-      "score": 10.0,
-      "source": "llm_judge",
-      "trace_evidence": "无直接轨迹证据表明ID分配逻辑。"
-    },
-    {
-      "answer_evidence": "",
-      "id": "anomaly-id",
-      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
-      "score": 15.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    },
-    {
-      "answer_evidence": "",
-      "id": "record-set",
-      "reason": "record_ids集合F1=1.000",
-      "score": 25.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    },
-    {
-      "answer_evidence": "提交答案：citations包含\"第十一条\"，doc_id: \"01_expense_reimbursement_2025.md\"。",
-      "id": "policy-basis",
-      "reason": "准确引用了《费用报销管理办法》第十一条（对应规则6.2），并说明了其适用性。",
-      "score": 15.0,
-      "source": "llm_judge",
-      "trace_evidence": "工具调用get_policy_excerpt返回第十一条内容，明确拆分报销定义。"
-    },
-    {
-      "answer_evidence": "提交答案：'间隔5天...合计¥10,200达到授权管理办法附件二AR-03档位'。",
-      "id": "case-reasoning",
-      "reason": "完整阐述了7天窗口内合计10200元，超过10000元审批线的关键事实和计算。",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "get_expense_detail返回R004212（5100元，2025-04-10）、R004213（5100元，2025-04-15），list_expenses确认员工E0009、类型travel_lodging。"
-    },
-    {
-      "answer_evidence": "",
-      "id": "submission",
-      "reason": "统一提交已接受且Schema有效",
-      "score": 5.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "提交的record_ids均为数据库中存在，无虚构。",
-      "score_cap": 20,
+      "value": 1,
+      "reason": "answer明确认定构成拆分报销且无矛盾表述",
+      "answer_evidence": "发现拆分报销异常SPLIT-001...证实为同一项目出差拆分以规避部门总经理审批",
+      "trace_evidence": "answer中明确提及拆分报销异常SPLIT-001，结论清晰",
       "source": "llm_judge"
+    },
+    {
+      "id": "anomaly-type-count-rule-type",
+      "value": 1,
+      "reason": "发现规则类型完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "anomaly-type-count-count",
+      "value": 1,
+      "reason": "发现数量完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r004212",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r004213",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "引用拆分报销规则条款",
+      "answer_evidence": "制度依据：《XX证券费用报销管理办法(2025修订版)》第十一条",
+      "trace_evidence": "citations中包含{ doc_id: '01_expense_reimbursement_2025.md', clause_no: '第十一条' }，工具调用get_policy_excerpt引用了第十一条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-authorization",
+      "value": 1,
+      "reason": "引用10000元审批线出处",
+      "answer_evidence": "《XX证券授权管理办法》附件二（AR-02/AR-03审批档位划分）",
+      "trace_evidence": "citations中包含{ doc_id: '03_authorization_management.md', clause_no: '附件二' }，工具调用get_policy_excerpt引用了附件二",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-window",
+      "value": 1,
+      "reason": "正确计算为7天窗口内",
+      "answer_evidence": "2025-04-10至2025-04-15（5天窗口内，≤7天）",
+      "trace_evidence": "list_expenses显示expense_date为2025-04-10和2025-04-15，间隔5天，在7天窗口内",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-sum",
+      "value": 1,
+      "reason": "合计金额计算为10200元",
+      "answer_evidence": "合计¥10,200",
+      "trace_evidence": "get_expense_detail显示单笔金额均为5100元，summarize_expenses显示total_amount为10200元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-threshold",
+      "value": 1,
+      "reason": "将合计金额与10000元审批线正确比较",
+      "answer_evidence": "合计¥10,200达到AR-03审批档位（≥¥10,000）",
+      "trace_evidence": "reconciled_figures中ar03_threshold=10000，combined_amount=10200，达到并超过审批线",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 698.035,
+    "expected_anomaly_ids": [
+      "SPLIT-001"
+    ],
     "actual_anomaly_ids": [
       "SPLIT-001"
+    ],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {
+        "SPLIT": 1
+      },
+      "actual_types": {
+        "SPLIT": 1
+      }
+    },
+    "expected_record_ids": [
+      "R004212",
+      "R004213"
     ],
     "actual_record_ids": [
       "R004212",
       "R004213"
     ],
-    "anomaly_metrics": {
-      "actual_types": {
-        "SPLIT": 1
-      },
-      "count_exact": true,
-      "expected_types": {
-        "SPLIT": 1
-      },
-      "f1": 1.0,
-      "precision": 1.0,
-      "recall": 1.0
-    },
-    "citation_count": 2,
-    "elapsed_seconds": 232.095,
-    "expected_anomaly_ids": [
-      "SPLIT-003"
-    ],
-    "expected_record_ids": [
-      "R004212",
-      "R004213"
-    ],
     "record_metrics": {
-      "exact": true,
-      "extra_count": 0,
-      "f1": 1.0,
-      "missing_count": 0,
       "precision": 1.0,
-      "recall": 1.0
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
     },
-    "required_citations": [
-      "clause:费用报销管理办法-6.2"
-    ],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
     "trap_tokens_in_conclusion": [],
-    "unknown_record_ids": []
+    "citation_count": 2,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T22:32:21+08:00",
-  "group": "oh-my-pi-enhanced",
   "judge": {
-    "attempt": 1,
-    "confidence": 0.9,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "候选答案正确识别了拆分报销行为与关键证据，唯一缺陷是异常ID编号与预期不一致，其余均符合要求。",
     "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选答案正确识别了拆分报销异常，引用了正确的制度条款，并准确计算了时间窗口和金额，全部检查项通过。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 2737,
-      "completion_tokens_details": {
-        "reasoning_tokens": 2274
-      },
-      "prompt_cache_hit_tokens": 896,
-      "prompt_cache_miss_tokens": 4490,
-      "prompt_tokens": 5386,
-      "prompt_tokens_details": {
-        "cached_tokens": 896
-      },
-      "total_tokens": 8123
-    }
+      "prompt_tokens": 11346,
+      "completion_tokens": 1905,
+      "total_tokens": 13251,
+      "prompt_cache_hit_tokens": 11264,
+      "prompt_cache_miss_tokens": 82
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 11346,
+          "completion_tokens": 1905,
+          "total_tokens": 13251,
+          "prompt_tokens_details": {
+            "cached_tokens": 11264
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1259
+          },
+          "prompt_cache_hit_tokens": 11264,
+          "prompt_cache_miss_tokens": 82
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 2,
+        "criteria_count": 6
+      }
+    ]
   },
-  "passed": true,
-  "run_path": "runs/gate4_formal/oh-my-pi-enhanced/L2-008",
-  "task_id": "L2-008"
+  "run_path": "runs/gate4_formal/oh-my-pi-enhanced/L2-008"
 }

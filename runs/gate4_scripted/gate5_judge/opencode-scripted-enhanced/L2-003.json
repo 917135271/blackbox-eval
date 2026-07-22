@@ -1,0 +1,182 @@
+{
+  "group": "opencode-scripted-enhanced",
+  "task_id": "L2-003",
+  "case_family": "record_audit",
+  "category": "policy_data_comparison",
+  "graded_at": "2026-07-22T00:59:25+08:00",
+  "checklist_passed": 10,
+  "checklist_total": 10,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "answer明确认定'重复报销异常'，无矛盾表述。",
+      "answer_evidence": "answer: '发现以R000020为线索的重复报销异常'",
+      "trace_evidence": "无可用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "anomaly-type-count-rule-type",
+      "value": 1,
+      "reason": "发现规则类型完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "anomaly-type-count-count",
+      "value": 1,
+      "reason": "发现数量完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r000020",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r004203",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "policy-basis",
+      "value": 1,
+      "reason": "引用了01_expense_reimbursement_2025.md第十条，条款直接支持重复报销认定。",
+      "answer_evidence": "citations: [{'clause_no': '第十条', 'doc_id': '01_expense_reimbursement_2025.md'}]，证据矩阵中明确引用条款内容并说明适用性。",
+      "trace_evidence": "无可用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-same-invoice",
+      "value": 1,
+      "reason": "facts中明确指出同一发票FP202500000020被R000020和R004203使用。",
+      "answer_evidence": "evidence_matrix facts: '发票FP202500000020(INV000020)被同一员工...在两张独立的报销单中使用：R000020和R004203'",
+      "trace_evidence": "无可用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "facts中明确两笔报销金额均为669.5元，与记录一致。",
+      "answer_evidence": "evidence_matrix facts: '两笔报销金额均为669.5元'",
+      "trace_evidence": "无可用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 164.951,
+    "expected_anomaly_ids": [
+      "DUP-001"
+    ],
+    "actual_anomaly_ids": [
+      "ANOM-L2-003-001"
+    ],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {
+        "DUP": 1
+      },
+      "actual_types": {
+        "DUP": 1
+      }
+    },
+    "expected_record_ids": [
+      "R000020",
+      "R004203"
+    ],
+    "actual_record_ids": [
+      "R000020",
+      "R004203"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 1,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选提交准确识别了重复报销异常，事实、制度引用和金额均正确，全部检查项通过。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 1841,
+      "completion_tokens": 1273,
+      "total_tokens": 3114,
+      "prompt_cache_hit_tokens": 768,
+      "prompt_cache_miss_tokens": 1073
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 1841,
+          "completion_tokens": 1273,
+          "total_tokens": 3114,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 851
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 1073
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/opencode-scripted-enhanced/L2-003"
+}

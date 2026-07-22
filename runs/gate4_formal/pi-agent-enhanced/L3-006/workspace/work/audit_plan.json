@@ -1,0 +1,48 @@
+{
+  "task_id": "L3-006",
+  "task_type": "version_trap",
+  "complexity": 3,
+  "complexity_reasons": [
+    "policy version, effective date, and repeal relationship between 2022 and 2025 editions",
+    "two or more policies: 2022版, 2025修订版, and 授权管理办法 as cross-reference",
+    "thresholds, effective dates, and delegation relationships"
+  ],
+  "scope": {
+    "audit_object": "费用报销审批线版本确定",
+    "questions": [
+      "应采用2022版还是2025修订版作为现行审批依据？",
+      "部门总经理审批线金额是多少？",
+      "新旧版本效力状态如何？",
+      "现行金额的出处是什么？"
+    ],
+    "business_period": "现行有效期间（2025年1月1日起）",
+    "organization_scope": "全公司",
+    "deliverable": "版本效力判断、审批金额、出处"
+  },
+  "policy_documents_required": [
+    "01_expense_reimbursement_2025.md",
+    "02_expense_reimbursement_2022_deprecated.md",
+    "03_authorization_management.md"
+  ],
+  "data_queries_required": false,
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "纯政策版本判断任务，无需数据查询。三个政策文档已全部读取完毕，信息充分。compact模式可完成全部调查。"
+  },
+  "execution_steps": [
+    "政策版本效力分析：比对2022版与2025修订版条文",
+    "查阅授权管理办法附件二获取现行部门总经理审批线",
+    "运行policy-version-check确认版本适用性",
+    "形成初步结论",
+    "运行evidence-coverage-check",
+    "运行false-positive-review（如触发）",
+    "运行audit-report",
+    "运行result-validator",
+    "validate_audit_result → submit_audit_result"
+  ],
+  "stopping_conditions": [
+    "所有三个政策文档均已查阅",
+    "版本效力状态明确",
+    "部门总经理审批金额及出处明确"
+  ]
+}

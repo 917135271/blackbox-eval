@@ -1,0 +1,78 @@
+{
+  "checklist": [
+    {
+      "id": "clean-conclusion",
+      "value": 1,
+      "reason": "候选提交明确得出“不构成重复报销或拆分报销，结论为无异常”，无矛盾表述。",
+      "answer_evidence": "“经核查，R004234和R004235不构成重复报销或拆分报销，结论为无异常。”",
+      "trace_evidence": "无异常结论与工具调用中发票不同、金额合计500元等事实一致。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-invoice",
+      "value": 1,
+      "reason": "候选提交准确说明了两条记录对应发票编号不同，不构成重复发票。",
+      "answer_evidence": "“R004234对应发票FP2025X0004228，R004235对应发票FP2025X0004229，两张发票编号不同，各自usage_count均为1”",
+      "trace_evidence": "list_invoices分别返回FP2025X0004228关联R004234、FP2025X0004229关联R004235，usage_count均为1。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "候选提交正确计算了7天内合计金额为500元。",
+      "answer_evidence": "“两笔记录均为同一员工E0009张婷、同一费用类型office_supplies、同一日期2025-10-20，满足7天内条件。合计金额500元。”",
+      "trace_evidence": "get_expense_detail显示R004234金额250、R004235金额250，合计500。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 1,
+      "reason": "候选提交正确比较了合计金额与审批线，指出500元低于AR-02的3000元门槛，未触发更高审批层级，实质上未达到任何较高审批线。",
+      "answer_evidence": "“两笔合计500元仍低于AR-02的3000元门槛，无法触发更高审批层级，不存在规避审批权限的动机和效果”",
+      "trace_evidence": "get_policy_excerpt返回附件二审批权限表：AR-01为0-3000，AR-02为3000-10000。合计500元未达到AR-02最低门槛。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-invoice",
+      "value": 1,
+      "reason": "工具轨迹list_invoices查询发票号为FP2025X0004228和FP2025X0004229，usage_count均为1，且记录ID不同，候选提交明确说明发票不同。满足。",
+      "answer_evidence": "候选提交: R004234对应发票FP2025X0004228，R004235对应发票FP2025X0004229",
+      "trace_evidence": "list_invoices返回FP2025X0004228关联R004234，FP2025X0004229关联R004235，皆usage_count=1",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "工具轨迹get_expense_detail显示两笔记录金额均为250，候选提交合计500，与预期一致。",
+      "answer_evidence": "候选提交: 合计金额500元",
+      "trace_evidence": "get_expense_detail R004234 amount: 250, R004235 amount: 250",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 1,
+      "reason": "虽然候选提交未明确提及10000元，但通过引用附件二并比较500元与AR-02门槛3000元，隐含证明了未达到任何更高审批线，包括10000元。工具轨迹已提供完整审批权限表，推理正确。",
+      "answer_evidence": "候选提交: 两笔合计500元仍低于AR-02的3000元门槛，无法触发更高审批层级",
+      "trace_evidence": "get_policy_doc返回附件二，AR-02: 3000-10000, AR-03: 10000-50000；候选提交已引用附件二",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "候选提交准确引用了01_expense_reimbursement_2025.md第十条和第十一条，工具轨迹也获取了这些条款的原文。",
+      "answer_evidence": "候选提交: 依据《XX证券费用报销管理办法(2025修订版)》第十条、第十一条",
+      "trace_evidence": "get_policy_excerpt返回第十条、第十一条内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "候选提交在citations中正确引用了03_authorization_management.md#附件二。",
+      "answer_evidence": "citations: [{\"doc_id\": \"03_authorization_management.md\", \"clause_no\": \"附件二\"}]",
+      "trace_evidence": "工具调用get_policy_excerpt和get_policy_doc获取了03_authorization_management.md，返回包含附件二费用报销审批权限表。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交正确判断了无异常，详细核对了发票不同、金额合计及审批线比较，所有检查项均满足要求。；候选提交正确判定无异常，准确核验发票差异、合计金额和审批线，制度引用完整，与预期输出一致。；唯一检查项准确引用制度依据，通过。",
+  "confidence": 0.9833333333333334
+}

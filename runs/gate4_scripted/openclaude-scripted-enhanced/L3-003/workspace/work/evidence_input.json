@@ -1,0 +1,70 @@
+{
+  "evidence_rows": [
+    {
+      "anomaly_id": "ANO-L3-003-001",
+      "citations": [
+        {
+          "clause_no": "第二条",
+          "doc_id": "07_office_communication.md"
+        }
+      ],
+      "facts": [
+        "R004221（李丽娟E0007，信息技术部，2025-01-24，办公用品，650.00元）：单笔金额650元超过《XX证券办公与通讯费用管理办法》（doc_id: 07_office_communication.md）第二条规定的每人每月不超过600元的月度上限。invoice_no=FP2025X0004215，状态approved，无special_approval。"
+      ],
+      "record_ids": [
+        "R004221"
+      ]
+    },
+    {
+      "anomaly_id": "ANO-L3-003-002",
+      "citations": [
+        {
+          "clause_no": "第三条",
+          "doc_id": "07_office_communication.md"
+        }
+      ],
+      "facts": [
+        "R004222（杨丹E0008，合规风控部，2025-03-20，通讯费用，330.00元）：单笔金额330元超过《XX证券办公与通讯费用管理办法》（doc_id: 07_office_communication.md）第三条规定的每人每月不超过300元的月度上限。invoice_no=FP2025X0004216，状态approved，无special_approval。"
+      ],
+      "record_ids": [
+        "R004222"
+      ]
+    },
+    {
+      "anomaly_id": "ANO-L3-003-003",
+      "citations": [
+        {
+          "clause_no": "第二条",
+          "doc_id": "05_training_expense.md"
+        }
+      ],
+      "facts": [
+        "R004223（张婷E0009，财务管理部，2025-05-18，培训费，3700.00元）：单笔金额3700元超过《XX证券培训费管理办法》（doc_id: 05_training_expense.md）第二条规定的每人每期不超过3500元的课程费上限。invoice_no=FP2025X0004217，状态approved，无special_approval。"
+      ],
+      "record_ids": [
+        "R004223"
+      ]
+    }
+  ],
+  "no_anomaly_coverage": {
+    "checked_rules": [
+      {
+        "clause_no": "第二条",
+        "doc_id": "06_business_entertainment.md"
+      },
+      {
+        "clause_no": "第四条",
+        "doc_id": "04_travel_expense.md"
+      },
+      {
+        "clause_no": "第六条",
+        "doc_id": "04_travel_expense.md"
+      }
+    ],
+    "complete": true,
+    "conclusion": "业务招待费、差旅住宿费、市内交通费三个费用类型经全量扫描，不存在单笔或单次即可确认的超标准异常。业务招待费最高单笔1884.07元未触及5000元单次上限；差旅住宿费883条全部经每夜间费率核实合规；市内交通费770条全部经日均费率核实合规。",
+    "population_count": 4240,
+    "query_conditions": "1.办公用品: amount>600筛选单笔超标，1条命中（异常ANO-L3-003-001）；2.通讯费用: amount>300筛选单笔超标，1条命中（异常ANO-L3-003-002）；3.培训费: amount>3500筛选课程费超标，1条命中（异常ANO-L3-003-003）；4.业务招待费: amount>5000筛选单次超标，0条命中；5.差旅住宿费: amount>1100筛选，130条命中后逐条核实每夜间费率(city_tier/nights/employee_level)，均合规；其余amount≤1100自动合规；6.市内交通费: amount>120筛选，317条命中后逐条核实日均费率(city_tier/days)，均合规。",
+    "searched_population": "2025全年全部费用报销记录，覆盖6种费用类型：office_supplies(694条)、communication(640条)、training_fee(578条)、business_entertainment(675条)、travel_lodging(883条)、local_transport(770条)，合计4240条记录。"
+  }
+}

@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from unittest import mock
 from pathlib import Path
 
@@ -333,6 +334,22 @@ class SubagentRoutingTests(unittest.TestCase):
             oversized = self.authorize(work_dir, context={"question": "x" * 17000})
             self.assertEqual(oversized["code"], "CONTEXT_TOO_LARGE")
 
+    def test_invalid_reason_returns_role_options_and_caps_retries(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            work_dir = Path(temp)
+            first = self.authorize(work_dir, reason_code="analysis")
+            self.assertEqual(first["code"], "INVALID_REASON_CODE")
+            self.assertTrue(first["retryable"])
+            self.assertIn("MULTI_POLICY_VERSION_CHECK", first["allowed_reason_codes"])
+
+            second = self.authorize(work_dir, reason_code="policy_review")
+            self.assertEqual(second["code"], "INVALID_REASON_CODE")
+            self.assertFalse(second["retryable"])
+
+            third = self.authorize(work_dir, reason_code="compliance")
+            self.assertEqual(third["code"], "ROLE_REJECTION_LIMIT")
+            self.assertFalse(third["retryable"])
+
     def test_authorized_subagent_requires_valid_completion_before_submission(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             work_dir = Path(temp)
@@ -420,9 +437,29 @@ class SubagentRoutingTests(unittest.TestCase):
             state = json.loads((work_dir / ".audit-control/state.json").read_text(encoding="utf-8"))
             self.assertEqual(state["context"]["compaction_count"], 1)
 
+    def test_parallel_first_calls_initialize_workspace_atomically(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            work_dir = Path(temp)
+
+            def initialize(_: int) -> str:
+                return initialize_task_state(
+                    work_dir=work_dir,
+                    task_id="parallel-init-task",
+                    framework="test",
+                    experiment_group="enhanced",
+                )["task_id"]
+
+            with ThreadPoolExecutor(max_workers=8) as executor:
+                task_ids = list(executor.map(initialize, range(24)))
+
+            self.assertEqual(set(task_ids), {"parallel-init-task"})
+            for path in (work_dir / ".audit-control" / "state.json", *(work_dir / "work").glob("*.json")):
+                with self.subTest(path=path):
+                    json.loads(path.read_text(encoding="utf-8"))
+
 
 class PackagingTests(unittest.TestCase):
-    def test_build_produces_five_identical_skill_sets(self) -> None:
+    def test_build_produces_six_identical_skill_sets(self) -> None:
         completed = subprocess.run(
             [sys.executable, str(DOMAIN / "build_adapters.py")],
             cwd=ROOT,
@@ -433,9 +470,9 @@ class PackagingTests(unittest.TestCase):
         )
         self.assertEqual(completed.returncode, 0, completed.stderr)
         payload = json.loads(completed.stdout)
-        self.assertEqual([item["skill_count"] for item in payload["adapters"]], [7, 7, 7, 7, 7])
+        self.assertEqual([item["skill_count"] for item in payload["adapters"]], [7, 7, 7, 7, 7, 7])
         manifests = []
-        for adapter in ("claude-code-best", "codex", "openclaude", "opencode", "oh-my-pi"):
+        for adapter in ("claude-code-best", "codex", "openclaude", "opencode", "oh-my-pi", "pi-agent"):
             path = DOMAIN / "adapters" / adapter / "securities-expense-audit" / "build_manifest.json"
             manifests.append(json.loads(path.read_text(encoding="utf-8"))["canonical_skill_hashes"])
         self.assertEqual(manifests[0], manifests[1])
@@ -453,7 +490,7 @@ class PackagingTests(unittest.TestCase):
             with self.subTest(path=path):
                 json.loads(path.read_text(encoding="utf-8"))
 
-    def test_all_five_adapters_publish_governance_tools(self) -> None:
+    def test_all_six_adapters_publish_governance_tools(self) -> None:
         expected = {
             "authorize_audit_subagent",
             "complete_audit_subagent",
@@ -461,7 +498,7 @@ class PackagingTests(unittest.TestCase):
             "validate_audit_result",
             "submit_audit_result",
         }
-        for adapter in ("claude-code-best", "codex", "openclaude", "opencode", "oh-my-pi"):
+        for adapter in ("claude-code-best", "codex", "openclaude", "opencode", "oh-my-pi", "pi-agent"):
             module_path = (
                 DOMAIN
                 / "adapters"
@@ -497,6 +534,25 @@ class PackagingTests(unittest.TestCase):
                 "submit_audit_result",
             ],
         )
+
+    def test_authorize_tool_schema_exposes_fixed_routing_contract(self) -> None:
+        module_path = DOMAIN / "control-mcp" / "audit_control_mcp.py"
+        spec = importlib.util.spec_from_file_location("audit_control_mcp_schema", module_path)
+        module = importlib.util.module_from_spec(spec)
+        assert spec and spec.loader
+        spec.loader.exec_module(module)
+        response = module.handle_rpc({"jsonrpc": "2.0", "id": 1, "method": "tools/list"})
+        tool = next(
+            item
+            for item in response["result"]["tools"]
+            if item["name"] == "authorize_audit_subagent"
+        )
+        schema = tool["inputSchema"]
+        self.assertEqual(schema["required"], ["role", "reason_code", "complexity"])
+        self.assertIn("MULTI_POLICY_VERSION_CHECK", schema["properties"]["reason_code"]["enum"])
+        self.assertIn("NO_ANOMALY_RECHECK", schema["properties"]["reason_code"]["enum"])
+        self.assertNotIn("reason", schema["properties"])
+        self.assertNotIn("subagent_type", schema["properties"])
 
     def test_baseline_control_mcp_hides_subagent_tool(self) -> None:
         module_path = DOMAIN / "control-mcp" / "audit_control_mcp.py"

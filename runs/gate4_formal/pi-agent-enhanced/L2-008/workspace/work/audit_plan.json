@@ -1,0 +1,64 @@
+{
+  "task_scope": {
+    "task_id": "L2-008",
+    "type": "policy_data_comparison",
+    "clue_record": "R004212",
+    "question": "结合制度和业务数据，核查以R004212为线索的拆分报销异常"
+  },
+  "audit_period": "2025-04-08 to 2025-04-17 (7-day window centered on R004212 expense_date 2025-04-10)",
+  "policy_questions": [
+    {
+      "rule": "拆分报销禁止（第十一条）",
+      "question": "R004212与同类费用记录是否构成同一员工、同一费用类型、7天内2笔及以上、合计金额达到较高审批线的拆分报销",
+      "policy_docs": ["01_expense_reimbursement_2025.md", "03_authorization_management.md"],
+      "clauses": ["第十一条", "附件二"]
+    }
+  ],
+  "data_questions": [
+    "查询R004212的详细信息（员工、费用类型、日期、金额）",
+    "查询同一员工E0009、同一费用类型travel_lodging在R004212日期前后7天内的所有记录",
+    "确认每笔记录对应的审批层级",
+    "计算合计金额并与附件二审批线比较"
+  ],
+  "required_fields": [
+    "record_id", "employee_id", "expense_date", "expense_type", "amount",
+    "invoice_no", "nights", "city_tier", "special_approval", "status",
+    "approval tier_id", "approver_role"
+  ],
+  "evidence_requirements": [
+    "R004212和关联记录的完整详情",
+    "01_expense_reimbursement_2025.md 第十一条全文",
+    "03_authorization_management.md 附件二审批权限表",
+    "日期窗口和金额合计的计算过程"
+  ],
+  "execution_steps": [
+    "1. 审计规划 → work/audit_plan.json",
+    "2. 获取R004212详情并查询制度",
+    "3. 查询E0009同类型费用7天窗口内所有记录",
+    "4. 日期窗口、合计金额计算，与审批线比较",
+    "5. 制度适用性确认 → work/policy_applicability.json",
+    "6. 证据覆盖检查 → work/evidence_matrix.json",
+    "7. 误报复核（若触发条件满足）",
+    "8. 审计报告 → work/report_draft.json",
+    "9. 结果校验 → work/validation_report.json",
+    "10. 提交"
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "需要结合两个制度文件（报销管理办法+授权管理办法附件二）",
+      "需要聚合多笔记录金额并比较阈值",
+      "涉及7天日期窗口和10000元审批线阈值判断"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "数据范围极小（单一员工、单一费用类型、7天窗口），仅涉及2条记录，主代理直接处理效率更高。数据分析和制度查询均可在紧凑模式下完成。"
+  },
+  "stopping_conditions": [
+    "确认R004212和关联记录的全部详情",
+    "确认制度适用的第十一条及附件二审批线",
+    "确认无其他E0009同类型同窗口记录遗漏"
+  ],
+  "unresolved_items": []
+}

@@ -1,46 +1,62 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "current-value",
-      "score": 30,
-      "reason": "准确指出现行部门总经理审批线为10000元。",
-      "answer_evidence": "单笔报销金额≥10000元且<50000元的，必要审批角色为部门总经理。因此部门总经理审批线为单笔报销金额达到10000元。",
-      "trace_evidence": "get_policy_doc 03_authorization_management.md 返回AR-03：大于等于10000元且小于50000元，部门总经理。"
+      "value": 1,
+      "reason": "答案明确指出现行部门总经理审批线为≥10,000元，与预期一致。",
+      "answer_evidence": "答案中写有“单笔报销金额≥10,000元且<50,000元时，须经部门总经理审批”。",
+      "trace_evidence": "工具调用get_policy_excerpt获取03_authorization_management.md附件二，确认AR-03档为≥10000元且<50000元，部门总经理审批。",
+      "source": "llm_judge"
     },
     {
-      "id": "deprecated-value",
-      "score": 25,
-      "reason": "明确指出2022版8000元已废止，金额和状态均正确。",
-      "answer_evidence": "2022版第二条记载的8000元部门总经理审批线已失效。",
-      "trace_evidence": "get_policy_doc 02_expense_reimbursement_2022_deprecated.md 返回第二条旧版8000元，第四条明确已替代。"
+      "id": "deprecated-value-amount",
+      "value": 0,
+      "reason": "答案中未明确给出2022版审批线8000元的具体金额。",
+      "answer_evidence": "答案中未出现“8000元”字样。",
+      "trace_evidence": "工具调用get_policy_doc获取02文档，其中第二条明确“单笔报销金额达到8000元的，应提交部门总经理审批”，但候选答案未引用此数据。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-value-status",
+      "value": 1,
+      "reason": "答案明确说明2022版已废止。",
+      "answer_evidence": "答案中写有“2022版：已废止，仅作制度沿革留档，不得作为现行审批依据。”",
+      "trace_evidence": "工具调用get_policy_doc获取02文档，其中第四条说明审批金额已被替代，不得作为现行审批依据，与答案一致。",
+      "source": "llm_judge"
     },
     {
       "id": "applicable-version",
-      "score": 20,
-      "reason": "选择2025修订版，并说明废止时间和制度衔接，理由充分。",
-      "answer_evidence": "费用报销审批线应采用2025修订版。根据...2022版已于二〇二五年一月一日废止。",
-      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md 第十四条载明废止2022版。"
+      "value": 1,
+      "reason": "答案正确选择2025修订版，并说明时间适用关系。",
+      "answer_evidence": "答案首句明确“费用报销审批线应采用2025修订版”，并说明2025版自2025年1月1日起施行，原2022版废止。",
+      "trace_evidence": "工具调用get_policy_doc获取01文档，第十四条明确2025版施行日期及废止旧版，支持该结论。",
+      "source": "llm_judge"
     },
     {
-      "id": "two-version-evidence",
-      "score": 20,
-      "reason": "同时提供了01和02两份制度文件的条款引用，证据可核查。",
-      "answer_evidence": "引用01_expense_reimbursement_2025.md第十四条、第五条，02_expense_reimbursement_2022_deprecated.md第二条、第四条。",
-      "trace_evidence": "工具调用获取了01和02文档全文，内容与引用一致。"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "R004233是有效记录，且未用于支撑版本或审批线结论，无伪造或无关记录支撑。"
+      "id": "two-version-evidence-current",
+      "value": 1,
+      "reason": "答案引用了2025修订版及其现行效力条款。",
+      "answer_evidence": "答案引用01的第十四条、第五条；citations中包含第十四条。",
+      "trace_evidence": "工具调用get_policy_doc获取01，第十四条显示2025版自2025年1月1日起施行；第五条指引审批金额按授权管理办法附件二。",
+      "source": "llm_judge"
     },
     {
-      "id": "deprecated-policy-as-current",
-      "triggered": false,
-      "reason": "明确否定2022版效力，结论基于2025版，未使用废止制度作为现行依据。"
+      "id": "two-version-evidence-deprecated",
+      "value": 1,
+      "reason": "答案引用了2022版及其废止状态。",
+      "answer_evidence": "答案引用02的第一条、第二条、第四条；citations中包含这些条款。",
+      "trace_evidence": "工具调用get_policy_doc获取02，第一条明确仅作制度沿革留档，第四条明确审批金额被替代。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-version-evidence-amount",
+      "value": 1,
+      "reason": "答案引用了授权管理办法附件二的金额依据。",
+      "answer_evidence": "答案引用03的第二条和附件二；citations中包含附件二。",
+      "trace_evidence": "工具调用get_policy_excerpt获取03，附件二表格显示AR-03档为≥10000元，部门总经理。",
+      "source": "llm_judge"
     }
   ],
-  "overall_comment": "候选答案准确识别了适用版本和现行审批线，废止金额表述完整，关键证据均有文档支撑，无关键错误。",
-  "confidence": 1.0
+  "overall_comment": "候选提交总体准确，但遗漏了明确给出2022版金额8000元，导致一项未通过。其余项均满足。",
+  "confidence": 0.9
 }

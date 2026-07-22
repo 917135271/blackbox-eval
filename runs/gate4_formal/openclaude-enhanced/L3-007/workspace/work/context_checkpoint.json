@@ -1,37 +1,96 @@
 {
-  "artifact_paths": [],
+  "artifact_paths": [
+    "work/final_result.json",
+    "work/evidence_matrix.json",
+    "work/validation_report.json"
+  ],
   "compacted": false,
-  "context_usage_percent": 60.0,
-  "created_at": 1784209303.3938847,
+  "context_usage_percent": 50.0,
+  "created_at": 1784621775.462654,
   "estimation_method": "reported_tokens",
   "retained_state": {
+    "anomalies_found": [
+      "L3_007_AR02_MISSING_FINANCIAL_REVIEW"
+    ],
     "applicable_policies": [
       "01_expense_reimbursement_2025.md",
       "03_authorization_management.md"
     ],
-    "artifact_index": {
-      "evidence_matrix": "work/evidence_matrix.json",
-      "final_result": "work/final_result.json",
-      "validation_report": "work/validation_report.json"
+    "approval_tiers": {
+      "AR-01": "[0,3000) → 部门经理",
+      "AR-02": "[3000,10000) → 部门经理,并经财务复核",
+      "AR-03": "[10000,50000) → 部门总经理",
+      "AR-04": "[50000,200000) → 分管副总",
+      "AR-05": "[200000,∞) → 总经理办公会"
     },
-    "audit_plan": "1. Query reimbursement policy (hop1) 2. Cross-reference authorization policy annex2 (hop2) 3. Check records against tiers",
-    "constraints": {
-      "anomaly_ids": [
-        "ANOM-L3-007-AR02-MISSING-FINREVIEW"
-      ],
-      "record_ids": 95,
-      "total_affected": 95
-    },
+    "artifact_index": [
+      "work/final_result.json",
+      "work/evidence_matrix.json",
+      "work/validation_report.json"
+    ],
+    "audit_plan": "1. 确认报销办法2025不存在直接审批金额,引用授权管理办法附件二; 2. 获取附件二的5个审批档位; 3. 查询业务数据中是否存在审批档位违规的记录; 4. 验证并提交结果",
+    "constraints": {},
     "evidence_status": "complete",
-    "question": "报销办法没有直接列审批金额时,请通过交叉引用找到单笔费用审批档位",
-    "record_ids": 95,
-    "remaining_budget": "ok",
-    "submission_status": "pending",
-    "task": "L3-007 two_hop_retrieval",
-    "task_id": "L3-007",
-    "type": "two_hop_retrieval",
+    "plan": "Two-hop retrieval: 2025报销办法第5条→授权管理办法附件二→审批档位AR-01至AR-05",
+    "record_ids": [
+      "R004233",
+      "R004207",
+      "R004208",
+      "R004217",
+      "R004218",
+      "R004219",
+      "R004220",
+      "R004236",
+      "R004237",
+      "R004212",
+      "R004213",
+      "R004223",
+      "R004214",
+      "R004215",
+      "R004216",
+      "R004209",
+      "R004210",
+      "R004211",
+      "R003850",
+      "R000712",
+      "R002489",
+      "R000003",
+      "R002871",
+      "R001909",
+      "R001842",
+      "R003140",
+      "R002637",
+      "R000468",
+      "R001937",
+      "R002369",
+      "R000297",
+      "R003872",
+      "R003498",
+      "R002844",
+      "R002590",
+      "R003947",
+      "R002839",
+      "R001442",
+      "R001486",
+      "R000102",
+      "R003735",
+      "R002853",
+      "R000194",
+      "R002474",
+      "R001342",
+      "R000152",
+      "R000241",
+      "R001666",
+      "R001917",
+      "R001468"
+    ],
+    "remaining_budget": {
+      "timeout_seconds": 900
+    },
+    "submission_status": "not_submitted",
+    "task": "L3-007",
     "unresolved_items": []
   },
-  "stage": "investigation_completed",
+  "stage": "review_ready",
   "task_id": "L3-007"
 }

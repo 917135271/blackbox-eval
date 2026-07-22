@@ -3,35 +3,31 @@
   "errors": [],
   "warnings": [],
   "field_checks": {
-    "anomaly_ids_non_empty_array": true,
-    "anomaly_ids_empty_for_no_anomaly": true,
-    "record_ids_non_empty_array": true,
-    "record_ids_all_regex_r_format": true,
-    "record_ids_unique": true,
-    "answer_non_empty_string": true,
-    "answer_contains_no_anomaly": true,
-    "citations_non_empty_array": true,
-    "citations_all_have_doc_id_clause_no": true,
-    "citations_unique": true,
-    "no_extra_fields": true
+    "anomaly_ids": {"present": true, "type": "array", "empty": true, "valid": true},
+    "record_ids": {"present": true, "type": "array", "items_match_pattern": true, "unique": true, "valid": true},
+    "answer": {"present": true, "type": "string", "not_empty": true, "contains_无异常": true, "valid": true},
+    "citations": {"present": true, "type": "array", "all_have_doc_id_and_clause_no": true, "unique": true, "valid": true}
   },
   "id_checks": {
-    "record_ids_all_verified": true,
-    "doc_ids_all_in_corpus": true,
-    "evidence_matrix_record_ids_match": true,
-    "candidate_submitted_match": true
+    "record_ids_in_db": {"R004239": true, "R004240": true},
+    "doc_ids_in_corpus": {
+      "01_expense_reimbursement_2025.md": true,
+      "03_authorization_management.md": true,
+      "06_business_entertainment.md": true
+    },
+    "valid": true
   },
   "evidence_checks": {
-    "evidence_matrix_status_pass": true,
+    "evidence_status_pass": true,
     "coverage_100_percent": true,
-    "no_anomaly_coverage_complete": true,
-    "evidence_rows_consistent": true
+    "submitted_matches_final": true,
+    "valid": true
   },
   "answer_consistency_checks": {
-    "no_anomaly_zero_anomaly_ids": true,
-    "record_count_matches_answer": true,
-    "boundary_values_stated": true,
-    "citations_support_conclusion": true
+    "anomaly_ids_match_answer": true,
+    "no_anomaly_explicit": true,
+    "citations_support_claims": true,
+    "valid": true
   },
   "repair_count": 0,
   "repairable_fields": [],

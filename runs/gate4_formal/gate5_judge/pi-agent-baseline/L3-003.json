@@ -1,0 +1,367 @@
+{
+  "group": "pi-agent-baseline",
+  "task_id": "L3-003",
+  "case_family": "full_year_audit",
+  "category": "full_year_rule_audit",
+  "graded_at": "2026-07-21T21:08:26+08:00",
+  "checklist_passed": 19,
+  "checklist_total": 27,
+  "checklist_pass_rate": 70.37,
+  "checklist": [
+    {
+      "id": "finding-type-count-rule-type",
+      "value": 1,
+      "reason": "发现规则类型完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "finding-type-count-count",
+      "value": 0,
+      "reason": "提交发现数量为4，期望为6。",
+      "answer_evidence": "最终答案仅列出4项异常。",
+      "trace_evidence": "提交的anomaly_ids数量为4。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004221",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r004222",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r004223",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r004224",
+      "value": 0,
+      "reason": "提交的record_ids不包含R004224。",
+      "answer_evidence": "提交的record_ids列表为：['R004221','R004222','R004223','R004225']。",
+      "trace_evidence": "candidate_evidence_matrix中无R004224。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004225",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "all-record-ids-include-r004226",
+      "value": 0,
+      "reason": "提交的record_ids不包含R004226。",
+      "answer_evidence": "提交的record_ids列表缺少R004226。",
+      "trace_evidence": "candidate_evidence_matrix中无R004226。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "R004221在答案中作为办公用品异常被识别。",
+      "answer_evidence": "答案明确列出R004221，金额650元超标准。",
+      "trace_evidence": "get_expense_detail('R004221')返回金额650，special_approval=0。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "R004222在答案中作为通讯费异常被识别。",
+      "answer_evidence": "答案明确列出R004222，金额330元超标准。",
+      "trace_evidence": "get_expense_detail('R004222')返回金额330，special_approval=0。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "R004223在答案中作为培训费异常被识别。",
+      "answer_evidence": "答案明确列出R004223，金额3700元超标准。",
+      "trace_evidence": "get_expense_detail('R004223')返回金额3700，special_approval=0。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 0,
+      "reason": "提交结果中未包含R004224。",
+      "answer_evidence": "答案和record_ids均未出现R004224。",
+      "trace_evidence": "工具调用记录中未对R004224进行异常标记。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 1,
+      "reason": "R004225在答案中作为差旅住宿异常被识别。",
+      "answer_evidence": "答案明确列出R004225，每晚均价900元超标准。",
+      "trace_evidence": "get_expense_detail('R004225')返回amount=900，city_tier='A'，nights=1，employee_level='D1'。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 0,
+      "reason": "提交结果中未包含R004226。",
+      "answer_evidence": "答案和record_ids均未出现R004226。",
+      "trace_evidence": "工具调用记录中未对R004226进行异常标记。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "轨迹显示使用list_expenses进行全量查询，答案描述扫描了全部4240笔记录。",
+      "answer_evidence": "答案中声明覆盖全年全部4240笔记录。",
+      "trace_evidence": "list_expenses多次分页调用，summarize_expenses统计总数4240。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-approval",
+      "value": 1,
+      "reason": "所有已识别的异常记录均标注special_approval=0，且答案中仅将无专项审批的计入异常。",
+      "answer_evidence": "答案中每条异常均注明‘无专项审批’。",
+      "trace_evidence": "get_expense_detail返回的special_approval字段均为0。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-office",
+      "value": 1,
+      "reason": "办公用品扫描以单笔>600元为条件，找到R004221金额650元。",
+      "answer_evidence": "答案描述办公用品单笔金额>600元时计入。",
+      "trace_evidence": "list_expenses('office_supplies', min_amount=600)返回唯一记录R004221。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-communication",
+      "value": 1,
+      "reason": "通讯费用扫描以单笔>300元为条件，找到R004222金额330元。",
+      "answer_evidence": "答案描述通讯费用单笔金额>300元时计入。",
+      "trace_evidence": "list_expenses('communication', min_amount=300)返回唯一记录R004222。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-training",
+      "value": 1,
+      "reason": "培训课程费以单次>3500元为条件，找到R004223金额3700元。",
+      "answer_evidence": "答案描述培训费单笔金额>3500元时计入。",
+      "trace_evidence": "list_expenses('training_fee', min_amount=3500)返回唯一记录R004223。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-entertainment",
+      "value": 0,
+      "reason": "答案仅核查了业务招待费的单次5000元标准，未核查人均300元标准。",
+      "answer_evidence": "答案‘业务招待费’部分仅描述‘单次活动不超过5000元’，未提及人均标准。",
+      "trace_evidence": "list_expenses('business_entertainment')无需判断人均，且未获取participants信息。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-travel",
+      "value": 1,
+      "reason": "差旅住宿检查使用了职级、城市档位和住宿晚数，计算每晚均价比对标准。",
+      "answer_evidence": "答案描述‘计算单笔金额÷住宿天数=每晚均价，与对应标准比对’，并使用了职级-城市标准表。",
+      "trace_evidence": "get_expense_detail('R004225')返回city_tier、nights字段，并用于计算。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-transport",
+      "value": 1,
+      "reason": "候选提交明确描述市内交通扫描使用城市档位和天数计算日均，与制度标准比对，满足同时使用城市档位和出差天数的条件。",
+      "answer_evidence": "answer中“6.【市内交通费】扫描方法：对全年770笔市内交通费记录逐笔获取详情(含city_tier和days字段)，计算日均=amount/days，与对应城市标准比对”",
+      "trace_evidence": "trace中多次调用get_expense_detail获取市内交通记录，返回字段含city_tier和days，如R002156返回days: 4, city_tier: A。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 0,
+      "reason": "期望发现6条异常记录，但候选提交只报告了4条，缺失R004224和R004226，中间统计未与最终6项发现一致。",
+      "answer_evidence": "answer中列出4个record_ids，expected_record_ids为6个。",
+      "trace_evidence": "rule_diagnostics显示actual_record_ids为4个，expected_record_ids为6个，recall仅0.6667。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "候选提交的citations中明确引用了“01_expense_reimbursement_2025.md”第十二条，满足了超标准总则条款的引用要求。",
+      "answer_evidence": "citations中包含{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十二条\"}。",
+      "trace_evidence": "无需trace证据，提交即包含。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-special",
+      "value": 0,
+      "reason": "候选提交的citations缺少06_business_entertainment.md，未覆盖全部要求的专项标准，业务招待费部分未提供制度条款引用。",
+      "answer_evidence": "citations列表中无06号文档，answer中业务招待费部分仅提及制度名称，未提供具体条款引用。",
+      "trace_evidence": "trace中获取过06号制度文档，但最终提交未引用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 369.403,
+    "expected_anomaly_ids": [
+      "OVERSTD-001",
+      "OVERSTD-002",
+      "OVERSTD-003",
+      "OVERSTD-004",
+      "OVERSTD-005",
+      "OVERSTD-006"
+    ],
+    "actual_anomaly_ids": [
+      "ANOMALY-L3-003-001",
+      "ANOMALY-L3-003-002",
+      "ANOMALY-L3-003-003",
+      "ANOMALY-L3-003-004"
+    ],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 0.666667,
+      "f1": 0.8,
+      "count_exact": false,
+      "expected_types": {
+        "OVERSTD": 6
+      },
+      "actual_types": {
+        "OVERSTD": 4
+      }
+    },
+    "expected_record_ids": [
+      "R004221",
+      "R004222",
+      "R004223",
+      "R004224",
+      "R004225",
+      "R004226"
+    ],
+    "actual_record_ids": [
+      "R004221",
+      "R004222",
+      "R004223",
+      "R004225"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 0.666667,
+      "f1": 0.8,
+      "exact": false,
+      "missing_count": 2,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 6,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十二条"
+      },
+      {
+        "doc_id": "04_travel_expense.md",
+        "clause_no": "第三条至第六条"
+      },
+      {
+        "doc_id": "05_training_expense.md",
+        "clause_no": "第二条至第五条"
+      },
+      {
+        "doc_id": "06_business_entertainment.md",
+        "clause_no": "第二条、第三条"
+      },
+      {
+        "doc_id": "07_office_communication.md",
+        "clause_no": "第二条、第三条"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 0.95,
+    "overall_comment": "提交结果遗漏了R004224和R004226两项应核查的超标准记录，且未对业务招待费执行人均标准核查，导致发现数量不足且部分方法不完整。；候选提交部分满足全量扫描方法要求，市内交通方法正确，但遗漏了部分超标准记录，导致核对不一致；政策引用中总则条款满足，但专项标准未完全覆盖。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 27840,
+      "completion_tokens": 4763,
+      "total_tokens": 32603,
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 26432
+    },
+    "batch_count": 2,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 14625,
+          "completion_tokens": 3162,
+          "total_tokens": 17787,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1585
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 13857
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 16
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 13215,
+          "completion_tokens": 1601,
+          "total_tokens": 14816,
+          "prompt_tokens_details": {
+            "cached_tokens": 640
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1011
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 12575
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      }
+    ]
+  },
+  "run_path": "runs/gate4_formal/pi-agent-baseline/L3-003"
+}

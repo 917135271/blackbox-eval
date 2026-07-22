@@ -1,58 +1,64 @@
 {
   "task_id": "L3-008",
-  "task_type": "near_clause_disambiguation",
-  "question": "比较差旅住宿和培训住宿标准,说明为什么不能混用。",
-  "scope": {
-    "audit_object": "差旅住宿标准 vs 培训住宿标准混用问题",
-    "expense_types": ["差旅住宿", "培训住宿"],
-    "policies": ["04_travel_expense.md", "05_training_expense.md"],
-    "period": "2025年现行制度",
-    "organization": "XX证券全体"
-  },
+  "task_scope": "比较差旅住宿和培训住宿的适用制度、标准维度和数值差异，列出培训住宿一二三类城市标准，提供同城市档位下职级差旅标准数值对照并说明不可混用原因",
+  "audit_period": "2025年1月1日起施行",
+  "policy_documents_in_scope": [
+    {"doc_id": "04_travel_expense.md", "title": "XX证券差旅费管理办法", "clause": "全部，重点关注第三章住宿标准"},
+    {"doc_id": "05_training_expense.md", "title": "XX证券培训费管理办法", "clause": "全部，重点关注第二章第五条培训住宿标准"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "title": "XX证券费用报销管理办法(2025修订版)", "clause": "第十二条无专项审批不得超制度标准"}
+  ],
   "policy_questions": [
-    "差旅住宿标准的适用条件和具体金额表是什么？",
-    "培训住宿标准的适用条件和具体金额表是什么？",
-    "两个标准各自的适用范围如何界定？",
-    "制度中是否明确禁止混用？"
+    "差旅住宿标准由哪个制度管辖？标准维度是什么？各职级各城市档位数值是多少？",
+    "培训住宿标准由哪个制度管辖？标准维度是什么？各城市档位数值是多少？",
+    "两个制度中是否存在关于住宿标准不得混用的明确规定？",
+    "同一城市档位下，培训住宿标准与各职级差旅住宿标准有哪些数值差异？"
   ],
   "data_questions": [],
-  "required_fields": [
-    "policy: 04_travel_expense.md Art 4 住宿标准表",
-    "policy: 04_travel_expense.md Art 7 培训不适用差旅表",
-    "policy: 05_training_expense.md Art 5 培训住宿标准表",
-    "policy: 05_training_expense.md Art 6 不得混用"
-  ],
+  "required_fields": {
+    "policies": ["doc_id", "title", "发文字号", "住宿标准表", "禁止混用条款"],
+    "data": []
+  },
   "evidence_requirements": [
-    "差旅住宿标准完整表格 (12个值, 4职级×3城市)",
-    "培训住宿标准完整表格 (3个值, 3城市)",
-    "禁止混用的制度条款引用"
+    "04_travel_expense.md 第四章住宿标准表（完整引用）",
+    "04_travel_expense.md 第七条培训住宿不适用本表条款",
+    "05_training_expense.md 第五条培训住宿标准表（完整引用）",
+    "05_training_expense.md 第六条不得与差旅住宿标准混用",
+    "同城市档位下至少一个职级的两制度数值对照"
   ],
   "execution_steps": [
-    "1. 已获取 04_travel_expense.md 全文，记录Art 4住宿标准和Art 7排除条款",
-    "2. 已获取 05_training_expense.md 全文，记录Art 5培训住宿标准和Art 6禁止混用条款",
-    "3. 对比两个标准的结构差异和数值差异",
-    "4. 形成结论：为什么不能混用",
-    "5. 证据覆盖检查",
-    "6. 审计报告",
-    "7. 结果校验与提交"
+    {"step": 1, "action": "制定审计计划，冻结规则与范围", "artifact": "work/audit_plan.json"},
+    {"step": 2, "action": "授权并启动policy_researcher子智能体，执行多条款制度对比", "artifact": "work/subagents/policy_researcher/"},
+    {"step": 3, "action": "汇总制度对比结果，完成调查", "artifact": "evidence_index"},
+    {"step": 4, "action": "证据覆盖检查", "artifact": "work/evidence_matrix.json"},
+    {"step": 5, "action": "生成审计报告", "artifact": "work/final_result.json"},
+    {"step": 6, "action": "结果校验", "artifact": "work/validation_report.json"},
+    {"step": 7, "action": "预检与提交", "artifact": "submission"}
   ],
-  "complexity": 1,
+  "complexity": 2,
   "complexity_reasons": [
-    "单一规则比较（两个标准的区分）",
-    "无政策版本冲突",
-    "无需聚合/分组/批量过滤",
-    "无阈值/日期/豁免边界判断",
-    "非综合审计报告"
+    "涉及两个独立制度（差旅、培训）的条款对比（+1）",
+    "涉及明确的禁止混用条款和制度边界阈值（+1）"
   ],
   "subagent_plan": {
-    "required": false,
-    "reason": "复杂度为1，主代理直接处理"
+    "selected": true,
+    "role": "policy_researcher",
+    "reason_code": "MULTI_CLAUSE_SUPPORT",
+    "context": {
+      "task": "对比差旅住宿制度和培训住宿制度的适用条款、标准维度和数值",
+      "policies": ["04_travel_expense.md", "05_training_expense.md", "01_expense_reimbursement_2025.md"],
+      "specific_tasks": [
+        "提取差旅住宿标准表（第四条）的所有职级×城市档位数值",
+        "提取培训住宿标准表（第五条）的所有城市档位数值",
+        "找出两个制度中禁止住宿标准混用的条款",
+        "提供至少一个同城市档位下培训住宿与某职级差旅住宿的数值对照"
+      ]
+    }
   },
   "stopping_conditions": [
-    "两个制度的标准表格均已完整获取",
-    "禁止混用的条款已定位引用",
-    "对比分析已覆盖标准结构差异和数值差异",
-    "结论已形成且证据充分"
+    "所有制度条款已完整提取",
+    "数值对照已覆盖至少一个城市档位和一个职级",
+    "混用禁止条款已定位",
+    "证据覆盖检查通过"
   ],
   "unresolved_items": []
 }

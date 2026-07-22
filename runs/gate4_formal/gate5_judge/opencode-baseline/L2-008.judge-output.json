@@ -1,34 +1,54 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "audit-conclusion",
-      "score": 20,
-      "reason": "结论明确识别为拆分报销，异常类型正确。",
-      "answer_evidence": "员工E0009(张婷)将同一差旅住宿事项拆分为两笔报销...违反《费用报销管理办法》第十一条禁止拆分报销的规定。",
-      "trace_evidence": ""
+      "value": 1,
+      "reason": "明确认定拆分报销",
+      "answer_evidence": "存在拆分报销异常...构成以规避部门总经理审批为目的的拆分报销行为",
+      "trace_evidence": "",
+      "source": "llm_judge"
     },
     {
-      "id": "policy-basis",
-      "score": 15,
-      "reason": "正确引用了费用报销管理办法第十一条（对应评测规则6.2），条款有效且直接支持拆分报销结论。",
-      "answer_evidence": "citations中包含doc_id 01_expense_reimbursement_2025.md clause_no 第十一条。",
-      "trace_evidence": ""
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "引用了费用报销办法第十一条",
+      "answer_evidence": "citations中包含第十一条",
+      "trace_evidence": "",
+      "source": "llm_judge"
     },
     {
-      "id": "case-reasoning",
-      "score": 20,
-      "reason": "完整给出了7天内两笔合计10200元、超过10000元审批线的关键事实和推理。",
-      "answer_evidence": "两笔报销发生在7天内(2025-04-10与2025-04-15),合计金额10200元达到《授权管理办法》附件二AR-03档位(10000元以上)审批线,但实际仅按AR-02档位审批。",
-      "trace_evidence": ""
-    }
-  ],
-  "critical_failures": [
+      "id": "policy-basis-authorization",
+      "value": 1,
+      "reason": "引用了授权管理办法附件二",
+      "answer_evidence": "citations中包含附件二",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
     {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "所有record_id均在预期内，无虚构。"
+      "id": "case-reasoning-window",
+      "value": 1,
+      "reason": "明确说明在7天窗口内",
+      "answer_evidence": "两笔日期间隔5天(在7天窗口内)",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-sum",
+      "value": 1,
+      "reason": "合计金额计算正确",
+      "answer_evidence": "合计¥10,200",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-threshold",
+      "value": 1,
+      "reason": "正确比较了合计金额与10000元审批线",
+      "answer_evidence": "合计¥10,200达到...AR-03档位(≥¥10,000)",
+      "trace_evidence": "",
+      "source": "llm_judge"
     }
   ],
-  "overall_comment": "候选正确识别拆分报销，引用条款恰当，推理完整准确。",
+  "overall_comment": "所有检查项均满足要求，通过。",
   "confidence": 1.0
 }

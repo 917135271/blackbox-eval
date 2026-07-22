@@ -3,17 +3,150 @@
     "timeout_seconds": 900
   },
   "context": {
-    "checkpoint_count": 2,
+    "checkpoint_count": 3,
     "compaction_count": 0,
-    "last_checkpoint_stage": "investigation_completed",
-    "last_usage_percent": 25.0
+    "last_checkpoint_stage": "review_ready",
+    "last_usage_percent": 35.0
   },
-  "event_sequence": 30,
+  "event_sequence": 120,
   "experiment_group": "oh-my-pi-enhanced",
   "framework": "oh-my-pi",
-  "phase": "investigation_completed",
-  "subagent_calls": {},
-  "subagent_invocations": {},
+  "phase": "review_ready",
+  "subagent_calls": {
+    "data_analyst": 1,
+    "independent_reviewer": 1
+  },
+  "subagent_invocations": {
+    "133d4a6e-4e7c-43c3-8e55-927dd1525462": {
+      "artifact_paths": [
+        "work/audit_plan.json"
+      ],
+      "artifacts": [
+        {
+          "path": "work/subagents/data_analyst/query.sql",
+          "sha256": "909009bb2aded14365f88becfc911ddf3b3e15229422967255b6c0b6497a14c6",
+          "size_bytes": 4781
+        },
+        {
+          "path": "work/subagents/data_analyst/data_findings.json",
+          "sha256": "384d4f9058be1b4feb660abf57755a0dd5c6b8c43a2e62ca0d1495b06a1cf9cc",
+          "size_bytes": 4800
+        },
+        {
+          "path": "work/subagents/data_analyst/summary.json",
+          "sha256": "c101d1890f7fe92eeff94c03637247af1bb3dcb3138269068f0d2c46e8074cb4",
+          "size_bytes": 1823
+        }
+      ],
+      "authorized_at": 1784618282.1451092,
+      "completed_at": 1784618487.277879,
+      "complexity": 2,
+      "invocation_id": "133d4a6e-4e7c-43c3-8e55-927dd1525462",
+      "reason_code": "MULTI_RECORD_SCOPE",
+      "role": "data_analyst",
+      "status": "completed",
+      "summary": {
+        "artifact_paths": [
+          "work/subagents/data_analyst/query.sql",
+          "work/subagents/data_analyst/data_findings.json",
+          "work/subagents/data_analyst/summary.json"
+        ],
+        "citations": [
+          {
+            "clause_no": "第十一条",
+            "doc_id": "01_expense_reimbursement_2025.md"
+          },
+          {
+            "clause_no": "附件二",
+            "doc_id": "03_authorization_management.md"
+          }
+        ],
+        "decision": "reject",
+        "key_findings": [
+          "同一员工E0009（张婷）在5天内提交2笔同类型travel_lodging报销：R004212（2025-04-10，¥5,100）和R004213（2025-04-15，¥5,100），符合第十一条7天窗口定义",
+          "两笔金额合计¥10,200，超过AR-03审批线¥10,000阈值，个体审批线为AR-02（¥3,000-10,000），形成阶梯跨越：个体AR-02→合计AR-03",
+          "两笔报销均由E0009本人以部门经理身份自批（AR-02级），但D009部门无部门总经理岗位，合计金额达到AR-03后缺少部门总经理审批",
+          "同一供应商（安程酒店管理有限公司）、同一事由（项目现场住宿费）、相同金额（各¥5,100）、相同天数（各7晚），存在明显拆分特征",
+          "发票独立无复用（FP2025X0004206、FP2025X0004207各使用1次），排除了重复报销但强化了拆分认定",
+          "全年2025年E0009仅2笔travel_lodging记录，均在本次7天窗口内；4月另有1笔communication（R004229，¥183），类型不同不纳入拆分分析"
+        ],
+        "record_ids": [
+          "R004212",
+          "R004213"
+        ],
+        "unresolved_items": [
+          "D009部门无部门总经理岗位——若合并为单笔¥10,200，AR-03审批人缺失。需确认上级部门总经理或分管副总的审批安排",
+          "7晚×2段=14晚连续性住宿，需确认是否为同一项目出差连续期间，或是否为两个独立出差行程"
+        ]
+      },
+      "token_budget": 5000,
+      "token_usage": {}
+    },
+    "522a18ad-ff65-4319-80ea-488573eb3d5a": {
+      "artifact_paths": [
+        "work/audit_plan.json",
+        "work/policy_applicability.json",
+        "work/evidence_matrix.json",
+        "work/subagents/data_analyst/data_findings.json"
+      ],
+      "artifacts": [
+        {
+          "path": "work/subagents/independent_reviewer/review.json",
+          "sha256": "8ddfff56c1206bf578e12c2ede30ef4f236244fa5e05a0a9eff1b09f9fb7ad0d",
+          "size_bytes": 2537
+        },
+        {
+          "path": "work/subagents/independent_reviewer/summary.json",
+          "sha256": "221c22aea0690a873344b919e7a0a2624c241f6e4f2849e35fe96cc17256ded1",
+          "size_bytes": 1677
+        }
+      ],
+      "authorized_at": 1784618544.5917542,
+      "completed_at": 1784618758.6032753,
+      "complexity": 2,
+      "invocation_id": "522a18ad-ff65-4319-80ea-488573eb3d5a",
+      "reason_code": "THRESHOLD_BOUNDARY",
+      "role": "independent_reviewer",
+      "status": "completed",
+      "summary": {
+        "artifact_paths": [
+          "work/subagents/independent_reviewer/review.json",
+          "work/subagents/independent_reviewer/summary.json"
+        ],
+        "citations": [
+          {
+            "clause_no": "第十一条",
+            "doc_id": "01_expense_reimbursement_2025.md"
+          },
+          {
+            "clause_no": "附件二",
+            "doc_id": "03_authorization_management.md"
+          }
+        ],
+        "decision": "reject",
+        "key_findings": [
+          "200-yuan margin does not exonerate: AR-03 hard boundary at >=10,000 crossed by 200 (2%); no tolerance, rounding, or de minimis clause exists",
+          "Article 11 all four conditions met: same employee E0009, same type travel_lodging, 5 days within 7-day window, combined 10,200 reaches AR-03",
+          "Date overlap: invoice dates imply stays 2025-04-03~10 and 2025-04-08~15, overlapping April 8-10 — physically impossible for one person to occupy two hotel rooms",
+          "Consecutive invoice numbers, identical vendor, identical reason, identical amounts, identical city tier — consistent with one engagement split for approval purposes",
+          "Approval tier avoidance confirmed: individual AR-02 -> combined AR-03 (requires 部门总经理 instead of 部门经理+财务复核)",
+          "Self-approval: both records approved by E0009 herself as 部门经理; AR-02 also requires 财务复核 not present",
+          "Per-night rate 728.57 within 850/night D1/A类 standard regardless of single/split treatment",
+          "No special approval or exemption applicable"
+        ],
+        "record_ids": [
+          "R004212",
+          "R004213"
+        ],
+        "unresolved_items": [
+          "Exact check-in/check-out dates not directly recorded — date overlap uses invoice dates as proxies; direct stay-date evidence would strengthen but is not required under Article 11"
+        ]
+      },
+      "token_budget": 4000,
+      "token_usage": {}
+    }
+  },
+  "subagent_rejections": {},
   "submission_attempts": 1,
   "submission_status": "accepted",
   "task_id": "L2-008"

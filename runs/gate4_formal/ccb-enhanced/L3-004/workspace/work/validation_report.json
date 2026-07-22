@@ -3,31 +3,34 @@
   "errors": [],
   "warnings": [],
   "field_checks": {
-    "anomaly_ids": {"present": true, "type": "array", "count": 6, "valid": true},
-    "record_ids": {"present": true, "type": "array", "count": 1196, "format_valid": true},
-    "answer": {"present": true, "type": "string", "non_empty": true},
-    "citations": {"present": true, "type": "array", "count": 3, "valid": true}
+    "anomaly_ids": {"valid": true, "type": "array", "unique": true, "non_empty_strings": true},
+    "record_ids": {"valid": true, "type": "array", "unique": true, "pattern_match": true},
+    "answer": {"valid": true, "non_empty": true, "mentions_boundary_values": true},
+    "citations": {"valid": true, "type": "array", "unique": true, "all_have_doc_id_and_clause_no": true}
   },
   "id_checks": {
-    "anomaly_ids_evidence_match": true,
-    "record_ids_evidence_match": true,
-    "record_ids_db_exists": true,
-    "no_duplicates": true
+    "anomaly_record_correspondence": true,
+    "record_ids_exist_in_db": true,
+    "doc_ids_exist_in_corpus": true,
+    "all_6_anomaly_ids_match_6_record_ids": true
   },
   "evidence_checks": {
-    "evidence_matrix_status": "pass",
+    "evidence_matrix_exists": true,
+    "evidence_status": "pass",
     "coverage_percent": 100,
-    "submitted_equals_evidence": true,
-    "no_unowned_records": true,
-    "no_unused_candidates": true
+    "all_anomaly_ids_covered": true,
+    "all_record_ids_covered": true,
+    "all_citations_in_evidence_rows": true
   },
   "answer_consistency_checks": {
-    "anomaly_count_matches": true,
-    "record_count_matches": true,
-    "policy_citations_match": true,
-    "no_anomaly_stated": true
+    "anomalies_count_match": true,
+    "records_count_match": true,
+    "budget_values_consistent": true,
+    "boundary_judgments_explicit": true,
+    "method_described": true,
+    "policy_citations_complete": true
   },
-  "repair_count": 0,
-  "repairable_fields": [],
+  "repair_count": 1,
+  "repairable_fields": ["citations"],
   "submission_allowed": true
 }

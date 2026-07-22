@@ -1,0 +1,40 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "L2-008-SPLIT-001",
+      "record_ids": ["R004212", "R004213"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "员工E0009（张婷）于2025-04-10提交R004212，travel_lodging类型，金额5,100元，7晚，供应商安程酒店管理有限公司，事由'项目现场住宿费'，发票FP2025X0004206",
+        "员工E0009（张婷）于2025-04-15提交R004213，travel_lodging类型，金额5,100元，7晚，供应商安程酒店管理有限公司，事由'项目现场住宿费'，发票FP2025X0004207",
+        "两笔报销日期相差5天，属于《费用报销管理办法》第十一条规定的7天拆分审查窗口内",
+        "两笔合计金额10,200元，达到《授权管理办法》附件二AR-03审批档位（≥10,000元，需部门总经理审批）",
+        "每笔单独金额5,100元，处于AR-02档位（3,000-10,000元，部门经理+财务复核），且均由E0009本人以部门经理身份自审批",
+        "同一员工、同一费用类型、同一事由、同一供应商，符合拆分报销规避更高审批权限的认定条件"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004212", "R004213"],
+  "submitted_record_ids": ["R004212", "R004213"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "R004212_amount": 5100,
+    "R004213_amount": 5100,
+    "combined_amount": 10200,
+    "date_window_days": 5,
+    "combined_approval_tier": "AR-03"
+  },
+  "unresolved_items": []
+}

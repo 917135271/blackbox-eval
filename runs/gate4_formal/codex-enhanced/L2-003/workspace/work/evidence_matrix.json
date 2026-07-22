@@ -3,15 +3,19 @@
   "coverage_percent": 100,
   "evidence_rows": [
     {
-      "anomaly_id": "DUP-R000020",
+      "anomaly_id": "ANOM-DUP-001",
       "record_ids": ["R000020", "R004203"],
       "citations": [
-        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
+        {
+          "doc_id": "01_expense_reimbursement_2025.md",
+          "clause_no": "第十条"
+        }
       ],
       "facts": [
-        "R000020使用发票FP202500000020(INV000020)报销travel_lodging费用669.5元,员工E0028杜丹,部门D009,于2025-02-28审批通过",
-        "R004203使用同一发票FP202500000020(INV000020)报销travel_lodging费用669.5元,同一员工E0028杜丹,同一部门D009,于2025-04-18审批通过",
-        "两者发票号、金额、供应商(XX供应商2706)均一致,构成同一发票重复报销"
+        "发票FP202500000020（INV000020，发票日期2025-01-05，金额669.5元，供应商XX供应商2706）同时在R000020和R004203两个报销记录中被使用",
+        "R000020：员工E0028（杜丹），财务管理部D009，费用日期2025-01-05，报销日期2025-02-28，差旅住宿费669.5元，事由'财务管理部跨部门协同赴杭州住宿费'，状态已批准",
+        "R004203：员工E0028（杜丹），财务管理部D009，费用日期2025-04-10，报销日期2025-04-18，差旅住宿费669.5元，事由'财务管理部跨部门协同赴杭州住宿费'，状态已批准",
+        "两笔报销使用完全相同的事由、相同的发票号FP202500000020、相同的发票金额669.5元，构成同一发票在不同报销单中重复出现"
       ],
       "fact_supported": true,
       "rule_supported": true,
@@ -24,10 +28,14 @@
   "unused_candidate_record_ids": [],
   "unused_citations": [],
   "missing_evidence": [],
-  "no_anomaly_coverage": {},
+  "no_anomaly_coverage": {
+    "complete": false
+  },
   "reconciled_figures": {
-    "total_duplicate_amount": 669.5,
-    "duplicate_record_count": 2
+    "total_amount": 1339.0,
+    "duplicate_amount": 669.5,
+    "invoice_count": 1,
+    "record_count": 2
   },
   "unresolved_items": []
 }

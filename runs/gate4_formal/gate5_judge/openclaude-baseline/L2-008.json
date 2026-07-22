@@ -1,138 +1,201 @@
 {
+  "group": "openclaude-baseline",
+  "task_id": "L2-008",
   "case_family": "record_audit",
-  "case_score": 100.0,
-  "case_score_raw": 100.0,
   "category": "policy_data_comparison",
-  "criteria": [
+  "graded_at": "2026-07-21T20:56:22+08:00",
+  "checklist_passed": 12,
+  "checklist_total": 12,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
     {
-      "answer_evidence": "answer中明确“发现拆分报销异常”、“构成拆分规避审批”，anomaly_ids包含SPLIT类型。",
       "id": "audit-conclusion",
-      "reason": "结论正确，识别为拆分报销异常，异常类型为SPLIT。",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "tool调用分析两笔记录并引用制度第十一条，确认拆分行为。"
-    },
-    {
-      "answer_evidence": "",
-      "id": "anomaly-id",
-      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
-      "score": 15.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    },
-    {
-      "answer_evidence": "",
-      "id": "record-set",
-      "reason": "record_ids集合F1=1.000",
-      "score": 25.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    },
-    {
-      "answer_evidence": "citations中引用了第十一条和附件二，answer中说明违反第十一条。",
-      "id": "policy-basis",
-      "reason": "引用费用报销管理办法第十一条（对应6.2）和授权管理办法附件二，条款有效且直接支持结论。",
-      "score": 15.0,
-      "source": "llm_judge",
-      "trace_evidence": "get_policy_excerpt获取第十一条内容，get_policy_doc获取附件二审批线。"
-    },
-    {
-      "answer_evidence": "answer中“金额均为5100元”、“间隔仅5天”、“合计金额10200元已达到AR-03审批线”。",
-      "id": "case-reasoning",
-      "reason": "准确陈述两笔报销金额5100元，间隔5天（7天内），合计10200元，达到AR-03审批线，数据完整。",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "get_expense_detail返回R004212和R004213的金额均为5100元，expense_date分别为2025-04-10和2025-04-15，间隔5天；get_policy_doc显示AR-03线为≥10000元。"
-    },
-    {
-      "answer_evidence": "",
-      "id": "submission",
-      "reason": "统一提交已接受且Schema有效",
-      "score": 5.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "所有提交的record_ids均存在于数据库，且与核心结论直接相关。",
-      "score_cap": 20,
+      "value": 1,
+      "reason": "answer中明确判断构成拆分报销",
+      "answer_evidence": "“该拆分行为违反...属于典型的拆分规避审批行为”",
+      "trace_evidence": "answer文本含有明确结论",
       "source": "llm_judge"
+    },
+    {
+      "id": "anomaly-type-count-rule-type",
+      "value": 1,
+      "reason": "发现规则类型完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "anomaly-type-count-count",
+      "value": 1,
+      "reason": "发现数量完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r004212",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r004213",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "引用了费用报销办法第十一条",
+      "answer_evidence": "citations中包含01_expense_reimbursement_2025.md#第十一条",
+      "trace_evidence": "get_policy_excerpt返回第十一条内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-authorization",
+      "value": 1,
+      "reason": "引用了授权管理办法附件二",
+      "answer_evidence": "citations中包含03_authorization_management.md#附件二",
+      "trace_evidence": "get_policy_doc和get_policy_excerpt返回附件二内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-window",
+      "value": 1,
+      "reason": "说明了两条记录在7天窗口内",
+      "answer_evidence": "“2025-04-10至2025-04-15（5天，7天窗口内）”",
+      "trace_evidence": "list_expenses返回两条记录的expense_date为2025-04-10和2025-04-15",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-sum",
+      "value": 1,
+      "reason": "合计金额计算正确",
+      "answer_evidence": "“合计¥10,200”",
+      "trace_evidence": "get_expense_detail返回R004212金额5100，R004213金额5100",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-threshold",
+      "value": 1,
+      "reason": "将合计金额与10000元审批线比较正确",
+      "answer_evidence": "“合计¥10,200按附件二应达AR-03（10000-49999，部门总经理）审批线”",
+      "trace_evidence": "get_policy_doc附件二显示AR-03为10000-49999",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 179.34,
+    "expected_anomaly_ids": [
+      "SPLIT-001"
+    ],
     "actual_anomaly_ids": [
       "L2-008-SPLIT-001"
+    ],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {
+        "SPLIT": 1
+      },
+      "actual_types": {
+        "SPLIT": 1
+      }
+    },
+    "expected_record_ids": [
+      "R004212",
+      "R004213"
     ],
     "actual_record_ids": [
       "R004212",
       "R004213"
     ],
-    "anomaly_metrics": {
-      "actual_types": {
-        "SPLIT": 1
-      },
-      "count_exact": true,
-      "expected_types": {
-        "SPLIT": 1
-      },
-      "f1": 1.0,
-      "precision": 1.0,
-      "recall": 1.0
-    },
-    "citation_count": 2,
-    "elapsed_seconds": 97.92,
-    "expected_anomaly_ids": [
-      "SPLIT-003"
-    ],
-    "expected_record_ids": [
-      "R004212",
-      "R004213"
-    ],
     "record_metrics": {
-      "exact": true,
-      "extra_count": 0,
-      "f1": 1.0,
-      "missing_count": 0,
       "precision": 1.0,
-      "recall": 1.0
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
     },
-    "required_citations": [
-      "clause:费用报销管理办法-6.2"
-    ],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
     "trap_tokens_in_conclusion": [],
-    "unknown_record_ids": []
+    "citation_count": 2,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T22:27:02+08:00",
-  "group": "openclaude-baseline",
   "judge": {
-    "attempt": 1,
-    "confidence": 1.0,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "候选答案正确识别了拆分报销异常，制度依据充分，推理清晰，数据准确。",
     "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "所有检查项均通过，候选答案准确识别了拆分报销异常，引用了正确制度依据，计算和比较无误。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 1728,
-      "completion_tokens_details": {
-        "reasoning_tokens": 1263
-      },
-      "prompt_cache_hit_tokens": 896,
-      "prompt_cache_miss_tokens": 4924,
-      "prompt_tokens": 5820,
-      "prompt_tokens_details": {
-        "cached_tokens": 896
-      },
-      "total_tokens": 7548
-    }
+      "prompt_tokens": 6607,
+      "completion_tokens": 1531,
+      "total_tokens": 8138,
+      "prompt_cache_hit_tokens": 6528,
+      "prompt_cache_miss_tokens": 79
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 6607,
+          "completion_tokens": 1531,
+          "total_tokens": 8138,
+          "prompt_tokens_details": {
+            "cached_tokens": 6528
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1041
+          },
+          "prompt_cache_hit_tokens": 6528,
+          "prompt_cache_miss_tokens": 79
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 6
+      }
+    ]
   },
-  "passed": true,
-  "run_path": "runs/gate4_formal/openclaude-baseline/L2-008",
-  "task_id": "L2-008"
+  "run_path": "runs/gate4_formal/openclaude-baseline/L2-008"
 }

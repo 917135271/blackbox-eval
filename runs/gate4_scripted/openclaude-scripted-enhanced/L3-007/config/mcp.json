@@ -1,0 +1,43 @@
+{
+  "mcpServers": {
+    "policy_query": {
+      "type": "stdio",
+      "command": "python3",
+      "args": [
+        "/benchmark/fixtures/policy_query_mcp.py"
+      ],
+      "env": {
+        "EVAL_POLICY_CORPUS_DIR": "/benchmark/data/corpus",
+        "EVAL_TASK_LOG": "/artifacts/tool_calls.jsonl",
+        "PYTHONIOENCODING": "utf-8"
+      }
+    },
+    "expense_query": {
+      "type": "stdio",
+      "command": "python3",
+      "args": [
+        "/benchmark/fixtures/expense_query_mcp.py"
+      ],
+      "env": {
+        "EVAL_EXPENSE_DB": "/benchmark/data/expense.db",
+        "EVAL_TASK_LOG": "/artifacts/tool_calls.jsonl",
+        "PYTHONIOENCODING": "utf-8"
+      }
+    },
+    "audit_control": {
+      "type": "stdio",
+      "command": "python3",
+      "args": [
+        "/plugin/shared/control-mcp/audit_control_mcp.py"
+      ],
+      "env": {
+        "AUDIT_TASK_ID": "${AUDIT_TASK_ID}",
+        "AUDIT_WORK_DIR": "${AUDIT_WORK_DIR}",
+        "AUDIT_SUBAGENTS_ENABLED": "1",
+        "EVAL_EXPENSE_DB": "${EVAL_EXPENSE_DB}",
+        "EVAL_POLICY_CORPUS_DIR": "${EVAL_POLICY_CORPUS_DIR}",
+        "PYTHONIOENCODING": "utf-8"
+      }
+    }
+  }
+}

@@ -1,41 +1,54 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "audit-conclusion",
-      "score": 0,
-      "reason": "结论包含非超标准异常（缺少财务复核），类型错误。",
-      "answer_evidence": "候选回答中称“发现两项超标准异常：(2)缺少财务复核审批”，该异常不是超标准。",
-      "trace_evidence": "无额外证据。"
+      "value": 1,
+      "reason": "答案明确认定R004223构成超标准",
+      "answer_evidence": "“核查发现超标准异常1项：R004223...该笔报销构成超标准违规。”",
+      "trace_evidence": "工具 get_expense_detail 返回 R004223 金额 3700，get_policy_doc 返回培训课程费标准 3500，结合答案确认超标结论。",
+      "source": "llm_judge"
     },
     {
-      "id": "anomaly-id",
-      "score": 0,
-      "reason": "未返回预期异常ID OVERSTD-003，返回了自定义ID。",
-      "answer_evidence": "submitted_json中anomaly_ids为[\"ANOMALY_L2_013_01\", \"ANOMALY_L2_013_02\"]。",
-      "trace_evidence": "无额外证据。"
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "答案引用了费用报销办法第十二条",
+      "answer_evidence": "“根据《XX证券费用报销管理办法(2025修订版)》（01_expense_reimbursement_2025.md）第十二条”",
+      "trace_evidence": "工具 get_policy_excerpt 查询“超标”返回了第十二条内容。",
+      "source": "llm_judge"
     },
     {
-      "id": "policy-basis",
-      "score": 15,
-      "reason": "引用了《费用报销管理办法》第十二条（对应6.3）和《培训费管理办法》第二条，有效支持超标准结论。",
-      "answer_evidence": "citations中包含01_expense_reimbursement_2025.md第十二条和05_training_expense.md第二条。",
-      "trace_evidence": "工具调用get_policy_doc获取了这两个文档，确认条款内容匹配。"
+      "id": "policy-basis-training",
+      "value": 1,
+      "reason": "答案引用了培训费管理办法第二条",
+      "answer_evidence": "“根据《XX证券培训费管理办法》（05_training_expense.md）第二条”",
+      "trace_evidence": "工具 get_policy_doc 获取 05_training_expense.md 全文，其中第二条为培训课程费标准。",
+      "source": "llm_judge"
     },
     {
-      "id": "case-reasoning",
-      "score": 20,
-      "reason": "完整说明了费用类型、金额、标准和超标情况，事实与计算一致。",
-      "answer_evidence": "evidence_matrix中列出R004223 training_fee 3700元，标准3500元，超标200元，无专项审批。",
-      "trace_evidence": "get_expense_detail返回金额3700，培训费标准get_policy_doc显示3500。"
+      "id": "case-reasoning-type",
+      "value": 1,
+      "reason": "费用类型识别为 training_fee",
+      "answer_evidence": "“费用类型为training_fee（培训费）”",
+      "trace_evidence": "工具 get_expense_detail 返回 expense_type: training_fee。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "报销金额识别为 3700 元",
+      "answer_evidence": "“报销外部专业培训课程费3700.00元”",
+      "trace_evidence": "工具 get_expense_detail 返回 amount: 3700.0。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-limit",
+      "value": 1,
+      "reason": "正确指出标准为 3500 元且本笔超标 200 元",
+      "answer_evidence": "“培训课程费...不超过3500元，该笔报销超出标准200元”",
+      "trace_evidence": "get_policy_doc 返回第二条“每人每期不超过3500元”，get_expense_detail 金额 3700，差额 200 正确。",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "所有record_id均存在于数据库。"
-    }
-  ],
-  "overall_comment": "候选正确识别了R004223的培训费超标准事实，但错误增加了非超标准异常且异常ID未匹配预期，导致结论和ID得分丢失。",
-  "confidence": 0.95
+  "overall_comment": "所有检查项均通过，候选提交正确识别了超标准异常并准确引用了费用报销办法第十二条和培训费管理办法第二条。",
+  "confidence": 1.0
 }

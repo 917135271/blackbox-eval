@@ -2,32 +2,47 @@
   "status": "pass",
   "coverage_percent": 100,
   "evidence_rows": [],
-  "candidate_record_ids": ["R004233", "R004234", "R004235", "R004236", "R004237", "R004238", "R004239", "R004240"],
-  "submitted_record_ids": ["R004233", "R004234", "R004235", "R004236", "R004237", "R004238", "R004239", "R004240"],
+  "candidate_record_ids": ["R004239", "R004240"],
+  "submitted_record_ids": ["R004239", "R004240"],
   "unowned_record_ids": [],
   "unused_candidate_record_ids": [],
   "unused_citations": [],
   "missing_evidence": [],
   "no_anomaly_coverage": {
     "complete": true,
-    "searched_population": "注入记录 R004201-R004240 中标记为'陷阱样本'的记录",
-    "query_conditions": "record_id IN R004233-R004240, 提取全部字段并逐条对照政策条款核查",
+    "searched_population": "R004239和R004240的业务招待费报销记录，通过get_expense_detail逐条获取详情",
+    "query_conditions": "record_id IN (R004239, R004240); invoice_no IN (FP2025X0004233, FP2025X0004234) 通过find_invoice_usage查询发票复用; department_id=D008通过get_department_budget查询预算",
     "checked_rules": [
-      {"rule": "Article 7 报销时限60天", "policy": "01_expense_reimbursement_2025.md 第七条", "result": "R004238正好60天，属于60天内，合规"},
-      {"rule": "Article 11 拆分报销7天窗口", "policy": "01_expense_reimbursement_2025.md 第十一条", "result": "R004234/235合计500元未达AR-02线；R004236/237相隔8天超过7天窗口；R004239/240合计1085元未达AR-02线；均不构成拆分"},
-      {"rule": "Article 5/授权审批 AR-02 3000元线", "policy": "03_authorization_management.md 附件二", "result": "R004233金额9990<10000正确触发AR-02；R004236/237各5200正确触发AR-02"},
-      {"rule": "旅行住宿标准", "policy": "04_travel_expense.md 第四条", "result": "R004233: 10晚×1100=11000>9990; R004236/237: 7晚×850=5950>5200; 均在标准内"},
-      {"rule": "办公室用品月度上限600元", "policy": "07_office_communication.md 第二条", "result": "E0009 2025-10 office_supplies合计500<600"},
-      {"rule": "通讯费月度上限300元", "policy": "07_office_communication.md 第三条", "result": "E0007 2025-07 communication合计220<300"},
-      {"rule": "业务招待单次≤5000元/人均≤300元", "policy": "06_business_entertainment.md 第二、三条", "result": "R004239:540/3=180<300; R004240:545/3≈182<300; 均<5000"},
-      {"rule": "Article 12 报销金额不超过制度标准", "policy": "01_expense_reimbursement_2025.md 第十二条", "result": "全部记录均在对应制度标准的1.0倍以内"}
+      {
+        "rule": "重复报销",
+        "policy": "01_expense_reimbursement_2025.md 第十条",
+        "check": "R004239发票FP2025X0004233使用次数1(仅R004239); R004240发票FP2025X0004234使用次数1(仅R004240); 两笔使用不同发票，各自独立"
+      },
+      {
+        "rule": "拆分报销",
+        "policy": "01_expense_reimbursement_2025.md 第十一条; 06_business_entertainment.md 第四条",
+        "check": "E0008(杨丹)两笔business_entertainment在7天内(10-25至10-26,间隔2天),合计1085元; 审批线: 各自均在AR-01(0-3000), 合计1085仍<AR-02(3000), 未达到较高审批线; 客户不同(甲/乙), 事由不同(产品方案交流/投行业务沟通), 不构成同一事项拆分"
+      },
+      {
+        "rule": "业务招待费超标准",
+        "policy": "06_business_entertainment.md 第二条、第三条",
+        "check": "R004239: 单次540<5000, 人均180<300; R004240: 单次545<5000, 人均181.67<300"
+      }
     ],
-    "population_count": 8,
-    "conclusion": "8条陷阱样本记录均未违反任何适用的费用报销政策条款，无异常。"
+    "population_count": 2,
+    "conclusion": "无异常。R004239与R004240使用不同发票、不同日期、不同客户、不同事由，发票各自使用1次，不构成重复报销；7天内合计金额1085元未突破AR-01审批线(3000元)，客户不同且事由不同，不构成拆分报销；两笔报销单次金额均未超5000元上限，人均金额均未超300元上限，不构成业务招待费超标准。"
   },
   "reconciled_figures": {
-    "total_records_checked": 8,
-    "total_anomalies": 0
+    "R004239_amount": 540.0,
+    "R004239_participants": 3,
+    "R004239_per_person": 180.0,
+    "R004240_amount": 545.0,
+    "R004240_participants": 3,
+    "R004240_per_person": 181.67,
+    "combined_amount": 1085.0,
+    "approval_tier_AR01_threshold": 3000,
+    "single_event_limit": 5000,
+    "per_person_limit": 300
   },
   "unresolved_items": []
 }

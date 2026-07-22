@@ -1,46 +1,70 @@
 {
-  "criteria": [
+  "checklist": [
     {
-      "id": "threshold",
-      "score": 0,
-      "reason": "回答给出的是AR-02档位（3000元≤单笔金额<10000元），未按要求提供部门总经理审批线10000元，金额错误。",
-      "answer_evidence": "“AR-02档位(3000元≤单笔金额<10000元)”",
-      "trace_evidence": ""
+      "id": "threshold-amount",
+      "value": 1,
+      "reason": "明确给出了部门总经理审批线10000元",
+      "answer_evidence": "AR-03(10000~50000元/部门总经理)",
+      "trace_evidence": "无工具调用，但答案直接列明金额",
+      "source": "llm_judge"
     },
     {
-      "id": "two-hop-path",
-      "score": 30,
-      "reason": "明确说明从费用报销管理办法第五条交叉引用到授权管理办法附件二，路径完整可复核。",
-      "answer_evidence": "“费用报销管理办法(2025修订版)第五条规定...统一按《XX证券授权管理办法》附件二执行”",
-      "trace_evidence": ""
+      "id": "threshold-inclusive",
+      "value": 1,
+      "reason": "明确说明包含10000元边界（≥10000元）",
+      "answer_evidence": "合计金额达到AR-03档位(≥10000元)",
+      "trace_evidence": "无工具调用，答案中使用了≥符号",
+      "source": "llm_judge"
     },
     {
-      "id": "citations",
-      "score": 20,
-      "reason": "正确引用了两份制度文档（费用报销管理办法和授权管理办法），证据有效。",
-      "answer_evidence": "引用“01_expense_reimbursement_2025.md 第五条”和“03_authorization_management.md 附件二”",
-      "trace_evidence": ""
+      "id": "two-hop-path-first",
+      "value": 1,
+      "reason": "识别了费用报销办法第五条为第一跳",
+      "answer_evidence": "《XX证券费用报销管理办法(2025修订版)》第五条未直接列示具体审批金额",
+      "trace_evidence": "无工具调用，但citations中包含01_expense_reimbursement_2025.md#第五条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-relation",
+      "value": 1,
+      "reason": "明确说明制度间交叉引用关系",
+      "answer_evidence": "第五条...统一按《XX证券授权管理办法》附件二执行",
+      "trace_evidence": "无工具调用，答案直接描述了引用关系",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-second",
+      "value": 1,
+      "reason": "完成了第二跳检索，定位到授权管理办法附件二",
+      "answer_evidence": "通过交叉引用附件二的费用报销审批权限表",
+      "trace_evidence": "无工具调用，但citations中包含03_authorization_management.md#附件二",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-expense",
+      "value": 1,
+      "reason": "引用了费用报销办法第五条",
+      "answer_evidence": "citations: 01_expense_reimbursement_2025.md#第五条",
+      "trace_evidence": "无工具调用，但submitted_json中citation条目存在",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-authorization",
+      "value": 1,
+      "reason": "引用了授权管理办法附件二",
+      "answer_evidence": "citations: 03_authorization_management.md#附件二",
+      "trace_evidence": "无工具调用，但submitted_json中citation条目存在",
+      "source": "llm_judge"
     },
     {
       "id": "no-premature-stop",
-      "score": 10,
-      "reason": "答案显示继续追踪到了授权管理办法附件二，未因首份制度未列金额而提前结束。",
-      "answer_evidence": "找到“授权管理办法附件二”并引用了具体内容",
-      "trace_evidence": "无轨迹记录，但答案逻辑表明未提前停止"
+      "value": 1,
+      "reason": "答案体现了从费用报销办法追踪到授权管理办法的完整检索路径，未因首份制度无金额而停止",
+      "answer_evidence": "第五条未直接列示具体审批金额,统一按《XX证券授权管理办法》附件二执行",
+      "trace_evidence": "无工具调用轨迹，但最终答案和citations证明完成了交叉引用",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": true,
-      "reason": "核心结论应为部门总经理审批线10000元，但候选回答使用95条记录支撑AR-02档位缺失财务复核的异常，记录与要求的核心结论无关。"
-    },
-    {
-      "id": "deprecated-policy-as-current",
-      "triggered": false,
-      "reason": "未使用废止制度。"
-    }
-  ],
-  "overall_comment": "回答未提供部门总经理审批线10000元，错误地聚焦于AR-02区间并进行了不必要的异常检测，触发关键失败，路径和引用部分正确但总分受限。",
-  "confidence": 0.5
+  "overall_comment": "所有检查项均满足，候选提交正确通过交叉引用给出了部门总经理审批线10000元，并明确了边界包含关系，引用了正确的制度条款。",
+  "confidence": 1.0
 }

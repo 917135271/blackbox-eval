@@ -1,0 +1,32 @@
+{
+  "decision": "pass",
+  "challenged_findings": [
+    {
+      "anomaly_id": "ANOM-001",
+      "challenge": "R900007(650元)是否因员工级别或部门经理审批获得豁免?",
+      "result": "未通过豁免。special_approval=0,无专项审批;07_office_communication.md第二条未设定员工级别分级标准;标准部门经理审批不构成月度标准豁免。"
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "challenge": "R900014(180元)+R900015(160元)=340元,两笔均为不同发票,是否可能因分开报销而各自不超标?",
+      "result": "未通过豁免。月度标准为聚合规则(每人每月),不因分笔报销而免除。两笔均无专项审批。"
+    }
+  ],
+  "boundary_checks": [
+    {"record_id": "R900008", "amount": 590, "threshold": 600, "difference": 10, "result": "未超标,确认为正常"},
+    {"record_id": "R900009", "amount": 590, "threshold": 600, "difference": 10, "result": "未超标,确认为正常"},
+    {"record_id": "R900001+R900002", "raw_total": 960, "deduplicated": 480, "threshold": 600, "result": "重复发票FPDEV900001去重后480元,未超标"}
+  ],
+  "exemption_checks": [
+    {"type": "special_approval", "result": "全部相关记录special_approval=0,无专项审批豁免"},
+    {"type": "employee_level", "result": "07_office_communication.md未设置员工级别分级标准,不区分员工级与经理级"},
+    {"type": "budget_override", "result": "月度标准为独立规则,不受部门预算影响"}
+  ],
+  "duplicate_check": {
+    "invoice": "FPDEV900001",
+    "records": ["R900001", "R900002"],
+    "handling": "去重后金额480元,不构成月度超标准;重复报销属于制度第十条问题,不在本次审计范围"
+  },
+  "required_changes": [],
+  "unresolved_conflicts": []
+}

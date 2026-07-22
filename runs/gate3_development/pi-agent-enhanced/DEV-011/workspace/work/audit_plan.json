@@ -1,0 +1,140 @@
+{
+  "task_scope": {
+    "task_id": "DEV-011",
+    "type": "aggregate_budget",
+    "audit_object": "D902部门年度预算执行",
+    "question": "核查D902部门年度预算执行，识别首次导致预算超限且没有专项审批的报销记录；专项审批记录不得误报。",
+    "department_id": "D902",
+    "budget_year": 2025
+  },
+  "audit_period": {
+    "start": "2025-01-01",
+    "end": "2025-12-31",
+    "budget_year": 2025
+  },
+  "policy_questions": [
+    {
+      "id": "PQ1",
+      "question": "D902部门年度预算额度及预算执行规则是什么？",
+      "applicable_policies": ["08_budget_management.md", "01_expense_reimbursement_2025.md"],
+      "clauses": [
+        "08_budget_management.md 第二条：各部门应在年度预算额度内发生费用",
+        "08_budget_management.md 第三条：部门费用累计使用达到年度预算额度的1.0倍后,原则上不得继续报销",
+        "08_budget_management.md 第四条：超预算支出应履行专项审批",
+        "01_expense_reimbursement_2025.md 第十三条：预算使用达到预算额度的1.0倍后,确需发生的费用应履行专项审批"
+      ]
+    },
+    {
+      "id": "PQ2",
+      "question": "专项审批的条件和认定标准是什么？",
+      "applicable_policies": ["08_budget_management.md", "01_expense_reimbursement_2025.md"],
+      "clauses": [
+        "08_budget_management.md 第四条",
+        "01_expense_reimbursement_2025.md 第十三条"
+      ]
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ1",
+      "question": "D902部门2025年度预算金额及累计使用金额？",
+      "tables": ["departments", "reimbursement_records"],
+      "fields": ["department_id", "annual_budget", "amount", "expense_date", "special_approval"]
+    },
+    {
+      "id": "DQ2",
+      "question": "按日期排序计算累计余额，找到首次超过预算的记录",
+      "tables": ["reimbursement_records"],
+      "fields": ["record_id", "amount", "expense_date", "special_approval", "status"],
+      "method": "cumulative running balance"
+    },
+    {
+      "id": "DQ3",
+      "question": "确认每个记录的专项审批状态",
+      "tables": ["reimbursement_records"],
+      "fields": ["record_id", "special_approval", "approvals"]
+    }
+  ],
+  "execution_steps": [
+    {
+      "step": 1,
+      "name": "audit_query_planning",
+      "artifact": "work/audit_plan.json",
+      "status": "completed"
+    },
+    {
+      "step": 2,
+      "name": "data_analyst_subagent",
+      "description": "授权并调用data_analyst子智能体，执行D902部门预算执行分析：获取所有approved记录，按日期排序计算累计余额，识别首次超预算记录并检查专项审批状态",
+      "subagent_role": "data_analyst",
+      "reason_code": "AGGREGATION_REQUIRED",
+      "complexity": 3,
+      "artifact": "work/subagents/data_analyst/"
+    },
+    {
+      "step": 3,
+      "name": "policy_version_check",
+      "description": "确认适用政策版本（2025版），明确预算超限和专项审批条款",
+      "artifact": "work/policy_applicability.json"
+    },
+    {
+      "step": 4,
+      "name": "evidence_coverage_check",
+      "artifact": "work/evidence_matrix.json"
+    },
+    {
+      "step": 5,
+      "name": "false_positive_review",
+      "description": "对阈值边界进行独立复核，验证R900019确为首次超预算且无专项审批，R900020有专项审批不应误报",
+      "artifact": "work/independent_review.json"
+    },
+    {
+      "step": 6,
+      "name": "audit_report",
+      "artifact": "work/final_result.json"
+    },
+    {
+      "step": 7,
+      "name": "result_validation",
+      "artifact": "work/validation_report.json"
+    },
+    {
+      "step": 8,
+      "name": "submission",
+      "tool": "submit_audit_result"
+    }
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "聚合计算（累计余额running balance）+1",
+      "阈值判定（预算超限边界）+1",
+      "批量记录过滤与排序+1"
+    ]
+  },
+  "subagent_plan": {
+    "role": "data_analyst",
+    "reason_code": "AGGREGATION_REQUIRED",
+    "complexity": 3,
+    "context": {
+      "task": "分析D902部门2025年预算执行情况。获取所有approved状态的报销记录，按expense_date排序，计算累计余额(running balance)。部门预算为¥50,000。识别首次导致累计金额超过¥50,000的记录。检查该记录是否具有special_approval（专项审批）。同时列出所有超预算记录及其special_approval状态，但只将首次超预算且无专项审批的记录作为异常。",
+      "department_id": "D902",
+      "budget_year": 2025,
+      "budget_amount": 50000,
+      "records_to_analyze": ["R900018", "R900019", "R900020"],
+      "rule": "预算使用达到年度预算额度的1.0倍后，需要专项审批。首次导致超限的记录若无专项审批即为异常。"
+    },
+    "artifact_paths": [],
+    "requested_token_budget": 4000
+  },
+  "stopping_conditions": [
+    "所有D902部门2025年approved记录已获取并排序",
+    "累计余额计算完成并确认首次超预算记录",
+    "专项审批状态已核实",
+    "有专项审批的记录已排除",
+    "证据矩阵100%覆盖",
+    "校验通过"
+  ],
+  "unresolved_items": [],
+  "subagent_note": "data_analyst was authorized (invocation_id: 3d7adde4-2379-4e1a-a763-eeb19ad3883b) but native invocation failed due to agent name mismatch (data_analyst vs data-analyst). ROLE_CALL_LIMIT prevents re-authorization. Proceeding in compact mode since main agent already has all 3 records with full detail, budget data, and policy clauses."
+}

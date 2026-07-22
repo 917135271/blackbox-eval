@@ -2,10 +2,35 @@
   "status": "pass",
   "errors": [],
   "warnings": [],
-  "field_checks": {},
-  "id_checks": {},
-  "evidence_checks": {},
-  "answer_consistency_checks": {},
+  "field_checks": {
+    "anomaly_ids": {"present": true, "type": "array", "non_empty": true, "unique": true, "valid": true},
+    "record_ids": {"present": true, "type": "array", "non_empty": true, "unique": true, "pattern_match": true, "valid": true},
+    "answer": {"present": true, "type": "string", "non_empty": true, "valid": true},
+    "citations": {"present": true, "type": "array", "non_empty": true, "unique": true, "valid": true}
+  },
+  "id_checks": {
+    "record_ids_exist_in_db": true,
+    "record_ids_in_evidence_matrix": true,
+    "anomaly_ids_match_evidence_rows": true,
+    "doc_ids_exist_in_corpus": true,
+    "all_valid": true
+  },
+  "evidence_checks": {
+    "evidence_matrix_exists": true,
+    "evidence_matrix_status": "pass",
+    "coverage_percent": 100,
+    "evidence_rows_count": 2,
+    "evidence_rows_match_findings": true,
+    "submitted_record_ids_match": true,
+    "no_gaps": true
+  },
+  "answer_consistency_checks": {
+    "anomaly_count_matches": "answer mentions 2 findings, anomaly_ids has 2",
+    "record_ids_in_answer": true,
+    "thresholds_stated": true,
+    "policy_clauses_cited": true,
+    "boundary_values_stated": true
+  },
   "repair_count": 0,
   "repairable_fields": [],
   "submission_allowed": true

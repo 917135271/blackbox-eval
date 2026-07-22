@@ -1,136 +1,191 @@
 {
+  "group": "openclaude-enhanced",
+  "task_id": "L2-013",
   "case_family": "record_audit",
-  "case_score": 100.0,
-  "case_score_raw": 100.0,
   "category": "policy_data_comparison",
-  "criteria": [
+  "graded_at": "2026-07-21T20:58:51+08:00",
+  "checklist_passed": 11,
+  "checklist_total": 11,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
     {
-      "answer_evidence": "anomaly_ids: [\"L2-013-ANM-001\"]，答案明确“超标准异常”",
       "id": "audit-conclusion",
-      "reason": "结论正确，异常类型为超标准，与预期一致",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "rule_diagnostics: precision=1.0, recall=1.0, actual_types OVERSTD:1"
-    },
-    {
-      "answer_evidence": "",
-      "id": "anomaly-id",
-      "reason": "按异常类型和数量规范化后的F1=1.000；不因候选未猜中隐藏内部编号而扣分",
-      "score": 15.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    },
-    {
-      "answer_evidence": "",
-      "id": "record-set",
-      "reason": "record_ids集合F1=1.000",
-      "score": 25.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    },
-    {
-      "answer_evidence": "citations: 01_expense_reimbursement_2025.md 第十二条，05_training_expense.md 第二条",
-      "id": "policy-basis",
-      "reason": "引用了费用报销管理办法第十二条（对应6.3）及培训费管理办法第二条，条款有效且直接支持",
-      "score": 15.0,
-      "source": "llm_judge",
-      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md 第十二条；get_policy_doc 05_training_expense.md 第二条"
-    },
-    {
-      "answer_evidence": "answer: “R004223（培训费，金额3700元）超出…3500元标准…超标200元”",
-      "id": "case-reasoning",
-      "reason": "完整说明R004223为培训费3700元，超出3500元标准，无专项审批，超标200元",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "get_expense_detail: amount 3700, expense_type training_fee；get_policy_doc 05_training_expense.md 第二条 3500元"
-    },
-    {
-      "answer_evidence": "",
-      "id": "submission",
-      "reason": "统一提交已接受且Schema有效",
-      "score": 5.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "R004223在数据库中存在，未使用无关记录",
-      "score_cap": 20,
+      "value": 1,
+      "reason": "答案明确认定超标准且无矛盾",
+      "answer_evidence": "发现1项超标准异常...构成超标准报销异常",
+      "trace_evidence": "",
       "source": "llm_judge"
+    },
+    {
+      "id": "anomaly-type-count-rule-type",
+      "value": 1,
+      "reason": "发现规则类型完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "anomaly-type-count-count",
+      "value": 1,
+      "reason": "发现数量完全匹配",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-include-r004223",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-set-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "引用了费用报销管理办法第十二条",
+      "answer_evidence": "根据《XX证券费用报销管理办法（2025修订版）》（01_expense_reimbursement_2025.md）第十二条规定...",
+      "trace_evidence": "工具调用get_policy_doc成功获取01_expense_reimbursement_2025.md文档",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-training",
+      "value": 1,
+      "reason": "引用了培训费管理办法第二条，标准3500元",
+      "answer_evidence": "根据《XX证券培训费管理办法》（05_training_expense.md）第二条规定，培训课程费按人次控制，每人每期不超过3500元",
+      "trace_evidence": "工具调用get_policy_doc获取05_training_expense.md，第二条：每人每期不超过3500元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-type",
+      "value": 1,
+      "reason": "费用类型识别为training_fee正确",
+      "answer_evidence": "费用类型为培训费（training_fee）",
+      "trace_evidence": "get_expense_detail返回expense_type: training_fee",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "报销金额3700元识别正确",
+      "answer_evidence": "报销金额3700.00元",
+      "trace_evidence": "get_expense_detail返回amount: 3700.0",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-limit",
+      "value": 1,
+      "reason": "标准3500元且比较正确",
+      "answer_evidence": "培训课程费按人次控制，每人每期不超过3500元...实际报销3700.00元超出标准3500.00元200元",
+      "trace_evidence": "get_policy_doc第五条第二条：不超过3500元；get_expense_detail amount: 3700",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 127.257,
+    "expected_anomaly_ids": [
+      "OVERSTD-001"
+    ],
     "actual_anomaly_ids": [
       "L2-013-ANM-001"
     ],
-    "actual_record_ids": [
-      "R004223"
-    ],
     "anomaly_metrics": {
-      "actual_types": {
-        "OVERSTD": 1
-      },
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
       "count_exact": true,
       "expected_types": {
         "OVERSTD": 1
       },
-      "f1": 1.0,
-      "precision": 1.0,
-      "recall": 1.0
+      "actual_types": {
+        "OVERSTD": 1
+      }
     },
-    "citation_count": 2,
-    "elapsed_seconds": 121.758,
-    "expected_anomaly_ids": [
-      "OVERSTD-003"
-    ],
     "expected_record_ids": [
       "R004223"
     ],
-    "record_metrics": {
-      "exact": true,
-      "extra_count": 0,
-      "f1": 1.0,
-      "missing_count": 0,
-      "precision": 1.0,
-      "recall": 1.0
-    },
-    "required_citations": [
-      "clause:费用报销管理办法-6.3"
+    "actual_record_ids": [
+      "R004223"
     ],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
     "trap_tokens_in_conclusion": [],
-    "unknown_record_ids": []
+    "citation_count": 2,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十二条"
+      },
+      {
+        "doc_id": "05_training_expense.md",
+        "clause_no": "第二条"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T22:28:08+08:00",
-  "group": "openclaude-enhanced",
   "judge": {
-    "attempt": 1,
-    "confidence": 1.0,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "候选答案完全正确，异常类型和记录ID匹配预期，制度引用准确，推理清晰。",
     "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选提交准确识别了超标准异常，引用制度条款正确，事实清晰，所有检查项均满足。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 1170,
-      "completion_tokens_details": {
-        "reasoning_tokens": 714
-      },
-      "prompt_cache_hit_tokens": 896,
-      "prompt_cache_miss_tokens": 4369,
-      "prompt_tokens": 5265,
-      "prompt_tokens_details": {
-        "cached_tokens": 896
-      },
-      "total_tokens": 6435
-    }
+      "prompt_tokens": 4525,
+      "completion_tokens": 2451,
+      "total_tokens": 6976,
+      "prompt_cache_hit_tokens": 4480,
+      "prompt_cache_miss_tokens": 45
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4525,
+          "completion_tokens": 2451,
+          "total_tokens": 6976,
+          "prompt_tokens_details": {
+            "cached_tokens": 4480
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1878
+          },
+          "prompt_cache_hit_tokens": 4480,
+          "prompt_cache_miss_tokens": 45
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 6
+      }
+    ]
   },
-  "passed": true,
-  "run_path": "runs/gate4_formal/openclaude-enhanced/L2-013",
-  "task_id": "L2-013"
+  "run_path": "runs/gate4_formal/openclaude-enhanced/L2-013"
 }

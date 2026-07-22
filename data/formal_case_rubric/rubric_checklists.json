@@ -1,0 +1,4209 @@
+{
+  "L1-001": [
+    {
+      "id": "current-threshold-amount",
+      "check": "给出现行部门总经理审批金额10000元",
+      "metric": "conclusion",
+      "evaluation_mode": "hybrid",
+      "expected": 10000,
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "明确给出10000元",
+      "fail_condition": "未完全满足通过条件：明确给出10000元"
+    },
+    {
+      "id": "current-threshold-inclusive",
+      "check": "说明10000元本身进入该审批档位",
+      "metric": "conclusion",
+      "evaluation_mode": "hybrid",
+      "expected": "达到10000元",
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "明确说明达到或等于10000元即适用",
+      "fail_condition": "未完全满足通过条件：明确说明达到或等于10000元即适用"
+    },
+    {
+      "id": "current-version",
+      "check": "现行版本：明确结论基于2025修订版或现行制度",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "2025修订版为现行制度",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "明确识别现行版本",
+      "fail_condition": "未完全满足通过条件：明确识别现行版本"
+    },
+    {
+      "id": "policy-citation-expense-rule",
+      "check": "引用费用报销办法第五条",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "01_expense_reimbursement_2025.md#第五条",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "引用费用报销办法第五条",
+      "fail_condition": "未完全满足通过条件：引用费用报销办法第五条"
+    },
+    {
+      "id": "policy-citation-authorization",
+      "check": "引用授权管理办法附件二",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "03_authorization_management.md#附件二",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "引用授权管理办法附件二",
+      "fail_condition": "未完全满足通过条件：引用授权管理办法附件二"
+    },
+    {
+      "id": "policy-citation-cross-reference",
+      "check": "说明两份制度的交叉引用关系",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "第五条指向附件二",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "说明审批金额由费用报销办法第五条指向授权管理办法附件二取得",
+      "fail_condition": "未完全满足通过条件：说明审批金额由费用报销办法第五条指向授权管理办法附件二取得"
+    },
+    {
+      "id": "old-value-control",
+      "check": "旧值排除：不把2022版8000元旧值当作当前标准",
+      "metric": "false_positive",
+      "evaluation_mode": "llm",
+      "expected": "8000元不得作为当前审批线",
+      "evidence_sources": [
+        "final_answer"
+      ],
+      "pass_condition": "明确排除旧值",
+      "fail_condition": "未完全满足通过条件：明确排除旧值"
+    },
+    {
+      "id": "submission",
+      "check": "统一Schema结果提交成功",
+      "metric": "format",
+      "evaluation_mode": "deterministic",
+      "expected": "submission_receipt.status=accepted",
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "提交回执状态为accepted且Schema校验通过",
+      "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
+    }
+  ],
+  "L3-006": [
+    {
+      "id": "current-value",
+      "check": "现行审批线：指出2025修订版现行值",
+      "metric": "conclusion",
+      "evaluation_mode": "hybrid",
+      "expected": "10000元",
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "现行值准确",
+      "fail_condition": "未完全满足通过条件：现行值准确"
+    },
+    {
+      "id": "deprecated-value-amount",
+      "check": "给出2022版审批线8000元",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": 8000,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "明确给出2022版金额8000元",
+      "fail_condition": "未完全满足通过条件：明确给出2022版金额8000元"
+    },
+    {
+      "id": "deprecated-value-status",
+      "check": "说明2022版已经废止",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "已废止",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "明确说明2022版不再有效",
+      "fail_condition": "未完全满足通过条件：明确说明2022版不再有效"
+    },
+    {
+      "id": "applicable-version",
+      "check": "适用版本：明确当前应采用2025修订版",
+      "metric": "reasoning",
+      "evaluation_mode": "llm",
+      "expected": "采用2025修订版，不采用2022版",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "选择正确并说明时间适用关系",
+      "fail_condition": "未完全满足通过条件：选择正确并说明时间适用关系"
+    },
+    {
+      "id": "two-version-evidence-current",
+      "check": "引用2025修订版的效力依据",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "01_expense_reimbursement_2025.md",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "引用2025修订版及其现行效力条款",
+      "fail_condition": "未完全满足通过条件：引用2025修订版及其现行效力条款"
+    },
+    {
+      "id": "two-version-evidence-deprecated",
+      "check": "引用2022版的废止依据",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "02_expense_reimbursement_2022_deprecated.md",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "引用2022版及其废止状态",
+      "fail_condition": "未完全满足通过条件：引用2022版及其废止状态"
+    },
+    {
+      "id": "two-version-evidence-amount",
+      "check": "引用授权管理办法附件二的金额依据",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "03_authorization_management.md#附件二",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "引用附件二中的10000元审批档位",
+      "fail_condition": "未完全满足通过条件：引用附件二中的10000元审批档位"
+    },
+    {
+      "id": "submission",
+      "check": "统一Schema结果提交成功",
+      "metric": "format",
+      "evaluation_mode": "deterministic",
+      "expected": "submission_receipt.status=accepted",
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "提交回执状态为accepted且Schema校验通过",
+      "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
+    }
+  ],
+  "L3-008": [
+    {
+      "id": "travel-dimensions-policy",
+      "check": "指出差旅住宿适用差旅费管理办法",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "04_travel_expense.md",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "正确识别差旅费管理办法",
+      "fail_condition": "未完全满足通过条件：正确识别差旅费管理办法"
+    },
+    {
+      "id": "travel-dimensions-job-level",
+      "check": "指出差旅住宿按员工职级区分",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "员工职级",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "明确包含员工职级维度",
+      "fail_condition": "未完全满足通过条件：明确包含员工职级维度"
+    },
+    {
+      "id": "travel-dimensions-city-tier",
+      "check": "指出差旅住宿按城市档位区分",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "城市档位",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "明确包含城市档位维度",
+      "fail_condition": "未完全满足通过条件：明确包含城市档位维度"
+    },
+    {
+      "id": "training-values-policy",
+      "check": "指出培训住宿适用培训费管理办法",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "05_training_expense.md",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "正确识别培训费管理办法",
+      "fail_condition": "未完全满足通过条件：正确识别培训费管理办法"
+    },
+    {
+      "id": "training-values-tier-a",
+      "check": "给出一类城市培训住宿标准500元/人/晚",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": 500,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "一类城市数值和单位均正确",
+      "fail_condition": "未完全满足通过条件：一类城市数值和单位均正确"
+    },
+    {
+      "id": "training-values-tier-b",
+      "check": "给出二类城市培训住宿标准420元/人/晚",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": 420,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "二类城市数值和单位均正确",
+      "fail_condition": "未完全满足通过条件：二类城市数值和单位均正确"
+    },
+    {
+      "id": "training-values-tier-c",
+      "check": "给出三类城市培训住宿标准350元/人/晚",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": 350,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "三类城市数值和单位均正确",
+      "fail_condition": "未完全满足通过条件：三类城市数值和单位均正确"
+    },
+    {
+      "id": "numeric-comparison-scenario",
+      "check": "给出一个明确的城市档位和差旅职级",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "城市档位和员工职级",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "对照场景的城市档位和差旅职级均明确",
+      "fail_condition": "未完全满足通过条件：对照场景的城市档位和差旅职级均明确"
+    },
+    {
+      "id": "numeric-comparison-travel-value",
+      "check": "给出该场景对应的差旅住宿标准",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "差旅住宿数值",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "差旅住宿标准与制度表一致",
+      "fail_condition": "未完全满足通过条件：差旅住宿标准与制度表一致"
+    },
+    {
+      "id": "numeric-comparison-training-value",
+      "check": "给出同一城市档位的培训住宿标准",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "培训住宿数值",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "培训住宿标准与制度表一致",
+      "fail_condition": "未完全满足通过条件：培训住宿标准与制度表一致"
+    },
+    {
+      "id": "numeric-comparison-same-tier",
+      "check": "两侧数值使用同一城市档位进行比较",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "同城市档位",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "培训与差旅数值属于同一城市档位",
+      "fail_condition": "未完全满足通过条件：培训与差旅数值属于同一城市档位"
+    },
+    {
+      "id": "no-mixing-scenario",
+      "check": "说明培训与差旅属于不同费用事项",
+      "metric": "reasoning",
+      "evaluation_mode": "llm",
+      "expected": "不同业务事项",
+      "evidence_sources": [
+        "final_answer"
+      ],
+      "pass_condition": "明确区分培训和差旅场景",
+      "fail_condition": "未完全满足通过条件：明确区分培训和差旅场景"
+    },
+    {
+      "id": "no-mixing-dimensions",
+      "check": "说明两套住宿标准的适用维度不同",
+      "metric": "reasoning",
+      "evaluation_mode": "llm",
+      "expected": "标准维度不同",
+      "evidence_sources": [
+        "final_answer"
+      ],
+      "pass_condition": "指出培训只按城市而差旅还按职级",
+      "fail_condition": "未完全满足通过条件：指出培训只按城市而差旅还按职级"
+    },
+    {
+      "id": "no-mixing-conclusion",
+      "check": "明确两套标准不得混用或择高套用",
+      "metric": "reasoning",
+      "evaluation_mode": "llm",
+      "expected": "不得混用",
+      "evidence_sources": [
+        "final_answer"
+      ],
+      "pass_condition": "明确作出不得混用结论",
+      "fail_condition": "未完全满足通过条件：明确作出不得混用结论"
+    },
+    {
+      "id": "comparison-evidence-travel",
+      "check": "引用差旅费管理办法第三、四、七条",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": "04_travel_expense.md#第三条、第四条、第七条",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "差旅制度及关键条款完整",
+      "fail_condition": "未完全满足通过条件：差旅制度及关键条款完整"
+    },
+    {
+      "id": "comparison-evidence-training",
+      "check": "引用培训费管理办法第五、六条",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": "05_training_expense.md#第五条、第六条",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "培训制度及关键条款完整",
+      "fail_condition": "未完全满足通过条件：培训制度及关键条款完整"
+    },
+    {
+      "id": "submission",
+      "check": "统一Schema结果提交成功",
+      "metric": "format",
+      "evaluation_mode": "deterministic",
+      "expected": "submission_receipt.status=accepted",
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "提交回执状态为accepted且Schema校验通过",
+      "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
+    }
+  ],
+  "L2-003": [
+    {
+      "id": "audit-conclusion",
+      "check": "异常结论：在answer中明确判断本案构成重复报销",
+      "metric": "conclusion",
+      "evaluation_mode": "hybrid",
+      "expected": "重复报销",
+      "evidence_sources": [
+        "final_answer"
+      ],
+      "pass_condition": "answer明确认定构成重复报销且无矛盾表述",
+      "fail_condition": "未完全满足通过条件：answer明确认定构成重复报销且无矛盾表述"
+    },
+    {
+      "id": "anomaly-type-count-rule-type",
+      "check": "发现类型为DUP",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": "DUP",
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "全部已提交发现均归属于DUP规则类型",
+      "fail_condition": "未完全满足通过条件：全部已提交发现均归属于DUP规则类型",
+      "deterministic_rule": "anomaly-rule-type-exact"
+    },
+    {
+      "id": "anomaly-type-count-count",
+      "check": "发现数量为1",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": 1,
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "已提交发现数量恰好为1",
+      "fail_condition": "未完全满足通过条件：已提交发现数量恰好为1",
+      "deterministic_rule": "anomaly-count-exact"
+    },
+    {
+      "id": "record-set-include-r000020",
+      "check": "结果包含应核查记录 R000020",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000020",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000020",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000020",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "record-set-include-r004203",
+      "check": "结果包含应核查记录 R004203",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004203",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004203",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004203",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "record-set-no-extra",
+      "check": "结果不包含本题范围外的记录",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": [
+        "R000020",
+        "R004203"
+      ],
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids除R000020, R004203外没有其他记录",
+      "fail_condition": "未完全满足通过条件：提交的record_ids除R000020, R004203外没有其他记录",
+      "deterministic_rule": "no-unexpected-records"
+    },
+    {
+      "id": "policy-basis",
+      "check": "制度依据：引用01_expense_reimbursement_2025.md 第十条并说明其适用性",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "01_expense_reimbursement_2025.md 第十条",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "条款有效且直接支持结论",
+      "fail_condition": "未完全满足通过条件：条款有效且直接支持结论"
+    },
+    {
+      "id": "case-reasoning-same-invoice",
+      "check": "说明两条记录使用同一发票",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "同一invoice_id",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "明确识别同一发票被重复使用",
+      "fail_condition": "未完全满足通过条件：明确识别同一发票被重复使用"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "check": "说明两条记录对应金额均为669.5元",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 669.5,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "金额669.5元与记录一致",
+      "fail_condition": "未完全满足通过条件：金额669.5元与记录一致"
+    },
+    {
+      "id": "submission",
+      "check": "统一Schema结果提交成功",
+      "metric": "format",
+      "evaluation_mode": "deterministic",
+      "expected": "submission_receipt.status=accepted",
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "提交回执状态为accepted且Schema校验通过",
+      "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
+    }
+  ],
+  "L2-008": [
+    {
+      "id": "audit-conclusion",
+      "check": "异常结论：在answer中明确判断本案构成拆分报销",
+      "metric": "conclusion",
+      "evaluation_mode": "hybrid",
+      "expected": "拆分报销",
+      "evidence_sources": [
+        "final_answer"
+      ],
+      "pass_condition": "answer明确认定构成拆分报销且无矛盾表述",
+      "fail_condition": "未完全满足通过条件：answer明确认定构成拆分报销且无矛盾表述"
+    },
+    {
+      "id": "anomaly-type-count-rule-type",
+      "check": "发现类型为SPLIT",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": "SPLIT",
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "全部已提交发现均归属于SPLIT规则类型",
+      "fail_condition": "未完全满足通过条件：全部已提交发现均归属于SPLIT规则类型",
+      "deterministic_rule": "anomaly-rule-type-exact"
+    },
+    {
+      "id": "anomaly-type-count-count",
+      "check": "发现数量为1",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": 1,
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "已提交发现数量恰好为1",
+      "fail_condition": "未完全满足通过条件：已提交发现数量恰好为1",
+      "deterministic_rule": "anomaly-count-exact"
+    },
+    {
+      "id": "record-set-include-r004212",
+      "check": "结果包含应核查记录 R004212",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004212",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004212",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004212",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "record-set-include-r004213",
+      "check": "结果包含应核查记录 R004213",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004213",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004213",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004213",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "record-set-no-extra",
+      "check": "结果不包含本题范围外的记录",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": [
+        "R004212",
+        "R004213"
+      ],
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids除R004212, R004213外没有其他记录",
+      "fail_condition": "未完全满足通过条件：提交的record_ids除R004212, R004213外没有其他记录",
+      "deterministic_rule": "no-unexpected-records"
+    },
+    {
+      "id": "policy-basis-expense",
+      "check": "引用费用报销办法第十一条",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "01_expense_reimbursement_2025.md#第十一条",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "引用拆分报销规则条款",
+      "fail_condition": "未完全满足通过条件：引用拆分报销规则条款"
+    },
+    {
+      "id": "policy-basis-authorization",
+      "check": "引用授权管理办法附件二",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "03_authorization_management.md#附件二",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "引用10000元审批线出处",
+      "fail_condition": "未完全满足通过条件：引用10000元审批线出处"
+    },
+    {
+      "id": "case-reasoning-window",
+      "check": "说明两条记录位于7天窗口内",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 7,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "正确计算为7天窗口内",
+      "fail_condition": "未完全满足通过条件：正确计算为7天窗口内"
+    },
+    {
+      "id": "case-reasoning-sum",
+      "check": "说明窗口内合计金额为10200元",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 10200,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "合计金额计算为10200元",
+      "fail_condition": "未完全满足通过条件：合计金额计算为10200元"
+    },
+    {
+      "id": "case-reasoning-threshold",
+      "check": "说明10200元达到并超过10000元审批线",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 10000,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "将合计金额与10000元审批线正确比较",
+      "fail_condition": "未完全满足通过条件：将合计金额与10000元审批线正确比较"
+    },
+    {
+      "id": "submission",
+      "check": "统一Schema结果提交成功",
+      "metric": "format",
+      "evaluation_mode": "deterministic",
+      "expected": "submission_receipt.status=accepted",
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "提交回执状态为accepted且Schema校验通过",
+      "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
+    }
+  ],
+  "L2-013": [
+    {
+      "id": "audit-conclusion",
+      "check": "异常结论：在answer中明确判断本案构成超标准",
+      "metric": "conclusion",
+      "evaluation_mode": "hybrid",
+      "expected": "超标准",
+      "evidence_sources": [
+        "final_answer"
+      ],
+      "pass_condition": "answer明确认定构成超标准且无矛盾表述",
+      "fail_condition": "未完全满足通过条件：answer明确认定构成超标准且无矛盾表述"
+    },
+    {
+      "id": "anomaly-type-count-rule-type",
+      "check": "发现类型为OVERSTD",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": "OVERSTD",
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "全部已提交发现均归属于OVERSTD规则类型",
+      "fail_condition": "未完全满足通过条件：全部已提交发现均归属于OVERSTD规则类型",
+      "deterministic_rule": "anomaly-rule-type-exact"
+    },
+    {
+      "id": "anomaly-type-count-count",
+      "check": "发现数量为1",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": 1,
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "已提交发现数量恰好为1",
+      "fail_condition": "未完全满足通过条件：已提交发现数量恰好为1",
+      "deterministic_rule": "anomaly-count-exact"
+    },
+    {
+      "id": "record-set-include-r004223",
+      "check": "结果包含应核查记录 R004223",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004223",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004223",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004223",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "record-set-no-extra",
+      "check": "结果不包含本题范围外的记录",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": [
+        "R004223"
+      ],
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids除R004223外没有其他记录",
+      "fail_condition": "未完全满足通过条件：提交的record_ids除R004223外没有其他记录",
+      "deterministic_rule": "no-unexpected-records"
+    },
+    {
+      "id": "policy-basis-expense",
+      "check": "引用费用报销办法第十二条",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "01_expense_reimbursement_2025.md#第十二条",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "引用超标准总则条款",
+      "fail_condition": "未完全满足通过条件：引用超标准总则条款"
+    },
+    {
+      "id": "policy-basis-training",
+      "check": "引用培训费管理办法第二条",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "05_training_expense.md#第二条",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "引用3500元培训课程费标准",
+      "fail_condition": "未完全满足通过条件：引用3500元培训课程费标准"
+    },
+    {
+      "id": "case-reasoning-type",
+      "check": "说明费用类型为training_fee",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "training_fee",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "费用类型识别正确",
+      "fail_condition": "未完全满足通过条件：费用类型识别正确"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "check": "说明报销金额为3700元",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 3700,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "报销金额识别正确",
+      "fail_condition": "未完全满足通过条件：报销金额识别正确"
+    },
+    {
+      "id": "case-reasoning-limit",
+      "check": "说明培训课程费标准为3500元且本笔超标",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 3500,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "标准及超标比较均正确",
+      "fail_condition": "未完全满足通过条件：标准及超标比较均正确"
+    },
+    {
+      "id": "submission",
+      "check": "统一Schema结果提交成功",
+      "metric": "format",
+      "evaluation_mode": "deterministic",
+      "expected": "submission_receipt.status=accepted",
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "提交回执状态为accepted且Schema校验通过",
+      "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
+    }
+  ],
+  "L3-001": [
+    {
+      "id": "finding-type-count-rule-type",
+      "check": "发现类型为DUP",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": "DUP",
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "全部已提交发现均归属于DUP规则类型",
+      "fail_condition": "未完全满足通过条件：全部已提交发现均归属于DUP规则类型",
+      "deterministic_rule": "anomaly-rule-type-exact"
+    },
+    {
+      "id": "finding-type-count-count",
+      "check": "发现数量为6",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": 6,
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "已提交发现数量恰好为6",
+      "fail_condition": "未完全满足通过条件：已提交发现数量恰好为6",
+      "deterministic_rule": "anomaly-count-exact"
+    },
+    {
+      "id": "all-record-ids-include-r000002",
+      "check": "结果包含应核查记录 R000002",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000002",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000002",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000002",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r000005",
+      "check": "结果包含应核查记录 R000005",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000005",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000005",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000005",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r000020",
+      "check": "结果包含应核查记录 R000020",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000020",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000020",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000020",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r000028",
+      "check": "结果包含应核查记录 R000028",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000028",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000028",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000028",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r000037",
+      "check": "结果包含应核查记录 R000037",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000037",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000037",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000037",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r000055",
+      "check": "结果包含应核查记录 R000055",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000055",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000055",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000055",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004201",
+      "check": "结果包含应核查记录 R004201",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004201",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004201",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004201",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004202",
+      "check": "结果包含应核查记录 R004202",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004202",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004202",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004202",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004203",
+      "check": "结果包含应核查记录 R004203",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004203",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004203",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004203",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004204",
+      "check": "结果包含应核查记录 R004204",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004204",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004204",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004204",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004205",
+      "check": "结果包含应核查记录 R004205",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004205",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004205",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004205",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004206",
+      "check": "结果包含应核查记录 R004206",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004206",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004206",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004206",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-no-extra",
+      "check": "结果不包含本题范围外的记录",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": [
+        "R000002",
+        "R000005",
+        "R000020",
+        "R000028",
+        "R000037",
+        "R000055",
+        "R004201",
+        "R004202",
+        "R004203",
+        "R004204",
+        "R004205",
+        "R004206"
+      ],
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids除R000002, R000005, R000020, R000028, R000037, R000055, R004201, R004202, R004203, R004204, R004205, R004206外没有其他记录",
+      "fail_condition": "未完全满足通过条件：提交的record_ids除R000002, R000005, R000020, R000028, R000037, R000055, R004201, R004202, R004203, R004204, R004205, R004206外没有其他记录",
+      "deterministic_rule": "no-unexpected-records"
+    },
+    {
+      "id": "finding-record-mapping-group-1",
+      "check": "核对发现记录分组R000002, R004201",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "DUP",
+        "record_ids": [
+          "R000002",
+          "R004201"
+        ]
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "记录R000002, R004201属于同一项发现",
+      "fail_condition": "未完全满足通过条件：记录R000002, R004201属于同一项发现"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "check": "核对发现记录分组R000005, R004202",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "DUP",
+        "record_ids": [
+          "R000005",
+          "R004202"
+        ]
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "记录R000005, R004202属于同一项发现",
+      "fail_condition": "未完全满足通过条件：记录R000005, R004202属于同一项发现"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "check": "核对发现记录分组R000020, R004203",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "DUP",
+        "record_ids": [
+          "R000020",
+          "R004203"
+        ]
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "记录R000020, R004203属于同一项发现",
+      "fail_condition": "未完全满足通过条件：记录R000020, R004203属于同一项发现"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "check": "核对发现记录分组R000028, R004204",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "DUP",
+        "record_ids": [
+          "R000028",
+          "R004204"
+        ]
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "记录R000028, R004204属于同一项发现",
+      "fail_condition": "未完全满足通过条件：记录R000028, R004204属于同一项发现"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "check": "核对发现记录分组R000037, R004205",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "DUP",
+        "record_ids": [
+          "R000037",
+          "R004205"
+        ]
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "记录R000037, R004205属于同一项发现",
+      "fail_condition": "未完全满足通过条件：记录R000037, R004205属于同一项发现"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "check": "核对发现记录分组R000055, R004206",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "DUP",
+        "record_ids": [
+          "R000055",
+          "R004206"
+        ]
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "记录R000055, R004206属于同一项发现",
+      "fail_condition": "未完全满足通过条件：记录R000055, R004206属于同一项发现"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "check": "轨迹证明查询覆盖全年全部记录",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "全年范围",
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "查询或脚本覆盖完整年度而非抽样记录",
+      "fail_condition": "未完全满足通过条件：查询或脚本覆盖完整年度而非抽样记录"
+    },
+    {
+      "id": "full-scan-method-invoice-key",
+      "check": "按invoice_id识别重复使用的发票",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "invoice_id",
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "查询或脚本以invoice_id作为重复判断键",
+      "fail_condition": "未完全满足通过条件：查询或脚本以invoice_id作为重复判断键"
+    },
+    {
+      "id": "full-scan-method-grouping",
+      "check": "每个重复发票组形成一项发现",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "每个重复invoice_id一项发现",
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "重复记录按发票分组且每组只形成一项发现",
+      "fail_condition": "未完全满足通过条件：重复记录按发票分组且每组只形成一项发现"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "check": "查询结果与最终提交数量能够核对一致",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 6,
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "中间统计为6组且与最终6项发现一致",
+      "fail_condition": "未完全满足通过条件：中间统计为6组且与最终6项发现一致"
+    },
+    {
+      "id": "policy-basis",
+      "check": "制度依据：引用01_expense_reimbursement_2025.md 第十条并将规则落实到查询条件",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "01_expense_reimbursement_2025.md 第十条",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "条款和查询条件对应",
+      "fail_condition": "未完全满足通过条件：条款和查询条件对应"
+    },
+    {
+      "id": "submission",
+      "check": "统一Schema结果提交成功",
+      "metric": "format",
+      "evaluation_mode": "deterministic",
+      "expected": "submission_receipt.status=accepted",
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "提交回执状态为accepted且Schema校验通过",
+      "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
+    }
+  ],
+  "L3-003": [
+    {
+      "id": "finding-type-count-rule-type",
+      "check": "发现类型为OVERSTD",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": "OVERSTD",
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "全部已提交发现均归属于OVERSTD规则类型",
+      "fail_condition": "未完全满足通过条件：全部已提交发现均归属于OVERSTD规则类型",
+      "deterministic_rule": "anomaly-rule-type-exact"
+    },
+    {
+      "id": "finding-type-count-count",
+      "check": "发现数量为6",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": 6,
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "已提交发现数量恰好为6",
+      "fail_condition": "未完全满足通过条件：已提交发现数量恰好为6",
+      "deterministic_rule": "anomaly-count-exact"
+    },
+    {
+      "id": "all-record-ids-include-r004221",
+      "check": "结果包含应核查记录 R004221",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004221",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004221",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004221",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004222",
+      "check": "结果包含应核查记录 R004222",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004222",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004222",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004222",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004223",
+      "check": "结果包含应核查记录 R004223",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004223",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004223",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004223",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004224",
+      "check": "结果包含应核查记录 R004224",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004224",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004224",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004224",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004225",
+      "check": "结果包含应核查记录 R004225",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004225",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004225",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004225",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004226",
+      "check": "结果包含应核查记录 R004226",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004226",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004226",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004226",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-no-extra",
+      "check": "结果不包含本题范围外的记录",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": [
+        "R004221",
+        "R004222",
+        "R004223",
+        "R004224",
+        "R004225",
+        "R004226"
+      ],
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids除R004221, R004222, R004223, R004224, R004225, R004226外没有其他记录",
+      "fail_condition": "未完全满足通过条件：提交的record_ids除R004221, R004222, R004223, R004224, R004225, R004226外没有其他记录",
+      "deterministic_rule": "no-unexpected-records"
+    },
+    {
+      "id": "finding-record-mapping-group-1",
+      "check": "核对发现记录分组R004221",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "OVERSTD",
+        "record_ids": [
+          "R004221"
+        ]
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "记录R004221属于同一项发现",
+      "fail_condition": "未完全满足通过条件：记录R004221属于同一项发现"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "check": "核对发现记录分组R004222",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "OVERSTD",
+        "record_ids": [
+          "R004222"
+        ]
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "记录R004222属于同一项发现",
+      "fail_condition": "未完全满足通过条件：记录R004222属于同一项发现"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "check": "核对发现记录分组R004223",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "OVERSTD",
+        "record_ids": [
+          "R004223"
+        ]
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "记录R004223属于同一项发现",
+      "fail_condition": "未完全满足通过条件：记录R004223属于同一项发现"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "check": "核对发现记录分组R004224",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "OVERSTD",
+        "record_ids": [
+          "R004224"
+        ]
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "记录R004224属于同一项发现",
+      "fail_condition": "未完全满足通过条件：记录R004224属于同一项发现"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "check": "核对发现记录分组R004225",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "OVERSTD",
+        "record_ids": [
+          "R004225"
+        ]
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "记录R004225属于同一项发现",
+      "fail_condition": "未完全满足通过条件：记录R004225属于同一项发现"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "check": "核对发现记录分组R004226",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "OVERSTD",
+        "record_ids": [
+          "R004226"
+        ]
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "记录R004226属于同一项发现",
+      "fail_condition": "未完全满足通过条件：记录R004226属于同一项发现"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "check": "轨迹证明查询覆盖全年全部记录",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "全年范围",
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "查询或脚本覆盖完整年度而非抽样记录",
+      "fail_condition": "未完全满足通过条件：查询或脚本覆盖完整年度而非抽样记录"
+    },
+    {
+      "id": "full-scan-method-approval",
+      "check": "超标准判断排除已有专项审批的记录",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "special_approval=0",
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "查询或脚本仅将无专项审批的超标准记录计为异常",
+      "fail_condition": "未完全满足通过条件：查询或脚本仅将无专项审批的超标准记录计为异常"
+    },
+    {
+      "id": "full-scan-method-office",
+      "check": "办公用品按单笔600元口径核查",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 600,
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "办公用品仅在单笔金额超过600元时计入",
+      "fail_condition": "未完全满足通过条件：办公用品仅在单笔金额超过600元时计入"
+    },
+    {
+      "id": "full-scan-method-communication",
+      "check": "通讯费用按单笔300元口径核查",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 300,
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "通讯费用仅在单笔金额超过300元时计入",
+      "fail_condition": "未完全满足通过条件：通讯费用仅在单笔金额超过300元时计入"
+    },
+    {
+      "id": "full-scan-method-training",
+      "check": "培训课程费按单次3500元口径核查",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 3500,
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "培训课程费仅在单次金额超过3500元时计入",
+      "fail_condition": "未完全满足通过条件：培训课程费仅在单次金额超过3500元时计入"
+    },
+    {
+      "id": "full-scan-method-entertainment",
+      "check": "业务招待费同时核查单次和人均标准",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": [
+        5000,
+        300
+      ],
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "业务招待费按单次5000元和人均300元两个标准核查",
+      "fail_condition": "未完全满足通过条件：业务招待费按单次5000元和人均300元两个标准核查"
+    },
+    {
+      "id": "full-scan-method-travel",
+      "check": "差旅住宿按职级、城市和晚数计算",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "职级×城市档位×晚数",
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "差旅住宿标准同时使用员工职级、城市档位和住宿晚数",
+      "fail_condition": "未完全满足通过条件：差旅住宿标准同时使用员工职级、城市档位和住宿晚数"
+    },
+    {
+      "id": "full-scan-method-transport",
+      "check": "市内交通按城市和天数计算",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "城市档位×天数",
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "市内交通标准同时使用城市档位和出差天数",
+      "fail_condition": "未完全满足通过条件：市内交通标准同时使用城市档位和出差天数"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "check": "查询结果与最终提交数量能够核对一致",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 6,
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "中间统计为6条且与最终6项发现一致",
+      "fail_condition": "未完全满足通过条件：中间统计为6条且与最终6项发现一致"
+    },
+    {
+      "id": "policy-basis-expense",
+      "check": "引用费用报销办法第十二条",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "01_expense_reimbursement_2025.md#第十二条",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "引用超标准总则条款",
+      "fail_condition": "未完全满足通过条件：引用超标准总则条款"
+    },
+    {
+      "id": "policy-basis-special",
+      "check": "引用各费用类型对应的专项标准",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "04至07号专项费用标准",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "专项标准与查询条件对应",
+      "fail_condition": "未完全满足通过条件：专项标准与查询条件对应"
+    },
+    {
+      "id": "submission",
+      "check": "统一Schema结果提交成功",
+      "metric": "format",
+      "evaluation_mode": "deterministic",
+      "expected": "submission_receipt.status=accepted",
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "提交回执状态为accepted且Schema校验通过",
+      "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
+    }
+  ],
+  "L3-004": [
+    {
+      "id": "finding-type-count-rule-type",
+      "check": "发现类型为BUDGET",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": "BUDGET",
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "全部已提交发现均归属于BUDGET规则类型",
+      "fail_condition": "未完全满足通过条件：全部已提交发现均归属于BUDGET规则类型",
+      "deterministic_rule": "anomaly-rule-type-exact"
+    },
+    {
+      "id": "finding-type-count-count",
+      "check": "发现数量为6",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": 6,
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "已提交发现数量恰好为6",
+      "fail_condition": "未完全满足通过条件：已提交发现数量恰好为6",
+      "deterministic_rule": "anomaly-count-exact"
+    },
+    {
+      "id": "all-record-ids-include-r000079",
+      "check": "结果包含应核查记录 R000079",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000079",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000079",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000079",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r000312",
+      "check": "结果包含应核查记录 R000312",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000312",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000312",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000312",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r000894",
+      "check": "结果包含应核查记录 R000894",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000894",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000894",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000894",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r002009",
+      "check": "结果包含应核查记录 R002009",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R002009",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R002009",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R002009",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r003479",
+      "check": "结果包含应核查记录 R003479",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R003479",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R003479",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R003479",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r003968",
+      "check": "结果包含应核查记录 R003968",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R003968",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R003968",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R003968",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-no-extra",
+      "check": "结果不包含本题范围外的记录",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": [
+        "R000079",
+        "R000312",
+        "R000894",
+        "R002009",
+        "R003479",
+        "R003968"
+      ],
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids除R000079, R000312, R000894, R002009, R003479, R003968外没有其他记录",
+      "fail_condition": "未完全满足通过条件：提交的record_ids除R000079, R000312, R000894, R002009, R003479, R003968外没有其他记录",
+      "deterministic_rule": "no-unexpected-records"
+    },
+    {
+      "id": "finding-record-mapping-group-1",
+      "check": "核对D001部门的关键记录R000079",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "BUDGET",
+        "record_ids": [
+          "R000079"
+        ],
+        "department_id": "D001"
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "D001部门与关键记录R000079对应正确",
+      "fail_condition": "未完全满足通过条件：D001部门与关键记录R000079对应正确"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "check": "核对D002部门的关键记录R002009",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "BUDGET",
+        "record_ids": [
+          "R002009"
+        ],
+        "department_id": "D002"
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "D002部门与关键记录R002009对应正确",
+      "fail_condition": "未完全满足通过条件：D002部门与关键记录R002009对应正确"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "check": "核对D003部门的关键记录R003968",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "BUDGET",
+        "record_ids": [
+          "R003968"
+        ],
+        "department_id": "D003"
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "D003部门与关键记录R003968对应正确",
+      "fail_condition": "未完全满足通过条件：D003部门与关键记录R003968对应正确"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "check": "核对D004部门的关键记录R000894",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "BUDGET",
+        "record_ids": [
+          "R000894"
+        ],
+        "department_id": "D004"
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "D004部门与关键记录R000894对应正确",
+      "fail_condition": "未完全满足通过条件：D004部门与关键记录R000894对应正确"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "check": "核对D005部门的关键记录R003479",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "BUDGET",
+        "record_ids": [
+          "R003479"
+        ],
+        "department_id": "D005"
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "D005部门与关键记录R003479对应正确",
+      "fail_condition": "未完全满足通过条件：D005部门与关键记录R003479对应正确"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "check": "核对D006部门的关键记录R000312",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "rule_type": "BUDGET",
+        "record_ids": [
+          "R000312"
+        ],
+        "department_id": "D006"
+      },
+      "evidence_sources": [
+        "final_answer",
+        "workspace_artifact",
+        "tool_trace"
+      ],
+      "pass_condition": "D006部门与关键记录R000312对应正确",
+      "fail_condition": "未完全满足通过条件：D006部门与关键记录R000312对应正确"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "check": "轨迹证明按部门覆盖全年预算执行记录",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "全年范围",
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "查询或脚本覆盖全部部门的年度记录而非抽样部门",
+      "fail_condition": "未完全满足通过条件：查询或脚本覆盖全部部门的年度记录而非抽样部门"
+    },
+    {
+      "id": "full-scan-method-grouping",
+      "check": "费用按department_id分别累计",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "department_id",
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "累计计算以department_id分组",
+      "fail_condition": "未完全满足通过条件：累计计算以department_id分组"
+    },
+    {
+      "id": "full-scan-method-ordering",
+      "check": "部门内按reimburse_date和record_id稳定排序",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": [
+        "reimburse_date",
+        "record_id"
+      ],
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "累计顺序先按reimburse_date再按record_id",
+      "fail_condition": "未完全满足通过条件：累计顺序先按reimburse_date再按record_id"
+    },
+    {
+      "id": "full-scan-method-cumulative",
+      "check": "逐笔累计已批准费用amount",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "累计amount",
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "每条关键记录的报销前后累计金额可复核",
+      "fail_condition": "未完全满足通过条件：每条关键记录的报销前后累计金额可复核"
+    },
+    {
+      "id": "full-scan-method-crossing",
+      "check": "选择累计首次超预算且无专项审批的记录",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "cumulative>annual_budget且special_approval=0",
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "关键记录同时满足累计超过年度预算和无专项审批",
+      "fail_condition": "未完全满足通过条件：关键记录同时满足累计超过年度预算和无专项审批"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "check": "每个超预算部门一项且数量与提交一致",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 6,
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "中间统计为6个部门且与最终6项发现一致",
+      "fail_condition": "未完全满足通过条件：中间统计为6个部门且与最终6项发现一致"
+    },
+    {
+      "id": "policy-basis-expense",
+      "check": "引用费用报销办法第十三条",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "01_expense_reimbursement_2025.md#第十三条",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "引用超预算总则条款",
+      "fail_condition": "未完全满足通过条件：引用超预算总则条款"
+    },
+    {
+      "id": "policy-basis-budget",
+      "check": "引用预算管理办法第二至第四条",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "08_budget_management.md#第二条至第四条",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "引用预算约束及专项审批条款",
+      "fail_condition": "未完全满足通过条件：引用预算约束及专项审批条款"
+    },
+    {
+      "id": "submission",
+      "check": "统一Schema结果提交成功",
+      "metric": "format",
+      "evaluation_mode": "deterministic",
+      "expected": "submission_receipt.status=accepted",
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "提交回执状态为accepted且Schema校验通过",
+      "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
+    }
+  ],
+  "TRAP-002": [
+    {
+      "id": "clean-conclusion",
+      "check": "无异常结论：明确判断本题记录不构成异常",
+      "metric": "conclusion",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "anomaly_ids": [],
+        "conclusion": "无异常"
+      },
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "明确无异常且无矛盾表述",
+      "fail_condition": "未完全满足通过条件：明确无异常且无矛盾表述"
+    },
+    {
+      "id": "record-scope-include-r004234",
+      "check": "结果包含应核查记录 R004234",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004234",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004234",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004234",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "record-scope-include-r004235",
+      "check": "结果包含应核查记录 R004235",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004235",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004235",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004235",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "record-scope-no-extra",
+      "check": "结果不包含本题范围外的记录",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": [
+        "R004234",
+        "R004235"
+      ],
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids除R004234, R004235外没有其他记录",
+      "fail_condition": "未完全满足通过条件：提交的record_ids除R004234, R004235外没有其他记录",
+      "deterministic_rule": "no-unexpected-records"
+    },
+    {
+      "id": "case-specific-reason-invoice",
+      "check": "说明两条记录发票不同",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "发票不同",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "准确说明不构成重复发票",
+      "fail_condition": "未完全满足通过条件：准确说明不构成重复发票"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "check": "说明7天内合计金额为500元",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 500,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "准确计算7天内合计500元",
+      "fail_condition": "未完全满足通过条件：准确计算7天内合计500元"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "check": "说明500元未达到10000元审批线",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 10000,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "正确比较合计金额与审批线",
+      "fail_condition": "未完全满足通过条件：正确比较合计金额与审批线"
+    },
+    {
+      "id": "reverse-check-invoice",
+      "check": "轨迹中独立核验：说明两条记录发票不同",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": "发票不同",
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "工具轨迹或工作产物包含数据来源或计算过程，并证明准确说明不构成重复发票",
+      "fail_condition": "未完全满足通过条件：工具轨迹或工作产物包含数据来源或计算过程，并证明准确说明不构成重复发票"
+    },
+    {
+      "id": "reverse-check-sum",
+      "check": "轨迹中独立核验：说明7天内合计金额为500元",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": 500,
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "工具轨迹或工作产物包含数据来源或计算过程，并证明准确计算7天内合计500元",
+      "fail_condition": "未完全满足通过条件：工具轨迹或工作产物包含数据来源或计算过程，并证明准确计算7天内合计500元"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "check": "轨迹中独立核验：说明500元未达到10000元审批线",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": 10000,
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "工具轨迹或工作产物包含数据来源或计算过程，并证明正确比较合计金额与审批线",
+      "fail_condition": "未完全满足通过条件：工具轨迹或工作产物包含数据来源或计算过程，并证明正确比较合计金额与审批线"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "check": "引用本题所需制度依据：01_expense_reimbursement_2025.md#第十条、第十一条",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条、第十一条"
+      },
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "准确引用01_expense_reimbursement_2025.md#第十条、第十一条",
+      "fail_condition": "未完全满足通过条件：准确引用01_expense_reimbursement_2025.md#第十条、第十一条"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "check": "引用本题所需制度依据：03_authorization_management.md#附件二",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      },
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "准确引用03_authorization_management.md#附件二",
+      "fail_condition": "未完全满足通过条件：准确引用03_authorization_management.md#附件二"
+    },
+    {
+      "id": "no-unsupported-output",
+      "check": "结构化结果不提交任何异常ID",
+      "metric": "false_positive",
+      "evaluation_mode": "deterministic",
+      "expected": {
+        "anomaly_ids": []
+      },
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "anomaly_ids为空",
+      "fail_condition": "未完全满足通过条件：anomaly_ids为空",
+      "deterministic_rule": "no-anomaly-ids"
+    },
+    {
+      "id": "submission",
+      "check": "统一Schema结果提交成功",
+      "metric": "format",
+      "evaluation_mode": "deterministic",
+      "expected": "submission_receipt.status=accepted",
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "提交回执状态为accepted且Schema校验通过",
+      "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
+    }
+  ],
+  "TRAP-003": [
+    {
+      "id": "clean-conclusion",
+      "check": "无异常结论：明确判断本题记录不构成异常",
+      "metric": "conclusion",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "anomaly_ids": [],
+        "conclusion": "无异常"
+      },
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "明确无异常且无矛盾表述",
+      "fail_condition": "未完全满足通过条件：明确无异常且无矛盾表述"
+    },
+    {
+      "id": "record-scope-include-r004236",
+      "check": "结果包含应核查记录 R004236",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004236",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004236",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004236",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "record-scope-include-r004237",
+      "check": "结果包含应核查记录 R004237",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004237",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004237",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004237",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "record-scope-no-extra",
+      "check": "结果不包含本题范围外的记录",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": [
+        "R004236",
+        "R004237"
+      ],
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids除R004236, R004237外没有其他记录",
+      "fail_condition": "未完全满足通过条件：提交的record_ids除R004236, R004237外没有其他记录",
+      "deterministic_rule": "no-unexpected-records"
+    },
+    {
+      "id": "case-specific-reason-gap",
+      "check": "说明两条费用发生日期相隔8天",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 8,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "日期间隔计算为8天",
+      "fail_condition": "未完全满足通过条件：日期间隔计算为8天"
+    },
+    {
+      "id": "case-specific-reason-window",
+      "check": "说明8天超出7天聚合窗口",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 7,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "正确应用7天窗口边界",
+      "fail_condition": "未完全满足通过条件：正确应用7天窗口边界"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "check": "说明两条记录合计金额为10400元",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 10400,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "准确计算合计金额10400元",
+      "fail_condition": "未完全满足通过条件：准确计算合计金额10400元"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "check": "说明10400元虽达到10000元审批线但因超窗不构成拆分",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 10000,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "正确说明金额条件满足但时间窗口条件不满足",
+      "fail_condition": "未完全满足通过条件：正确说明金额条件满足但时间窗口条件不满足"
+    },
+    {
+      "id": "reverse-check-gap",
+      "check": "轨迹中独立核验：说明两条费用发生日期相隔8天",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": 8,
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "工具轨迹或工作产物包含数据来源或计算过程，并证明日期间隔计算为8天",
+      "fail_condition": "未完全满足通过条件：工具轨迹或工作产物包含数据来源或计算过程，并证明日期间隔计算为8天"
+    },
+    {
+      "id": "reverse-check-window",
+      "check": "轨迹中独立核验：说明8天超出7天聚合窗口",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": 7,
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "工具轨迹或工作产物包含数据来源或计算过程，并证明正确应用7天窗口边界",
+      "fail_condition": "未完全满足通过条件：工具轨迹或工作产物包含数据来源或计算过程，并证明正确应用7天窗口边界"
+    },
+    {
+      "id": "reverse-check-sum",
+      "check": "轨迹中独立核验：说明两条记录合计金额为10400元",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": 10400,
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "工具轨迹或工作产物包含数据来源或计算过程，并证明准确计算合计金额10400元",
+      "fail_condition": "未完全满足通过条件：工具轨迹或工作产物包含数据来源或计算过程，并证明准确计算合计金额10400元"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "check": "轨迹中独立核验：说明10400元虽达到10000元审批线但因超窗不构成拆分",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": 10000,
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "工具轨迹或工作产物包含数据来源或计算过程，并证明正确说明金额条件满足但时间窗口条件不满足",
+      "fail_condition": "未完全满足通过条件：工具轨迹或工作产物包含数据来源或计算过程，并证明正确说明金额条件满足但时间窗口条件不满足"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "check": "引用本题所需制度依据：01_expense_reimbursement_2025.md#第十一条",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条"
+      },
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "准确引用01_expense_reimbursement_2025.md#第十一条",
+      "fail_condition": "未完全满足通过条件：准确引用01_expense_reimbursement_2025.md#第十一条"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "check": "引用本题所需制度依据：03_authorization_management.md#附件二",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      },
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "准确引用03_authorization_management.md#附件二",
+      "fail_condition": "未完全满足通过条件：准确引用03_authorization_management.md#附件二"
+    },
+    {
+      "id": "no-unsupported-output",
+      "check": "结构化结果不提交任何异常ID",
+      "metric": "false_positive",
+      "evaluation_mode": "deterministic",
+      "expected": {
+        "anomaly_ids": []
+      },
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "anomaly_ids为空",
+      "fail_condition": "未完全满足通过条件：anomaly_ids为空",
+      "deterministic_rule": "no-anomaly-ids"
+    },
+    {
+      "id": "submission",
+      "check": "统一Schema结果提交成功",
+      "metric": "format",
+      "evaluation_mode": "deterministic",
+      "expected": "submission_receipt.status=accepted",
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "提交回执状态为accepted且Schema校验通过",
+      "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
+    }
+  ],
+  "TRAP-005": [
+    {
+      "id": "clean-conclusion",
+      "check": "无异常结论：明确判断本题记录不构成异常",
+      "metric": "conclusion",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "anomaly_ids": [],
+        "conclusion": "无异常"
+      },
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "明确无异常且无矛盾表述",
+      "fail_condition": "未完全满足通过条件：明确无异常且无矛盾表述"
+    },
+    {
+      "id": "record-scope-include-r004239",
+      "check": "结果包含应核查记录 R004239",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004239",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004239",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004239",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "record-scope-include-r004240",
+      "check": "结果包含应核查记录 R004240",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004240",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004240",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004240",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "record-scope-no-extra",
+      "check": "结果不包含本题范围外的记录",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": [
+        "R004239",
+        "R004240"
+      ],
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids除R004239, R004240外没有其他记录",
+      "fail_condition": "未完全满足通过条件：提交的record_ids除R004239, R004240外没有其他记录",
+      "deterministic_rule": "no-unexpected-records"
+    },
+    {
+      "id": "case-specific-reason-business-context",
+      "check": "说明两条记录对应不同客户和不同业务事项",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": [
+        "客户甲产品方案交流",
+        "客户乙投行业务沟通"
+      ],
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "准确区分两次独立业务活动",
+      "fail_condition": "未完全满足通过条件：准确区分两次独立业务活动"
+    },
+    {
+      "id": "case-specific-reason-date-window",
+      "check": "说明两条费用发生日期相隔1天并完成窗口核查",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 1,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "准确核对日期间隔及7天窗口",
+      "fail_condition": "未完全满足通过条件：准确核对日期间隔及7天窗口"
+    },
+    {
+      "id": "case-specific-reason-invoice",
+      "check": "说明两条记录发票不同",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "发票不同",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "准确排除重复发票",
+      "fail_condition": "未完全满足通过条件：准确排除重复发票"
+    },
+    {
+      "id": "case-specific-reason-amounts",
+      "check": "给出单次金额540元和545元",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": [
+        540,
+        545
+      ],
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "两笔金额均准确",
+      "fail_condition": "未完全满足通过条件：两笔金额均准确"
+    },
+    {
+      "id": "case-specific-reason-participants",
+      "check": "说明两次活动均为3人",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 3,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "参与人数准确",
+      "fail_condition": "未完全满足通过条件：参与人数准确"
+    },
+    {
+      "id": "case-specific-reason-per-capita",
+      "check": "计算人均180元和约181.67元",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": [
+        180,
+        181.67
+      ],
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "两笔人均金额均准确",
+      "fail_condition": "未完全满足通过条件：两笔人均金额均准确"
+    },
+    {
+      "id": "case-specific-reason-standard",
+      "check": "说明单次金额和人均金额均未超过招待费标准",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": [
+        5000,
+        300
+      ],
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "正确比较单次5000元和人均300元标准",
+      "fail_condition": "未完全满足通过条件：正确比较单次5000元和人均300元标准"
+    },
+    {
+      "id": "case-specific-reason-split",
+      "check": "说明两笔合计未达到10000元审批线",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": 10000,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "正确排除拆分规避审批",
+      "fail_condition": "未完全满足通过条件：正确排除拆分规避审批"
+    },
+    {
+      "id": "reverse-check-business-context",
+      "check": "轨迹中独立核验：说明两条记录对应不同客户和不同业务事项",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": [
+        "客户甲产品方案交流",
+        "客户乙投行业务沟通"
+      ],
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "工具轨迹或工作产物包含数据来源或计算过程，并证明准确区分两次独立业务活动",
+      "fail_condition": "未完全满足通过条件：工具轨迹或工作产物包含数据来源或计算过程，并证明准确区分两次独立业务活动"
+    },
+    {
+      "id": "reverse-check-date-window",
+      "check": "轨迹中独立核验：说明两条费用发生日期相隔1天并完成窗口核查",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": 1,
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "工具轨迹或工作产物包含数据来源或计算过程，并证明准确核对日期间隔及7天窗口",
+      "fail_condition": "未完全满足通过条件：工具轨迹或工作产物包含数据来源或计算过程，并证明准确核对日期间隔及7天窗口"
+    },
+    {
+      "id": "reverse-check-invoice",
+      "check": "轨迹中独立核验：说明两条记录发票不同",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": "发票不同",
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "工具轨迹或工作产物包含数据来源或计算过程，并证明准确排除重复发票",
+      "fail_condition": "未完全满足通过条件：工具轨迹或工作产物包含数据来源或计算过程，并证明准确排除重复发票"
+    },
+    {
+      "id": "reverse-check-amounts",
+      "check": "轨迹中独立核验：给出单次金额540元和545元",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": [
+        540,
+        545
+      ],
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "工具轨迹或工作产物包含数据来源或计算过程，并证明两笔金额均准确",
+      "fail_condition": "未完全满足通过条件：工具轨迹或工作产物包含数据来源或计算过程，并证明两笔金额均准确"
+    },
+    {
+      "id": "reverse-check-participants",
+      "check": "轨迹中独立核验：说明两次活动均为3人",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": 3,
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "工具轨迹或工作产物包含数据来源或计算过程，并证明参与人数准确",
+      "fail_condition": "未完全满足通过条件：工具轨迹或工作产物包含数据来源或计算过程，并证明参与人数准确"
+    },
+    {
+      "id": "reverse-check-per-capita",
+      "check": "轨迹中独立核验：计算人均180元和约181.67元",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": [
+        180,
+        181.67
+      ],
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "工具轨迹或工作产物包含数据来源或计算过程，并证明两笔人均金额均准确",
+      "fail_condition": "未完全满足通过条件：工具轨迹或工作产物包含数据来源或计算过程，并证明两笔人均金额均准确"
+    },
+    {
+      "id": "reverse-check-standard",
+      "check": "轨迹中独立核验：说明单次金额和人均金额均未超过招待费标准",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": [
+        5000,
+        300
+      ],
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "工具轨迹或工作产物包含数据来源或计算过程，并证明正确比较单次5000元和人均300元标准",
+      "fail_condition": "未完全满足通过条件：工具轨迹或工作产物包含数据来源或计算过程，并证明正确比较单次5000元和人均300元标准"
+    },
+    {
+      "id": "reverse-check-split",
+      "check": "轨迹中独立核验：说明两笔合计未达到10000元审批线",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": 10000,
+      "evidence_sources": [
+        "tool_trace",
+        "workspace_artifact"
+      ],
+      "pass_condition": "工具轨迹或工作产物包含数据来源或计算过程，并证明正确排除拆分规避审批",
+      "fail_condition": "未完全满足通过条件：工具轨迹或工作产物包含数据来源或计算过程，并证明正确排除拆分规避审批"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "check": "引用本题所需制度依据：01_expense_reimbursement_2025.md#第十条、第十一条",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条、第十一条"
+      },
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "准确引用01_expense_reimbursement_2025.md#第十条、第十一条",
+      "fail_condition": "未完全满足通过条件：准确引用01_expense_reimbursement_2025.md#第十条、第十一条"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "check": "引用本题所需制度依据：06_business_entertainment.md#第二条至第四条",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "doc_id": "06_business_entertainment.md",
+        "clause_no": "第二条至第四条"
+      },
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "准确引用06_business_entertainment.md#第二条至第四条",
+      "fail_condition": "未完全满足通过条件：准确引用06_business_entertainment.md#第二条至第四条"
+    },
+    {
+      "id": "policy-basis-source-3",
+      "check": "引用本题所需制度依据：03_authorization_management.md#附件二",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      },
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "准确引用03_authorization_management.md#附件二",
+      "fail_condition": "未完全满足通过条件：准确引用03_authorization_management.md#附件二"
+    },
+    {
+      "id": "no-unsupported-output",
+      "check": "结构化结果不提交任何异常ID",
+      "metric": "false_positive",
+      "evaluation_mode": "deterministic",
+      "expected": {
+        "anomaly_ids": []
+      },
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "anomaly_ids为空",
+      "fail_condition": "未完全满足通过条件：anomaly_ids为空",
+      "deterministic_rule": "no-anomaly-ids"
+    },
+    {
+      "id": "submission",
+      "check": "统一Schema结果提交成功",
+      "metric": "format",
+      "evaluation_mode": "deterministic",
+      "expected": "submission_receipt.status=accepted",
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "提交回执状态为accepted且Schema校验通过",
+      "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
+    }
+  ],
+  "L3-007": [
+    {
+      "id": "threshold-amount",
+      "check": "给出部门总经理审批线10000元",
+      "metric": "conclusion",
+      "evaluation_mode": "hybrid",
+      "expected": 10000,
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "明确给出金额10000元",
+      "fail_condition": "未完全满足通过条件：明确给出金额10000元"
+    },
+    {
+      "id": "threshold-inclusive",
+      "check": "说明达到10000元即进入该审批档位",
+      "metric": "conclusion",
+      "evaluation_mode": "hybrid",
+      "expected": "达到10000元",
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "明确说明包含10000元边界",
+      "fail_condition": "未完全满足通过条件：明确说明包含10000元边界"
+    },
+    {
+      "id": "two-hop-path-first",
+      "check": "第一跳定位费用报销办法第五条",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "01_expense_reimbursement_2025.md#第五条",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "识别第一跳制度和条款",
+      "fail_condition": "未完全满足通过条件：识别第一跳制度和条款"
+    },
+    {
+      "id": "two-hop-path-relation",
+      "check": "识别第五条指向授权管理办法附件二",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "交叉引用",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "明确说明制度间交叉引用关系",
+      "fail_condition": "未完全满足通过条件：明确说明制度间交叉引用关系"
+    },
+    {
+      "id": "two-hop-path-second",
+      "check": "第二跳定位授权管理办法附件二",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "03_authorization_management.md#附件二",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "完成第二跳检索",
+      "fail_condition": "未完全满足通过条件：完成第二跳检索"
+    },
+    {
+      "id": "citations-expense",
+      "check": "引用费用报销办法第五条",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "01_expense_reimbursement_2025.md#第五条",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "引用第一跳制度及条款",
+      "fail_condition": "未完全满足通过条件：引用第一跳制度及条款"
+    },
+    {
+      "id": "citations-authorization",
+      "check": "引用授权管理办法附件二",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "03_authorization_management.md#附件二",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "引用第二跳制度及附件",
+      "fail_condition": "未完全满足通过条件：引用第二跳制度及附件"
+    },
+    {
+      "id": "no-premature-stop",
+      "check": "检索完整性：不因首份制度未列金额而提前结束",
+      "metric": "false_positive",
+      "evaluation_mode": "llm",
+      "expected": "继续追踪交叉引用",
+      "evidence_sources": [
+        "tool_trace",
+        "final_answer"
+      ],
+      "pass_condition": "轨迹证明继续检索",
+      "fail_condition": "未完全满足通过条件：轨迹证明继续检索"
+    },
+    {
+      "id": "submission",
+      "check": "统一Schema结果提交成功",
+      "metric": "format",
+      "evaluation_mode": "deterministic",
+      "expected": "submission_receipt.status=accepted",
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "提交回执状态为accepted且Schema校验通过",
+      "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
+    }
+  ],
+  "L3-009": [
+    {
+      "id": "overall-count-total",
+      "check": "提交异常发现总数为30项",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": 30,
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "anomaly_ids数量恰好为30",
+      "fail_condition": "未完全满足通过条件：anomaly_ids数量恰好为30",
+      "deterministic_rule": "anomaly-count-exact"
+    },
+    {
+      "id": "overall-count-type-dup",
+      "check": "DUP类发现数量为6项",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": {
+        "rule_type": "DUP",
+        "count": 6
+      },
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "DUP类anomaly_id数量恰好为6",
+      "fail_condition": "未完全满足通过条件：DUP类anomaly_id数量恰好为6",
+      "deterministic_rule": "anomaly-type-count-exact"
+    },
+    {
+      "id": "overall-count-type-split",
+      "check": "SPLIT类发现数量为6项",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": {
+        "rule_type": "SPLIT",
+        "count": 6
+      },
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "SPLIT类anomaly_id数量恰好为6",
+      "fail_condition": "未完全满足通过条件：SPLIT类anomaly_id数量恰好为6",
+      "deterministic_rule": "anomaly-type-count-exact"
+    },
+    {
+      "id": "overall-count-type-overstd",
+      "check": "OVERSTD类发现数量为6项",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": {
+        "rule_type": "OVERSTD",
+        "count": 6
+      },
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "OVERSTD类anomaly_id数量恰好为6",
+      "fail_condition": "未完全满足通过条件：OVERSTD类anomaly_id数量恰好为6",
+      "deterministic_rule": "anomaly-type-count-exact"
+    },
+    {
+      "id": "overall-count-type-budget",
+      "check": "BUDGET类发现数量为6项",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": {
+        "rule_type": "BUDGET",
+        "count": 6
+      },
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "BUDGET类anomaly_id数量恰好为6",
+      "fail_condition": "未完全满足通过条件：BUDGET类anomaly_id数量恰好为6",
+      "deterministic_rule": "anomaly-type-count-exact"
+    },
+    {
+      "id": "overall-count-type-overdue",
+      "check": "OVERDUE类发现数量为6项",
+      "metric": "conclusion",
+      "evaluation_mode": "deterministic",
+      "expected": {
+        "rule_type": "OVERDUE",
+        "count": 6
+      },
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "OVERDUE类anomaly_id数量恰好为6",
+      "fail_condition": "未完全满足通过条件：OVERDUE类anomaly_id数量恰好为6",
+      "deterministic_rule": "anomaly-type-count-exact"
+    },
+    {
+      "id": "all-record-ids-include-r000002",
+      "check": "结果包含应核查记录 R000002",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000002",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000002",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000002",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004201",
+      "check": "结果包含应核查记录 R004201",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004201",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004201",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004201",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r000005",
+      "check": "结果包含应核查记录 R000005",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000005",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000005",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000005",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004202",
+      "check": "结果包含应核查记录 R004202",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004202",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004202",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004202",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r000020",
+      "check": "结果包含应核查记录 R000020",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000020",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000020",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000020",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004203",
+      "check": "结果包含应核查记录 R004203",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004203",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004203",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004203",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r000028",
+      "check": "结果包含应核查记录 R000028",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000028",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000028",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000028",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004204",
+      "check": "结果包含应核查记录 R004204",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004204",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004204",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004204",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r000037",
+      "check": "结果包含应核查记录 R000037",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000037",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000037",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000037",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004205",
+      "check": "结果包含应核查记录 R004205",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004205",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004205",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004205",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r000055",
+      "check": "结果包含应核查记录 R000055",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000055",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000055",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000055",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004206",
+      "check": "结果包含应核查记录 R004206",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004206",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004206",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004206",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004207",
+      "check": "结果包含应核查记录 R004207",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004207",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004207",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004207",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004208",
+      "check": "结果包含应核查记录 R004208",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004208",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004208",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004208",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004209",
+      "check": "结果包含应核查记录 R004209",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004209",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004209",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004209",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004210",
+      "check": "结果包含应核查记录 R004210",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004210",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004210",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004210",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004211",
+      "check": "结果包含应核查记录 R004211",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004211",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004211",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004211",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004212",
+      "check": "结果包含应核查记录 R004212",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004212",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004212",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004212",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004213",
+      "check": "结果包含应核查记录 R004213",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004213",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004213",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004213",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004214",
+      "check": "结果包含应核查记录 R004214",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004214",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004214",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004214",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004215",
+      "check": "结果包含应核查记录 R004215",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004215",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004215",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004215",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004216",
+      "check": "结果包含应核查记录 R004216",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004216",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004216",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004216",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004217",
+      "check": "结果包含应核查记录 R004217",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004217",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004217",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004217",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004218",
+      "check": "结果包含应核查记录 R004218",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004218",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004218",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004218",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004219",
+      "check": "结果包含应核查记录 R004219",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004219",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004219",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004219",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004220",
+      "check": "结果包含应核查记录 R004220",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004220",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004220",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004220",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004221",
+      "check": "结果包含应核查记录 R004221",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004221",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004221",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004221",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004222",
+      "check": "结果包含应核查记录 R004222",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004222",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004222",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004222",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004223",
+      "check": "结果包含应核查记录 R004223",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004223",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004223",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004223",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004224",
+      "check": "结果包含应核查记录 R004224",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004224",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004224",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004224",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004225",
+      "check": "结果包含应核查记录 R004225",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004225",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004225",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004225",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004226",
+      "check": "结果包含应核查记录 R004226",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004226",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004226",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004226",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r000079",
+      "check": "结果包含应核查记录 R000079",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000079",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000079",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000079",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r002009",
+      "check": "结果包含应核查记录 R002009",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R002009",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R002009",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R002009",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r003968",
+      "check": "结果包含应核查记录 R003968",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R003968",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R003968",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R003968",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r000894",
+      "check": "结果包含应核查记录 R000894",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000894",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000894",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000894",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r003479",
+      "check": "结果包含应核查记录 R003479",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R003479",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R003479",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R003479",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r000312",
+      "check": "结果包含应核查记录 R000312",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R000312",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R000312",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R000312",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004227",
+      "check": "结果包含应核查记录 R004227",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004227",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004227",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004227",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004228",
+      "check": "结果包含应核查记录 R004228",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004228",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004228",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004228",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004229",
+      "check": "结果包含应核查记录 R004229",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004229",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004229",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004229",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004230",
+      "check": "结果包含应核查记录 R004230",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004230",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004230",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004230",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004231",
+      "check": "结果包含应核查记录 R004231",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004231",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004231",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004231",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-include-r004232",
+      "check": "结果包含应核查记录 R004232",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": "R004232",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids包含R004232",
+      "fail_condition": "未完全满足通过条件：提交的record_ids包含R004232",
+      "deterministic_rule": "expected-record-present"
+    },
+    {
+      "id": "all-record-ids-no-extra",
+      "check": "结果不包含本题范围外的记录",
+      "metric": "evidence",
+      "evaluation_mode": "deterministic",
+      "expected": [
+        "R000002",
+        "R004201",
+        "R000005",
+        "R004202",
+        "R000020",
+        "R004203",
+        "R000028",
+        "R004204",
+        "R000037",
+        "R004205",
+        "R000055",
+        "R004206",
+        "R004207",
+        "R004208",
+        "R004209",
+        "R004210",
+        "R004211",
+        "R004212",
+        "R004213",
+        "R004214",
+        "R004215",
+        "R004216",
+        "R004217",
+        "R004218",
+        "R004219",
+        "R004220",
+        "R004221",
+        "R004222",
+        "R004223",
+        "R004224",
+        "R004225",
+        "R004226",
+        "R000079",
+        "R002009",
+        "R003968",
+        "R000894",
+        "R003479",
+        "R000312",
+        "R004227",
+        "R004228",
+        "R004229",
+        "R004230",
+        "R004231",
+        "R004232"
+      ],
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "提交的record_ids除R000002, R004201, R000005, R004202, R000020, R004203, R000028, R004204, R000037, R004205, R000055, R004206, R004207, R004208, R004209, R004210, R004211, R004212, R004213, R004214, R004215, R004216, R004217, R004218, R004219, R004220, R004221, R004222, R004223, R004224, R004225, R004226, R000079, R002009, R003968, R000894, R003479, R000312, R004227, R004228, R004229, R004230, R004231, R004232外没有其他记录",
+      "fail_condition": "未完全满足通过条件：提交的record_ids除R000002, R004201, R000005, R004202, R000020, R004203, R000028, R004204, R000037, R004205, R000055, R004206, R004207, R004208, R004209, R004210, R004211, R004212, R004213, R004214, R004215, R004216, R004217, R004218, R004219, R004220, R004221, R004222, R004223, R004224, R004225, R004226, R000079, R002009, R003968, R000894, R003479, R000312, R004227, R004228, R004229, R004230, R004231, R004232外没有其他记录",
+      "deterministic_rule": "no-unexpected-records"
+    },
+    {
+      "id": "representative-evidence-dup",
+      "check": "DUP类至少有1个可复核发现及record_id",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": "DUP",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "DUP类同时给出稳定发现ID和正确record_id证据",
+      "fail_condition": "未完全满足通过条件：DUP类同时给出稳定发现ID和正确record_id证据"
+    },
+    {
+      "id": "representative-evidence-split",
+      "check": "SPLIT类至少有1个可复核发现及record_id",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": "SPLIT",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "SPLIT类同时给出稳定发现ID和正确record_id证据",
+      "fail_condition": "未完全满足通过条件：SPLIT类同时给出稳定发现ID和正确record_id证据"
+    },
+    {
+      "id": "representative-evidence-overstd",
+      "check": "OVERSTD类至少有1个可复核发现及record_id",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": "OVERSTD",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "OVERSTD类同时给出稳定发现ID和正确record_id证据",
+      "fail_condition": "未完全满足通过条件：OVERSTD类同时给出稳定发现ID和正确record_id证据"
+    },
+    {
+      "id": "representative-evidence-budget",
+      "check": "BUDGET类至少有1个可复核发现及record_id",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": "BUDGET",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "BUDGET类同时给出稳定发现ID和正确record_id证据",
+      "fail_condition": "未完全满足通过条件：BUDGET类同时给出稳定发现ID和正确record_id证据"
+    },
+    {
+      "id": "representative-evidence-overdue",
+      "check": "OVERDUE类至少有1个可复核发现及record_id",
+      "metric": "evidence",
+      "evaluation_mode": "hybrid",
+      "expected": "OVERDUE",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "OVERDUE类同时给出稳定发现ID和正确record_id证据",
+      "fail_condition": "未完全满足通过条件：OVERDUE类同时给出稳定发现ID和正确record_id证据"
+    },
+    {
+      "id": "policy-coverage-expense",
+      "check": "引用费用报销办法中五类规则的对应条款",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "01_expense_reimbursement_2025.md第七、九、十、十一、十二、十三条",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "费用报销办法规则条款可核查",
+      "fail_condition": "未完全满足通过条件：费用报销办法规则条款可核查"
+    },
+    {
+      "id": "policy-coverage-special",
+      "check": "超标准结论引用对应专项费用标准",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "04至07号专项费用标准",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "专项费用标准与超标准发现对应",
+      "fail_condition": "未完全满足通过条件：专项费用标准与超标准发现对应"
+    },
+    {
+      "id": "policy-coverage-budget",
+      "check": "超预算结论引用预算管理办法",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "08_budget_management.md第二至第四条",
+      "evidence_sources": [
+        "submitted_json",
+        "tool_trace"
+      ],
+      "pass_condition": "预算管理条款可核查",
+      "fail_condition": "未完全满足通过条件：预算管理条款可核查"
+    },
+    {
+      "id": "trap-control-r004233",
+      "check": "未把合规边界记录R004233判为异常",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": "R004233",
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "结构化结果和文字结论均未将R004233认定为异常",
+      "fail_condition": "未完全满足通过条件：结构化结果和文字结论均未将R004233认定为异常"
+    },
+    {
+      "id": "trap-control-r004234",
+      "check": "未把合规边界记录R004234判为异常",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": "R004234",
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "结构化结果和文字结论均未将R004234认定为异常",
+      "fail_condition": "未完全满足通过条件：结构化结果和文字结论均未将R004234认定为异常"
+    },
+    {
+      "id": "trap-control-r004235",
+      "check": "未把合规边界记录R004235判为异常",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": "R004235",
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "结构化结果和文字结论均未将R004235认定为异常",
+      "fail_condition": "未完全满足通过条件：结构化结果和文字结论均未将R004235认定为异常"
+    },
+    {
+      "id": "trap-control-r004236",
+      "check": "未把合规边界记录R004236判为异常",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": "R004236",
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "结构化结果和文字结论均未将R004236认定为异常",
+      "fail_condition": "未完全满足通过条件：结构化结果和文字结论均未将R004236认定为异常"
+    },
+    {
+      "id": "trap-control-r004237",
+      "check": "未把合规边界记录R004237判为异常",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": "R004237",
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "结构化结果和文字结论均未将R004237认定为异常",
+      "fail_condition": "未完全满足通过条件：结构化结果和文字结论均未将R004237认定为异常"
+    },
+    {
+      "id": "trap-control-r004238",
+      "check": "未把合规边界记录R004238判为异常",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": "R004238",
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "结构化结果和文字结论均未将R004238认定为异常",
+      "fail_condition": "未完全满足通过条件：结构化结果和文字结论均未将R004238认定为异常"
+    },
+    {
+      "id": "trap-control-r004239",
+      "check": "未把合规边界记录R004239判为异常",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": "R004239",
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "结构化结果和文字结论均未将R004239认定为异常",
+      "fail_condition": "未完全满足通过条件：结构化结果和文字结论均未将R004239认定为异常"
+    },
+    {
+      "id": "trap-control-r004240",
+      "check": "未把合规边界记录R004240判为异常",
+      "metric": "false_positive",
+      "evaluation_mode": "hybrid",
+      "expected": "R004240",
+      "evidence_sources": [
+        "submitted_json",
+        "final_answer"
+      ],
+      "pass_condition": "结构化结果和文字结论均未将R004240认定为异常",
+      "fail_condition": "未完全满足通过条件：结构化结果和文字结论均未将R004240认定为异常"
+    },
+    {
+      "id": "report-shape-fact",
+      "check": "报告包含事实",
+      "metric": "format",
+      "evaluation_mode": "llm",
+      "expected": "事实",
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "报告中存在可识别的事实内容",
+      "fail_condition": "未完全满足通过条件：报告中存在可识别的事实内容"
+    },
+    {
+      "id": "report-shape-rule",
+      "check": "报告包含规则",
+      "metric": "format",
+      "evaluation_mode": "llm",
+      "expected": "规则",
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "报告中存在可识别的规则内容",
+      "fail_condition": "未完全满足通过条件：报告中存在可识别的规则内容"
+    },
+    {
+      "id": "report-shape-judgment",
+      "check": "报告包含判断",
+      "metric": "format",
+      "evaluation_mode": "llm",
+      "expected": "判断",
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "报告中存在可识别的判断内容",
+      "fail_condition": "未完全满足通过条件：报告中存在可识别的判断内容"
+    },
+    {
+      "id": "report-shape-impact",
+      "check": "报告包含影响",
+      "metric": "format",
+      "evaluation_mode": "llm",
+      "expected": "影响",
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "报告中存在可识别的影响内容",
+      "fail_condition": "未完全满足通过条件：报告中存在可识别的影响内容"
+    },
+    {
+      "id": "report-shape-recommendation",
+      "check": "报告包含建议",
+      "metric": "format",
+      "evaluation_mode": "llm",
+      "expected": "建议",
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "报告中存在可识别的建议内容",
+      "fail_condition": "未完全满足通过条件：报告中存在可识别的建议内容"
+    },
+    {
+      "id": "submission",
+      "check": "统一Schema结果提交成功",
+      "metric": "format",
+      "evaluation_mode": "deterministic",
+      "expected": "submission_receipt.status=accepted",
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "提交回执状态为accepted且Schema校验通过",
+      "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
+    }
+  ],
+  "L3-010": [
+    {
+      "id": "current-threshold-version",
+      "check": "说明2025修订版为现行版本",
+      "metric": "conclusion",
+      "evaluation_mode": "hybrid",
+      "expected": "2025修订版",
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "明确识别现行版本",
+      "fail_condition": "未完全满足通过条件：明确识别现行版本"
+    },
+    {
+      "id": "current-threshold-amount",
+      "check": "给出现行审批线10000元",
+      "metric": "conclusion",
+      "evaluation_mode": "hybrid",
+      "expected": 10000,
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "明确给出现行金额10000元",
+      "fail_condition": "未完全满足通过条件：明确给出现行金额10000元"
+    },
+    {
+      "id": "old-threshold-status-amount",
+      "check": "给出2022版审批线8000元",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": 8000,
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "明确给出旧版金额8000元",
+      "fail_condition": "未完全满足通过条件：明确给出旧版金额8000元"
+    },
+    {
+      "id": "old-threshold-status-status",
+      "check": "说明2022版审批线已经废止",
+      "metric": "policy",
+      "evaluation_mode": "hybrid",
+      "expected": "已废止",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "明确说明旧版不再适用",
+      "fail_condition": "未完全满足通过条件：明确说明旧版不再适用"
+    },
+    {
+      "id": "cross-reference-expense",
+      "check": "定位费用报销办法第五条",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "01_expense_reimbursement_2025.md#第五条",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "引用费用报销办法第五条",
+      "fail_condition": "未完全满足通过条件：引用费用报销办法第五条"
+    },
+    {
+      "id": "cross-reference-relation",
+      "check": "说明第五条将金额授权给附件二规定",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "交叉引用关系",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "正确说明制度关系",
+      "fail_condition": "未完全满足通过条件：正确说明制度关系"
+    },
+    {
+      "id": "cross-reference-authorization",
+      "check": "定位授权管理办法附件二",
+      "metric": "reasoning",
+      "evaluation_mode": "hybrid",
+      "expected": "03_authorization_management.md#附件二",
+      "evidence_sources": [
+        "final_answer",
+        "tool_trace"
+      ],
+      "pass_condition": "引用附件二中的现行金额",
+      "fail_condition": "未完全满足通过条件：引用附件二中的现行金额"
+    },
+    {
+      "id": "risk-explanation-risk",
+      "check": "说明使用8000元旧线会扩大升级审批范围并造成误报",
+      "metric": "reasoning",
+      "evaluation_mode": "llm",
+      "expected": "误报风险",
+      "evidence_sources": [
+        "final_answer"
+      ],
+      "pass_condition": "具体说明旧线造成的误判方向",
+      "fail_condition": "未完全满足通过条件：具体说明旧线造成的误判方向"
+    },
+    {
+      "id": "risk-explanation-control",
+      "check": "提出制度版本校验措施",
+      "metric": "reasoning",
+      "evaluation_mode": "llm",
+      "expected": "版本校验建议",
+      "evidence_sources": [
+        "final_answer"
+      ],
+      "pass_condition": "提出可执行的版本识别或有效性校验措施",
+      "fail_condition": "未完全满足通过条件：提出可执行的版本识别或有效性校验措施"
+    },
+    {
+      "id": "report-shape",
+      "check": "报告表达：以审计说明形式提交并保持字段一致",
+      "metric": "format",
+      "evaluation_mode": "hybrid",
+      "expected": "事实、规则、判断和建议一致",
+      "evidence_sources": [
+        "final_answer",
+        "submitted_json"
+      ],
+      "pass_condition": "表达完整且一致",
+      "fail_condition": "未完全满足通过条件：表达完整且一致"
+    },
+    {
+      "id": "submission",
+      "check": "统一Schema结果提交成功",
+      "metric": "format",
+      "evaluation_mode": "deterministic",
+      "expected": "submission_receipt.status=accepted",
+      "evidence_sources": [
+        "submitted_json"
+      ],
+      "pass_condition": "提交回执状态为accepted且Schema校验通过",
+      "fail_condition": "未完全满足通过条件：提交回执状态为accepted且Schema校验通过"
+    }
+  ]
+}

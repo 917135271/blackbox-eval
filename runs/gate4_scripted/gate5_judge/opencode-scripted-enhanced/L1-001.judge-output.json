@@ -1,0 +1,62 @@
+{
+  "checklist": [
+    {
+      "id": "current-threshold-amount",
+      "value": 1,
+      "reason": "答案明确给出10000元审批金额",
+      "answer_evidence": "答案：\"单笔费用报销金额达到10,000元（含）且不足50,000元时，需要部门总经理审批\"",
+      "trace_evidence": "无工具调用，直接来源于答案",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-threshold-inclusive",
+      "value": 1,
+      "reason": "说明10000元本身进入该审批档位",
+      "answer_evidence": "答案：\"达到10,000元（含）\"，明确含10000元",
+      "trace_evidence": "无工具调用，直接来源于答案",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-version",
+      "value": 1,
+      "reason": "明确结论基于2025修订版",
+      "answer_evidence": "答案：\"适用版本为《XX证券费用报销管理办法(2025修订版)》\"",
+      "trace_evidence": "无工具调用，直接来源于答案",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-expense-rule",
+      "value": 1,
+      "reason": "引用费用报销办法第五条",
+      "answer_evidence": "引用列表包含：{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第五条\"}",
+      "trace_evidence": "无工具调用，直接来源于提交的引用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-authorization",
+      "value": 1,
+      "reason": "候选回答明确提及《XX证券授权管理办法》附件二，并在citations中列出附件二。",
+      "answer_evidence": "金额边界见《XX证券授权管理办法》附件二。",
+      "trace_evidence": "citations中包含03_authorization_management.md附件二。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-cross-reference",
+      "value": 1,
+      "reason": "候选回答同时引用费用报销办法第五条和授权管理办法附件二，表明审批金额来源于费用报销办法并指向授权管理办法，构成交叉引用关系。",
+      "answer_evidence": "适用版本为《XX证券费用报销管理办法(2025修订版)》，金额边界见《XX证券授权管理办法》附件二。",
+      "trace_evidence": "citations中同时包含01_expense_reimbursement_2025.md第五条和03_authorization_management.md附件二。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "old-value-control",
+      "value": 1,
+      "reason": "候选回答明确指出旧版8000元审批线已被废止，不再适用，排除了旧值。",
+      "answer_evidence": "旧版8,000元审批线已被废止，不再适用。",
+      "trace_evidence": "citations中包含02_expense_reimbursement_2022_deprecated.md第二条和第四条，支持旧版废止结论。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "所有检查项均通过，候选回答满足expected_facts和required_citations。；所有检查项均满足，候选提交正确引用了制度依据，明确了现行审批线和旧版废止。",
+  "confidence": 1.0
+}

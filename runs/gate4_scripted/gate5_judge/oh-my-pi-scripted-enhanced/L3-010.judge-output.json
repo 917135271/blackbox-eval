@@ -1,0 +1,86 @@
+{
+  "checklist": [
+    {
+      "id": "current-threshold-version",
+      "value": 1,
+      "reason": "明确识别了2025修订版为现行版本，并指出报销办法通过授权管理办法附件二取得现行审批金额。",
+      "answer_evidence": "“现行审批线（有效）：《XX证券授权管理办法》附件二”以及“2025修订版报销管理办法第五条：审批权限统一按授权管理办法附件二执行。”",
+      "trace_evidence": "从get_policy_doc('01_expense_reimbursement_2025.md')得到第五条，从search_policy得到相关交叉引用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-threshold-amount",
+      "value": 1,
+      "reason": "明确给出现行部门总经理审批线为10000元（AR-03：10,000≤金额<50,000）。",
+      "answer_evidence": "“AR-03 10,000≤金额<50,000→部门总经理”",
+      "trace_evidence": "从get_policy_doc('03_authorization_management.md')提取到附件二表格中明确有AR-03金额区间10000-50000。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "old-threshold-status-amount",
+      "value": 1,
+      "reason": "明确给出2022版审批线8000元。",
+      "answer_evidence": "“旧版审批线（已废止）：《XX证券费用报销管理办法(2022版)》第二条（≥8,000元→部门总经理）”",
+      "trace_evidence": "从get_policy_doc('02_expense_reimbursement_2022_deprecated.md')第二条提取到“单笔报销金额达到8000元的，应提交部门总经理审批”。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "old-threshold-status-status",
+      "value": 1,
+      "reason": "明确说明了旧版审批线已废止，不再适用。",
+      "answer_evidence": "“旧版审批线（已废止）”及“不得把旧版条款作为当前审批依据”的表述。",
+      "trace_evidence": "从get_policy_doc('02_expense_reimbursement_2022_deprecated.md')第四条：“本办法的审批金额已被后续制度替代，不得作为现行审批依据。”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "cross-reference-expense",
+      "value": 1,
+      "reason": "候选提交明确引用并引用了费用报销办法第五条。",
+      "answer_evidence": "2025修订版报销管理办法第五条：审批权限统一按授权管理办法附件二执行。",
+      "trace_evidence": "get_policy_doc('01_expense_reimbursement_2025.md')返回第五条原文；citations中含第五条。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "cross-reference-relation",
+      "value": 1,
+      "reason": "候选提交正确说明第五条将审批金额授权给附件二规定。",
+      "answer_evidence": "交叉引用链：报销管理办法(2025)第五条→授权管理办法附件二→五档审批权限表。",
+      "trace_evidence": "get_policy_excerpt('01_expense_reimbursement_2025.md')返回第五条，显示授权附件二。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "cross-reference-authorization",
+      "value": 1,
+      "reason": "候选提交引用了附件二中的现行金额，并列出具体档位和金额。",
+      "answer_evidence": "现行审批线（有效）：《XX证券授权管理办法》附件二，AR-01至AR-05。",
+      "trace_evidence": "get_policy_doc('03_authorization_management.md')返回附件二表格，包含各档位金额区间。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "risk-explanation-risk",
+      "value": 1,
+      "reason": "候选提交具体说明了使用8000元旧线会将8,000–9,999元区间误判为需部门总经理审批，并给出实例。",
+      "answer_evidence": "误判一（8,000–9,999元区间）：旧版需部门总经理，现行AR-02仅需部门经理加财务复核。实例R004233。",
+      "trace_evidence": "answer中三、使用旧版可能造成的误判部分。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "risk-explanation-control",
+      "value": 1,
+      "reason": "候选提交在“四、版本校验措施”中明确提出了制度时效性前置检查、交叉引用链完整性验证、附件版本锁定、费用系统派生结果校验和废止制度隔离等5项措施，均属可执行版本识别或有效性校验。",
+      "answer_evidence": "“## 四、版本校验措施\\n1.制度时效性前置检查；2.交叉引用链完整性验证；3.附件版本锁定；4.费用系统派生结果校验；5.废止制度隔离。”",
+      "trace_evidence": "候选提交答案中直接包含上述措施，无需工具调用佐证。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape",
+      "value": 1,
+      "reason": "候选提交以“版本陷阱审计说明”为标题，完整包含新旧审批线对照、现行金额交叉引用依据、误判实例分析、版本校验措施和结论，所有事实、规则、判断和建议保持一致，无矛盾。",
+      "answer_evidence": "“## 版本陷阱审计说明”、“一、新旧审批线对照及效力状态”、“二、现行金额的交叉引用依据”、“三、使用旧版可能造成的误判”、“四、版本校验措施”、“五、结论”。",
+      "trace_evidence": "工具调用轨迹显示制度文档、审批记录及交叉引用链已全面获取并正确使用，与最终报告表述一致。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交完整识别了现行版本和旧版本，准确给出了新旧审批金额，并明确旧版废止状态，完全满足所有检查项要求。；所有检查项均满足通过条件，候选提交正确交叉引用制度、说明新旧审批线及误判风险。；候选提交准确识别了新旧审批线交叉引用及误判风险，提出了具体可执行的版本校验措施，报告结构完整、逻辑一致，完全满足审计说明要求。",
+  "confidence": 0.9833333333333334
+}

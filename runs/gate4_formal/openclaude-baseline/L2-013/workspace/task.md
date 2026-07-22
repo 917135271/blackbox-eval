@@ -2,7 +2,7 @@
 
 任务ID：L2-013
 题型：policy_data_comparison
-问题：结合制度和业务数据,核查以R004223为线索的超标准异常,返回异常ID和记录ID集合。
+问题：结合制度和业务数据，核查以R004223为线索的超标准异常，返回发现ID和record_id集合，并说明费用类型、金额、适用标准和制度依据。
 
 不得调用领域 Skills 或子智能体；使用框架基础工具、业务 MCP 和统一提交工具独立完成。
 OpenClaude运行时只保证Bash、Edit、Read可用；必须使用Edit或Bash中的安全脚本更新预置JSON，禁止调用Write、Grep等未暴露工具。

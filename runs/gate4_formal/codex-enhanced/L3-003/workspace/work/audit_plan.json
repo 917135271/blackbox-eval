@@ -1,197 +1,54 @@
 {
   "task_scope": {
-    "audit_object": "2025年全年所有费用类型超标准专项扫描",
+    "audit_object": "2025全年单笔超标准专项扫描",
     "audit_period": "2025-01-01 to 2025-12-31",
-    "expense_types": ["travel_lodging", "local_transport", "training_fee", "business_entertainment", "office_supplies", "communication"],
-    "organization_scope": "XX证券全体部门及员工",
-    "deliverable": "按11条子规则逐一比对，识别所有超标准异常记录"
+    "expense_types": ["office_supplies", "communication", "travel_lodging", "business_entertainment", "training_fee", "local_transport"],
+    "organization_scope": "全公司",
+    "deliverable": "每种费用类型的异常record_ids及详细分析文件"
   },
-  "applicable_policies": [
-    {"doc_id": "01_expense_reimbursement_2025.md", "title": "XX证券费用报销管理办法(2025修订版)", "effective": "2025-01-01", "status": "current"},
-    {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "title": "XX证券费用报销管理办法(2022版)", "status": "deprecated_2025-01-01"},
-    {"doc_id": "04_travel_expense.md", "title": "XX证券差旅费管理办法", "status": "current"},
-    {"doc_id": "05_training_expense.md", "title": "XX证券培训费管理办法", "status": "current"},
-    {"doc_id": "06_business_entertainment.md", "title": "XX证券业务招待费管理办法", "status": "current"},
-    {"doc_id": "07_office_communication.md", "title": "XX证券办公与通讯费用管理办法", "status": "current"},
-    {"doc_id": "08_budget_management.md", "title": "XX证券预算管理办法", "status": "current"}
-  ],
   "policy_questions": [
-    {
-      "rule_id": "R1",
-      "rule_name": "差旅住宿超标准",
-      "expense_type": "travel_lodging",
-      "check": "amount/nights > standard by level×city_tier, special_approval=false",
-      "policy_docs": ["04_travel_expense.md"],
-      "clauses": ["3", "4", "5"],
-      "standard_table": {
-        "员工级": {"一类": 450, "二类": 380, "三类": 300},
-        "经理级": {"一类": 650, "二类": 550, "三类": 450},
-        "部门负责人级": {"一类": 850, "二类": 700, "三类": 600},
-        "高管级": {"一类": 1100, "二类": 900, "三类": 750}
-      },
-      "unit": "per_person_per_night"
-    },
-    {
-      "rule_id": "R2",
-      "rule_name": "市内交通超标准",
-      "expense_type": "local_transport",
-      "check": "amount/days > city_tier_rate, special_approval=false",
-      "policy_docs": ["04_travel_expense.md"],
-      "clauses": ["6"],
-      "standard_table": {"一类": 120, "二类": 100, "三类": 80},
-      "unit": "per_day"
-    },
-    {
-      "rule_id": "R3",
-      "rule_name": "培训课程费超标准",
-      "expense_type": "training_fee",
-      "check": "amount/participants > 3500, special_approval=false",
-      "policy_docs": ["05_training_expense.md"],
-      "clauses": ["2"],
-      "unit": "per_person_per_period"
-    },
-    {
-      "rule_id": "R4",
-      "rule_name": "内部培训综合超标准",
-      "expense_type": "training_fee",
-      "check": "internal training, amount/days > 800, special_approval=false",
-      "policy_docs": ["05_training_expense.md"],
-      "clauses": ["3"],
-      "unit": "per_day"
-    },
-    {
-      "rule_id": "R5",
-      "rule_name": "外部培训综合超标准",
-      "expense_type": "training_fee",
-      "check": "external training, amount/days > 1200, special_approval=false",
-      "policy_docs": ["05_training_expense.md"],
-      "clauses": ["4"],
-      "unit": "per_day"
-    },
-    {
-      "rule_id": "R6",
-      "rule_name": "培训住宿超标准",
-      "expense_type": "training_fee",
-      "check": "amount/nights > city_tier_rate, special_approval=false",
-      "policy_docs": ["05_training_expense.md"],
-      "clauses": ["5"],
-      "standard_table": {"一类": 500, "二类": 420, "三类": 350},
-      "unit": "per_person_per_night"
-    },
-    {
-      "rule_id": "R7",
-      "rule_name": "招待费单次超标准",
-      "expense_type": "business_entertainment",
-      "check": "amount > 5000, special_approval=false",
-      "policy_docs": ["06_business_entertainment.md"],
-      "clauses": ["2"],
-      "unit": "per_event"
-    },
-    {
-      "rule_id": "R8",
-      "rule_name": "招待费人均超标准",
-      "expense_type": "business_entertainment",
-      "check": "amount/participants > 300, special_approval=false",
-      "policy_docs": ["06_business_entertainment.md"],
-      "clauses": ["3"],
-      "unit": "per_person"
-    },
-    {
-      "rule_id": "R9",
-      "rule_name": "办公用品月度超标准",
-      "expense_type": "office_supplies",
-      "check": "GROUP BY employee_id, month: sum(amount) > 600, all records special_approval=false",
-      "policy_docs": ["07_office_communication.md"],
-      "clauses": ["2"],
-      "unit": "per_employee_per_month"
-    },
-    {
-      "rule_id": "R10",
-      "rule_name": "通讯费月度超标准",
-      "expense_type": "communication",
-      "check": "GROUP BY employee_id, month: sum(amount) > 300, all records special_approval=false",
-      "policy_docs": ["07_office_communication.md"],
-      "clauses": ["3"],
-      "unit": "per_employee_per_month"
-    },
-    {
-      "rule_id": "R11",
-      "rule_name": "部门预算超支",
-      "expense_type": "all",
-      "check": "Cumulative per department exceeds annual budget, records after crossing without special_approval",
-      "policy_docs": ["08_budget_management.md", "01_expense_reimbursement_2025.md"],
-      "clauses": ["3", "4"],
-      "unit": "per_department_cumulative"
-    }
+    {"rule": "办公用品单笔>600", "policy": "07_office_communication.md 第二条", "threshold": "amount > 600"},
+    {"rule": "通讯费用单笔>300", "policy": "07_office_communication.md 第三条", "threshold": "amount > 300"},
+    {"rule": "差旅住宿夜间单价超标", "policy": "04_travel_expense.md 第四条", "threshold": "amount/nights > 城市职级标准"},
+    {"rule": "业务招待超标", "policy": "06_business_entertainment.md 第二条,第三条", "threshold": "amount > 5000 OR amount/participants > 300"},
+    {"rule": "培训费>3500", "policy": "05_training_expense.md 第二条", "threshold": "amount > 3500"},
+    {"rule": "市内交通包干超标", "policy": "04_travel_expense.md 第六条", "threshold": "amount/days > 城市包干标准"}
   ],
-  "data_questions": [
-    "Get all 4240 records across 6 expense types for full 2025",
-    "For each record: fetch detail (participants, days, nights, city_tier, special_approval, invoice_no)",
-    "Get employee info (level, department_id) for all employees",
-    "Get department budgets for all departments",
-    "For R1: join travel_lodging with employee level + city_tier standard table",
-    "For R2: join local_transport with city_tier standard",
-    "For R3-R6: split training_fee by category",
-    "For R7-R8: check business_entertainment amounts",
-    "For R9-R10: GROUP BY employee×month aggregation, reconcile duplicate invoices first",
-    "For R11: cumulative per department, ordered by reimburse_date"
-  ],
-  "required_fields": ["record_id", "employee_id", "department_id", "expense_type", "amount", "expense_date", "reimburse_date", "participants", "days", "nights", "city_tier", "special_approval", "invoice_no", "employee_level", "department_budget"],
+  "data_requirements": {
+    "tables": ["expense_records", "employees"],
+    "fields": ["record_id", "employee_id", "expense_date", "expense_type", "amount", "city_tier", "nights", "days", "participants", "special_approval", "employee_level"],
+    "joins": "expense_records JOIN employees ON employee_id for travel_lodging"
+  },
   "execution_steps": [
-    {"step": "audit_plan", "status": "in_progress", "output": "work/audit_plan.json"},
-    {"step": "policy_version_check", "status": "pending", "output": "work/policy_applicability.json"},
-    {"step": "data_analyst_subagent", "status": "pending", "output": "work/subagents/data_analyst/"},
-    {"step": "evidence_coverage_check", "status": "pending", "output": "work/evidence_matrix.json"},
-    {"step": "false_positive_review", "status": "pending", "output": "work/independent_review.json"},
-    {"step": "audit_report", "status": "pending", "output": "work/report_draft.json"},
-    {"step": "result_validation", "status": "pending", "output": "work/validation_report.json"},
-    {"step": "submission", "status": "pending", "output": "submit_audit_result"}
+    {"step": "planning", "artifact": "work/audit_plan.json", "status": "pending"},
+    {"step": "policy_version_check", "artifact": "work/policy_check.json", "status": "pending"},
+    {"step": "sql_analysis_all_6_types", "artifact": "work/subagents/data_analyst/", "status": "pending"},
+    {"step": "evidence_coverage_check", "artifact": "work/evidence_matrix.json", "status": "pending"},
+    {"step": "false_positive_review", "artifact": "work/fp_review.json", "status": "pending"},
+    {"step": "audit_report", "artifact": "work/audit_report.json", "status": "pending"},
+    {"step": "result_validation", "artifact": "work/validation_report.json", "status": "pending"},
+    {"step": "submit", "artifact": "final submission", "status": "pending"}
   ],
   "complexity": {
-    "score": 6,
+    "score": 5,
     "reasons": [
-      "two_or_more_policies: 04,05,06,07,08 + 01 apply",
-      "aggregation_grouping_joins_batch: GROUP BY for R9-R10, cumulative for R11, joins with employee/department",
-      "two_or_more_business_rules: 11 sub-rules across 6 types",
-      "thresholds_dates_exemptions: all rules have thresholds and special_approval exemptions",
-      "comprehensive_audit_report: full-year multi-rule scan"
+      "多政策(4份政策文件)",
+      "需JOIN employees表",
+      "6条业务规则",
+      "阈值/豁免(special_approval)",
+      "综合审计报告"
     ]
   },
   "subagent_plan": {
-    "data_analyst": {
-      "role": "data_analyst",
-      "reason_code": "AGGREGATION_REQUIRED",
-      "complexity": 6,
-      "requested_token_budget": 80000,
-      "task": "Query all 6 expense types for full 2025, fetch every record detail (participants, days, nights, city_tier, special_approval, invoice_no, invoice_usage), get all employees with level/department, get all department budgets, then apply all 11 rules: R1 travel_lodging per-night standard by level×city_tier; R2 local_transport per-day standard by city_tier; R3 training course ≤3500 per participant; R4 internal training ≤800/day; R5 external training ≤1200/day; R6 training lodging by city_tier; R7 entertainment ≤5000/event; R8 entertainment ≤300/person; R9 office_supplies GROUP BY employee×month ≤600; R10 communication GROUP BY employee×month ≤300; R11 department cumulative budget. For R9-R10, first reconcile duplicate invoices. For R11, order by reimburse_date, pre-crossing records are context, only first unapproved exceedance record per department is anomalous. Save all detailed work under work/subagents/data_analyst/.",
-      "context": {
-        "question": "对2025年全年所有费用类型进行超标准专项扫描，按11条子规则逐一比对，识别所有超标准异常。",
-        "rules": ["R1差旅住宿", "R2市内交通", "R3培训课程费", "R4内部培训综合", "R5外部培训综合", "R6培训住宿", "R7招待费单次", "R8招待费人均", "R9办公用品月度", "R10通讯费月度", "R11部门预算超支"],
-        "period": "2025-01-01 to 2025-12-31",
-        "standards": {
-          "R1": {"员工级": {"一类":450,"二类":380,"三类":300}, "经理级": {"一类":650,"二类":550,"三类":450}, "部门负责人级": {"一类":850,"二类":700,"三类":600}, "高管级": {"一类":1100,"二类":900,"三类":750}},
-          "R2": {"一类":120,"二类":100,"三类":80},
-          "R3": 3500,
-          "R4": 800,
-          "R5": 1200,
-          "R6": {"一类":500,"二类":420,"三类":350},
-          "R7": 5000,
-          "R8": 300,
-          "R9": 600,
-          "R10": 300,
-          "R11": "per department annual budget"
-        }
-      },
-      "artifact_paths": ["work/audit_plan.json"],
-      "allowed_tools": ["exec_command", "mcp__expense_query__list_expenses", "mcp__expense_query__get_expense_detail", "mcp__expense_query__get_employee", "mcp__expense_query__list_employees", "mcp__expense_query__get_department_budget", "mcp__expense_query__summarize_expenses", "mcp__expense_query__summarize_department_budgets", "mcp__expense_query__list_invoices", "mcp__expense_query__find_invoice_usage", "mcp__expense_query__find_reused_invoices", "mcp__expense_query__list_approvals"]
-    }
+    "role": "data_analyst",
+    "reason_code": "MULTI_TABLE_JOIN",
+    "task": "对6种费用类型执行只读SQL全量扫描，JOIN employees表获取职级，计算每条记录的规则判定，输出异常record_ids"
   },
+  "exclusions": ["special_approval=1"],
   "stopping_conditions": [
-    "All 11 rules checked against complete population",
-    "All records with special_approval=true are excluded from anomalies",
-    "R9-R10: duplicate invoices reconciled before monthly aggregation",
-    "R11: only unapproved records after budget crossing are anomalous",
-    "evidence_matrix passes with 100% coverage"
+    "每种费用类型完成全量COUNT和异常筛选",
+    "所有异常record_ids有完整字段证据",
+    "evidence_matrix覆盖100%"
   ],
   "unresolved_items": []
 }

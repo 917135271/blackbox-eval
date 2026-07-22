@@ -1,0 +1,32 @@
+=== L3-003 Single-Transaction Exceedance Analysis ===
+
+Total records scanned: 4240 (all approved)
+Total violations found: 5
+
+  travel_lodging (差旅住宿费): 883 checked, 1 violation
+    - Policy: 04_travel_expense.md 第四条 (per-night cap by employee_level + city_tier)
+    - Normalization: amount / nights vs per-night cap
+
+  local_transport (市内交通费): 770 checked, 1 violation
+    - Policy: 04_travel_expense.md 第六条 (daily cap by city_tier)
+    - Normalization: amount / days vs daily cap
+
+  training_fee (培训费): 578 checked, 1 violation
+    - Policy: 05_training_expense.md 第二条 (per person per session <= 3500)
+
+  business_entertainment (业务招待费): 675 checked, 0 violations
+    - Policy: 06_business_entertainment.md 第二条 (per event <= 5000)
+
+  office_supplies (办公用品): 694 checked, 1 violation
+    - Policy: 07_office_communication.md 第二条 (single transaction > 600)
+
+  communication (通讯费): 640 checked, 1 violation
+    - Policy: 07_office_communication.md 第三条 (single transaction > 300)
+
+=== Violation Details ===
+
+1. R004221 | office_supplies | amount=650.00 | threshold=600 | excess=50.00 | D1(部门负责人级) | E0007 李丽娟 | 项目资料及办公耗材采购
+2. R004222 | communication | amount=330.00 | threshold=300 | excess=30.00 | D1(部门负责人级) | E0008 杨丹 | 业务通讯费
+3. R004223 | training_fee | amount=3700.00 | threshold=3500 | excess=200.00 | D1(部门负责人级) | E0009 张婷 | 外部专业培训课程费
+4. R004225 | travel_lodging | amount=900.00 (1 night, per_night=900.00) | threshold=850 (D1/A/一类) | excess=50.00 | D1(部门负责人级) | E0007 李丽娟 | 项目现场住宿费
+5. R004226 | local_transport | amount=92.00 (1 day, per_day=92.00) | threshold=80 (C/三类) | excess=12.00 | D1(部门负责人级) | E0008 杨丹 | 市内业务交通费

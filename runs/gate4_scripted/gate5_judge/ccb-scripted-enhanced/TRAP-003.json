@@ -1,0 +1,268 @@
+{
+  "group": "ccb-scripted-enhanced",
+  "task_id": "TRAP-003",
+  "case_family": "clean_trap",
+  "category": "clean_but_suspicious",
+  "graded_at": "2026-07-22T00:52:36+08:00",
+  "checklist_passed": 16,
+  "checklist_total": 16,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "clean-conclusion",
+      "value": 1,
+      "reason": "候选答案明确判断无异常，且结论与证据一致",
+      "answer_evidence": "无异常。R004236和R004237不构成7天内拆分报销。",
+      "trace_evidence": "get_expense_detail返回记录R004236费用日期2025-10-01，R004237费用日期2025-10-09，间隔8天；搜索政策返回第十一条拆分条款。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "record-scope-include-r004236",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-include-r004237",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "case-specific-reason-gap",
+      "value": 1,
+      "reason": "正确计算日期间隔为8天",
+      "answer_evidence": "费用发生日期分别为2025-10-01和2025-10-09，间隔8天",
+      "trace_evidence": "get_expense_detail: R004236的expense_date为2025-10-01，R004237的expense_date为2025-10-09，间隔8天。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-window",
+      "value": 1,
+      "reason": "正确应用7天窗口边界",
+      "answer_evidence": "超过《XX证券费用报销管理办法(2025修订版)》第十一条规定的7天内标准",
+      "trace_evidence": "get_policy_excerpt: 第十一条规定'7天内出现2笔及以上报销'。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "准确计算合计金额10400元",
+      "answer_evidence": "合计金额10,400元",
+      "trace_evidence": "get_expense_detail: R004236金额5200元，R004237金额5200元，合计10400元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 1,
+      "reason": "答案正确说明金额条件满足但时间窗口不满足",
+      "answer_evidence": "候选答案第3-4行：合计金额10,400元达到《XX证券授权管理办法》附件二AR-03较高审批线，但因时间条件不满足，不构成拆分规避审批。",
+      "trace_evidence": "搜索政策返回第十一条，摘要显示7天内条件；get_expense_detail显示日期2025-10-01和2025-10-09，金额各5200。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-gap",
+      "value": 1,
+      "reason": "工具轨迹显示费用发生日期2025-10-01和2025-10-09，间隔8天",
+      "answer_evidence": "候选答案第1行：费用发生日期分别为2025-10-01和2025-10-09，间隔8天。",
+      "trace_evidence": "get_expense_detail R004236返回expense_date: 2025-10-01；R004237返回expense_date: 2025-10-09；可计算出间隔8天。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-window",
+      "value": 1,
+      "reason": "答案说明间隔8天超过7天窗口",
+      "answer_evidence": "候选答案第1行：间隔8天，超过第十一条规定的7天内标准。",
+      "trace_evidence": "get_policy_excerpt返回第十一条：同一员工、同一费用类型在7天内出现2笔及以上报销...；日期间隔计算为8天。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "合计金额10400元正确计算",
+      "answer_evidence": "候选答案第2行：合计金额10,400元。",
+      "trace_evidence": "get_expense_detail两笔记录金额均为5200，合计10400。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 1,
+      "reason": "轨迹通过工具调用获取了R004236和R004237的金额和日期，合计10400元，间隔8天，并引用了制度第十一条，独立核验了金额满足10000元审批线但时间窗口不满足，正确说明不构成拆分。",
+      "answer_evidence": "答案明确说明：合计金额10,400元达到审批线，但费用发生日期间隔8天，超过7天内标准，不构成拆分规避审批。",
+      "trace_evidence": "get_expense_detail返回R004236 expense_date 2025-10-01, amount 5200; R004237 expense_date 2025-10-09, amount 5200; 间隔8天; get_policy_excerpt获得第十一条; 审批线来自03_authorization_management.md附件二AR-03≥10000元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "候选提交准确引用了制度01_expense_reimbursement_2025.md第十一条。",
+      "answer_evidence": "citations中包含{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十一条\"}。",
+      "trace_evidence": "工具trace中get_policy_excerpt查询了01_expense_reimbursement_2025.md第十一条，且答案引用了该条款。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "候选提交准确引用了制度03_authorization_management.md附件二。",
+      "answer_evidence": "citations中包含{\"doc_id\": \"03_authorization_management.md\", \"clause_no\": \"附件二\"}。",
+      "trace_evidence": "工具trace中get_policy_doc获取了03_authorization_management.md，包含附件二审批权限表，且答案引用了该附件。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-unsupported-output",
+      "value": 1,
+      "reason": "未提交异常ID",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 98.196,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "actual_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 2,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "所有检查项均通过，候选答案准确无异常。；候选答案完全符合预期，无异常判定正确，推理清晰，引用了相应制度。所有检查项均通过。；候选提交正确判断无异常，引用制度准确，工具轨迹提供了完整的数据核验，所有检查项均满足通过条件。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 11507,
+      "completion_tokens": 3882,
+      "total_tokens": 15389,
+      "prompt_cache_hit_tokens": 4480,
+      "prompt_cache_miss_tokens": 7027
+    },
+    "batch_count": 3,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 3765,
+          "completion_tokens": 1122,
+          "total_tokens": 4887,
+          "prompt_tokens_details": {
+            "cached_tokens": 384
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 724
+          },
+          "prompt_cache_hit_tokens": 384,
+          "prompt_cache_miss_tokens": 3381
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 3876,
+          "completion_tokens": 1594,
+          "total_tokens": 5470,
+          "prompt_tokens_details": {
+            "cached_tokens": 384
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1088
+          },
+          "prompt_cache_hit_tokens": 384,
+          "prompt_cache_miss_tokens": 3492
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 3866,
+          "completion_tokens": 1166,
+          "total_tokens": 5032,
+          "prompt_tokens_details": {
+            "cached_tokens": 3712
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 654
+          },
+          "prompt_cache_hit_tokens": 3712,
+          "prompt_cache_miss_tokens": 154
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 2,
+        "criteria_count": 3
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/ccb-scripted-enhanced/TRAP-003"
+}

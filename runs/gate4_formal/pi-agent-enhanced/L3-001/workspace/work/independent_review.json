@@ -1,0 +1,57 @@
+{
+  "decision": "pass",
+  "review_method": "对全部6组重复发票发现逐一验证豁免条件、特殊审批、撤销状态和制度例外",
+  "challenged_findings": [
+    {
+      "anomaly_id": "DUP-FP202500000002",
+      "challenge": "是否存在特殊审批豁免或制度例外？",
+      "result": "两笔记录special_approval=0，status=approved，无撤销。制度第十条为禁止性规定，无豁免条款。时间矛盾(R004201报销日早于发票日)进一步佐证异常。",
+      "resolved": true,
+      "action": "维持发现"
+    },
+    {
+      "anomaly_id": "DUP-FP202500000005",
+      "challenge": "是否存在特殊审批豁免或制度例外？",
+      "result": "两笔记录special_approval=0，status=approved，无撤销。R004202报销日早于发票日。维持发现。",
+      "resolved": true,
+      "action": "维持发现"
+    },
+    {
+      "anomaly_id": "DUP-FP202500000020",
+      "challenge": "是否存在特殊审批豁免或差旅住宿例外？",
+      "result": "两笔记录special_approval=0，status=approved。制度第十条未区分费用类型，差旅住宿同样适用。维持发现。",
+      "resolved": true,
+      "action": "维持发现"
+    },
+    {
+      "anomaly_id": "DUP-FP202500000028",
+      "challenge": "是否存在特殊审批豁免？",
+      "result": "两笔记录special_approval=0，status=approved。维持发现。",
+      "resolved": true,
+      "action": "维持发现"
+    },
+    {
+      "anomaly_id": "DUP-FP202500000037",
+      "challenge": "是否存在特殊审批豁免？",
+      "result": "两笔记录special_approval=0，status=approved。维持发现。",
+      "resolved": true,
+      "action": "维持发现"
+    },
+    {
+      "anomaly_id": "DUP-FP202500000055",
+      "challenge": "是否存在特殊审批豁免或业务招待例外？",
+      "result": "两笔记录special_approval=0，status=approved。制度第十条未区分费用类型。维持发现。",
+      "resolved": true,
+      "action": "维持发现"
+    }
+  ],
+  "global_checks": [
+    {"check": "制度版本适用性", "result": "2025修订版自2025-01-01施行，覆盖全部记录，无版本过渡问题"},
+    {"check": "费用类型例外", "result": "第十条适用于全部费用类型，未设例外"},
+    {"check": "特殊审批豁免", "result": "全部12条记录special_approval=0"},
+    {"check": "记录撤销/取消", "result": "全部为approved状态，无撤销"},
+    {"check": "全量扫描遗漏", "result": "SQL与API交叉验证一致，usage_count>=3查询为空，无遗漏"}
+  ],
+  "required_changes": [],
+  "unresolved_conflicts": []
+}

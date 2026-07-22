@@ -1,0 +1,174 @@
+{
+  "checklist": [
+    {
+      "id": "finding-type-count-count",
+      "value": 0,
+      "reason": "候选提交仅包含5个异常ID，而预期为6个，不满足发现数量恰好为6的条件。",
+      "answer_evidence": "候选提交中anomaly_ids字段为['ANM-L3-003-001', 'ANM-L3-003-002', 'ANM-L3-003-003', 'ANM-L3-003-004', 'ANM-L3-003-005']，共5个。",
+      "trace_evidence": "工具调用摘要中actual_anomaly_ids包含5个ID。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004224",
+      "value": 0,
+      "reason": "候选提交的record_ids中未包含R004224。",
+      "answer_evidence": "候选提交的record_ids列表为['R004221', 'R004222', 'R004223', 'R004207', ...]，不包含R004224。",
+      "trace_evidence": "工具调用摘要中actual_record_ids不包含R004224。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004226",
+      "value": 0,
+      "reason": "候选提交的record_ids中未包含R004226。",
+      "answer_evidence": "候选提交的record_ids列表不包含R004226。",
+      "trace_evidence": "工具调用摘要中actual_record_ids不包含R004226。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-no-extra",
+      "value": 0,
+      "reason": "候选提交的record_ids包含大量预期之外的记录，如R004207等，不符合只包含指定6条记录的条件。",
+      "answer_evidence": "候选提交的record_ids包含22条记录，超出预期的6条。",
+      "trace_evidence": "工具调用摘要中actual_record_ids包含22条记录，其中18条为额外记录。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "候选提交中记录R004221属于发现ANM-L3-003-001",
+      "answer_evidence": "answer中record_ids包含R004221",
+      "trace_evidence": "工具调用list_expenses(office_supplies)返回R004221，并被纳入提交",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "候选提交中记录R004222属于发现ANM-L3-003-002",
+      "answer_evidence": "answer中record_ids包含R004222",
+      "trace_evidence": "工具调用list_expenses(communication)返回R004222，并被纳入提交",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "候选提交中记录R004223属于发现ANM-L3-003-003",
+      "answer_evidence": "answer中record_ids包含R004223",
+      "trace_evidence": "工具调用list_expenses(training_fee)返回R004223，并被纳入提交",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 0,
+      "reason": "候选提交中未包含记录R004224，未形成预期发现分组",
+      "answer_evidence": "answer和record_ids中均无R004224",
+      "trace_evidence": "工具调用list_expenses和get_expense_detail未覆盖R004224，候选提交中未出现此记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 0,
+      "reason": "候选将R004225归入ANM-L3-003-004，该发现包含多条记录，不符合预期中R004225单独成组的要求。",
+      "answer_evidence": "candidate_evidence_matrix中ANM-L3-003-004的record_ids包含除R004225外的多条记录，如R004207等，未形成单一记录分组。",
+      "trace_evidence": "candidate_evidence_matrix.evidence_rows[3].record_ids列出R004207等多条记录，R004225混杂其中。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 0,
+      "reason": "候选未提交记录R004226，完全缺少该发现分组。",
+      "answer_evidence": "候选回答的record_ids中无R004226，anomaly_ids列表也无对应项。",
+      "trace_evidence": "candidate_submission.record_ids不包含R004226，candidate_evidence_matrix.unused_candidate_record_ids为空，无R004226任何证据。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "工具调用中summarize_expenses和list_expenses均无日期过滤，获取了全年所有费用类型的记录。",
+      "answer_evidence": "候选在answer中声明‘全年单笔超标准专项扫描’，并覆盖所有相关费用类型。",
+      "trace_evidence": "tool_trace_summary中summarize_expenses两次调用均按全年汇总，list_expenses多次无月份限制，如traing_fee、communication等。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-approval",
+      "value": 1,
+      "reason": "候选通过get_expense_detail检查special_approval字段，提交的所有记录均special_approval=0，排除了有专项审批的记录。",
+      "answer_evidence": "candidate_evidence_matrix中全部事实均标注‘无专项审批’，如office_supplies、communication、training_fee。",
+      "trace_evidence": "tool_trace中get_expense_detail对R004221、R004222等返回的JSON包含\"special_approval\": 0，候选仅将这些记录计为异常。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-office",
+      "value": 1,
+      "reason": "办公用品扫描仅计入单笔超600元记录",
+      "answer_evidence": "发现办公用品异常ANM-L3-003-001(R004221金额650元)",
+      "trace_evidence": "list_expenses office_supplies min_amount=600返回R004221一条记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-communication",
+      "value": 1,
+      "reason": "通讯费用扫描仅计入单笔超300元记录",
+      "answer_evidence": "发现通讯费用异常ANM-L3-003-002(R004222金额330元)",
+      "trace_evidence": "list_expenses communication min_amount=300返回R004222一条记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-training",
+      "value": 1,
+      "reason": "培训课程费扫描仅计入单次超3500元记录",
+      "answer_evidence": "发现培训课程费异常ANM-L3-003-003(R004223金额3700元)",
+      "trace_evidence": "list_expenses training_fee min_amount=3500返回R004223一条记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-entertainment",
+      "value": 0,
+      "reason": "未核查人均300元标准，仅按单次金额检索",
+      "answer_evidence": "未返回任何业务招待费异常，也未说明人均标准核查",
+      "trace_evidence": "仅list_expenses business_entertainment按金额降序，未获取参与人数或按人均过滤",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-travel",
+      "value": 0,
+      "reason": "未使用住宿晚数计算超标准，仅比较金额与标准不成比例",
+      "answer_evidence": "候选答案未描述扫描方法，仅列记录",
+      "trace_evidence": "get_expense_detail 返回 days 为 null，未见晚数提取或计算",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-transport",
+      "value": 1,
+      "reason": "扫描中使用了城市档位和出差天数",
+      "answer_evidence": "候选答案未描述，但证据矩阵提及相关字段",
+      "trace_evidence": "list_expenses local_transport 后 get_expense_detail 返回 city_tier 和 days 字段",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 0,
+      "reason": "中间统计和最终发现均为5条，与预期6条不一致",
+      "answer_evidence": "提交发现5个 anomaly_ids，非6个",
+      "trace_evidence": "工具查询结果和最终提交均为5条超标准记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "引用了超标准总则条款",
+      "answer_evidence": "citations 包含 01_expense_reimbursement_2025.md 第十二条",
+      "trace_evidence": "get_policy_doc 获取了该文档并含第十二条内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-special",
+      "value": 0,
+      "reason": "候选提交未引用06号业务招待费专项标准，缺少费用类型对应的专项标准，不符合“04至07号专项费用标准”的完整要求",
+      "answer_evidence": "citations中仅包含04、05、07和01，缺少06_business_entertainment.md",
+      "trace_evidence": "工具调用获取了06_business_entertainment.md（get_policy_doc doc_id=06_business_entertainment.md），但候选未在citations中列出",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交的异常数量不足，缺失预期记录R004224和R004226，且包含大量无关记录，完全未满足要求。；前三项记录正确分组，第四项R004224缺失导致失败。；候选遗漏了R004224和R004226两个预期发现，导致分组不完整，但扫描范围完整且正确排除了专项审批记录。；办公用品、通讯、培训三项口径正确，业务招待费缺少人均标准核查；住宿扫描未使用晚数，导致遗漏2条预期发现；交通扫描方法满足；数量核对不一致；政策引用正确。；缺失业务招待费专项标准引用，未完全满足专项标准与费用类型对应要求。",
+  "confidence": 0.8083333333333332
+}

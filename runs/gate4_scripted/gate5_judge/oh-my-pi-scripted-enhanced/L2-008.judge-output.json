@@ -1,0 +1,54 @@
+{
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "答案明确认定构成拆分报销，无矛盾表述。",
+      "answer_evidence": "经核查，员工E0009...构成《XX证券费用报销管理办法(2025修订版)》第十一条所定义的拆分报销以规避审批权限的违规行为。",
+      "trace_evidence": "未使用工具直接判断，但答案基于轨迹数据得出。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "明确引用了费用报销办法第十一条。",
+      "answer_evidence": "citations中包含{\"clause_no\":\"第十一条\",\"doc_id\":\"01_expense_reimbursement_2025.md\"}。",
+      "trace_evidence": "搜索策略后get_policy_excerpt返回第十一条内容：\"第十一条 不得将同一事项或同类事项拆分为多笔报销以规避审批权限...\"",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-authorization",
+      "value": 1,
+      "reason": "明确引用了授权管理办法附件二。",
+      "answer_evidence": "citations中包含{\"clause_no\":\"附件二\",\"doc_id\":\"03_authorization_management.md\"}。",
+      "trace_evidence": "get_policy_doc返回附件二内容，包含审批线表格。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-window",
+      "value": 1,
+      "reason": "正确计算为5天间隔，在7天窗口内。",
+      "answer_evidence": "答案表述：“日期窗口为2025-04-10至2025-04-15（间隔5天，在7天窗口内）”",
+      "trace_evidence": "list_expenses返回R004212日期2025-04-10，R004213日期2025-04-15。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-sum",
+      "value": 1,
+      "reason": "候选答案明确陈述合计金额为10200元，且工具轨迹显示R004212和R004213均为5100元，合计10200元。",
+      "answer_evidence": "合计金额10200元。",
+      "trace_evidence": "get_expense_detail(R004212)和get_expense_detail(R004213)返回amount均为5100.0，合计10200元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-threshold",
+      "value": 1,
+      "reason": "候选答案明确指出10200元触及AR-03审批线（10000元及以上），与审批权限表相符。",
+      "answer_evidence": "合计10200元已触及AR-03审批线（10000元及以上，需部门总经理审批）。",
+      "trace_evidence": "get_policy_doc(03_authorization_management.md)返回附件二，AR-03档位为大于等于10000元且小于50000元。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "所有检查项均符合要求，答案明确认定拆分报销，正确引用制度条款，并准确计算了7天窗口。；全部检查项通过。合计金额计算正确并与10000元审批线进行了正确比较，推理符合制度依据。",
+  "confidence": 1.0
+}

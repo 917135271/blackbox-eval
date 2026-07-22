@@ -1,66 +1,67 @@
 {
   "task_id": "TRAP-002",
   "task_type": "clean_but_suspicious",
-  "audit_scope": {
-    "audit_object": "TRAP-002涉及的报销记录——R000002与R004201（发票FP202500000002重复使用）",
+  "question": "请核查R004234和R004235是否构成重复报销或拆分报销。必须核对发票是否相同及7天内合计金额；若不构成异常，请明确说明无异常、原因和制度依据。",
+  "scope": {
+    "audit_object": "R004234和R004235两笔报销记录",
+    "records": ["R004234", "R004235"],
     "expense_types": ["office_supplies"],
-    "business_period": "2025-02-10 至 2025-09-09",
-    "organization_scope": "合规风控部(D008)，员工姚瑜(E0050)",
-    "requested_deliverable": "判定R000002与R004201是否构成重复报销异常"
+    "business_period": "2025-10-20",
+    "organization_scope": "E0009 张婷, D009 财务管理部"
   },
   "policy_questions": [
     {
-      "question": "同一发票被两次报销是否违反制度？",
-      "policy_rule": "第十条：同一发票最多报销1次",
-      "applicable_doc": "01_expense_reimbursement_2025.md",
-      "effective_date": "2025-01-01",
-      "boundaries": "发票FP202500000002在R000002和R004201中均被使用"
+      "rule": "重复报销",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十条",
+      "check": "同一发票是否在不同报销单中重复出现"
+    },
+    {
+      "rule": "拆分报销",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十一条",
+      "check": "同一员工、同一费用类型在7天内2笔及以上报销，合计金额是否达到较高审批线"
     }
   ],
   "data_questions": [
-    {
-      "question": "R000002和R004201是否使用同一张发票FP202500000002？",
-      "tables": ["expense_records", "invoices"],
-      "required_fields": ["record_id", "invoice_no", "invoice_id", "amount", "reason", "employee_id", "expense_date"]
-    },
-    {
-      "question": "R004201的'重复发票注入样本'标签是否表明其为测试/注入记录，不应作为真实违规？",
-      "tables": ["expense_records"],
-      "required_fields": ["reason", "record_no", "invoice_no"]
-    }
+    "R004234和R004235的发票号是否相同",
+    "两笔记录的员工、费用类型是否相同",
+    "两笔记录的日期差是否在7天内",
+    "合计金额是否达到授权管理办法附件二中较高的审批线"
   ],
-  "evidence_requirements": [
-    "R000002和R004201的完整详情(含审批)",
-    "发票FP202500000002的使用记录",
-    "制度第十条原文",
-    "R004201的reason字段明确标注'重复发票注入样本'"
+  "required_fields": [
+    "record_id", "employee_id", "expense_type", "expense_date",
+    "amount", "invoice_no", "invoice_id", "status", "special_approval"
+  ],
+  "required_policies": [
+    "01_expense_reimbursement_2025.md",
+    "03_authorization_management.md"
   ],
   "execution_steps": [
-    "1. 确认适用制度：01_expense_reimbursement_2025.md第十条",
-    "2. 获取R000002和R004201详情，确认发票复用关系",
-    "3. 分析R004201的reason字段是否为注入样本标识",
-    "4. 判断：注入样本不应视为真实违规",
-    "5. 证据覆盖检查",
-    "6. 误判复核（false-positive-review触发）",
-    "7. 撰写审计报告",
-    "8. 结果校验与提交"
+    "获取R004234和R004235详细信息",
+    "核对发票是否相同（第十条 重复报销）",
+    "核对7天内合计金额及审批线（第十一条 拆分报销）",
+    "检查7天窗口内是否有其他同员工同类型记录",
+    "撰写证据矩阵",
+    "撰写审计报告",
+    "校验并提交"
   ],
   "complexity": {
     "score": 2,
     "reasons": [
-      "需要分组查找复用发票（find_reused_invoices → join/grouping）",
-      "注入样本属于例外/豁免边界判断"
+      "涉及两条业务规则（重复报销+拆分报销）",
+      "涉及7天窗口和审批线阈值判断"
     ]
   },
   "subagent_plan": {
     "use_subagent": false,
-    "reason": "复杂度2，数据范围窄（仅2条记录），可直接在主智能体中完成"
+    "reason": "仅两条记录，数据已通过MCP获取完毕，无需子智能体"
   },
   "stopping_conditions": [
-    "制度第十条确认适用",
-    "R000002和R004201详情获取完毕",
-    "注入样本标签确认",
-    "无异常结论已通过复核"
+    "发票核对完成",
+    "7天窗口和审批线判断完成",
+    "证据矩阵覆盖100%",
+    "校验通过并提交成功"
   ],
   "unresolved_items": []
 }

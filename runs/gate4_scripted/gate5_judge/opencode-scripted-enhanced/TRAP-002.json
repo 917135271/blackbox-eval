@@ -1,0 +1,252 @@
+{
+  "group": "opencode-scripted-enhanced",
+  "task_id": "TRAP-002",
+  "case_family": "clean_trap",
+  "category": "clean_but_suspicious",
+  "graded_at": "2026-07-22T01:00:37+08:00",
+  "checklist_passed": 12,
+  "checklist_total": 14,
+  "checklist_pass_rate": 85.714,
+  "checklist": [
+    {
+      "id": "clean-conclusion",
+      "value": 1,
+      "reason": "明确判断无异常，无矛盾表述。",
+      "answer_evidence": "经核查，R004234与R004235不构成重复报销或拆分报销，判定为无异常。",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "record-scope-include-r004234",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-include-r004235",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "case-specific-reason-invoice",
+      "value": 1,
+      "reason": "准确说明发票不同。",
+      "answer_evidence": "两笔记录使用不同发票（FP2025X0004228与FP2025X0004229）",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "准确计算7天内合计500元。",
+      "answer_evidence": "合计金额500元",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 0,
+      "reason": "错误地使用3000元审批线，预期应为10000元。",
+      "answer_evidence": "未达《XX证券授权管理办法》附件二AR-02档的较高审批线3000元",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-invoice",
+      "value": 1,
+      "reason": "答案明确说明发票不同，工作产物包含数据来源",
+      "answer_evidence": "两笔记录使用不同发票（FP2025X0004228与FP2025X0004229）",
+      "trace_evidence": "无工具调用，但工作产物中明确包含发票编号",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "答案明确说明合计金额500元，工作产物包含计算数据",
+      "answer_evidence": "合计金额500元",
+      "trace_evidence": "无工具调用，但工作产物中明确包含金额",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 0,
+      "reason": "错误比较审批线为3000元，未与预期的10000元比较",
+      "answer_evidence": "未达《XX证券授权管理办法》附件二AR-02档的较高审批线3000元",
+      "trace_evidence": "无工具调用，但工作产物中错误使用3000元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用01_expense_reimbursement_2025.md第十条和第十一条",
+      "answer_evidence": "citations包含第十条和第十一条",
+      "trace_evidence": "无工具调用，但提交的citations字段符合要求",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "候选提交准确引用了03_authorization_management.md#附件二",
+      "answer_evidence": "citations中包含{'doc_id': '03_authorization_management.md', 'clause_no': '附件二'}",
+      "trace_evidence": "无工具调用痕迹，但回答中明确引用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-unsupported-output",
+      "value": 1,
+      "reason": "未提交异常ID",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 106.962,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": [
+      "R004234",
+      "R004235"
+    ],
+    "actual_record_ids": [
+      "R004234",
+      "R004235"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 3,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条、第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 0.9666666666666667,
+    "overall_comment": "候选提交正确识别发票不同和合计金额，但审批线阈值错误。；候选答案正确识别了发票不同和合计金额，但错误地将审批线比较为3000元而非题目预期的10000元，导致该检查项不通过。；候选提交正确引用了所需制度依据，满足检查项要求。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 5719,
+      "completion_tokens": 3838,
+      "total_tokens": 9557,
+      "prompt_cache_hit_tokens": 2176,
+      "prompt_cache_miss_tokens": 3543
+    },
+    "batch_count": 3,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 1940,
+          "completion_tokens": 1462,
+          "total_tokens": 3402,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1131
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 1172
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 2094,
+          "completion_tokens": 1728,
+          "total_tokens": 3822,
+          "prompt_tokens_details": {
+            "cached_tokens": 896
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1372
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 1198
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 1685,
+          "completion_tokens": 648,
+          "total_tokens": 2333,
+          "prompt_tokens_details": {
+            "cached_tokens": 512
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 525
+          },
+          "prompt_cache_hit_tokens": 512,
+          "prompt_cache_miss_tokens": 1173
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 1
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/opencode-scripted-enhanced/TRAP-002"
+}

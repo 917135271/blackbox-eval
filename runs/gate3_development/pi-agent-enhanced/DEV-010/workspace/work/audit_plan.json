@@ -1,0 +1,80 @@
+{
+  "task_id": "DEV-010",
+  "task_type": "clean_trap",
+  "audit_object": "R900010与R900011",
+  "audit_period": "2025-06-01 至 2025-06-09（费用发生日期）/ 2025-06-05 至 2025-06-13（报销提交日期）",
+  "organization_scope": "E9001（开发员工甲），D901（开发审计一部）",
+  "requested_deliverable": "核查是否构成7天内拆分报销，准确处理日期边界",
+
+  "policy_questions": [
+    {
+      "id": "PQ1",
+      "question": "拆分报销规则：第十一条规定的7天窗口如何计算？起算日使用expense_date还是reimburse_date？",
+      "policy_docs": ["01_expense_reimbursement_2025.md"],
+      "clause": "第十一条"
+    },
+    {
+      "id": "PQ2",
+      "question": "审批线阈值：合计金额10600元达到哪个审批档位？",
+      "policy_docs": ["03_authorization_management.md"],
+      "clause": "附件二"
+    }
+  ],
+
+  "data_questions": [
+    {
+      "id": "DQ1",
+      "question": "R900010与R900011的日期差是多少？按expense_date与reimburse_date分别计算。",
+      "fields": ["expense_date", "reimburse_date", "amount", "employee_id", "expense_type"]
+    },
+    {
+      "id": "DQ2",
+      "question": "两笔记录是否属于同一员工、同一费用类型？",
+      "fields": ["employee_id", "expense_type"]
+    },
+    {
+      "id": "DQ3",
+      "question": "是否存在其他相近日期内的同类型报销（排除遗漏风险）？",
+      "fields": ["expense_date", "employee_id", "expense_type"]
+    }
+  ],
+
+  "required_fields": ["record_id", "employee_id", "expense_type", "expense_date", "reimburse_date", "amount", "invoice_no", "status"],
+  "execution_steps": [
+    {"step": 1, "action": "获取R900010和R900011详情", "tool": "get_expense_detail", "status": "done"},
+    {"step": 2, "action": "获取拆分报销相关政策全文", "tool": "get_policy_doc", "status": "done"},
+    {"step": 3, "action": "日期边界精确计算：expense_date和reimburse_date两种口径", "tool": "manual_calculation", "status": "pending"},
+    {"step": 4, "action": "排除遗漏：检查E9001在2025-05-25至2025-06-16期间同类型的其他报销", "tool": "list_expenses", "status": "pending"},
+    {"step": 5, "action": "形成初步结论", "tool": "analysis", "status": "pending"},
+    {"step": 6, "action": "证据覆盖检查", "tool": "evidence-coverage-check skill", "status": "pending"},
+    {"step": 7, "action": "审计报告", "tool": "audit-report skill", "status": "pending"},
+    {"step": 8, "action": "结果校验", "tool": "result-validator skill", "status": "pending"},
+    {"step": 9, "action": "提交", "tool": "submit_audit_result", "status": "pending"}
+  ],
+
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "单规则（第十一条拆分报销）",
+      "两条记录已知，仅需直接查询和日期计算",
+      "无策略版本歧义（2025版明确适用）",
+      "总量和分组可通过直接查询覆盖，无需batch"
+    ]
+  },
+
+  "subagent_plan": {
+    "enabled": false,
+    "reason": "complexity=1，主上下文紧凑处理日期边界即可"
+  },
+
+  "stopping_conditions": [
+    "完成日期边界双口径精确计算",
+    "排除遗漏风险（同员工同期同类型）",
+    "证据覆盖100%通过",
+    "结果校验通过"
+  ],
+
+  "unresolved_items": [
+    "7天窗口起算日口径需通过政策文本确定（expense_date vs reimburse_date）"
+  ]
+}

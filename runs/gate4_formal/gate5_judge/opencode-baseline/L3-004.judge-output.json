@@ -1,22 +1,118 @@
 {
-  "all-record-ids": {
-    "score": 0,
-    "answer_evidence": "候选提交的record_ids列表包含数千条记录，远超期望的6条，且包含大量无关记录（例如R000001等），未返回期望集合{R000079, R000312, R000894, R002009, R003479, R003968}。",
-    "trace_evidence": "无工具轨迹，仅分析候选提交内容。"
-  },
-  "full-scan-method": {
-    "score": 15,
-    "answer_evidence": "answer中明确列出6个部门全年累计报销金额、超出预算金额及记录总数（如投资银行部525笔），证据矩阵中对每个部门均有详细统计，显示对全年数据进行了汇总计算。",
-    "trace_evidence": "无工具轨迹，但从候选提交的详实统计推断进行了全年全量扫描。"
-  },
-  "policy-basis": {
-    "score": 10,
-    "answer_evidence": "citations引用了《XX证券预算管理办法》第二、三、四条及《XX证券费用报销管理办法》第十三条，与预算管理办法-4.1（指导对应第十三条和第三条）实质对应；查询条件体现了累计超过预算且无专项审批。",
-    "trace_evidence": "无工具轨迹，但提交内容明确引用了相关条款。"
-  },
-  "false-positive-control": {
-    "score": 0,
-    "answer_evidence": "候选提交的record_ids返回了所有报销记录（数千条），而非仅6条异常触发记录，包含大量非异常记录，构成实质性误报。",
-    "trace_evidence": "无工具轨迹，直接基于提交的record_ids列表判定。"
-  }
+  "checklist": [
+    {
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "D001部门与关键记录R000079对应正确",
+      "answer_evidence": "提交答案明确D001累计突破预算关键记录为R000079，record_ids列表包含R000079。",
+      "trace_evidence": "工具调用次数0，但答案自包含对应信息。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "D002部门与关键记录R002009对应正确",
+      "answer_evidence": "提交答案明确D002关键记录R002009。",
+      "trace_evidence": "无工具轨迹，答案自包含。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "D003部门与关键记录R003968对应正确",
+      "answer_evidence": "答案明确D003关键记录R003968。",
+      "trace_evidence": "无轨迹，答案自包含。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 1,
+      "reason": "D004部门与关键记录R000894对应正确",
+      "answer_evidence": "答案明确D004关键记录R000894。",
+      "trace_evidence": "无轨迹，答案自包含。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 1,
+      "reason": "D005部门与关键记录R003479对应正确",
+      "answer_evidence": "答案明确D005关键记录R003479。",
+      "trace_evidence": "无轨迹，答案自包含。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 1,
+      "reason": "D006部门与关键记录R000312对应正确",
+      "answer_evidence": "答案明确D006关键记录R000312。",
+      "trace_evidence": "无轨迹，答案自包含。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "扫描覆盖全部部门，证据中包含预算内部门计数4",
+      "answer_evidence": "答案说明对全年度已批准报销记录按部门分析，reconciled_figures显示within_budget_dept_count=4。",
+      "trace_evidence": "无工具调用，但答案及证据矩阵显示全面扫描。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-grouping",
+      "value": 1,
+      "reason": "费用按department_id分别累计",
+      "answer_evidence": "答案明确'对每个部门'进行累计。",
+      "trace_evidence": "无轨迹，答案方法描述符合。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-ordering",
+      "value": 1,
+      "reason": "部门内按reimburse_date和record_id稳定排序",
+      "answer_evidence": "答案明确'按reimburse_date升序及record_id升序排列'。",
+      "trace_evidence": "无轨迹，答案方法描述符合。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-cumulative",
+      "value": 1,
+      "reason": "逐笔累计已批准费用，提供累计前后金额",
+      "answer_evidence": "答案给出每个部门突破预算前后的具体累计金额，如D001累计前230281.68，加226.98后达230508.66。",
+      "trace_evidence": "无轨迹，答案数值计算可复核。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-crossing",
+      "value": 1,
+      "reason": "关键记录同时满足累计超预算且无专项审批",
+      "answer_evidence": "答案明确条件：第一个使累计>年度预算且special_approval=0的记录。每个关键记录均注明special_approval=0。",
+      "trace_evidence": "无轨迹，答案满足条件。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 1,
+      "reason": "中间统计6个超预算部门与最终6项发现一致",
+      "answer_evidence": "reconciled_figures中over_budget_dept_count=6，提交的anomaly_ids和record_ids数量均为6。",
+      "trace_evidence": "无轨迹，数字一致。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "引用费用报销办法第十三条",
+      "answer_evidence": "citations中包含doc_id: 01_expense_reimbursement_2025.md, clause_no: 第十三条。",
+      "trace_evidence": "提交内容中直接引用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-budget",
+      "value": 1,
+      "reason": "引用预算管理办法第二至第四条",
+      "answer_evidence": "citations中列出了第二条、第三条、第四条，覆盖第二至第四条。",
+      "trace_evidence": "提交内容中直接引用。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "所有检查项均满足通过条件，候选提交正确识别所有超预算部门的关键记录，方法描述完整且符合要求，制度依据准确。",
+  "confidence": 1.0
 }

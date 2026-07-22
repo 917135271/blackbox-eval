@@ -1,53 +1,182 @@
 {
-  "criteria": [
+  "checklist": [
     {
-      "id": "all-anomaly-ids",
-      "score": 0,
-      "reason": "提交的异常ID（L3-003-A01~A09）与预期完全不符，且包含6个重复发票异常，不属于超标准专项扫描范围。预期6个超标准异常一个未以正确ID出现，零召回。",
-      "answer_evidence": "anomaly_ids: ['L3-003-A01',...,'L3-003-A09']，全部为自定义ID，无OVERSTD-*。",
-      "trace_evidence": "工具调用中未生成任何OVERSTD-*的ID，系统诊断precision=0.0, recall=0.0。"
+      "id": "finding-type-count-count",
+      "value": 0,
+      "reason": "提交发现数量为2，不等于6",
+      "answer_evidence": "anomaly_ids包含2个",
+      "trace_evidence": "无",
+      "source": "llm_judge"
     },
     {
-      "id": "all-record-ids",
-      "score": 0,
-      "reason": "预期6个超标准记录，提交15个记录，仅命中R004221,R004222,R004223，缺失R004224,R004225,R004226；另12个为重复发票记录（R000002等），recall=0.5，precision=0.2，远未达到80%且混入大量无关记录，不满足partial锚点。",
-      "answer_evidence": "submitted_record_ids: ['R000002',...,'R004223']，缺R004224~R004226。",
-      "trace_evidence": "find_reused_invoices返回多张重复发票，其record_ids全部被纳入结果；list_expenses未系统检出全部超标准记录。"
+      "id": "all-record-ids-include-r004223",
+      "value": 0,
+      "reason": "提交的record_ids未包含R004223",
+      "answer_evidence": "record_ids为['R004221','R004222']",
+      "trace_evidence": "无",
+      "source": "llm_judge"
     },
     {
-      "id": "full-scan-method",
-      "score": 7,
-      "reason": "执行了多费用类型和分页查询，但超标准比对不完整：仅用min_amount简单过滤（如office_supplies≥600、communication≥300），未对差旅住宿、招待等按城市、职级等明细标准逐条复核，导致漏掉3个超标准记录，复核不充分。",
-      "answer_evidence": "answer提及对office_supplies/communication/training_fee做了检查，但未展示其他类型完整比对过程。",
-      "trace_evidence": "summarize_expenses仅按employee_id,month汇总，未结合标准；list_expenses用min_amount粗略筛选，travel_lodging等实际未完成逐笔标准校验。"
+      "id": "all-record-ids-include-r004224",
+      "value": 0,
+      "reason": "提交的record_ids未包含R004224",
+      "answer_evidence": "同上",
+      "trace_evidence": "无",
+      "source": "llm_judge"
     },
     {
-      "id": "policy-basis",
-      "score": 3,
-      "reason": "引用了办公通讯管理办法和培训管理办法的具体条款，但未明确引用费用报销管理办法-6.3（对应第十二条综合标准条款），且查询条件与标准条款的对应关系不清晰，未在计算中体现完整规则映射。",
-      "answer_evidence": "citations中列出了第十条、第二条等，缺少6.3条款。",
-      "trace_evidence": "未查询或引用01_expense_reimbursement_2025.md中关于超标准的核心规则条款。"
+      "id": "all-record-ids-include-r004225",
+      "value": 0,
+      "reason": "提交的record_ids未包含R004225",
+      "answer_evidence": "同上",
+      "trace_evidence": "无",
+      "source": "llm_judge"
     },
     {
-      "id": "false-positive-control",
-      "score": 0,
-      "reason": "混入了6个重复发票异常（L3-003-A01~A06），属于其他规则领域，实质误报占提交异常的2/3，严重违反误报控制要求。",
-      "answer_evidence": "anomaly_ids中A01~A06描述均为发票重复使用，与超标准无关。",
-      "trace_evidence": "find_reused_invoices结果被直接当作超标准异常输出。"
+      "id": "all-record-ids-include-r004226",
+      "value": 0,
+      "reason": "提交的record_ids未包含R004226",
+      "answer_evidence": "同上",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "R004221被归类在ANOM-L3-003-001中",
+      "answer_evidence": "ANOM-L3-003-001对应record_ids['R004221']",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "R004222被归类在ANOM-L3-003-002中",
+      "answer_evidence": "ANOM-L3-003-002对应record_ids['R004222']",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 0,
+      "reason": "未提交R004223相关的发现",
+      "answer_evidence": "无对应异常",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 0,
+      "reason": "未提交R004224相关的发现",
+      "answer_evidence": "无对应异常",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 0,
+      "reason": "未提交R004225相关的发现",
+      "answer_evidence": "无对应异常",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 0,
+      "reason": "未提交R004226相关的发现",
+      "answer_evidence": "无对应异常",
+      "trace_evidence": "无",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "查询条件覆盖2025-01-01至2025-12-31完整年度",
+      "answer_evidence": "查询date_from和date_to为全年",
+      "trace_evidence": "list_expenses使用2025-01-01至2025-12-31参数",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-approval",
+      "value": 1,
+      "reason": "核实special_approval=0，排除已有专项审批",
+      "answer_evidence": "逐一核实记录详情确认无专项审批",
+      "trace_evidence": "get_expense_detail R004221和R004222调用并确认special_approval",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-office",
+      "value": 1,
+      "reason": "办公用品仅单笔>600元计入",
+      "answer_evidence": "list_expenses使用min_amount=600筛选",
+      "trace_evidence": "list_expenses office_supplies min_amount=600",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-communication",
+      "value": 1,
+      "reason": "通讯费用仅单笔>300元计入",
+      "answer_evidence": "list_expenses使用min_amount=300筛选",
+      "trace_evidence": "list_expenses communication min_amount=300",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-training",
+      "value": 0,
+      "reason": "未对培训课程费进行单次3500元超标准核查",
+      "answer_evidence": "答案仅涉及办公和通讯",
+      "trace_evidence": "轨迹中无培训费min_amount=3500查询",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-entertainment",
+      "value": 0,
+      "reason": "候选未对业务招待费执行单次5000元和人均300元的核查",
+      "answer_evidence": "答案仅描述办公用品和通讯费用的扫描，未提及业务招待费",
+      "trace_evidence": "工具调用仅包含office_supplies和communication的list_expenses，无business_entertainment查询",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-travel",
+      "value": 0,
+      "reason": "候选未对差旅住宿使用职级、城市档位和住宿晚数进行核查",
+      "answer_evidence": "答案未涉及差旅住宿费用类型，未说明相关计算口径",
+      "trace_evidence": "无travel_lodging或travel相关的list_expenses或get_expense_detail调用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-transport",
+      "value": 0,
+      "reason": "候选未对市内交通使用城市档位和出差天数进行核查",
+      "answer_evidence": "答案未提及市内交通费用类型，未说明相关计算口径",
+      "trace_evidence": "无transportation或local_transport相关的list_expenses调用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 0,
+      "reason": "中间统计仅为2条异常，与题目要求的6条不一致",
+      "answer_evidence": "候选证据矩阵中reconciled_figures显示办公用品1条、通讯1条，共2条；最终提交2条发现",
+      "trace_evidence": "list_expenses筛选结果仅返回2条超限记录；expected_record_ids要求6条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "引用了《费用报销管理办法》第十二条作为超标准总则条款",
+      "answer_evidence": "答案制度依据部分明确列出‘01_expense_reimbursement_2025.md’第十二条",
+      "trace_evidence": "citations字段包含{'doc_id': '01_expense_reimbursement_2025.md', 'clause_no': '第十二条'}",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-special",
+      "value": 0,
+      "reason": "仅引用了07号办公通讯专项标准，未引用04差旅、05培训、06招待专项标准",
+      "answer_evidence": "答案仅列出07_office_communication.md的第二、三条；未出现04、05、06号文档",
+      "trace_evidence": "citations中仅包含07号文档，无04_travel_expense.md等专项标准引用",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": true,
-      "reason": "未提交不存在的record_id，但使用了重复发票记录（R000002等）支撑超标准专项结论，属于用无关记录支撑核心结论，触发条件后半部分。"
-    },
-    {
-      "id": "partial-scan-presented-as-complete",
-      "triggered": false,
-      "reason": "工具调用覆盖了全年各费用类型的全量列表，未见仅检查部分月份或样例，漏报系方法不完善所致，不满足“只检查部分月份或样例记录”的条件。"
-    }
-  ],
-  "overall_comment": "候选将超标准规则与重复发票规则混淆，未能正确输出全部6个超标准异常，尽管扫描范围覆盖全年数据，但核查方法不完整且存在大量误报，制度依据不清晰，总分受fabricated-record-id关键失败限制为20，实际得分12。",
-  "confidence": 0.3
+  "overall_comment": "候选仅识别办公用品和通讯费用的2项异常，未覆盖其他费用类型且未满足全部记录要求，导致多项检查失败。；候选仅对办公用品和通讯费用进行了单笔超标准扫描，遗漏了差旅、培训、招待等其他费用类型的扫描，导致仅发现2项异常，不符合题目对全年数据全量扫描的要求。",
+  "confidence": 0.975
 }

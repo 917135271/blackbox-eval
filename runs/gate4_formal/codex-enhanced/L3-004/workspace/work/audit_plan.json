@@ -1,68 +1,91 @@
 {
-  "task_scope": {
-    "audit_object": "All departments annual expense vs. budget",
-    "expense_types": "All types",
-    "business_period": "2025-01-01 to 2025-12-31",
-    "organization_scope": "All departments",
-    "requested_deliverable": "Over-budget departments with record-level classification (exempt vs. violation)"
+  "task_id": "L3-004",
+  "task_type": "full_year_rule_audit",
+  "audit_object": "超预算专项扫描",
+  "task_question": "对全年数据做超预算专项扫描。按reimburse_date和record_id依次累计部门已批准费用，每个超预算部门形成1项发现，以首次使累计支出超过年度预算且无专项审批的记录作为关键record_id。返回全部发现ID和关键record_id集合，并说明计算方法和制度依据。",
+  "audit_period": {
+    "start": "2025-01-01",
+    "end": "2025-12-31"
   },
-  "policy_questions": [
+  "scope": {
+    "departments": "all",
+    "expense_types": "all",
+    "status": "approved"
+  },
+  "applicable_rules": [
     {
-      "rule": "预算管理办法第2条",
-      "description": "各部门应在年度预算额度内发生费用"
+      "policy_doc": "08_budget_management.md",
+      "clauses": ["第二条", "第三条", "第四条"],
+      "rule": "各部门应在年度预算额度内发生费用。累计达到预算1.0倍后原则上不得继续报销。超预算支出需专项审批。"
     },
     {
-      "rule": "预算管理办法第3条",
-      "description": "部门费用累计使用达到年度预算额度1.0倍后,原则上不得继续报销"
-    },
-    {
-      "rule": "预算管理办法第4条",
-      "description": "因监管要求、客户服务或经营连续性确需超预算支出的,应履行专项审批(special_approval)"
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clauses": ["第十三条"],
+      "rule": "部门年度预算不足时不得继续报销。预算达到1.0倍后确需发生的费用应履行专项审批。"
     }
   ],
+  "policy_questions": [
+    "预算管理办法第二条：部门年度预算额度定义",
+    "预算管理办法第三条：累计达到1.0倍预算后不得报销",
+    "预算管理办法第四条：专项审批作为超预算豁免条件",
+    "费用报销管理办法第十三条：预算不足时专项审批要求"
+  ],
   "data_questions": [
-    "Which departments have used_amount > annual_budget × 1.0?",
-    "For each over-budget department, what are all reimbursement records in 2025?",
-    "Which records have special_approval=true (exempt)?",
-    "Which records have special_approval=false/null (violation)?"
+    "哪些部门的累计已批准费用超过了年度预算？",
+    "每个超预算部门首次突破预算的关键记录是哪条？",
+    "关键记录是否具有专项审批(special_approval)？"
   ],
   "required_fields": [
-    "department_id", "department_name", "annual_budget", "used_amount",
-    "record_id", "employee_id", "expense_type", "amount", "expense_date",
-    "special_approval", "status", "invoice_no"
+    "record_id", "employee_id", "department_id", "amount",
+    "reimburse_date", "expense_date", "status", "special_approval",
+    "expense_type", "annual_budget"
   ],
-  "evidence_requirements": [
-    "summarize_department_budgets for all departments (approved and all statuses)",
-    "list_expenses for each over-budget department (full year 2025)",
-    "Policy doc for budget management rules"
+  "evidence_needed": [
+    "部门年度预算数据",
+    "全年已批准报销记录（按reimburse_date, record_id排序）",
+    "专项审批标记",
+    "累计计算过程"
   ],
   "execution_steps": [
-    "1. Get all department budgets via summarize_department_budgets",
-    "2. Identify over-budget departments (used > budget × 1.0)",
-    "3. For each over-budget department, list all 2025 expenses",
-    "4. Classify records: special_approval=true → exempt; otherwise → violation",
-    "5. Save detailed analysis and compact summary",
-    "6. Run evidence-coverage-check",
-    "7. Run false-positive-review if applicable",
-    "8. Run audit-report",
-    "9. Run result-validator",
-    "10. Submit via validate_audit_result then submit_audit_result"
+    {
+      "step": "policy_version_check",
+      "description": "确认适用的预算管理和费用报销制度版本"
+    },
+    {
+      "step": "data_analysis",
+      "description": "获取部门预算和全部已批准记录，按部门累计，定位超预算关键记录"
+    },
+    {
+      "step": "evidence_coverage",
+      "description": "对每个超预算部门确认关键记录无专项审批，覆盖100%"
+    },
+    {
+      "step": "false_positive_review",
+      "description": "复核边界情况和豁免条件"
+    },
+    {
+      "step": "report_and_validate",
+      "description": "生成审计报告并校验"
+    }
   ],
-  "complexity": {
-    "score": 3,
-    "reasons": [
-      "Aggregation, grouping, batch filtering (department-level budget comparison)",
-      "Two business rules (budget cap + special approval exemption)",
-      "Thresholds, exemptions, exceptions (1.0× threshold, special_approval exemption)"
-    ],
-    "subagent_plan": "None — task explicitly prohibits subagent creation"
+  "complexity_score": 3,
+  "complexity_reasons": [
+    "涉及两个以上制度（预算管理+费用报销）",
+    "需要聚合、分组、累计计算和批量过滤",
+    "涉及预算阈值(1.0x)和专项审批豁免条件",
+    "单规则批量聚合阈值任务"
+  ],
+  "subagent_plan": {
+    "role": "data_analyst",
+    "reason_code": "AGGREGATION_REQUIRED",
+    "task": "对全年已批准费用按reimburse_date和record_id排序后，按部门累计费用。对每个部门找出首次使累计超出年度预算的记录。检查该记录是否有special_approval。为每个超预算部门形成一项发现。",
+    "artifact_paths": []
   },
   "stopping_conditions": [
-    "All departments budget data retrieved",
-    "All over-budget department records enumerated",
-    "Each record classified as exempt or violation",
-    "Evidence coverage at 100%",
-    "Validation passes"
+    "所有部门预算与累计费用已计算",
+    "每个超预算部门关键记录已定位且无专项审批",
+    "evidence_matrix覆盖率100%",
+    "validation_report通过"
   ],
   "unresolved_items": []
 }

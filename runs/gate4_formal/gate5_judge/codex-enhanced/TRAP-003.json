@@ -1,137 +1,225 @@
 {
+  "group": "codex-enhanced",
+  "task_id": "TRAP-003",
   "case_family": "clean_trap",
-  "case_score": 45.0,
-  "case_score_raw": 45.0,
   "category": "clean_but_suspicious",
-  "criteria": [
+  "graded_at": "2026-07-21T20:55:27+08:00",
+  "checklist_passed": 16,
+  "checklist_total": 16,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
     {
-      "answer_evidence": "answer: 无异常。R000003培训费3209.78元经六项制度核查全部合规...",
       "id": "clean-conclusion",
-      "reason": "明确判断无异常，结论与预期一致",
-      "score": 30.0,
-      "source": "llm_judge",
-      "trace_evidence": "candidate_evidence_matrix.conclusion: '无异常 - 六项制度检查全部通过'"
+      "value": 1,
+      "reason": "候选答案明确判断无异常，表述无矛盾。",
+      "answer_evidence": "“无异常。经核查，R004236和R004237不构成7天内拆分报销。”",
+      "trace_evidence": "最终答案中没有矛盾表述，工具轨迹显示相关记录已核实。",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "record_ids: ['R000003', 'R003369', 'R003915']，未包含预期记录",
-      "id": "record-scope",
-      "reason": "未核查核心记录R004236、R004237，而是核查了无关记录R000003等",
-      "score": 0.0,
-      "source": "llm_judge",
-      "trace_evidence": "工具调用get_expense_detail('R000003')等，未尝试查询R004236或R004237"
-    },
-    {
-      "answer_evidence": "answer: 'R000003培训费3209.78元经六项制度核查全部合规...'，无窗口原因",
-      "id": "case-specific-reason",
-      "reason": "未说明专属合规原因outside aggregation window，给出的理由是基于金额、审批等常规检查",
-      "score": 0.0,
-      "source": "llm_judge",
-      "trace_evidence": "轨迹中无提及聚合窗口或边界窗口检查"
-    },
-    {
-      "answer_evidence": "无相关说明",
-      "id": "reverse-check",
-      "reason": "未进行与本题匹配的聚合窗口核查，未查询R004236、R004237",
-      "score": 0.0,
-      "source": "llm_judge",
-      "trace_evidence": "轨迹中仅查询了R000003及同员工培训费，无针对R004236的窗口检查"
-    },
-    {
+      "id": "record-scope-include-r004236",
+      "value": 1,
+      "reason": "期望record_id已提交",
       "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-include-r004237",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "case-specific-reason-gap",
+      "value": 1,
+      "reason": "正确计算两笔费用发生日期间隔为8天。",
+      "answer_evidence": "“两笔费用发生日期间隔为8天”",
+      "trace_evidence": "get_expense_detail返回R004236日期2025-10-01，R004237日期2025-10-09，间隔8天。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-window",
+      "value": 1,
+      "reason": "正确指出8天超出7天聚合窗口。",
+      "answer_evidence": "“超出制度规定的7天阈值”",
+      "trace_evidence": "search_policy结果第十一条规定7天内需核查，日期差8天>7天。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "准确计算合计金额为10400元。",
+      "answer_evidence": "“合计金额¥10,400”",
+      "trace_evidence": "get_expense_detail返回R004236金额5200，R004237金额5200，合计10400。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 1,
+      "reason": "正确说明金额条件满足但时间窗口条件不满足。",
+      "answer_evidence": "“合计金额¥10,400达到AR-03较高审批线（≥¥10,000），但…不满足条件(2)”",
+      "trace_evidence": "summarize_expenses显示total_amount=10400，list_expenses确认两笔记录日期差8天，制度要求7天内。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-gap",
+      "value": 1,
+      "reason": "工具轨迹包含数据来源和计算过程，证明日期间隔为8天。",
+      "answer_evidence": "无需从答案引用",
+      "trace_evidence": "get_expense_detail两次调用返回expense_date分别为2025-10-01和2025-10-09，差值为8天。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-window",
+      "value": 1,
+      "reason": "工具轨迹包含制度依据和日期计算，证明8天超出7天窗口。",
+      "answer_evidence": "无需从答案引用",
+      "trace_evidence": "search_policy返回第十一条（7天窗口），轨迹已计算日期差8天>7天。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "工具轨迹包含数据来源和计算，证明合计金额为10400元。",
+      "answer_evidence": "无需从答案引用",
+      "trace_evidence": "get_expense_detail返回金额5200和5200，summarize_expenses返回total_amount=10400。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 1,
+      "reason": "工具轨迹包含制度、金额和日期，证明金额条件满足但时间窗口不满足。",
+      "answer_evidence": "无需从答案引用",
+      "trace_evidence": "search_policy返回第十一条，金额合计10400达到AR-03线，日期差8天>7天。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用01_expense_reimbursement_2025.md第十一条。",
+      "answer_evidence": "citations中包含{\"doc_id\":\"01_expense_reimbursement_2025.md\",\"clause_no\":\"第十一条\"}",
+      "trace_evidence": "get_policy_doc调用了该文档，answer中正确引用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "准确引用03_authorization_management.md附件二。",
+      "answer_evidence": "citations中包含{\"doc_id\":\"03_authorization_management.md\",\"clause_no\":\"附件二\"}",
+      "trace_evidence": "get_policy_doc调用了该文档，answer中正确引用。",
+      "source": "llm_judge"
+    },
+    {
       "id": "no-unsupported-output",
-      "reason": "未提交实质异常",
-      "score": 10.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    },
-    {
+      "value": 1,
+      "reason": "未提交异常ID",
       "answer_evidence": "",
-      "id": "submission",
-      "reason": "统一提交已接受且Schema有效",
-      "score": 5.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "提交的记录均存在于数据库中，未使用伪造ID",
-      "score_cap": 20,
-      "source": "llm_judge"
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     },
     {
-      "id": "trap-false-positive",
-      "triggered": false,
-      "reason": "结论为无异常，未将合规记录判为异常",
-      "score_cap": 30,
-      "source": "llm_judge"
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 189.664,
+    "expected_anomaly_ids": [],
     "actual_anomaly_ids": [],
-    "actual_record_ids": [
-      "R000003",
-      "R003369",
-      "R003915"
-    ],
     "anomaly_metrics": {
-      "actual_types": {},
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
       "count_exact": true,
       "expected_types": {},
-      "f1": 1.0,
-      "precision": 1.0,
-      "recall": 1.0
+      "actual_types": {}
     },
-    "citation_count": 6,
-    "elapsed_seconds": 544.321,
-    "expected_anomaly_ids": [],
     "expected_record_ids": [
       "R004236",
       "R004237"
     ],
+    "actual_record_ids": [
+      "R004236",
+      "R004237"
+    ],
     "record_metrics": {
-      "exact": false,
-      "extra_count": 3,
-      "f1": 0.0,
-      "missing_count": 2,
-      "precision": 0.0,
-      "recall": 0.0
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
     },
-    "required_citations": [],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
     "trap_tokens_in_conclusion": [],
-    "unknown_record_ids": []
+    "citation_count": 2,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T23:25:30+08:00",
-  "group": "codex-enhanced",
   "judge": {
-    "attempt": 1,
-    "confidence": 0.95,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "候选正确给出了无异常结论，但完全忽略了本题核心记录R004236、R004237，导致核查范围错误、合规原因解释错误，且缺少必要的反向验证。",
-    "shape_attempt": 1,
     "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选提交完全符合预期，正确识别无异常，计算日期间隔、合计金额，并准确应用7天窗口和审批线，制度引用正确。轨迹核验充分。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 2325,
-      "completion_tokens_details": {
-        "reasoning_tokens": 1785
-      },
-      "prompt_cache_hit_tokens": 1024,
-      "prompt_cache_miss_tokens": 7427,
-      "prompt_tokens": 8451,
-      "prompt_tokens_details": {
-        "cached_tokens": 1024
-      },
-      "total_tokens": 10776
-    }
+      "prompt_tokens": 4972,
+      "completion_tokens": 1999,
+      "total_tokens": 6971,
+      "prompt_cache_hit_tokens": 4864,
+      "prompt_cache_miss_tokens": 108
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4972,
+          "completion_tokens": 1999,
+          "total_tokens": 6971,
+          "prompt_tokens_details": {
+            "cached_tokens": 4864
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 900
+          },
+          "prompt_cache_hit_tokens": 4864,
+          "prompt_cache_miss_tokens": 108
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 11
+      }
+    ]
   },
-  "passed": false,
-  "run_path": "runs/gate4_formal/codex-enhanced/TRAP-003",
-  "task_id": "TRAP-003"
+  "run_path": "runs/gate4_formal/codex-enhanced/TRAP-003"
 }

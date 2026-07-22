@@ -1,66 +1,72 @@
 {
   "task_id": "L2-003",
-  "task_scope": {
-    "audit_object": "以R000020为线索的重复报销异常",
+  "task_type": "policy_data_comparison",
+  "question": "结合制度和业务数据，核查以R000020为线索的重复报销异常，返回发现ID和record_id集合，并说明关键业务事实和制度依据。",
+  "scope": {
+    "audit_object": "R000020及关联的重复报销线索",
+    "rule": "同一发票最多报销1次（重复报销）",
     "expense_types": ["travel_lodging"],
-    "business_period": "2025-01至2025-04",
-    "organization_scope": "E0028(杜丹)/D009(财务管理部)",
-    "deliverable": "返回重复报销异常ID和记录ID集合"
+    "business_period": "2025-01-01至2025-04-18",
+    "organization_scope": "员工E0028（杜丹），部门D009（财务管理部）"
   },
   "policy_questions": [
     {
-      "question": "重复报销规则是什么？",
-      "policy_doc": "01_expense_reimbursement_2025.md",
+      "id": "PQ-1",
+      "question": "适用哪个制度的哪一条款规范同一发票重复报销？",
+      "applicable_doc": "01_expense_reimbursement_2025.md",
       "clause": "第十条",
-      "rule": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。",
-      "applicable_period": "2025-01-01起",
-      "exemptions": "special_approval字段"
+      "effective_date": "2025-01-01",
+      "status": "有效"
     }
   ],
   "data_questions": [
     {
-      "question": "R000020使用的发票FP202500000020是否被其他报销记录使用？",
-      "method": "find_invoice_usage",
-      "result": "FP202500000020被R000020和R004203两笔记录使用"
+      "id": "DQ-1",
+      "question": "发票FP202500000020（INV000020）在多少报销记录中被使用？",
+      "finding": "2条记录：R000020和R004203"
     },
     {
-      "question": "R004203是否有特殊审批或豁免？",
-      "method": "get_expense_detail",
-      "result": "special_approval=0, 无特殊审批"
+      "id": "DQ-2",
+      "question": "两条记录的详情和审批状态？",
+      "finding": "均审批通过，无特殊审批，同一员工、同一部门、同一事由、同一金额"
     }
   ],
-  "required_fields": ["record_id", "invoice_no", "invoice_id", "amount", "expense_type", "employee_id", "status", "special_approval", "expense_date", "reimburse_date"],
+  "required_fields": [
+    "record_id", "invoice_no", "invoice_id", "employee_id", "expense_date",
+    "expense_type", "amount", "status", "special_approval", "reason"
+  ],
   "evidence_requirements": [
-    "发票FP202500000020在两个报销记录中的使用证明",
-    "两笔记录的特殊审批状态",
-    "政策第十条的适用性确认"
+    "发票FP202500000020的两次使用记录详情",
+    "制度01_expense_reimbursement_2025.md第十条全文",
+    "两条记录的审批链"
   ],
   "execution_steps": [
-    "1. 获取R000020详情，确定线索发票",
-    "2. 查找发票FP202500000020的所有使用记录",
-    "3. 检查R004203的特殊审批状态和豁免",
-    "4. 确认2025版制度第十条的适用性",
-    "5. 构建证据矩阵",
-    "6. 独立复核（如果触发条件满足）",
-    "7. 审计报告",
-    "8. 结果校验",
-    "9. 提交"
+    {"step": 1, "action": "规划", "output": "work/audit_plan.json"},
+    {"step": 2, "action": "制度版本检查", "output": "work/policy_applicability.json"},
+    {"step": 3, "action": "数据分析验证", "output": "work/analysis/data_findings.json"},
+    {"step": 4, "action": "证据覆盖检查", "output": "work/evidence_matrix.json"},
+    {"step": 5, "action": "误报复核", "output": "work/independent_review.json"},
+    {"step": 6, "action": "审计报告", "output": "work/report_draft.json"},
+    {"step": 7, "action": "结果校验", "output": "work/validation_report.json"},
+    {"step": 8, "action": "提交", "output": "work/final_result.json"}
   ],
   "complexity": 2,
   "complexity_reasons": [
-    "多记录联合查询(发票跨记录使用)=+1",
-    "需检查特殊审批豁免=+1"
+    "单规则任务（重复报销）",
+    "多记录关联（2条记录共用同一发票）",
+    "无制度版本歧义（2025版制度适用）",
+    "无阈值边界判断"
   ],
   "subagent_plan": {
-    "policy_researcher": false,
-    "data_analyst": false,
-    "independent_reviewer": true,
-    "reason": "任务复杂度2，证据明确但涉及判断，需独立复核以挑战结论"
+    "planned": false,
+    "reason": "复杂性为2，数据范围小（2条记录），find_invoice_usage已直接关联记录，无需子智能体"
   },
   "stopping_conditions": [
-    "发票使用记录已完整获取",
-    "政策条款已明确",
-    "特殊审批状态已确认"
+    "制度条款确认完毕",
+    "两条记录详情验证完毕",
+    "证据覆盖率达到100%",
+    "误报复核通过",
+    "校验通过"
   ],
   "unresolved_items": []
 }

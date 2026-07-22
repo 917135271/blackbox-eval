@@ -1,0 +1,39 @@
+{
+  "decision": "pass",
+  "challenged_findings": [
+    {
+      "finding": "R004234与R004235不构成重复报销",
+      "challenge": "发票是否确实不同？是否存在同一发票拆分编号的规避手法？",
+      "resolution": "经核查，INV004228(FP2025X0004228)与INV004229(FP2025X0004229)为不同发票编号，各自usage_count=1，未在系统中发现交叉使用。发票编号连续但分属不同发票实体，制度仅约束同一发票重复使用，不同发票不触发第十条。"
+    },
+    {
+      "finding": "R004234与R004235不构成拆分报销",
+      "challenge": "两笔报销同日、同人、同类型、同金额、同供应商、同摘要，是否试图规避某一审批线？",
+      "resolution": "第十一条触发条件为'合计金额达到较高审批线'。两笔各250元，分别适用AR-01(部门经理)。合并500元仍适用AR-01，较高审批线为AR-02(≥3000元)。500元远低于3000元，不触发拆分核查条件。即使合并报销，审批层级不变，不存在规避审批权限的动机。"
+    },
+    {
+      "finding": "月度办公用品控制未超限",
+      "challenge": "E0009在10月是否还有其他办公用品报销？",
+      "resolution": "经全量查询E0009的office_supplies记录，仅此2笔合计500元，未超过第七条第二条的600元月度上限。"
+    }
+  ],
+  "supporting_evidence": [
+    "FP2025X0004228 usage_count=1, only linked to R004234",
+    "FP2025X0004229 usage_count=1, only linked to R004235",
+    "E0009 office_supplies total records: 2, all in scope",
+    "Combined amount 500 < AR-02 threshold 3000",
+    "Combined amount 500 < monthly cap 600"
+  ],
+  "opposing_evidence": [
+    "两笔报销同日、同人、同类型、同金额、同供应商、同摘要（'项目资料及办公耗材采购'），外观高度相似",
+    "发票编号连续（FP2025X0004228和FP2025X0004229），提示可能为同一交易分单开具"
+  ],
+  "exceptions_or_boundaries": {
+    "boundary_recheck": "7天窗口起点2025-10-20，同日记录间距0天，在窗口内但不触发阈值",
+    "threshold_recheck": "较高审批线AR-02=3000，观察值500，差距2500，安全边际充足",
+    "monthly_cap": "600，观察值500，安全边际100"
+  },
+  "required_changes": [],
+  "rationale": "外观高度相似（同日、同人、同类型、同金额、同供应商、同摘要），但制度判断需要满足客观触发条件。第十条（重复报销）要求同一发票，本案发票不同；第十一条（拆分报销）要求合计达到较高审批线（3000元），本案合计仅500元。两笔报销外观可疑但未触发任何制度规定的异常判定条件，无异常结论成立。",
+  "unresolved_conflicts": []
+}

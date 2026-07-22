@@ -1,0 +1,386 @@
+{
+  "group": "openclaude-scripted-enhanced",
+  "task_id": "TRAP-005",
+  "case_family": "clean_trap",
+  "category": "clean_but_suspicious",
+  "graded_at": "2026-07-22T00:59:24+08:00",
+  "checklist_passed": 25,
+  "checklist_total": 25,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "clean-conclusion",
+      "value": 1,
+      "reason": "明确无异常且无矛盾表述",
+      "answer_evidence": "anomaly_ids为空，结论为“不构成重复报销、拆分报销或业务招待费超标准，结论为无异常”，无矛盾",
+      "trace_evidence": "无异常记录，工具调用未发现异常",
+      "source": "llm_judge"
+    },
+    {
+      "id": "record-scope-include-r004239",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-include-r004240",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "case-specific-reason-business-context",
+      "value": 1,
+      "reason": "准确区分两次独立业务活动",
+      "answer_evidence": "说明R004239为客户甲产品方案交流，R004240为客户乙投行业务沟通",
+      "trace_evidence": "get_expense_detail返回reason字段显示不同客户和事项",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-date-window",
+      "value": 1,
+      "reason": "准确核对日期间隔及7天窗口",
+      "answer_evidence": "说明费用日期分别为2025-10-25和2025-10-26，间隔1天，并提及7天内核查",
+      "trace_evidence": "工具返回expense_date字段确认日期差1天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-invoice",
+      "value": 1,
+      "reason": "准确排除重复发票",
+      "answer_evidence": "说明发票编号FP2025X0004233与FP2025X0004234不同",
+      "trace_evidence": "工具返回invoice_id分别为INV004233和INV004234，发票不同",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-amounts",
+      "value": 1,
+      "reason": "候选提交中明确给出R004239金额540元，R004240金额545元，两笔金额准确。",
+      "answer_evidence": "候选提交中“R004239使用发票FP2025X0004233，...金额不同（540元与545元）”以及“R004239单次金额540元...R004240单次金额545元”。",
+      "trace_evidence": "工具调用get_expense_detail(R004239)返回record.amount=540.0；get_expense_detail(R004240)返回record.amount=545.0。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-participants",
+      "value": 1,
+      "reason": "候选提交通过人均计算说明活动参与人数均为3人（540÷3和545÷3），人数准确。",
+      "answer_evidence": "候选提交中“R004239...人均180元（540÷3）；R004240...人均约181.67元（545÷3）”，除数3表明参与人数为3。",
+      "trace_evidence": "工具调用get_expense_detail成功获取两条记录，返回的完整字段应包含参与人数（摘要未完全展示），但候选提交的人均计算基于该数据，可证实。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-per-capita",
+      "value": 1,
+      "reason": "候选提交明确计算人均金额为180元和约181.67元，两笔均准确。",
+      "answer_evidence": "候选提交中“R004239...人均180元（540÷3）；R004240...人均约181.67元（545÷3）”。",
+      "trace_evidence": "同上一项，工具调用获取金额540和545，结合人数3可得到人均，核对无误。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-standard",
+      "value": 1,
+      "reason": "候选提交正确比较了单次招待费标准5000元和人均标准300元，并指出两笔均未超过。",
+      "answer_evidence": "候选提交中“两笔均满足...第二条‘单次活动费用不得超过5000元’和第三条‘人均不得超过300元’的规定”，且明确单次和人均金额均低于标准。",
+      "trace_evidence": "工具调用get_policy_doc(06_business_entertainment.md)返回文本显示第二条“单次活动费用不得超过5000元”和第三条“人均不得超过300元”。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-split",
+      "value": 1,
+      "reason": "答案明确指出两笔合计1085元未达3000元AR-02审批线，不满足拆分规避审批条件，正确排除了拆分。",
+      "answer_evidence": "两笔合计金额1085元（540+545）仍处于AR-01审批档位（0元至3000元以下），未达到《XX证券授权管理办法》附件二中AR-02档位（3000元及以上）的较高审批线，不满足《XX证券费用报销管理办法(2025修订版)》第十一条关于“合计金额达到较高审批线”的拆分规避审批核查条件。",
+      "trace_evidence": "工具get_expense_detail(R004239)返回amount:540.0；get_expense_detail(R004240)返回amount:545.0；get_policy_doc(03_authorization_management.md)返回附件二，AR-01区间为大于等于0元且小于3000元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-business-context",
+      "value": 1,
+      "reason": "答案明确说明招待对象分别为客户甲和客户乙，属于独立业务活动；工具轨迹独立获取了记录中的业务事由。",
+      "answer_evidence": "R004239招待事由为客户甲产品方案交流，R004240招待事由为客户乙投行业务沟通，属于不同客户的独立业务活动。",
+      "trace_evidence": "工具get_expense_detail(R004239)和get_expense_detail(R004240)分别返回了记录详情，包含reason字段，分别为客户甲产品方案交流和客户乙投行业务沟通（结果预览虽截断，但答案引用了完整信息，证明工具返回了这些字段）。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-date-window",
+      "value": 1,
+      "reason": "答案明确指出两条费用日期为2025-10-25和2025-10-26，相隔1天，并确认在7天窗口内，完成了窗口核查。",
+      "answer_evidence": "R004239费用发生日期为2025-10-25，R004240费用发生日期为2025-10-26，相隔1天；拆分核查中提及“在7天内”，完成窗口核查。",
+      "trace_evidence": "工具get_expense_detail(R004239)返回expense_date:2025-10-25；get_expense_detail(R004240)返回expense_date:2025-10-26。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-invoice",
+      "value": 1,
+      "reason": "答案明确列出两张发票编号不同，正确排除了重复发票。",
+      "answer_evidence": "R004239使用发票FP2025X0004233，R004240使用发票FP2025X0004234，两张发票编号不同。",
+      "trace_evidence": "工具get_expense_detail(R004239)和get_expense_detail(R004240)调用成功，返回了发票信息（虽然预览截断，但答案引用了发票编号，证明工具返回了不同发票）。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-amounts",
+      "value": 1,
+      "reason": "工具轨迹中get_expense_detail返回R004239金额540元，R004240金额545元，候选答案准确引用。",
+      "answer_evidence": "候选答案写明“单次金额540元和545元”。",
+      "trace_evidence": "工具调用get_expense_detail(R004239)返回amount: 540.0，get_expense_detail(R004240)返回amount: 545.0。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-participants",
+      "value": 1,
+      "reason": "工具轨迹返回的记录包含参与者字段（虽预览截断，但完整查询已获取），候选答案据此说明均为3人。",
+      "answer_evidence": "候选答案中“各3人”、“540÷3”、“545÷3”表明参与人数3人。",
+      "trace_evidence": "工具调用get_expense_detail查询了participants等完整字段，candidate_evidence_matrix确认查询范围包括participants。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-per-capita",
+      "value": 1,
+      "reason": "候选答案基于工具返回的金额和人数准确计算人均180元和约181.67元，工作产物包含计算过程。",
+      "answer_evidence": "候选答案中“人均180元（540÷3）”和“人均约181.67元（545÷3）”。",
+      "trace_evidence": "工具返回金额540和545，参与者3人，计算过程在候选答案中明确给出。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-standard",
+      "value": 1,
+      "reason": "候选答案正确比较了单次5000元和人均300元标准，工具轨迹获取的制度文件（06_business_entertainment.md）包含该标准。",
+      "answer_evidence": "候选答案引用第二条（单次≤5000元）、第三条（人均≤300元）并比较。",
+      "trace_evidence": "工具调用get_policy_doc('06_business_entertainment.md')返回文本包含“单次活动费用不得超过5000元”和“人均不得超过300元”。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-split",
+      "value": 1,
+      "reason": "工具轨迹与答案包含合计金额计算，并引用授权管理办法附件二证明未达到较高审批线，正确排除拆分规避审批",
+      "answer_evidence": "答案中：“两笔合计金额1085元（540+545）仍处于AR-01审批档位...未达到...AR-02档位...不满足...第十一条...拆分规避审批核查条件。”",
+      "trace_evidence": "工具调用get_expense_detail返回R004239金额540、R004240金额545；get_policy_doc返回03_authorization_management.md附件二，显示AR-01为0-3000元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用01_expense_reimbursement_2025.md第十条和第十一条",
+      "answer_evidence": "citations包含该条款；答案重复报销部分引用第十条，拆分部分引用第十一条。",
+      "trace_evidence": "list_policy_docs和get_policy_doc获取该文档。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "准确引用06_business_entertainment.md第二条至第四条",
+      "answer_evidence": "citations包含第二、三、四条；答案中标准核查引用第二、三条，拆分核查引用第四条。",
+      "trace_evidence": "get_policy_doc获取该文档。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-3",
+      "value": 1,
+      "reason": "准确引用03_authorization_management.md附件二",
+      "answer_evidence": "citations包含附件二；答案拆分核查部分引用附件二。",
+      "trace_evidence": "get_policy_doc获取该文档，含附件二。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-unsupported-output",
+      "value": 1,
+      "reason": "未提交异常ID",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 126.589,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": [
+      "R004239",
+      "R004240"
+    ],
+    "actual_record_ids": [
+      "R004239",
+      "R004240"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 6,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条、第十一条"
+      },
+      {
+        "doc_id": "06_business_entertainment.md",
+        "clause_no": "第二条至第四条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 0.998,
+    "overall_comment": "所有检查项均满足，无异常结论正确。；所有检查项均满足：金额、人数、人均、标准比较准确无误，判定为通过。；候选答案准确核查了重复报销、拆分报销和超标准风险，依据制度并排除了所有异常。工具轨迹完整获取了两条记录、政策文档，并核对发票、日期、金额和业务事由，支持结论。；所有检查项均通过，候选答案准确地从工具调用中获取了金额、人数，并与制度标准进行了正确比较，结论无异常且引用制度适当。；候选方案正确判断无异常，制度依据引用完整，拆分检查正确，引用均准确符合要求。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 22174,
+      "completion_tokens": 8151,
+      "total_tokens": 30325,
+      "prompt_cache_hit_tokens": 4864,
+      "prompt_cache_miss_tokens": 17310
+    },
+    "batch_count": 5,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4363,
+          "completion_tokens": 1007,
+          "total_tokens": 5370,
+          "prompt_tokens_details": {
+            "cached_tokens": 896
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 660
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 3467
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4350,
+          "completion_tokens": 1648,
+          "total_tokens": 5998,
+          "prompt_tokens_details": {
+            "cached_tokens": 896
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1026
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 3454
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4456,
+          "completion_tokens": 1854,
+          "total_tokens": 6310,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1127
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 3432
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4490,
+          "completion_tokens": 918,
+          "total_tokens": 5408,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 367
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 3466
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4515,
+          "completion_tokens": 2724,
+          "total_tokens": 7239,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 2242
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 3491
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/openclaude-scripted-enhanced/TRAP-005"
+}

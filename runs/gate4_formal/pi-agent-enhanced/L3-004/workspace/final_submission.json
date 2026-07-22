@@ -1,0 +1,37 @@
+{
+  "anomaly_ids": [
+    "BUDGET-OVER-D001",
+    "BUDGET-OVER-D002",
+    "BUDGET-OVER-D003",
+    "BUDGET-OVER-D004",
+    "BUDGET-OVER-D005",
+    "BUDGET-OVER-D006"
+  ],
+  "answer": "全年超预算专项扫描结果：对全部10个部门按reimburse_date和record_id依次累计已批准费用，发现6个部门年度累计支出超过年度预算1.0倍，且首次超预算记录均无专项审批。\n\n计算方法：对每个部门所有status='approved'记录按reimburse_date ASC, record_id ASC排序，逐条累加amount得到running_total，比较running_total与annual_budget。取首次running_total > annual_budget的记录，检查其special_approval标志。本次扫描中全部6个超预算部门的首次超预算记录special_approval均为0（无专项审批），故均为违规关键记录。\n\n制度依据：《XX证券预算管理办法》（08_budget_management.md）第二条要求部门在年度预算额度内发生费用，第三条规定累计达到1.0倍后原则上不得继续报销，第四条规定确需超预算应履行专项审批；《XX证券费用报销管理办法（2025修订版）》（01_expense_reimbursement_2025.md）第十三条规定部门年度预算不足时不得继续报销，预算使用达到1.0倍后确需发生的费用应履行专项审批。\n\n各发现：\n- BUDGET-OVER-D001（投资银行部）：预算230395.17元，累计363614.58元，关键记录R000079（2025-10-21，226.98元，累计突破至230508.66元）\n- BUDGET-OVER-D002（固定收益部）：预算107785.42元，累计164928.12元，关键记录R002009（2025-09-28，746.04元，累计突破至108158.44元）\n- BUDGET-OVER-D003（财富管理部）：预算109772.07元，累计174150.67元，关键记录R003968（2025-09-28，213.68元，累计突破至109878.91元）\n- BUDGET-OVER-D004（研究所）：预算264890.39元，累计408832.95元，关键记录R000894（2025-09-30，126.41元，累计突破至264953.59元）\n- BUDGET-OVER-D005（机构业务部）：预算278540.94元，累计433442.76元，关键记录R003479（2025-10-13，429.21元，累计突破至278755.54元）\n- BUDGET-OVER-D006（运营管理部）：预算340961.75元，累计530241.29元，关键记录R000312（2025-10-06，256.90元，累计突破至341090.20元）",
+  "citations": [
+    {
+      "clause_no": "第二条",
+      "doc_id": "08_budget_management.md"
+    },
+    {
+      "clause_no": "第三条",
+      "doc_id": "08_budget_management.md"
+    },
+    {
+      "clause_no": "第四条",
+      "doc_id": "08_budget_management.md"
+    },
+    {
+      "clause_no": "第十三条",
+      "doc_id": "01_expense_reimbursement_2025.md"
+    }
+  ],
+  "record_ids": [
+    "R000079",
+    "R002009",
+    "R003968",
+    "R000894",
+    "R003479",
+    "R000312"
+  ]
+}

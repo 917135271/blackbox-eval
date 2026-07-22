@@ -1,77 +1,64 @@
 {
   "task_id": "TRAP-002",
-  "task_type": "clean_but_suspicious",
-  "question": "核查TRAP-002涉及的记录是否构成异常，正确时应说明无异常",
-  "scope": {
-    "audit_object": "重复发票报销记录",
-    "expense_types": ["office_supplies", "local_transport", "travel_lodging", "communication", "business_entertainment"],
-    "business_period": "2025-01-01 to 2025-12-31",
-    "record_ids_candidates": ["R000002", "R004201", "R000005", "R004202", "R000020", "R004203", "R000028", "R004204", "R000037", "R004205", "R000055", "R004206"],
-    "invoices_affected": ["FP202500000002", "FP202500000005", "FP202500000020", "FP202500000028", "FP202500000037", "FP202500000055"]
+  "task_scope": {
+    "question": "核查R004234和R004235是否构成重复报销或拆分报销",
+    "records": ["R004234", "R004235"],
+    "audit_period": "2025-10-20",
+    "expense_types": ["office_supplies"],
+    "department": "D009",
+    "employee": "E0009"
   },
   "policy_questions": [
     {
-      "question": "同一发票是否被多个报销单使用？",
+      "id": "PQ1",
+      "question": "R004234和R004235是否使用同一发票？",
       "rule": "第十条 同一发票最多报销1次",
-      "doc_id": "01_expense_reimbursement_2025.md",
-      "clause_no": "第十条"
+      "doc_id": "01_expense_reimbursement_2025.md"
     },
     {
-      "question": "是否构成拆分报销规避审批？",
-      "rule": "第十一条 同一员工同一费用类型7天内2笔及以上",
+      "id": "PQ2",
+      "question": "R004234和R004235是否构成7天内合计金额达到较高审批线的拆分报销？",
+      "rule": "第十一条 同一员工、同一费用类型在7天内出现2笔及以上报销，且合计金额达到较高审批线",
       "doc_id": "01_expense_reimbursement_2025.md",
-      "clause_no": "第十一条"
-    },
-    {
-      "question": "报销是否超出60天时限？",
-      "rule": "第七条 费用发生后60天内提交报销申请",
-      "doc_id": "01_expense_reimbursement_2025.md",
-      "clause_no": "第七条"
+      "threshold_ref": "03_authorization_management.md 附件二"
     }
   ],
   "data_questions": [
-    "哪些发票被多个报销记录使用？",
-    "重复使用的发票对应的记录是否为测试注入样本？",
-    "是否存在费用发生在发票日期之前的异常？",
-    "所有记录的审批链是否完整？"
-  ],
-  "required_fields": ["record_id", "record_no", "employee_id", "department_id", "expense_date", "reimburse_date", "expense_type", "amount", "reason", "invoice_no", "invoice_date", "status", "special_approval", "approvals"],
-  "evidence_requirements": [
-    "所有重复使用发票的完整记录",
-    "政策第十条关于重复发票的原文",
-    "各记录的审批链"
-  ],
-  "execution_steps": [
-    {"step": 1, "action": "query_planning", "status": "in_progress"},
-    {"step": 2, "action": "policy_lookup_article_10", "status": "pending"},
-    {"step": 3, "action": "find_reused_invoices", "status": "completed"},
-    {"step": 4, "action": "get_all_reused_invoice_record_details", "status": "completed"},
-    {"step": 5, "action": "analyze_trap_nature", "status": "pending"},
-    {"step": 6, "action": "evidence_coverage_check", "status": "pending"},
-    {"step": 7, "action": "false_positive_review", "status": "pending"},
-    {"step": 8, "action": "audit_report", "status": "pending"},
-    {"step": 9, "action": "result_validation", "status": "pending"},
-    {"step": 10, "action": "submit", "status": "pending"}
+    {
+      "id": "DQ1",
+      "description": "获取R004234和R004235的完整报销详情，重点核对发票编号",
+      "fields": ["record_id", "invoice_no", "invoice_id", "amount", "expense_date", "expense_type", "employee_id"]
+    }
   ],
   "complexity": {
-    "score": 1,
+    "score": 3,
     "reasons": [
-      "Single rule question (Article 10 - duplicate invoice)",
-      "Directly related records found via find_reused_invoices",
-      "No policy version ambiguity (only 2025 policy applies)",
-      "No aggregation required - tool returns joined data",
-      "Compact investigation sufficient"
+      "policy_version_check: 需确认2025版制度适用（费用发生在2025年）",
+      "two_business_rules: 需同时核查重复报销（第十条）和拆分报销（第十一条）",
+      "thresholds: 拆分报销涉及7天窗口和较高审批线金额阈值"
     ]
   },
   "subagent_plan": {
-    "planned": false,
-    "reason": "Complexity 1 - compact mode sufficient"
+    "selected": false,
+    "reason": "范围限定为2条记录，规则清晰，金额计算简单，主智能体可独立完成"
   },
-  "stopping_conditions": [
-    "All reused invoice records investigated",
-    "Policy clauses confirmed",
-    "Evidence matrix completed",
-    "Answer determined: 无异常 (trap injection samples)"
+  "execution_steps": [
+    {"step": 1, "action": "查询R004234和R004235完整详情", "status": "completed"},
+    {"step": 2, "action": "查询制度：01_expense_reimbursement_2025.md 第十条、第十一条", "status": "completed"},
+    {"step": 3, "action": "查询制度：03_authorization_management.md 附件二审批线", "status": "completed"},
+    {"step": 4, "action": "核对发票是否相同", "status": "pending"},
+    {"step": 5, "action": "核对7天内合计金额是否达较高审批线", "status": "pending"},
+    {"step": 6, "action": "形成初步结论", "status": "pending"},
+    {"step": 7, "action": "运行evidence-coverage-check", "status": "pending"},
+    {"step": 8, "action": "运行false-positive-review（如触发）", "status": "pending"},
+    {"step": 9, "action": "运行audit-report", "status": "pending"},
+    {"step": 10, "action": "运行result-validator", "status": "pending"},
+    {"step": 11, "action": "调用validate_audit_result", "status": "pending"},
+    {"step": 12, "action": "调用submit_audit_result", "status": "pending"}
   ],
-  "unresolved_items": []
+  "stopping_conditions": [
+    "所有规则核查完成",
+    "证据覆盖率100%",
+    "提交成功"
+  ]
 }

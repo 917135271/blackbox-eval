@@ -1,0 +1,225 @@
+{
+  "group": "pi-agent-baseline",
+  "task_id": "TRAP-003",
+  "case_family": "clean_trap",
+  "category": "clean_but_suspicious",
+  "graded_at": "2026-07-21T21:07:59+08:00",
+  "checklist_passed": 16,
+  "checklist_total": 16,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "clean-conclusion",
+      "value": 1,
+      "reason": "候选答案明确声明无异常，无矛盾表述",
+      "answer_evidence": "answer字段首句“无异常。经核查...”",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "record-scope-include-r004236",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-include-r004237",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "case-specific-reason-gap",
+      "value": 1,
+      "reason": "答案正确计算两条费用发生日期间隔为8天",
+      "answer_evidence": "answer字段：“R004236（费用发生日期2025-10-01）与R004237（费用发生日期2025-10-09）的间隔为8天”",
+      "trace_evidence": "工具调用get_expense_detail返回R004236日期2025-10-01，R004237日期2025-10-09，间隔8天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-window",
+      "value": 1,
+      "reason": "答案明确说明8天超出7天聚合窗口",
+      "answer_evidence": "answer字段：“超过《XX证券费用报销管理办法(2025修订版)》第十一条规定的7天内拆分报销核查标准”",
+      "trace_evidence": "get_policy_excerpt查询拆报销7天窗口，返回第十一条原文包含7天内条件",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "答案准确计算合计金额10400元",
+      "answer_evidence": "answer字段：“合计金额10400元”",
+      "trace_evidence": "get_expense_detail两次调用返回amount均为5200.0，合计10400元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 1,
+      "reason": "答案正确说明金额达到10000元线但时间窗口不满足",
+      "answer_evidence": "answer字段：“合计金额10400元达到《授权管理办法》附件二AR-03较高审批线，但因...超过7天，不满足第十一条的全部触发条件”",
+      "trace_evidence": "get_policy_doc(03_authorization_management.md)返回附件二AR-03线为10000-50000元；get_expense_detail显示日期间隔8天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-gap",
+      "value": 1,
+      "reason": "轨迹包含工具调用直接获取日期，可独立计算间隔8天",
+      "answer_evidence": "工具调用get_expense_detail返回expense_date字段2025-10-01和2025-10-09",
+      "trace_evidence": "get_expense_detail返回值明确，间隔8天无需额外计算",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-window",
+      "value": 1,
+      "reason": "轨迹中通过政策查询确认7天窗口，且日期间隔8天明确超出",
+      "answer_evidence": "get_policy_excerpt返回第十一条含“7天内”条款",
+      "trace_evidence": "get_policy_excerpt查询拆分报销7天，返回文本含“7天内出现2笔及以上报销”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "轨迹通过工具调用直接获取金额数据，合计10400元",
+      "answer_evidence": "get_expense_detail返回amount均为5200.0",
+      "trace_evidence": "工具返回值5200.0+5200.0=10400，无需额外计算",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 1,
+      "reason": "轨迹同时获取金额条件（10000元线）和时间条件（8天），证明金额线满足但时间窗口不满足",
+      "answer_evidence": "get_policy_doc(03_authorization_management.md)返回附件二AR-03线>=10000；get_expense_detail日期间隔8天",
+      "trace_evidence": "工具返回值：金额5200+5200>=10000，日期间隔8天>7天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "候选答案准确引用01_expense_reimbursement_2025.md#第十一条",
+      "answer_evidence": "citations数组含{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十一条\"}",
+      "trace_evidence": "get_policy_doc和get_policy_excerpt均涉及该文档和条款",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "候选答案准确引用03_authorization_management.md#附件二",
+      "answer_evidence": "citations数组含{\"doc_id\": \"03_authorization_management.md\", \"clause_no\": \"附件二\"}",
+      "trace_evidence": "get_policy_doc调用该文档并返回附件二内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-unsupported-output",
+      "value": 1,
+      "reason": "未提交异常ID",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 80.218,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "actual_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 2,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选输出准确完成无异常判断，所有核查点均满足要求，证据充分。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 4927,
+      "completion_tokens": 1791,
+      "total_tokens": 6718,
+      "prompt_cache_hit_tokens": 4864,
+      "prompt_cache_miss_tokens": 63
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4927,
+          "completion_tokens": 1791,
+          "total_tokens": 6718,
+          "prompt_tokens_details": {
+            "cached_tokens": 4864
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 735
+          },
+          "prompt_cache_hit_tokens": 4864,
+          "prompt_cache_miss_tokens": 63
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 11
+      }
+    ]
+  },
+  "run_path": "runs/gate4_formal/pi-agent-baseline/TRAP-003"
+}

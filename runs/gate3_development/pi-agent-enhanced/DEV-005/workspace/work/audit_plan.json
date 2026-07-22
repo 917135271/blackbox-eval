@@ -1,0 +1,74 @@
+{
+  "task_id": "DEV-005",
+  "task_type": "single_anomaly",
+  "question": "核查R900005的业务招待费是否超标，需要同时计算单次活动总额和人均金额。",
+  "audit_object": "R900005",
+  "audit_period": "2025-03-12",
+  "expense_type": "business_entertainment",
+  "applicable_policies": [
+    {
+      "doc_id": "06_business_entertainment.md",
+      "title": "XX证券业务招待费管理办法",
+      "effective": true,
+      "clauses": [
+        "第二条: 业务招待单次活动费用不得超过5000元",
+        "第三条: 业务招待费用按参与人数核算,人均不得超过300元"
+      ]
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "R900005单次活动总额是否超过5000元",
+      "fields": ["amount"],
+      "value": 3600,
+      "threshold": 5000,
+      "result": "pass"
+    },
+    {
+      "question": "R900005人均金额是否超过300元",
+      "fields": ["amount", "participants"],
+      "value": 360,
+      "threshold": 300,
+      "result": "violation"
+    }
+  ],
+  "required_fields": ["record_id", "amount", "participants", "expense_type", "expense_date", "reason"],
+  "evidence_requirements": [
+    "R900005 expense detail with amount and participants",
+    "Policy 06_business_entertainment.md full text with clauses 2 and 3"
+  ],
+  "execution_steps": [
+    "1. Plan: create audit_plan.json with scope and rules",
+    "2. Policy: confirm 06_business_entertainment.md applies (2025, single policy, no version conflict)",
+    "3. Data: get R900005 detail, compute total and per-person amounts",
+    "4. Evidence: coverage check connecting record to policy clauses",
+    "5. Report: write final_result.json with anomaly finding",
+    "6. Validate: run result-validator",
+    "7. Submit: validate_audit_result then submit_audit_result"
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "single known record R900005",
+      "single policy with two clauses",
+      "simple arithmetic threshold comparison",
+      "no policy version ambiguity",
+      "no batch aggregation needed"
+    ]
+  },
+  "subagent_plan": {
+    "required": false,
+    "reason": "complexity=1, compact mode sufficient"
+  },
+  "stopping_conditions": [
+    "R900005 total vs 5000 threshold determined",
+    "R900005 per-person vs 300 threshold determined",
+    "evidence matrix covers all findings",
+    "validation passes"
+  ],
+  "expected_anomaly": {
+    "total_check": "3600 < 5000 → pass",
+    "per_person_check": "3600/10 = 360 > 300 → violation",
+    "anomaly_type": "人均超标"
+  }
+}

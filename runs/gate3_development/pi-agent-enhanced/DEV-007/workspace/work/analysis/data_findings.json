@@ -1,0 +1,58 @@
+{
+  "in_scope_population_count": 8,
+  "candidate_count": 2,
+  "matched_record_ids": ["R900007", "R900014", "R900015"],
+  "aggregate_results": [
+    {
+      "employee_id": "E9001",
+      "employee_name": "开发员工甲",
+      "expense_type": "office_supplies",
+      "month": "2025-04",
+      "total_amount": 650.0,
+      "threshold": 600,
+      "record_ids": ["R900007"],
+      "special_approval_any": false,
+      "status": "OVER"
+    },
+    {
+      "employee_id": "E9001",
+      "employee_name": "开发员工甲",
+      "expense_type": "communication",
+      "month": "2025-09",
+      "total_amount": 340.0,
+      "threshold": 300,
+      "record_ids": ["R900014", "R900015"],
+      "special_approval_any": false,
+      "status": "OVER"
+    }
+  ],
+  "all_monthly_aggregates": [
+    {"employee_id": "E9001", "expense_type": "communication", "month": "2025-03", "total": 200.0, "threshold": 300, "status": "OK"},
+    {"employee_id": "E9001", "expense_type": "communication", "month": "2025-09", "total": 340.0, "threshold": 300, "status": "OVER"},
+    {"employee_id": "E9001", "expense_type": "office_supplies", "month": "2025-01", "total": 480.0, "threshold": 600, "status": "OK", "note": "重复发票FPDEV900001已按去重处理,去重后实际金额480"},
+    {"employee_id": "E9001", "expense_type": "office_supplies", "month": "2025-04", "total": 650.0, "threshold": 600, "status": "OVER"},
+    {"employee_id": "E9001", "expense_type": "office_supplies", "month": "2025-05", "total": 590.0, "threshold": 600, "status": "OK"},
+    {"employee_id": "E9002", "expense_type": "office_supplies", "month": "2025-05", "total": 590.0, "threshold": 600, "status": "OK"}
+  ],
+  "completed_checks": [
+    "全量扫描office_supplies和communication共8条记录",
+    "按employee_id、expense_type、自然月聚合金额",
+    "重复发票FPDEV900001(INV900001)识别与去重处理",
+    "月度标准阈值比较(office≤600, communication≤300)",
+    "special_approval字段检查(均为0,无豁免)",
+    "审批记录核实(均为标准部门经理审批)"
+  ],
+  "duplicate_invoices_found": [
+    {
+      "invoice_no": "FPDEV900001",
+      "invoice_id": "INV900001",
+      "record_ids": ["R900001", "R900002"],
+      "amounts": [480.0, 480.0],
+      "handling": "去重后按480元计入月度合计,不构成月度超标准"
+    }
+  ],
+  "data_quality_issues": [
+    "发现重复发票FPDEV900001被R900001和R900002两次报销,属于重复报销风险(制度第十条),但不在本次月度标准审计范围内"
+  ],
+  "unresolved_items": []
+}

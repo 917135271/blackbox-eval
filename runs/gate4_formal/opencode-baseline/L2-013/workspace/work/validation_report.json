@@ -2,10 +2,37 @@
   "status": "pass",
   "errors": [],
   "warnings": [],
-  "field_checks": {},
-  "id_checks": {},
-  "evidence_checks": {},
-  "answer_consistency_checks": {},
+  "field_checks": {
+    "anomaly_ids": {"present": true, "unique": true, "non_empty": true},
+    "record_ids": {"present": true, "unique": true, "format_valid": true, "pattern_match": true},
+    "answer": {"present": true, "non_empty": true},
+    "citations": {"present": true, "unique": true, "non_empty": true, "valid_doc_ids": true},
+    "evidence_rows": {"present": true, "min_items": true, "all_required_fields": true}
+  },
+  "id_checks": {
+    "anomaly_id_format": "ANOM-L2-013-NNN",
+    "anomaly_ids_match_evidence": true,
+    "record_ids_in_submitted": true,
+    "candidate_records_covered": true,
+    "no_orphan_records": true
+  },
+  "evidence_checks": {
+    "fact_supported_all": true,
+    "rule_supported_all": true,
+    "coverage_status_all_pass": true,
+    "citations_valid": true,
+    "facts_non_empty": true
+  },
+  "answer_consistency_checks": {
+    "anomaly_count_in_answer": 2,
+    "anomaly_count_in_evidence": 2,
+    "counts_match": true,
+    "record_ids_in_answer": ["R004223", "R004212", "R004213"],
+    "record_ids_in_submission": ["R004223", "R004212", "R004213"],
+    "record_ids_match": true,
+    "amount_consistency": true,
+    "policy_references_consistent": true
+  },
   "repair_count": 0,
   "repairable_fields": [],
   "submission_allowed": true

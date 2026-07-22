@@ -1,0 +1,88 @@
+{
+  "task_id": "L3-003",
+  "scan_period": "2025-01-01 至 2025-12-31",
+  "database": "/benchmark/data/expense.db",
+  "total_records_scanned": 4240,
+  "rule_checks": [
+    {
+      "rule_id": "R01",
+      "expense_type": "travel_lodging",
+      "display_name": "差旅住宿费",
+      "population_count": 883,
+      "scanned_count": 883,
+      "method": "JOIN employees ON employee_id获取employee_level，计算单晚金额=amount/nights，对照标准表（按employee_level×city_tier），排除special_approval=1和nights=0",
+      "standards": "员工级(E1):A类≤450/B类≤380/C类≤300；经理级(M1):A类≤650/B类≤550/C类≤450；部门负责人级(D1):A类≤850/B类≤700/C类≤600；高管级(X1):A类≤1100/B类≤900/C类≤750（元/人/晚）",
+      "violation_count": 1,
+      "violation_record_ids": ["R004225"],
+      "notes": "R004225: E0007(部门负责人级D1)在A类城市住宿1晚900元，单晚900元>850元标准"
+    },
+    {
+      "rule_id": "R02",
+      "expense_type": "local_transport",
+      "display_name": "市内交通包干",
+      "population_count": 770,
+      "scanned_count": 770,
+      "method": "计算单日金额=amount/days，对照city_tier标准，排除special_approval=1和days=0",
+      "standards": "A类(一类)≤120元/日；B类(二类)≤100元/日；C类(三类)≤80元/日",
+      "violation_count": 1,
+      "violation_record_ids": ["R004226"],
+      "notes": "R004226: E0008在C类城市(三类)交通1日92元，单日92元>80元标准"
+    },
+    {
+      "rule_id": "R03",
+      "expense_type": "business_entertainment",
+      "display_name": "业务招待费",
+      "population_count": 675,
+      "scanned_count": 675,
+      "method": "检查单次金额>5000元或人均金额(amount/participants)>300元，排除special_approval=1和participants=0",
+      "standards": "单次活动≤5000元；人均≤300元",
+      "violation_count": 1,
+      "violation_record_ids": ["R004224"],
+      "notes": "R004224: E0010招待费700元/2人=350元/人>300元标准。单次700元未超5000元，但人均超标"
+    },
+    {
+      "rule_id": "R04",
+      "expense_type": "training_fee",
+      "display_name": "培训费",
+      "population_count": 578,
+      "scanned_count": 578,
+      "method": "检查课程费>3500元（仅可检查项）。因数据库缺少days/nights/city_tier/sub_type字段，无法按每日标准和住宿标准检查",
+      "standards": "课程费每人每期≤3500元（实际仅检查此条）；内部培训每日≤800元；外部培训每日≤1200元；培训住宿：A类≤500/B类≤420/C类≤350元/人/晚",
+      "violation_count": 1,
+      "violation_record_ids": ["R004223"],
+      "notes": "R004223: E0009培训费3700元>3500元课程费上限。培训住宿和每日费用标准无法检查（缺少必要字段）"
+    },
+    {
+      "rule_id": "R05",
+      "expense_type": "office_supplies",
+      "display_name": "办公用品",
+      "population_count": 694,
+      "scanned_count": 694,
+      "method": "单笔金额>600元即为超标准（不累计月度），排除special_approval=1",
+      "standards": "每人每月≤600元（仅检查单笔自身超限）",
+      "violation_count": 1,
+      "violation_record_ids": ["R004221"],
+      "notes": "R004221: E0007办公用品650元>600元月度上限"
+    },
+    {
+      "rule_id": "R06",
+      "expense_type": "communication",
+      "display_name": "通讯费用",
+      "population_count": 640,
+      "scanned_count": 640,
+      "method": "单笔金额>300元即为超标准（不累计月度），排除special_approval=1",
+      "standards": "每人每月≤300元（仅检查单笔自身超限）",
+      "violation_count": 1,
+      "violation_record_ids": ["R004222"],
+      "notes": "R004222: E0008通讯费330元>300元月度上限"
+    }
+  ],
+  "data_quality_issues": [
+    "培训费(training_fee)记录中city_tier、nights、days、participants均为NULL，无法区分内部/外部培训类型，无法检查住宿标准和每日综合费用标准"
+  ],
+  "limitations": [
+    "培训费仅能检查课程费上限(3500元/人/期)，住宿和每日标准因字段缺失无法检查"
+  ],
+  "sql_artifacts": ["work/sql/r01_travel_lodging.sql"],
+  "unresolved_items": []
+}

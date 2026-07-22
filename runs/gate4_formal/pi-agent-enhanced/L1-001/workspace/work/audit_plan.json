@@ -1,0 +1,63 @@
+{
+  "task_id": "L1-001",
+  "task_type": "policy_qa",
+  "audit_question": "现行制度下，单笔费用报销达到多少金额需要部门总经理审批？请说明适用版本、金额边界及费用报销办法与授权管理办法中的制度依据，并说明旧版审批线是否仍适用。",
+  "scope": {
+    "audit_object": "部门总经理审批金额阈值",
+    "expense_types": ["all"],
+    "business_period": "current (2025 onwards)",
+    "organization_scope": "all departments"
+  },
+  "policy_questions": [
+    "What is the current single-expense threshold for department general manager (部门总经理) approval?",
+    "Which policy version applies (2025 revised vs 2022 deprecated)?",
+    "What are the exact amount boundaries?",
+    "What is the basis in the Expense Reimbursement Rules?",
+    "What is the basis in the Authorization Management Rules (Annex 2)?",
+    "Does the old 2022 approval line (8000 yuan) still apply?"
+  ],
+  "required_policies": [
+    "01_expense_reimbursement_2025.md",
+    "02_expense_reimbursement_2022_deprecated.md",
+    "03_authorization_management.md"
+  ],
+  "data_questions": [],
+  "required_fields": [],
+  "evidence_needs": [
+    "Policy text: 2025 Expense Reimbursement Rules Article 5 (delegation to Authorization Rules)",
+    "Policy text: Authorization Management Rules Annex 2 AR-03 (部门总经理 threshold)",
+    "Policy text: 2022 deprecated rules Article 2 (old 8000 line, now replaced)",
+    "Effective dates and repeal relationships"
+  ],
+  "execution_steps": [
+    { "step": 1, "action": "plan", "skill": "audit-query-planner", "output": "work/audit_plan.json" },
+    { "step": 2, "action": "checkpoint", "stage": "planning_completed" },
+    { "step": 3, "action": "policy_research", "description": "Read all three policy documents and extract relevant clauses" },
+    { "step": 4, "action": "checkpoint", "stage": "investigation_completed" },
+    { "step": 5, "action": "evidence_coverage_check", "skill": "evidence-coverage-check", "output": "work/evidence_matrix.json" },
+    { "step": 6, "action": "checkpoint", "stage": "review_ready" },
+    { "step": 7, "action": "report", "skill": "audit-report", "output": "work/final_result.json" },
+    { "step": 8, "action": "validate", "skill": "result-validator", "output": "work/validation_report.json" },
+    { "step": 9, "action": "checkpoint", "stage": "validation_ready" },
+    { "step": 10, "action": "submit", "description": "validate_audit_result then submit_audit_result" }
+  ],
+  "complexity": 0,
+  "complexity_reasons": [
+    "Single rule / policy fact question",
+    "No data queries needed",
+    "No aggregation, grouping, or batch filtering",
+    "Straightforward policy lookup with clear version precedence",
+    "Old policy explicitly marked as deprecated with clear replacement"
+  ],
+  "subagent_plan": {
+    "subagent_needed": false,
+    "reason": "Complexity 0-1: keep in main agent; simple policy lookup with no data analysis"
+  },
+  "stopping_conditions": [
+    "All three policy documents read and relevant clauses extracted",
+    "Amount boundary clearly identified from Annex 2",
+    "Old policy applicability clearly determined",
+    "Evidence matrix, final result, and validation report all pass"
+  ],
+  "unresolved_items": []
+}

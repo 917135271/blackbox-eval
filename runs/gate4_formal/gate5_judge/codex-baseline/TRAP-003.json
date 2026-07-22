@@ -1,135 +1,225 @@
 {
+  "group": "codex-baseline",
+  "task_id": "TRAP-003",
   "case_family": "clean_trap",
-  "case_score": 75.0,
-  "case_score_raw": 75.0,
   "category": "clean_but_suspicious",
-  "criteria": [
+  "graded_at": "2026-07-21T20:54:01+08:00",
+  "checklist_passed": 15,
+  "checklist_total": 16,
+  "checklist_pass_rate": 93.75,
+  "checklist": [
     {
-      "answer_evidence": "answer字段为“无异常”，anomaly_ids为[]。",
       "id": "clean-conclusion",
-      "reason": "明确给出无异常结论，anomaly_ids为空，与预期一致。",
-      "score": 30.0,
-      "source": "llm_judge",
-      "trace_evidence": "最终提交中未发现矛盾表述。"
+      "value": 1,
+      "reason": "候选提交明确结论为无异常，anomaly_ids为空，无矛盾表述。",
+      "answer_evidence": "answer明确说明“无异常”，anomaly_ids=[]。",
+      "trace_evidence": "候选提交anomaly_ids与结论一致。",
+      "source": "llm_judge"
     },
     {
+      "id": "record-scope-include-r004236",
+      "value": 1,
+      "reason": "期望record_id已提交",
       "answer_evidence": "",
-      "id": "record-scope",
-      "reason": "record_ids集合F1=1.000",
-      "score": 15.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     },
     {
-      "answer_evidence": "answer仅给出“无异常”，未解释原因。",
-      "id": "case-specific-reason",
-      "reason": "未在答案或轨迹中说明“outside aggregation window”这一专属合规原因，仅提供结论和引用。",
-      "score": 0.0,
-      "source": "llm_judge",
-      "trace_evidence": "轨迹未提及聚合窗口或相关边界。"
-    },
-    {
-      "answer_evidence": "最终答案为无异常。",
-      "id": "reverse-check",
-      "reason": "轨迹中执行了多项核查，包括查询拆分政策、员工、预算，并获取R004236和R004237详情，其日期差8天，可支持无异常结论。",
-      "score": 15.0,
-      "source": "llm_judge",
-      "trace_evidence": "get_expense_detail  R004236（expense_date 2025-10-01）和 R004237（expense_date 2025-10-09），间隔8天，不触发7天拆分规则；同时搜索了拆分、重复报销等政策。"
-    },
-    {
+      "id": "record-scope-include-r004237",
+      "value": 1,
+      "reason": "期望record_id已提交",
       "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "case-specific-reason-gap",
+      "value": 1,
+      "reason": "候选答案正确计算日期间隔为8天。",
+      "answer_evidence": "answer说明“日期间隔为8天”。",
+      "trace_evidence": "工具轨迹中R004236日期2025-10-01，R004237日期2025-10-09，间隔8天。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-window",
+      "value": 1,
+      "reason": "候选答案正确说明8天超出7天聚合窗口。",
+      "answer_evidence": "answer提到“超过...第十一条规定的7天内拆分核查标准”。",
+      "trace_evidence": "政策文档第十一条明确7天窗口。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "候选答案准确计算合计金额10400元。",
+      "answer_evidence": "answer说明“合计金额10400元”。",
+      "trace_evidence": "R004236金额5200，R004237金额5200，合计10400。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 1,
+      "reason": "候选答案明确说明金额达审批线但因超窗不构成拆分。",
+      "answer_evidence": "answer说明“合计金额10400元，但因费用发生日期间隔不满足7天内的触发条件”。",
+      "trace_evidence": "附件二审批线AR-03为10000元，与记录合计吻合。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-gap",
+      "value": 1,
+      "reason": "工具轨迹独立核验日期间隔为8天。",
+      "answer_evidence": "无直接引用，但工具轨迹可独立证明。",
+      "trace_evidence": "两次get_expense_detail返回expense_date，日期差为8天。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-window",
+      "value": 1,
+      "reason": "工具轨迹独立核验8天超出7天窗口。",
+      "answer_evidence": "无直接引用，但工具轨迹可证明。",
+      "trace_evidence": "search_policy和get_policy_doc显示第十一条7天窗口；日期差8天>7天。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "工具轨迹独立核验合计金额10400元。",
+      "answer_evidence": "无直接引用，但工具轨迹可证明。",
+      "trace_evidence": "get_expense_detail返回amount字段，分别为5200，合计10400。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 1,
+      "reason": "工具轨迹独立核验金额达审批线但超窗。",
+      "answer_evidence": "无直接引用，但工具轨迹可证明。",
+      "trace_evidence": "政策附件二AR-03审批线≥10000元，日期差8天>7天，金额10400≥10000。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "候选提交准确引用了01_expense_reimbursement_2025.md#第十一条。",
+      "answer_evidence": "citations包含{\"doc_id\":\"01_expense_reimbursement_2025.md\",\"clause_no\":\"第十一条\"}。",
+      "trace_evidence": "无冲突，引用正确。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 0,
+      "reason": "候选提交未在citations中引用03_authorization_management.md#附件二。",
+      "answer_evidence": "answer提及《授权管理办法》附件二，但submitted_json的citations无对应条目。",
+      "trace_evidence": "工具轨迹调用了get_policy_doc('03_authorization_management.md')，但候选提交未将其列为引用。",
+      "source": "llm_judge"
+    },
+    {
       "id": "no-unsupported-output",
-      "reason": "未提交实质异常",
-      "score": 10.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    },
-    {
+      "value": 1,
+      "reason": "未提交异常ID",
       "answer_evidence": "",
-      "id": "submission",
-      "reason": "统一提交已接受且Schema有效",
-      "score": 5.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "提交的record_ids均为有效记录。",
-      "score_cap": 20,
-      "source": "llm_judge"
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     },
     {
-      "id": "trap-false-positive",
-      "triggered": false,
-      "reason": "未将合规记录判为异常，anomaly_ids为空。",
-      "score_cap": 30,
-      "source": "llm_judge"
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 114.214,
+    "expected_anomaly_ids": [],
     "actual_anomaly_ids": [],
-    "actual_record_ids": [
-      "R004236",
-      "R004237"
-    ],
     "anomaly_metrics": {
-      "actual_types": {},
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
       "count_exact": true,
       "expected_types": {},
-      "f1": 1.0,
-      "precision": 1.0,
-      "recall": 1.0
+      "actual_types": {}
     },
-    "citation_count": 1,
-    "elapsed_seconds": 292.501,
-    "expected_anomaly_ids": [],
     "expected_record_ids": [
       "R004236",
       "R004237"
     ],
+    "actual_record_ids": [
+      "R004236",
+      "R004237"
+    ],
     "record_metrics": {
-      "exact": true,
-      "extra_count": 0,
-      "f1": 1.0,
-      "missing_count": 0,
       "precision": 1.0,
-      "recall": 1.0
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
     },
-    "required_citations": [],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
     "trap_tokens_in_conclusion": [],
-    "unknown_record_ids": []
+    "citation_count": 1,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T22:25:47+08:00",
-  "group": "codex-baseline",
   "judge": {
-    "attempt": 1,
-    "confidence": 0.9,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "整体判断正确，但未说明关键合规原因（outside aggregation window），仅给出结论。建议在回答中明确说明记录不触发异常的具体理由。",
     "status": "ok",
+    "confidence": 0.95,
+    "overall_comment": "除缺少03_authorization_management.md附件二的明确引用外，候选提交在结论、推理和证据上均正确且一致。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 1467,
-      "completion_tokens_details": {
-        "reasoning_tokens": 1059
-      },
-      "prompt_cache_hit_tokens": 896,
-      "prompt_cache_miss_tokens": 9218,
-      "prompt_tokens": 10114,
-      "prompt_tokens_details": {
-        "cached_tokens": 896
-      },
-      "total_tokens": 11581
-    }
+      "prompt_tokens": 4504,
+      "completion_tokens": 2214,
+      "total_tokens": 6718,
+      "prompt_cache_hit_tokens": 4480,
+      "prompt_cache_miss_tokens": 24
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 4504,
+          "completion_tokens": 2214,
+          "total_tokens": 6718,
+          "prompt_tokens_details": {
+            "cached_tokens": 4480
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1160
+          },
+          "prompt_cache_hit_tokens": 4480,
+          "prompt_cache_miss_tokens": 24
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 11
+      }
+    ]
   },
-  "passed": true,
-  "run_path": "runs/gate4_formal/codex-baseline/TRAP-003",
-  "task_id": "TRAP-003"
+  "run_path": "runs/gate4_formal/codex-baseline/TRAP-003"
 }

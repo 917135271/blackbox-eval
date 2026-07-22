@@ -1,111 +1,106 @@
 {
   "task_id": "L3-004",
   "audit_scope": {
-    "object": "XX证券全年部门费用超预算专项扫描",
-    "period": "2025-01-01 至 2025-12-31",
+    "object": "全年部门费用超预算专项扫描",
+    "period": "2025-01-01至2025-12-31",
     "organization": "XX证券全部10个部门",
-    "data_scope": "expense_records表4240条2025年度记录"
+    "data_scope": "2025年度所有已批准(approved)费用记录共4240条"
   },
   "verified_facts": [
-    "审计范围覆盖全部10个部门共4240条费用记录",
-    "全部记录预算年度为2025年，状态均为approved",
-    "全部记录special_approval=0，无专项审批豁免",
-    "6个部门年度累计费用超过其年度预算1.0倍",
-    "4个部门年度累计费用未超过预算"
+    "2025年度全公司共有4240条已批准费用记录，涉及10个部门",
+    "所有4240条记录的special_approval字段均为0，不存在专项审批",
+    "审批层级仅含AR-01(4145条)和AR-02(95条)标准审批",
+    "6个部门全年累计已批准费用超过其年度预算额度",
+    "4个部门(D007-D010)全年累计费用未超过年度预算"
   ],
   "applicable_policies": [
-    {"doc_id": "08_budget_management.md", "clause": "第三条", "rule": "部门费用累计使用达到年度预算额度的1.0倍后，原则上不得继续报销"},
-    {"doc_id": "08_budget_management.md", "clause": "第四条", "rule": "因监管要求、客户服务或经营连续性确需超预算支出的，应履行专项审批"},
-    {"doc_id": "01_expense_reimbursement_2025.md", "clause": "第十三条", "rule": "部门年度预算不足时不得继续报销，达1.0倍后确需发生的费用应履行专项审批"}
+    {"doc_id": "08_budget_management.md", "clause": "第2条", "rule": "各部门应在年度预算额度内发生费用"},
+    {"doc_id": "08_budget_management.md", "clause": "第3条", "rule": "部门费用累计达到年度预算额度1.0倍后原则上不得继续报销"},
+    {"doc_id": "08_budget_management.md", "clause": "第4条", "rule": "确需超预算支出应履行专项审批"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause": "第13条", "rule": "部门年度预算不足时不得继续报销;达1.0倍后确需费用应履行专项审批"}
   ],
+  "calculation_method": "SQL窗口函数SUM(amount) OVER (PARTITION BY department_id ORDER BY reimburse_date ASC, record_id ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)，按部门分组、按报销日期升序和记录ID升序计算累计金额。对于每个部门，取累计金额首次超过年度预算的记录作为关键记录。",
   "findings": [
     {
-      "anomaly_id": "OVER_BUDGET_D001",
+      "anomaly_id": "L3-004-F001",
       "department": "投资银行部(D001)",
       "annual_budget": 230395.17,
-      "total_expense": 363614.58,
-      "usage_rate": "157.82%",
-      "crossing_record": "R001388",
-      "crossing_date": "2025-09-21",
-      "crossing_detail": "记录R001388金额625.78元使累计从229,926.35元增至230,552.13元，首次超过预算230,395.17元",
-      "violation_count": 193,
-      "impact": "超预算133,219.41元(57.82%)"
+      "key_record_id": "R000079",
+      "key_reimburse_date": "2025-10-21",
+      "cumulative_at_key": 230508.66,
+      "over_amount": 113.49,
+      "prev_cumulative": 230281.68,
+      "special_approval": 0
     },
     {
-      "anomaly_id": "OVER_BUDGET_D002",
+      "anomaly_id": "L3-004-F002",
       "department": "固定收益部(D002)",
       "annual_budget": 107785.42,
-      "total_expense": 164928.12,
-      "usage_rate": "153.02%",
-      "crossing_record": "R000415",
-      "crossing_date": "2025-08-29",
-      "crossing_detail": "记录R000415金额653.40元使累计从107,673.63元增至108,327.03元，首次超过预算107,785.42元",
-      "violation_count": 99,
-      "impact": "超预算57,142.70元(53.02%)"
+      "key_record_id": "R002009",
+      "key_reimburse_date": "2025-09-28",
+      "cumulative_at_key": 108158.44,
+      "over_amount": 373.02,
+      "prev_cumulative": 107412.40,
+      "special_approval": 0
     },
     {
-      "anomaly_id": "OVER_BUDGET_D003",
+      "anomaly_id": "L3-004-F003",
       "department": "财富管理部(D003)",
       "annual_budget": 109772.07,
-      "total_expense": 174150.67,
-      "usage_rate": "158.65%",
-      "crossing_record": "R002362",
-      "crossing_date": "2025-08-19",
-      "crossing_detail": "记录R002362金额2,630.16元使累计从108,353.28元增至110,983.44元，首次超过预算109,772.07元",
-      "violation_count": 103,
-      "impact": "超预算64,378.60元(58.65%)"
+      "key_record_id": "R003968",
+      "key_reimburse_date": "2025-09-28",
+      "cumulative_at_key": 109878.91,
+      "over_amount": 106.84,
+      "prev_cumulative": 109665.23,
+      "special_approval": 0
     },
     {
-      "anomaly_id": "OVER_BUDGET_D004",
+      "anomaly_id": "L3-004-F004",
       "department": "研究所(D004)",
       "annual_budget": 264890.39,
-      "total_expense": 408832.95,
-      "usage_rate": "154.34%",
-      "crossing_record": "R003179",
-      "crossing_date": "2025-09-02",
-      "crossing_detail": "记录R003179金额1,958.19元使累计从263,245.03元增至265,203.22元，首次超过预算264,890.39元",
-      "violation_count": 236,
-      "impact": "超预算143,942.56元(54.34%)"
+      "key_record_id": "R000894",
+      "key_reimburse_date": "2025-09-30",
+      "cumulative_at_key": 264953.59,
+      "over_amount": 63.20,
+      "prev_cumulative": 264827.18,
+      "special_approval": 0
     },
     {
-      "anomaly_id": "OVER_BUDGET_D005",
+      "anomaly_id": "L3-004-F005",
       "department": "机构业务部(D005)",
       "annual_budget": 278540.94,
-      "total_expense": 433442.76,
-      "usage_rate": "155.61%",
-      "crossing_record": "R000541",
-      "crossing_date": "2025-09-02",
-      "crossing_detail": "记录R000541金额828.73元使累计从278,043.27元增至278,872.00元，首次超过预算278,540.94元",
-      "violation_count": 250,
-      "impact": "超预算154,901.82元(55.61%)"
+      "key_record_id": "R003479",
+      "key_reimburse_date": "2025-10-13",
+      "cumulative_at_key": 278755.54,
+      "over_amount": 214.60,
+      "prev_cumulative": 278326.33,
+      "special_approval": 0
     },
     {
-      "anomaly_id": "OVER_BUDGET_D006",
+      "anomaly_id": "L3-004-F006",
       "department": "运营管理部(D006)",
       "annual_budget": 340961.75,
-      "total_expense": 530241.29,
-      "usage_rate": "155.51%",
-      "crossing_record": "R000217",
-      "crossing_date": "2025-09-07",
-      "crossing_detail": "记录R000217金额3,083.18元使累计从339,577.26元增至342,660.44元，首次超过预算340,961.75元",
-      "violation_count": 315,
-      "impact": "超预算189,279.54元(55.51%)"
+      "key_record_id": "R000312",
+      "key_reimburse_date": "2025-10-06",
+      "cumulative_at_key": 341090.20,
+      "over_amount": 128.45,
+      "prev_cumulative": 340833.30,
+      "special_approval": 0
     }
   ],
-  "no_anomaly_departments": [
-    {"department": "信息技术部(D007)", "annual_budget": 301500.00, "total_expense": 252588.38, "usage_rate": "83.78%"},
-    {"department": "合规风控部(D008)", "annual_budget": 381600.00, "total_expense": 297095.29, "usage_rate": "77.86%"},
-    {"department": "财务管理部(D009)", "annual_budget": 191300.00, "total_expense": 159294.06, "usage_rate": "83.27%"},
-    {"department": "人力资源部(D010)", "annual_budget": 164500.00, "total_expense": 139536.39, "usage_rate": "84.82%"}
+  "impact": "6个部门超预算支出合计643,568.53元，部门超支比例从153%到158%不等。全部无专项审批，违反预算管理办法和费用报销管理办法的预算控制规定。",
+  "recommendations": [
+    "对6个超预算部门的后续费用暂停报销，直至完成专项审批",
+    "核查超预算原因，存在监管、客户服务或经营连续性需求的，补办专项审批"
   ],
-  "recommendations": "6个超预算部门应补办专项审批或调整下年度预算。建议建立预算预警机制，在部门费用达到预算80%时触发提醒。",
-  "anomaly_ids": ["OVER_BUDGET_D001","OVER_BUDGET_D002","OVER_BUDGET_D003","OVER_BUDGET_D004","OVER_BUDGET_D005","OVER_BUDGET_D006"],
-  "record_ids_count": 1196,
+  "anomaly_ids": ["L3-004-F001","L3-004-F002","L3-004-F003","L3-004-F004","L3-004-F005","L3-004-F006"],
+  "record_ids": ["R000079","R002009","R003968","R000894","R003479","R000312"],
   "citations": [
-    {"doc_id": "08_budget_management.md", "clause_no": "第三条"},
-    {"doc_id": "08_budget_management.md", "clause_no": "第四条"},
-    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"}
+    {"doc_id": "08_budget_management.md", "clause_no": "第2条"},
+    {"doc_id": "08_budget_management.md", "clause_no": "第3条"},
+    {"doc_id": "08_budget_management.md", "clause_no": "第4条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第13条"}
   ],
-  "answer": "全年超预算专项扫描发现6个部门超预算。投资银行部(D001)预算230,395.17元，实际363,614.58元(157.82%)；固定收益部(D002)预算107,785.42元，实际164,928.12元(153.02%)；财富管理部(D003)预算109,772.07元，实际174,150.67元(158.65%)；研究所(D004)预算264,890.39元，实际408,832.95元(154.34%)；机构业务部(D005)预算278,540.94元，实际433,442.76元(155.61%)；运营管理部(D006)预算340,961.75元，实际530,241.29元(155.51%)。上述6个部门穿越预算阈值后共1196条记录未经专项审批继续报销，违反预算管理办法第三条和费用报销管理办法第十三条。信息技术部(D007)、合规风控部(D008)、财务管理部(D009)、人力资源部(D010)累计费用未超过年度预算，无异常。",
+  "answer": "对2025全年共4240条已批准费用记录，以部门为单位按报销日期和记录ID升序累计。依据《XX证券预算管理办法》(XX证财规〔2025〕辛号)第2-4条和《XX证券费用报销管理办法(2025修订版)》(XX证财规〔2025〕甲号)第13条，部门累计费用达到年度预算1.0倍后原则上不得继续报销，确需超预算的应履行专项审批。经扫描，6个部门存在超预算且无专项审批的情况，每个部门以首次使累计支出超过年度预算的记录作为关键记录：投资银行部(D001) R000079、固定收益部(D002) R002009、财富管理部(D003) R003968、研究所(D004) R000894、机构业务部(D005) R003479、运营管理部(D006) R000312。其余4个部门(信息技术部D007、合规风控部D008、财务管理部D009、人力资源部D010)全年费用在预算内。",
   "limitations": []
 }

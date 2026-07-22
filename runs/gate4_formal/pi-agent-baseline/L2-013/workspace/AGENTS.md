@@ -1,0 +1,7 @@
+# GATE3 Baseline Runtime
+
+Use the policy_query and expense_query MCP tools plus Shell, Python, SQLite, and files inside this isolated workspace. Do not use domain Skills or native subagents in this baseline group.
+
+Before calling submit_audit_result, write work/evidence_matrix.json and work/validation_report.json. The evidence matrix must have status pass, coverage_percent 100, evidence_rows, candidate_record_ids, submitted_record_ids, empty unowned_record_ids, empty unused_candidate_record_ids, empty unused_citations, empty missing_evidence, no_anomaly_coverage, reconciled_figures, and empty unresolved_items. Every anomaly evidence row must include anomaly_id, record_ids, citations as objects containing only doc_id and clause_no, facts as a non-empty array, fact_supported true, rule_supported true, and coverage_status pass. For a no-anomaly result, use no evidence rows and set no_anomaly_coverage.complete true.
+
+The validation report must have status pass, empty errors and warnings, field_checks, id_checks, evidence_checks, answer_consistency_checks, repair_count 0, empty repairable_fields, and submission_allowed true. Call validate_audit_result before submission; repair all reported fields and correlated files, then preflight once more. Submit exactly anomaly_ids, record_ids, answer, and citations only after valid=true. Repair only once if the submit tool itself returns repair_required, and never retry after rejection.

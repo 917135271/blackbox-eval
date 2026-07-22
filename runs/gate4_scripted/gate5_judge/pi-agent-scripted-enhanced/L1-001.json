@@ -1,0 +1,170 @@
+{
+  "group": "pi-agent-scripted-enhanced",
+  "task_id": "L1-001",
+  "case_family": "policy_and_version",
+  "category": "policy_qa",
+  "graded_at": "2026-07-22T01:04:11+08:00",
+  "checklist_passed": 8,
+  "checklist_total": 8,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "current-threshold-amount",
+      "value": 1,
+      "reason": "明确给出部门总经理审批金额10000元",
+      "answer_evidence": "现行制度下，单笔费用报销达到10,000元（含）...需要部门总经理审批。",
+      "trace_evidence": "附件二AR-03区间：大于等于10000元且小于50000元，必要审批角色为部门总经理。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-threshold-inclusive",
+      "value": 1,
+      "reason": "明确说明达到或等于10000元即适用",
+      "answer_evidence": "金额达到10,000元（含）起即需部门总经理审批",
+      "trace_evidence": "附件二AR-03区间：大于等于10000元且小于50000元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-version",
+      "value": 1,
+      "reason": "明确识别现行版本为2025修订版",
+      "answer_evidence": "现行有效版本为《XX证券费用报销管理办法(2025修订版)》",
+      "trace_evidence": "搜索和获取文档均为2025修订版，并在回答中明确引用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-expense-rule",
+      "value": 1,
+      "reason": "明确引用费用报销办法第五条",
+      "answer_evidence": "1.《XX证券费用报销管理办法(2025修订版)》第五条：...",
+      "trace_evidence": "submitted_json中citations包含doc_id: 01_expense_reimbursement_2025.md, clause_no: 第五条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-authorization",
+      "value": 1,
+      "reason": "引用授权管理办法附件二",
+      "answer_evidence": "答案明确引用附件二AR-03档审批线",
+      "trace_evidence": "工具获取03_authorization_management.md附件二，含AR-03档审批线",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-cross-reference",
+      "value": 1,
+      "reason": "说明第五条指向附件二的交叉引用",
+      "answer_evidence": "答案说明费用报销办法第五条指向授权管理办法附件二",
+      "trace_evidence": "2025费用报销办法第五条指向附件二，授权管理办法附件二提供审批线",
+      "source": "llm_judge"
+    },
+    {
+      "id": "old-value-control",
+      "value": 1,
+      "reason": "明确排除旧版8000元审批线",
+      "answer_evidence": "答案指出旧版8000元审批线不具现行效力",
+      "trace_evidence": "旧版文档声明已废止且审批金额不得作为现行依据",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 159.767,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": null,
+    "actual_record_ids": [],
+    "record_metrics": null,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 7,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第五条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选提交完全满足所有检查项，正确给出了部门总经理审批金额10000元，包含边界条件，依据现行2025修订版制度，并准确引用了费用报销办法第五条。；全部三项检查通过，答案准确引用制度并排除旧版。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 7900,
+      "completion_tokens": 2319,
+      "total_tokens": 10219,
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 6492
+    },
+    "batch_count": 2,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 3995,
+          "completion_tokens": 1047,
+          "total_tokens": 5042,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 658
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 3227
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 3905,
+          "completion_tokens": 1272,
+          "total_tokens": 5177,
+          "prompt_tokens_details": {
+            "cached_tokens": 640
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1027
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 3265
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 3
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/pi-agent-scripted-enhanced/L1-001"
+}

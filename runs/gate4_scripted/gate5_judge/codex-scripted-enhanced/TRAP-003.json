@@ -1,0 +1,268 @@
+{
+  "group": "codex-scripted-enhanced",
+  "task_id": "TRAP-003",
+  "case_family": "clean_trap",
+  "category": "clean_but_suspicious",
+  "graded_at": "2026-07-22T00:55:54+08:00",
+  "checklist_passed": 15,
+  "checklist_total": 16,
+  "checklist_pass_rate": 93.75,
+  "checklist": [
+    {
+      "id": "clean-conclusion",
+      "value": 1,
+      "reason": "候选答案明确判断不构成异常，结论表述清晰且无矛盾",
+      "answer_evidence": "结论：无异常。经核查，R004236和R004237不构成7天内拆分报销异常。",
+      "trace_evidence": "轨迹无异常输出，工具调用未发现拆分报销触发条件",
+      "source": "llm_judge"
+    },
+    {
+      "id": "record-scope-include-r004236",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-include-r004237",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "case-specific-reason-gap",
+      "value": 1,
+      "reason": "正确计算费用发生日期相隔8天",
+      "answer_evidence": "R004236费用发生日期2025-10-01，R004237费用发生日期2025-10-09，间隔8天",
+      "trace_evidence": "get_expense_detail R004236 expense_date: 2025-10-01; R004237 expense_date: 2025-10-09; 间隔8天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-window",
+      "value": 1,
+      "reason": "正确应用7天聚合窗口边界，8天超出窗口",
+      "answer_evidence": "间隔8天，超出制度规定的7天窗口",
+      "trace_evidence": "search_policy/get_policy_excerpt 结果：第十一条明确7天内出现2笔及以上报销，且合计金额达到较高审批线才核查。工具返回的条款与窗口边界一致",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "准确计算合计金额为10400元",
+      "answer_evidence": "合计10400元达AR-03较高审批线",
+      "trace_evidence": "get_expense_detail R004236 amount: 5200.0; R004237 amount: 5200.0; 合计10400",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 1,
+      "reason": "明确说明合计10400元达到审批线但因间隔8天超出7天窗口不构成拆分",
+      "answer_evidence": "合计10400元达AR-03较高审批线，但因间隔超7天，不触发...拆分规避审批核查",
+      "trace_evidence": "get_expense_detail返回金额均为5200，get_policy_excerpt返回第十一条7天规则，合计金额计算正确且窗口判断正确",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-gap",
+      "value": 1,
+      "reason": "工具轨迹明确包含两条记录的费用发生日期，计算得间隔8天",
+      "answer_evidence": "费用发生日期2025-10-01和2025-10-09，间隔8天",
+      "trace_evidence": "get_expense_detail R004236 expense_date 2025-10-01, R004237 expense_date 2025-10-09",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-window",
+      "value": 1,
+      "reason": "工具轨迹获取第十一条7天窗口，正确应用并判断8天超出",
+      "answer_evidence": "超出制度规定的7天窗口，不满足拆分报销的时间条件",
+      "trace_evidence": "get_policy_excerpt返回第十一条明确7天窗口，计算8天>7天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "工具轨迹显示两笔金额均为5200元，合计10400元，计算准确",
+      "answer_evidence": "合计10400元达AR-03较高审批线",
+      "trace_evidence": "get_expense_detail R004236 amount 5200.0, R004237 amount 5200.0, 合计10400",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 1,
+      "reason": "工具轨迹展示了两条记录的日期和金额，计算间隔8天、合计10400元，并正确说明金额达标但时间窗口不满足。",
+      "answer_evidence": "“R004236费用发生日期2025-10-01，R004237费用发生日期2025-10-09，间隔8天...合计10400元达AR-03较高审批线”",
+      "trace_evidence": "get_expense_detail显示expense_date和amount；get_policy_excerpt引用第十一条。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用01_expense_reimbursement_2025.md#第十一条。",
+      "answer_evidence": "citations中包含{\"doc_id\": \"01_expense_reimbursement_2025.md\", \"clause_no\": \"第十一条\"}。",
+      "trace_evidence": "citations列表匹配。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 0,
+      "reason": "未引用03_authorization_management.md#附件二。",
+      "answer_evidence": "无此引用。",
+      "trace_evidence": "未在citations中找到。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-unsupported-output",
+      "value": 1,
+      "reason": "未提交异常ID",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 404.126,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "actual_record_ids": [
+      "R004236",
+      "R004237"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 1,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 0.9666666666666667,
+    "overall_comment": "候选提交完全满足四项检查要求，日期间隔、金额计算正确，结论明确无异常，推理符合制度第十一条。；候选提交正确识别无异常，满足全部检查项：日期间隔、窗口边界、合计金额均准确引用并推理，无需修改；候选回答正确识别无异常，并合理说明金额和间隔，但遗漏引用03_authorization_management.md#附件二。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 9796,
+      "completion_tokens": 3245,
+      "total_tokens": 13041,
+      "prompt_cache_hit_tokens": 1920,
+      "prompt_cache_miss_tokens": 7876
+    },
+    "batch_count": 3,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 3217,
+          "completion_tokens": 845,
+          "total_tokens": 4062,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 421
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 2449
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 3328,
+          "completion_tokens": 824,
+          "total_tokens": 4152,
+          "prompt_tokens_details": {
+            "cached_tokens": 384
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 349
+          },
+          "prompt_cache_hit_tokens": 384,
+          "prompt_cache_miss_tokens": 2944
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 3251,
+          "completion_tokens": 1576,
+          "total_tokens": 4827,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1217
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 2483
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 3
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/codex-scripted-enhanced/TRAP-003"
+}

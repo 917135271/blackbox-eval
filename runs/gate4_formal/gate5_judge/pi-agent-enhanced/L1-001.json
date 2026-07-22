@@ -1,0 +1,148 @@
+{
+  "group": "pi-agent-enhanced",
+  "task_id": "L1-001",
+  "case_family": "policy_and_version",
+  "category": "policy_qa",
+  "graded_at": "2026-07-21T21:08:35+08:00",
+  "checklist_passed": 8,
+  "checklist_total": 8,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "current-threshold-amount",
+      "value": 1,
+      "reason": "明确给出10000元",
+      "answer_evidence": "即单笔费用报销达到10,000元（含）时需要部门总经理审批",
+      "trace_evidence": "工具调用返回附件二AR-03档：大于等于10000元且小于50000元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-threshold-inclusive",
+      "value": 1,
+      "reason": "明确说明达到或等于10000元即适用",
+      "answer_evidence": "达到10,000元（含）时",
+      "trace_evidence": "附件二区间为大于等于10000元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "current-version",
+      "value": 1,
+      "reason": "明确识别现行版本",
+      "answer_evidence": "现行制度以《XX证券费用报销管理办法(2025修订版)》...为准",
+      "trace_evidence": "工具调用list_policy_docs和获取01_expense_reimbursement_2025.md",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-expense-rule",
+      "value": 1,
+      "reason": "引用了费用报销办法第五条",
+      "answer_evidence": "《XX证券费用报销管理办法(2025修订版)》第五条明确规定",
+      "trace_evidence": "get_policy_doc返回第五条内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-authorization",
+      "value": 1,
+      "reason": "引用了授权管理办法附件二",
+      "answer_evidence": "《XX证券授权管理办法》第二条明确附件二适用于费用报销系统...附件二AR-03档",
+      "trace_evidence": "get_policy_doc返回附件二内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-cross-reference",
+      "value": 1,
+      "reason": "说明了第五条指向附件二的交叉引用关系",
+      "answer_evidence": "第五条明确规定...统一按《XX证券授权管理办法》附件二执行",
+      "trace_evidence": "get_policy_doc 01_expense_reimbursement_2025.md包含该引用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "old-value-control",
+      "value": 1,
+      "reason": "明确排除了旧版8000元审批线",
+      "answer_evidence": "不适用。旧版...已被废止...不得作为现行审批依据",
+      "trace_evidence": "get_policy_doc 02_expense_reimbursement_2022_deprecated.md显示旧版已替代",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 192.798,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": null,
+    "actual_record_ids": [],
+    "record_metrics": null,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 7,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第五条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选答案准确提取了现行制度要素，清晰给出了金额边界、版本和交叉引用，并明确排除了旧值。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 3943,
+      "completion_tokens": 1729,
+      "total_tokens": 5672,
+      "prompt_cache_hit_tokens": 3840,
+      "prompt_cache_miss_tokens": 103
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 3943,
+          "completion_tokens": 1729,
+          "total_tokens": 5672,
+          "prompt_tokens_details": {
+            "cached_tokens": 3840
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1105
+          },
+          "prompt_cache_hit_tokens": 3840,
+          "prompt_cache_miss_tokens": 103
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 7
+      }
+    ]
+  },
+  "run_path": "runs/gate4_formal/pi-agent-enhanced/L1-001"
+}

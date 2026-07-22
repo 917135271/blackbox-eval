@@ -2,20 +2,22 @@
   "decision": "pass",
   "challenged_findings": [],
   "supporting_evidence": [
-    "所有陷阱记录(R004233-R004240)已正确排除，未出现在异常列表中",
-    "单记录超标准违规均为注入样本，标准对比计算正确",
-    "预算跨过记录验证通过，均为首个触发预算超支的记录",
-    "阈值边界检查通过：无恰好等于阈值的边界案例",
-    "拆分报销的7天窗口和3000元阈值计算正确",
-    "重复发票6对均经invoice_no验证"
+    "All 5 records have special_approval=0; zero special_approval=1 records exist in entire database",
+    "R004221: office_supplies 650.00 > 600, 07_office_communication.md 第二条",
+    "R004222: communication 330.00 > 300, 07_office_communication.md 第三条",
+    "R004223: training_fee 3700.00 > 3500, 05_training_expense.md 第二条",
+    "R004225: travel_lodging 900.00/night > 850 D1一类, 04_travel_expense.md 第四条",
+    "R004226: local_transport 92.00/day > 80 三类, 04_travel_expense.md 第六条"
   ],
   "opposing_evidence": [],
-  "exceptions_and_boundaries": {
-    "trap_records_excluded": ["R004233","R004234","R004235","R004236","R004237","R004238","R004239","R004240"],
-    "double_counting_note": "R000002和R000028同时出现在重复报销和月度超标中，属不同规则独立判定，非重复计算",
-    "split_billing_training_fee": "86个培训费拆分案例均满足同人同类型7天内多笔合计≥3000条件，政策要求重点核查"
+  "exceptions_or_boundaries": {
+    "special_approval_check": "All 4240 records have special_approval=0 — no exemptions apply",
+    "policy_version": "2025 policies apply to all dates (Jan-Oct 2025), no version transition",
+    "threshold_exact_match": "No records have amounts exactly at threshold — no boundary disputes",
+    "city_tier_verification": "Database city_tier column used (not text extraction), verified against DB values",
+    "training_type": "R004223 is '外部专业培训课程费', applicable rule is 第二条 (course fee ≤3500), not 第四条 (daily comprehensive fee)"
   },
   "required_changes": [],
-  "rationale": "经独立复核，359项异常均通过以下验证：(1)陷阱记录已排除；(2)无阈值边界假阳性；(3)预算跨过记录为首个触发记录；(4)重复发票对已验证；(5)拆分报销窗口和金额计算正确。月度超标按员工+月份聚合后再比较阈值，无误。",
+  "rationale": "All 5 findings are clear single-transaction exceedances with no special approvals, no policy version ambiguity, no boundary edge cases, and correct policy clause matching. The database's structured columns (city_tier, nights, days) were used for reliable threshold comparison.",
   "unresolved_conflicts": []
 }

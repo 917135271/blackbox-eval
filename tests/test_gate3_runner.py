@@ -180,7 +180,7 @@ class Gate3RunnerTimeoutTests(unittest.TestCase):
         self.assertIn('AUDIT_FRAMEWORK = "codex"', config)
         self.assertIn("[agents.policy_researcher]", config)
 
-    def test_oh_my_pi_config_uses_native_model_mcp_and_ten_groups(self) -> None:
+    def test_oh_my_pi_config_uses_native_model_mcp_and_twelve_groups(self) -> None:
         runner = load_runner()
         models = runner.oh_my_pi_models_config()
         mcp = runner.oh_my_pi_mcp_config("DEV-001", enhanced=True)
@@ -191,7 +191,7 @@ class Gate3RunnerTimeoutTests(unittest.TestCase):
             "oh-my-pi",
         )
         self.assertIn("/plugin/shared/control-mcp", mcp["mcpServers"]["audit_control"]["args"][0])
-        self.assertEqual(len(runner.GROUPS), 10)
+        self.assertEqual(len(runner.GROUPS), 12)
         self.assertIn("oh-my-pi-enhanced", runner.GROUPS)
 
     def test_oh_my_pi_baseline_command_excludes_native_subagent_tool(self) -> None:
@@ -208,6 +208,30 @@ class Gate3RunnerTimeoutTests(unittest.TestCase):
         tools = command[command.index("--tools") + 1].split(",")
         self.assertNotIn("task", tools)
         self.assertNotIn("hub", tools)
+
+    def test_pi_agent_baseline_excludes_subagent_and_enhanced_loads_seven_skills(self) -> None:
+        runner = load_runner()
+        with mock.patch.object(runner, "prepare_task") as prepare:
+            base = ROOT / "runs" / "unit-pi-agent"
+            prepare.return_value = (base, base / "workspace", base / "artifacts")
+            baseline, _ = runner.pi_agent_command(
+                "pi-agent-baseline",
+                {"id": "DEV-001", "category": "record_audit", "prompt": "test"},
+                ROOT / "baseline",
+                {"LLM_API_KEY": "test"},
+            )
+            enhanced, _ = runner.pi_agent_command(
+                "pi-agent-enhanced",
+                {"id": "DEV-001", "category": "record_audit", "prompt": "test"},
+                ROOT / "baseline",
+                {"LLM_API_KEY": "test"},
+            )
+        baseline_tools = baseline[baseline.index("--tools") + 1].split(",")
+        enhanced_tools = enhanced[enhanced.index("--tools") + 1].split(",")
+        self.assertNotIn("subagent", baseline_tools)
+        self.assertIn("subagent", enhanced_tools)
+        self.assertEqual(enhanced.count("--skill"), 7)
+        self.assertIn("/plugin/.pi/extensions/business-tools.ts", baseline)
 
     def test_timeout_removes_container_before_collecting_output(self) -> None:
         runner = load_runner()

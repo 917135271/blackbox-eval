@@ -1,48 +1,110 @@
 {
   "audit_scope": {
     "task_id": "L3-003",
-    "type": "full_year_rule_audit",
-    "period": "2025-01-01至2025-12-31",
-    "total_records": 4240,
-    "expense_types": ["travel_lodging","local_transport","training_fee","business_entertainment","office_supplies","communication"],
-    "departments": "全部10个部门",
-    "employees": "全部80人"
+    "task_type": "full_year_rule_audit",
+    "audit_period": "2025-01-01 to 2025-12-31",
+    "organization": "XX证券各部门",
+    "data_scope": "4240条已审批费用记录（expense_records WHERE status='approved'）",
+    "expense_types": ["travel_lodging", "local_transport", "training_fee", "business_entertainment", "office_supplies", "communication"]
   },
   "verified_facts": [
-    "全年共4240条费用记录，覆盖10个部门80名员工",
-    "所有记录special_approval均为0，无专项审批记录",
-    "city_tier使用A/B/C编码（对应一/二/三类城市）",
-    "员工职级：E1员工级、M1经理级、D1部门负责人级、X1高管级",
-    "6个部门年度预算超支（D001/D002/D003/D004/D005/D006）",
-    "6张发票在不同报销单中重复出现",
-    "培训费拆分报销占拆分异常的89.6%（86/96）"
+    "全年共4240条已审批费用记录，覆盖10个部门、80名员工",
+    "数据库含结构化字段city_tier(A/B/C)、nights、days，用于精确阈值比较",
+    "全部记录special_approval=0，无专项审批豁免",
+    "2025版制度全集覆盖完整审计期间，无版本切换"
   ],
   "applicable_policies": [
-    {"doc_id":"01_expense_reimbursement_2025.md","clauses":["第十条","第十一条","第十二条","第十三条"]},
-    {"doc_id":"04_travel_expense.md","clauses":["第四条","第六条"]},
-    {"doc_id":"05_training_expense.md","clauses":["第二条"]},
-    {"doc_id":"06_business_entertainment.md","clauses":["第三条"]},
-    {"doc_id":"07_office_communication.md","clauses":["第二条","第三条"]},
-    {"doc_id":"08_budget_management.md","clauses":["第三条"]}
+    {"doc_id": "04_travel_expense.md", "clause_no": "第四条", "rule": "差旅住宿费按职级×城市档位标准"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "第六条", "rule": "市内交通包干标准"},
+    {"doc_id": "05_training_expense.md", "clause_no": "第二条", "rule": "培训课程费每人每期不超过3500元"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第二条", "rule": "业务招待单次活动不超过5000元"},
+    {"doc_id": "07_office_communication.md", "clause_no": "第二条", "rule": "办公用品每人每月不超过600元"},
+    {"doc_id": "07_office_communication.md", "clause_no": "第三条", "rule": "通讯费用每人每月不超过300元"}
   ],
   "findings": [
-    {"category":"差旅住宿超标准","count":1,"description":"R004225:李丽娟(D1)A类城市1晚900元,标准850元/晚,超标50元"},
-    {"category":"市内交通超标准","count":1,"description":"R004226:杨丹C类城市1天92元,标准80元/天,超标12元"},
-    {"category":"培训课程费超标准","count":1,"description":"R004223:张婷培训费3700元,超过3500元/人/期标准"},
-    {"category":"业务招待人均超标准","count":1,"description":"R004224:闭想招待700元/2人=350元/人,超过300元/人标准"},
-    {"category":"办公用品月度超标准","count":115,"description":"115个员工-月份组合办公用品合计超过600元/人/月标准"},
-    {"category":"通讯费用月度超标准","count":132,"description":"132个员工-月份组合通讯费合计超过300元/人/月标准"},
-    {"category":"重复报销","count":6,"description":"6张发票(FP202500000002/005/020/028/037/055)在2条报销记录中重复出现"},
-    {"category":"拆分报销规避审批","count":96,"description":"96组同人同类型7天内多笔合计≥3000元(培训费86组/差旅住宿8组/业务招待2组)"},
-    {"category":"部门预算超支","count":6,"description":"6个部门首个触发预算超支的记录,均在无专项审批下超预算1.0倍"}
+    {
+      "anomaly_id": "L3-003-A01",
+      "expense_type": "office_supplies",
+      "policy": "07_office_communication.md 第二条",
+      "threshold": "600元/月",
+      "observed": "650.00元（单笔）",
+      "excess": "50.00元",
+      "record_ids": ["R004221"],
+      "employee": "李丽娟(D1/信息技术部)",
+      "date": "2025-01-24",
+      "reason": "项目资料及办公耗材采购"
+    },
+    {
+      "anomaly_id": "L3-003-A02",
+      "expense_type": "communication",
+      "policy": "07_office_communication.md 第三条",
+      "threshold": "300元/月",
+      "observed": "330.00元（单笔）",
+      "excess": "30.00元",
+      "record_ids": ["R004222"],
+      "employee": "杨丹(D1/合规风控部)",
+      "date": "2025-03-20",
+      "reason": "业务通讯费"
+    },
+    {
+      "anomaly_id": "L3-003-A03",
+      "expense_type": "training_fee",
+      "policy": "05_training_expense.md 第二条",
+      "threshold": "3500元/人/期",
+      "observed": "3700.00元（单笔）",
+      "excess": "200.00元",
+      "record_ids": ["R004223"],
+      "employee": "张婷(D1/财务管理部)",
+      "date": "2025-05-18",
+      "reason": "外部专业培训课程费"
+    },
+    {
+      "anomaly_id": "L3-003-A04",
+      "expense_type": "travel_lodging",
+      "policy": "04_travel_expense.md 第四条",
+      "threshold": "850元/晚（D1一类城市）",
+      "observed": "900.00元/晚（1晚）",
+      "excess": "50.00元/晚",
+      "record_ids": ["R004225"],
+      "employee": "李丽娟(D1/信息技术部)",
+      "date": "2025-08-15",
+      "reason": "项目现场住宿费"
+    },
+    {
+      "anomaly_id": "L3-003-A05",
+      "expense_type": "local_transport",
+      "policy": "04_travel_expense.md 第六条",
+      "threshold": "80元/日（三类城市）",
+      "observed": "92.00元/日（1日）",
+      "excess": "12.00元/日",
+      "record_ids": ["R004226"],
+      "employee": "杨丹(D1/合规风控部)",
+      "date": "2025-10-16",
+      "reason": "市内业务交通费"
+    }
   ],
-  "impact": "全年超标准违规共359项,涉及812条记录。差旅/交通/培训/招待单项超标为注入样本;月度办公和通讯超标为普遍现象;重复报销和拆分报销存在系统性审批规避风险;6个部门预算管控失效。",
-  "recommendations": "1.加强月度办公和通讯费用预算控制 2.完善发票查重机制 3.对培训费密集报销增设预警 4.对超预算部门实行强制专项审批",
-  "anomaly_ids_count": 359,
-  "record_ids_count": 812,
-  "answer": "全年超标准专项扫描共发现359项异常,涉及812条记录。具体分类:差旅住宿超标准1项(R004225,D1/A类900元超850元标准)、市内交通超标准1项(R004226,C类92元超80元标准)、培训课程费超标准1项(R004223,3700元超3500元标准)、业务招待人均超标准1项(R004224,350元/人超300元标准)、办公用品月度超标准115项(员工月度合计超600元)、通讯费用月度超标准132项(员工月度合计超300元)、重复报销6项(6对重复发票)、拆分报销规避审批96项(同人同类型7天内多笔合计≥3000元)、部门预算超支6项(6个部门累计超年度预算1.0倍且无专项审批)。",
-  "limitations": [
-    "培训费内部/外部培训区分需从reason字段推断,可能存在分类误差",
-    "业务招待人均计算依赖participants字段,该字段为0时无法判定人均超标"
-  ]
+  "no_anomaly_types": [
+    {
+      "expense_type": "business_entertainment",
+      "rule": "单次活动≤5000元",
+      "searched": 675,
+      "max_amount": 1884.07,
+      "conclusion": "无异常"
+    }
+  ],
+  "impact": "5项单笔超标准异常涉及3名部门负责人级员工，超额金额12-200元，均无专项审批",
+  "recommendations": "补办专项审批或退回超标部分；办公用品和通讯费注意月度累计控制",
+  "anomaly_ids": ["L3-003-A01", "L3-003-A02", "L3-003-A03", "L3-003-A04", "L3-003-A05"],
+  "record_ids": ["R004221", "R004222", "R004223", "R004225", "R004226"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "第六条"},
+    {"doc_id": "05_training_expense.md", "clause_no": "第二条"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第二条"},
+    {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+    {"doc_id": "07_office_communication.md", "clause_no": "第三条"}
+  ],
+  "answer_text": "同final_result.json中answer字段",
+  "limitations": ["市内交通和住宿费依赖数据库city_tier/nights/days字段，未对原始票据进行实物核验"]
 }

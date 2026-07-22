@@ -1,0 +1,174 @@
+{
+  "group": "openclaude-scripted-enhanced",
+  "task_id": "L3-006",
+  "case_family": "policy_and_version",
+  "category": "version_trap",
+  "graded_at": "2026-07-22T00:56:22+08:00",
+  "checklist_passed": 8,
+  "checklist_total": 8,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
+    {
+      "id": "current-value",
+      "value": 1,
+      "reason": "明确给出部门总经理审批线为≥10000元且<50000元，现行值10000元准确",
+      "answer_evidence": "部门总经理审批线为单笔报销金额≥10000元且<50000元",
+      "trace_evidence": "get_policy_excerpt返回AR-03档为『大于等于10000元且小于50000元』，角色为部门总经理",
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-value-amount",
+      "value": 1,
+      "reason": "明确给出2022版审批线为8000元",
+      "answer_evidence": "2022版（XX证财规〔2022〕乙号）第二条曾规定8000元提交部门总经理审批",
+      "trace_evidence": "get_policy_doc(02)返回『第二条 旧版制度曾规定,单笔报销金额达到8000元的,应提交部门总经理审批』",
+      "source": "llm_judge"
+    },
+    {
+      "id": "deprecated-value-status",
+      "value": 1,
+      "reason": "明确说明2022版已废止，不得作为现行依据",
+      "answer_evidence": "2022版已于2025年1月1日起废止……已被明确废止，仅作制度沿革留档，不得作为现行审批依据",
+      "trace_evidence": "get_policy_doc(02)返回第一条『仅作为制度沿革留档。现行制度应以《XX证券费用报销管理办法(2025修订版)》为准』，第四条『不得作为现行审批依据』",
+      "source": "llm_judge"
+    },
+    {
+      "id": "applicable-version",
+      "value": 1,
+      "reason": "正确选择2025修订版并说明废止关系",
+      "answer_evidence": "费用报销审批线应采用2025修订版（《XX证券费用报销管理办法(2025修订版)》……2022版已于2025年1月1日起废止",
+      "trace_evidence": "get_policy_doc(01)显示2025修订版，第十四条或相关条文体现版本替代关系；search_policy结果中2022版第一条明确仅留档",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-version-evidence-current",
+      "value": 1,
+      "reason": "候选提交明确引用2025修订版第十四条作为现行效力依据，说明版本更替和废止旧版。",
+      "answer_evidence": "answer中说明‘费用报销审批线应采用2025修订版’并引用01_expense_reimbursement_2025.md第十四条。",
+      "trace_evidence": "tool_trace_summary中get_policy_doc返回了01_expense_reimbursement_2025.md全文，但未展示第十四条具体内容；然而候选提交已明确基于该条款论证现行效力，符合pass_condition。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-version-evidence-deprecated",
+      "value": 1,
+      "reason": "候选提交引用2022版第一条、第二条、第四条，第一条声明旧版仅作留档，第四条明确审批金额不得作为现行依据，构成废止状态。",
+      "answer_evidence": "answer中引用02_expense_reimbursement_2022_deprecated.md第一条、第二条、第四条，并说明‘2022版已被明确废止’。",
+      "trace_evidence": "tool_trace_summary中get_policy_doc返回了02文档全文，明确包含第一条、第二条、第四条的废止声明。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-version-evidence-amount",
+      "value": 1,
+      "reason": "候选提交引用授权管理办法附件二AR-03档，指出部门总经理审批线为≥10000元且<50000元。",
+      "answer_evidence": "answer中引用03_authorization_management.md附件二，并说明‘AR-03档规定单笔金额区间[10000,50000)元的必要审批角色为部门总经理’。",
+      "trace_evidence": "tool_trace_summary中get_policy_excerpt返回了附件二表格，包含‘AR-03 | 大于等于10000元且小于50000元 | 部门总经理’，确认为10000元审批档位。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 81.781,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": null,
+    "actual_record_ids": [],
+    "record_metrics": null,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 7,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十四条"
+      },
+      {
+        "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+        "clause_no": "第一条、第二条、第四条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选提交完全满足所有检查项，现行值、旧版金额、废止状态及适用版本均准确引用制度原文，证据完整。；候选提交准确区分2022版与2025修订版的效力，明确废止状态，并正确引用授权管理办法附件二的金额依据，三个检查项均满足pass_condition。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 7471,
+      "completion_tokens": 2137,
+      "total_tokens": 9608,
+      "prompt_cache_hit_tokens": 1408,
+      "prompt_cache_miss_tokens": 6063
+    },
+    "batch_count": 2,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 3765,
+          "completion_tokens": 1032,
+          "total_tokens": 4797,
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 538
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 2997
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 3706,
+          "completion_tokens": 1105,
+          "total_tokens": 4811,
+          "prompt_tokens_details": {
+            "cached_tokens": 640
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 589
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 3066
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 3
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/openclaude-scripted-enhanced/L3-006"
+}

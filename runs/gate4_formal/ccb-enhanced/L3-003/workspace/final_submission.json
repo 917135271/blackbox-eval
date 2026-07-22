@@ -1,0 +1,39 @@
+{
+  "anomaly_ids": [
+    "L3-003-A01",
+    "L3-003-A02",
+    "L3-003-A03",
+    "L3-003-A04",
+    "L3-003-A05"
+  ],
+  "answer": "对全年4240条已审批费用记录进行单笔超标准专项扫描，共发现5项单笔/单次即可确认的异常。\n\n## 各费用类型计算口径、全量扫描方法和制度依据\n\n### 1. 办公用品 (office_supplies)\n- 计算口径：单笔报销金额与月度上限600元比较，仅识别单笔自身超过上限的异常，不评估月度累计超限\n- 扫描方法：SQL全量过滤 expense_type='office_supplies' AND amount > 600\n- 制度依据：XX证券办公与通讯费用管理办法(XX证办规〔2025〕庚号)第二条\n- 发现：L3-003-A01，R004221，金额650.00元，超出月度上限50.00元\n\n### 2. 通讯费用 (communication)\n- 计算口径：单笔报销金额与月度上限300元比较，仅识别单笔自身超过上限的异常，不评估月度累计超限\n- 扫描方法：SQL全量过滤 expense_type='communication' AND amount > 300\n- 制度依据：XX证券办公与通讯费用管理办法(XX证办规〔2025〕庚号)第三条\n- 发现：L3-003-A02，R004222，金额330.00元，超出月度上限30.00元\n\n### 3. 培训费 (training_fee)\n- 计算口径：单笔培训课程费与每人每期上限3500元比较\n- 扫描方法：SQL全量过滤 expense_type='training_fee' AND amount > 3500\n- 制度依据：XX证券培训费管理办法(XX证人规〔2025〕戊号)第二条\n- 发现：L3-003-A03，R004223，金额3700.00元，超出上限200.00元\n\n### 4. 差旅住宿费 (travel_lodging)\n- 计算口径：单笔住宿费按nights字段折算每人每晚费用，与职级×城市档位的住宿标准比较。E1: 450/380/300, M1: 650/550/450, D1: 850/700/600, X1: 1100/900/750（一类/二类/三类）\n- 扫描方法：SQL联表查询，JOIN employees获取职级，使用数据库city_tier字段（A/B/C→一类/二类/三类），计算per_night=amount/nights，与对应标准比较\n- 制度依据：XX证券差旅费管理办法(XX证行规〔2025〕丁号)第四条\n- 发现：L3-003-A04，R004225，D1职级一类城市，per_night=900.00元，超出标准(850元)50.00元\n\n### 5. 市内交通费 (local_transport)\n- 计算口径：单笔交通费按days字段折算每人每日费用，与城市档位日标准比较。一类120元/日，二类100元/日，三类80元/日\n- 扫描方法：SQL联表查询，使用数据库city_tier字段和days字段，计算per_day=amount/days，与对应标准比较\n- 制度依据：XX证券差旅费管理办法(XX证行规〔2025〕丁号)第六条\n- 发现：L3-003-A05，R004226，三类城市，per_day=92.00元，超出标准(80元)12.00元\n\n### 6. 业务招待费 (business_entertainment)\n- 计算口径：单次活动费用与上限5000元比较\n- 扫描方法：SQL全量过滤 expense_type='business_entertainment' AND amount > 5000\n- 制度依据：XX证券业务招待费管理办法(XX证客规〔2025〕己号)第二条\n- 发现：全年最高单笔招待费为1884.07元，未超过5000元上限，业务招待费类型不存在单笔超标准异常\n\n## 全量扫描方法总结\n所有扫描使用SQLite直接查询expense_records表（/benchmark/data/expense.db），联表employees获取员工职级，使用数据库自身的city_tier、nights、days结构化字段进行计算。对4240条status='approved'记录逐条应用对应费用类型的阈值规则。",
+  "citations": [
+    {
+      "clause_no": "第四条",
+      "doc_id": "04_travel_expense.md"
+    },
+    {
+      "clause_no": "第六条",
+      "doc_id": "04_travel_expense.md"
+    },
+    {
+      "clause_no": "第二条",
+      "doc_id": "05_training_expense.md"
+    },
+    {
+      "clause_no": "第二条",
+      "doc_id": "07_office_communication.md"
+    },
+    {
+      "clause_no": "第三条",
+      "doc_id": "07_office_communication.md"
+    }
+  ],
+  "record_ids": [
+    "R004221",
+    "R004222",
+    "R004223",
+    "R004225",
+    "R004226"
+  ]
+}

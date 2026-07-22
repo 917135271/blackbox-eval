@@ -1,164 +1,43 @@
 {
   "artifact_paths": [
-    "final_submission.json",
-    "submission_receipt.json",
-    "traces/context_events.jsonl",
-    "traces/events.jsonl",
-    "traces/subagents.jsonl",
-    "traces/tool_calls.jsonl",
-    "work/artifact_index.json",
     "work/audit_plan.json",
-    "work/context_checkpoint.json",
-    "work/decision_log.jsonl",
-    "work/evidence_index.json",
+    "work/policy_applicability.json",
     "work/evidence_matrix.json",
-    "work/final_result.json",
     "work/report_draft.json",
-    "work/task_state.json",
+    "work/final_result.json",
     "work/validation_report.json"
   ],
   "compacted": false,
-  "context_usage_percent": 0.0,
-  "created_at": 1784206015.1572332,
-  "estimation_method": "outer_runner_finalization",
+  "context_usage_percent": 15.0,
+  "created_at": 1784617936.304911,
+  "estimation_method": "reported_tokens",
   "retained_state": {
+    "applicable_clauses": [
+      "第十条"
+    ],
     "applicable_policies": [
       "01_expense_reimbursement_2025.md"
     ],
-    "artifact_index": [
-      "final_submission.json",
-      "submission_receipt.json",
-      "traces/context_events.jsonl",
-      "traces/events.jsonl",
-      "traces/subagents.jsonl",
-      "traces/tool_calls.jsonl",
-      "work/artifact_index.json",
-      "work/audit_plan.json",
-      "work/context_checkpoint.json",
-      "work/decision_log.jsonl",
-      "work/evidence_index.json",
-      "work/evidence_matrix.json",
-      "work/final_result.json",
-      "work/report_draft.json",
-      "work/task_state.json",
-      "work/validation_report.json"
-    ],
-    "audit_plan": {
-      "complexity": {
-        "reasons": [
-          "单一规则（重复报销）",
-          "已知线索记录R000020",
-          "仅需一次发票查重即可覆盖"
-        ],
-        "score": 1
-      },
-      "data_questions": [
-        {
-          "fields": [
-            "record_id",
-            "employee_id",
-            "amount",
-            "expense_date",
-            "invoice_no"
-          ],
-          "method": "find_invoice_usage",
-          "question": "发票FP202500000020/INV000020是否被多个报销记录使用？"
-        }
-      ],
-      "evidence_requirements": {
-        "data_points": "R000020 and R004203 both use FP202500000020 with identical amount 669.5",
-        "policy": "01_expense_reimbursement_2025.md 第十条 - 同一发票最多报销1次"
-      },
-      "execution_steps": [
-        {
-          "status": "completed",
-          "step": "planning"
-        },
-        {
-          "status": "pending",
-          "step": "policy_check"
-        },
-        {
-          "status": "completed",
-          "step": "batch_data_analysis"
-        },
-        {
-          "status": "pending",
-          "step": "evidence_coverage"
-        },
-        {
-          "status": "pending",
-          "step": "false_positive_review"
-        },
-        {
-          "status": "pending",
-          "step": "report"
-        },
-        {
-          "status": "pending",
-          "step": "validation"
-        },
-        {
-          "status": "pending",
-          "step": "submission"
-        }
-      ],
-      "policy_questions": [
-        {
-          "clause": "第十条",
-          "policy_doc": "01_expense_reimbursement_2025.md",
-          "question": "同一发票是否允许多次报销？"
-        }
-      ],
-      "required_fields": [
-        "record_id",
-        "employee_id",
-        "department_id",
-        "expense_type",
-        "amount",
-        "invoice_no",
-        "invoice_id",
-        "expense_date",
-        "reimburse_date",
-        "status"
-      ],
-      "stopping_conditions": [
-        "所有关联发票使用记录已核查",
-        "制度规则已确认",
-        "证据覆盖率达到100%"
-      ],
-      "subagent_plan": null,
-      "task_id": "L2-003",
-      "task_scope": {
-        "audit_object": "重复报销异常",
-        "entry_point": "R000020",
-        "expense_types": [
-          "travel_lodging"
-        ],
-        "organization": "D009 / E0028",
-        "period": "2025"
-      },
-      "unresolved_items": []
-    },
+    "artifact_index": "work/artifact_index.json",
+    "audit_object": "重复报销异常",
+    "audit_plan": "work/audit_plan.json",
     "constraints": [
-      "isolated GATE3 workspace",
-      "formal answer assets prohibited",
-      "outer runner timeout enforced"
+      "单规则任务"
     ],
     "evidence_status": "pass",
+    "invoice": "FP202500000020",
     "record_ids": [
       "R000020",
       "R004203"
     ],
     "remaining_budget": {
-      "elapsed_seconds": 174.179,
-      "remaining_seconds": 725.821,
       "timeout_seconds": 900
     },
-    "submission_status": "accepted",
-    "task": "你正在执行 GATE4 正式证券费用审计评测，当前为领域增强组。\n\n任务ID：L2-003\n题型：policy_data_comparison\n问题：结合制度和业务数据,核查以R000020为线索的重复报销异常,返回异常ID和记录ID集合。\n\n必须遵循已安装的证券费用审计 Skills；先规划并记录Checkpoint，再按触发条件调查、复核、校验并通过统一工具提交。若复杂度至少为2且存在符合路由规则的角色，必须先授权原生子智能体，并在角色结束后登记结构化摘要和产物。\n\n\n要求：\n1. 必须查询制度和只读业务库后作答，可以使用 Shell、Python、SQLite 和当前工作区临时文件。\n2. 只处理当前独立任务。禁止读取 ground_truth、cases.json、Rubric、判卷代码、历史答案、其他任务或候选轨迹，也不得访问与题目无关的互联网。\n3. anomaly_ids 必须与审计发现一一对应、稳定且类型明确；不得为了迎合未知答案猜测隐藏编号。record_ids 必须完整、准确且只覆盖本题范围。\n4. 有异常时，record_ids 只包含参与本题所问违规的记录，不含累计计算背景、有效豁免或无关规则记录；无异常时仍保留题目直接核查或结论覆盖的记录，并在 answer 中明确写“无异常”。\n5. 必须维护 work/final_result.json、work/evidence_matrix.json 和 work/validation_report.json 三个预置文件。对应Schema的绝对路径分别是 /runtime-schemas/final_result.schema.json、/runtime-schemas/evidence_matrix.schema.json 和 /runtime-schemas/validation_report.schema.json；当前工作区兼容路径分别是 /workspace/runtime-schemas/final_result.schema.json、/workspace/runtime-schemas/evidence_matrix.schema.json 和 /workspace/runtime-schemas/validation_report.schema.json。当前目录已经是 /workspace，禁止拼成 /workspace/workspace，也禁止把 .schema.json 猜成普通 .json。\n6. 先调用 audit_control.validate_audit_result；取得 valid=true 后，再以 result_path=\"work/final_result.json\" 调用 audit_control.submit_audit_result。不得把完整结果直接打印出来代替提交。\n7. 提交成功后最终只输出 GATE4_TASK_PASS；无法提交时只输出 GATE4_TASK_FAIL。\n",
+    "submission_status": "not_submitted",
+    "task": "以R000020为线索的重复报销异常核查",
+    "task_id": "L2-003",
     "unresolved_items": []
   },
-  "stage": "submission_ready",
+  "stage": "validation_ready",
   "task_id": "L2-003"
 }

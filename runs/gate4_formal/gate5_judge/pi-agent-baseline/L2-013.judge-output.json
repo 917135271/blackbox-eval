@@ -1,0 +1,54 @@
+{
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "候选答案明确判定“构成超标准报销异常”，无矛盾表述。",
+      "answer_evidence": "“构成超标准报销异常”",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "引用了费用报销办法第十二条，符合超标准总则条款。",
+      "answer_evidence": "citations 引用了 01_expense_reimbursement_2025.md 第十二条",
+      "trace_evidence": "get_policy_doc 获取到第十二条“无专项审批时，报销金额不得超过对应制度标准的1.0倍”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-training",
+      "value": 1,
+      "reason": "引用了培训费管理办法第二条，明确3500元标准。",
+      "answer_evidence": "citations 引用了 05_training_expense.md 第二条",
+      "trace_evidence": "get_policy_doc 获取到第二条“培训课程费按人次控制，每人每期不超过3500元”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-type",
+      "value": 1,
+      "reason": "费用类型识别为 training_fee，正确。",
+      "answer_evidence": "“费用类型为training_fee（培训课程费）”",
+      "trace_evidence": "get_expense_detail 结果显示 expense_type: training_fee",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "报销金额识别为 3700 元，正确。",
+      "answer_evidence": "“报销金额3700元”",
+      "trace_evidence": "get_expense_detail 结果显示 amount: 3700.0",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-limit",
+      "value": 1,
+      "reason": "标准 3500 元与超标 200 元比较正确。",
+      "answer_evidence": "“适用标准...每人每期不超过3500元，实际3700元超出标准200元”",
+      "trace_evidence": "get_policy_doc 第二条标准 3500 元，get_expense_detail 金额 3700 元，比对正确",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交完全满足所有检查项：明确判定超标准，正确引用制度条款，费用类型、金额、标准及比较均准确无误。",
+  "confidence": 1.0
+}

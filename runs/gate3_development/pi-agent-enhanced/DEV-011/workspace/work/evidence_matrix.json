@@ -1,0 +1,42 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "DEV011-D902-BUDGET-001",
+      "record_ids": ["R900019"],
+      "citations": [
+        {"doc_id": "08_budget_management.md", "clause_no": "第三条"},
+        {"doc_id": "08_budget_management.md", "clause_no": "第四条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"}
+      ],
+      "facts": [
+        "D902部门2025年度预算为¥50,000",
+        "R900019（2025-02-15, ¥6,000）报销后累计余额达到¥51,000，首次超过预算额度¥50,000（1.0倍阈值）",
+        "R900019的special_approval=0，未履行专项审批",
+        "R900018（¥45,000）为预算内记录，累计余额¥45,000未超预算",
+        "R900020（¥5,000）虽超预算但special_approval=1，已履行专项审批，合规排除"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R900019"],
+  "submitted_record_ids": ["R900019"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {
+    "complete": false
+  },
+  "reconciled_figures": {
+    "department_budget": 50000,
+    "cumulative_approved": 56000,
+    "running_balance_check": "R900018:45000→R900019:51000(EXCEED)→R900020:56000",
+    "anomaly_amount": 6000,
+    "budget_exceed_point": 51000
+  },
+  "unresolved_items": []
+}

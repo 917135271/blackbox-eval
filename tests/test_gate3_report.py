@@ -18,10 +18,12 @@ class Gate3ReportNormalizationTests(unittest.TestCase):
         answer = REPORT.normalize_text("两笔费用间隔为8个日历日，无异常。")
         self.assertIn(REPORT.normalize_text("8天"), answer)
 
-    def test_report_covers_ten_groups(self) -> None:
-        self.assertEqual(len(REPORT.GROUPS), 10)
+    def test_report_covers_twelve_groups(self) -> None:
+        self.assertEqual(len(REPORT.GROUPS), 12)
         self.assertIn("oh-my-pi-baseline", REPORT.GROUPS)
         self.assertIn("oh-my-pi-enhanced", REPORT.GROUPS)
+        self.assertIn("pi-agent-baseline", REPORT.GROUPS)
+        self.assertIn("pi-agent-enhanced", REPORT.GROUPS)
 
 
 if __name__ == "__main__":

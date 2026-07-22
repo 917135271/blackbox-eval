@@ -1,64 +1,57 @@
 {
   "task_id": "L3-007",
-  "question_type": "two_hop_retrieval",
-  "question": "报销办法没有直接列审批金额时，请通过交叉引用找到单笔费用审批档位。",
+  "task_type": "two_hop_retrieval",
+  "question": "报销办法没有直接列审批金额时,请通过交叉引用找到单笔费用审批档位",
   "audit_scope": {
-    "audit_object": "单笔费用审批档位",
-    "policy_cross_reference": "XX证券费用报销管理办法(2025修订版) 第五条 → XX证券授权管理办法 附件二",
-    "business_period": "2025年1月1日起施行",
-    "organization_scope": "XX证券全部门"
+    "description": "通过交叉引用《XX证券费用报销管理办法(2025修订版)》和《XX证券授权管理办法》附件二，找到单笔费用审批档位",
+    "expense_types": "all",
+    "period": "2025-01-01起",
+    "organization_scope": "XX证券全部部门"
   },
   "policy_questions": [
     {
-      "id": "PQ-01",
-      "question": "报销办法是否直接列示审批金额？",
-      "answer": "否，第五条明确不在正文列示具体金额，统一按《XX证券授权管理办法》附件二执行。"
+      "id": "PQ-1",
+      "question": "报销管理办法是否直接列出单笔费用审批金额？",
+      "policy_docs": ["01_expense_reimbursement_2025.md"],
+      "trigger_clause": "第五条"
     },
     {
-      "id": "PQ-02",
-      "question": "授权管理办法附件二中的审批档位和金额区间是什么？",
-      "policy_doc": "03_authorization_management.md"
+      "id": "PQ-2",
+      "question": "审批金额档位在哪个交叉引用文件中定义？",
+      "policy_docs": ["03_authorization_management.md"],
+      "trigger_clause": "附件二 费用报销审批权限表"
     }
   ],
   "data_questions": [],
-  "required_fields": ["单笔金额区间", "必要审批角色", "档位编号"],
+  "required_fields": ["doc_id", "clause_no", "approval_tier", "amount_range", "required_role"],
   "evidence_requirements": [
-    {
-      "source": "01_expense_reimbursement_2025.md",
-      "clause": "第五条",
-      "content": "单笔费用报销的审批权限不在本办法正文列示具体金额，统一按《XX证券授权管理办法》附件二执行"
-    },
-    {
-      "source": "03_authorization_management.md",
-      "clause": "附件二",
-      "content": "费用报销审批权限表，包含AR-01至AR-05共5个档位"
-    }
+    "01_expense_reimbursement_2025.md 第五条：确认审批金额不直接列示，引用《授权管理办法》附件二",
+    "03_authorization_management.md 附件二：提取五个审批档位(AR-01至AR-05)及其金额区间和审批角色"
   ],
   "execution_steps": [
-    {"step": 1, "action": "audit-query-planner", "output": "work/audit_plan.json", "status": "completed"},
-    {"step": 2, "action": "policy-version-check", "output": "work/policy_version.json", "status": "pending"},
-    {"step": 3, "action": "evidence-coverage-check", "output": "work/evidence_matrix.json", "status": "pending"},
-    {"step": 4, "action": "audit-report", "output": "work/final_result.json", "status": "pending"},
-    {"step": 5, "action": "result-validator", "output": "work/validation_report.json", "status": "pending"},
-    {"step": 6, "action": "validate and submit", "output": null, "status": "pending"}
+    {"step": 1, "action": "policy_version_check", "description": "确认2025版报销办法为现行有效制度，2022版已废止"},
+    {"step": 2, "action": "read_policy", "description": "阅读《XX证券费用报销管理办法(2025修订版)》第五条交叉引用"},
+    {"step": 3, "action": "read_policy", "description": "阅读《XX证券授权管理办法》附件二审批权限表"},
+    {"step": 4, "action": "evidence_coverage_check", "description": "确认两个hop的证据完整覆盖"},
+    {"step": 5, "action": "report", "description": "编写审计报告总结审批档位"},
+    {"step": 6, "action": "validate_and_submit", "description": "验证并提交最终结果"}
   ],
   "complexity": {
     "score": 1,
     "reasons": [
-      "单一规则（审批档位查询）",
-      "两个制度文件交叉引用（报销办法+授权管理办法）",
-      "不涉及数据聚合、分组、关联或批量过滤",
-      "不涉及阈值边界、日期边界、例外或豁免判断",
-      "不涉及复杂审计报告"
+      "两跳检索(two_hop_retrieval)需要交叉引用两份制度文件",
+      "纯制度事实问题，无需数据表查询或聚合",
+      "无阈值判定、豁免或例外情形"
     ]
   },
   "subagent_plan": {
-    "required": false,
-    "reason": "复杂度为1，无需原生子智能体"
+    "use_subagent": false,
+    "reason": "复杂度1，纯政策事实问题，在主智能体中直接完成"
   },
   "stopping_conditions": [
-    "已从授权管理办法附件二获取完整的5档审批权限表",
-    "已确认2025修订版为现行有效版本"
+    "完成两个hop的政策交叉引用并提取完整审批档位表",
+    "证据矩阵覆盖率达到100%",
+    "验证通过且提交成功"
   ],
   "unresolved_items": []
 }

@@ -3,36 +3,35 @@
   "errors": [],
   "warnings": [],
   "field_checks": {
-    "anomaly_ids_type": "pass",
-    "anomaly_ids_non_empty": "pass",
-    "anomaly_ids_unique": "pass",
-    "record_ids_type": "pass",
-    "record_ids_pattern": "pass",
-    "record_ids_unique": "pass",
-    "answer_non_empty": "pass",
-    "citations_type": "pass",
-    "citations_fields": "pass",
-    "no_extra_fields": "pass"
+    "anomaly_ids": "valid - non-empty array with unique string elements",
+    "record_ids": "valid - 2 unique strings matching pattern R[0-9]{6}",
+    "answer": "valid - non-empty string with all required components",
+    "citations": "valid - 2 unique objects with doc_id and clause_no"
   },
   "id_checks": {
-    "record_ids_exist_in_db": "pass",
-    "doc_ids_exist_in_corpus": "pass",
-    "anomaly_ids_internal_consistent": "pass"
+    "record_ids_in_db": "all valid - R004212 and R004213 confirmed in expense.db",
+    "doc_ids_in_corpus": "all valid - 01_expense_reimbursement_2025.md and 03_authorization_management.md confirmed in corpus",
+    "anomaly_id_consistency": "valid - AN-L2-008-001 matches evidence matrix and report",
+    "orphan_records": "none",
+    "missing_records": "none"
   },
   "evidence_checks": {
-    "evidence_status_pass": "pass",
-    "coverage_100_percent": "pass",
-    "submitted_matches_final": "pass",
-    "anomaly_evidence_alignment": "pass",
-    "citations_in_evidence_rows": "pass",
-    "no_unowned_records": "pass",
-    "no_unused_candidates": "pass"
+    "evidence_matrix_status": "pass",
+    "coverage_percent": 100,
+    "anomaly_record_alignment": "valid - evidence_rows record_ids match final_result record_ids",
+    "submitted_vs_evidence_consistency": "valid - submitted_record_ids equals final_result record_ids",
+    "unowned_records": "none",
+    "unused_candidates": "none",
+    "fact_rule_supported": "all evidence rows have fact_supported=true and rule_supported=true"
   },
   "answer_consistency_checks": {
-    "threshold_values_stated": "pass",
-    "anomaly_record_agreement": "pass",
-    "citations_match_policy": "pass",
-    "only_in_scope_records": "pass"
+    "anomaly_id_in_answer": true,
+    "record_ids_in_answer": true,
+    "date_window_in_answer": true,
+    "total_amount_in_answer": true,
+    "policy_basis_in_answer": true,
+    "threshold_observed_values": "stated - 5 days observed vs 7-day threshold; 10200 combined vs AR-03 10000 lower bound",
+    "report_alignment": "answer matches report_draft.json findings"
   },
   "repair_count": 0,
   "repairable_fields": [],

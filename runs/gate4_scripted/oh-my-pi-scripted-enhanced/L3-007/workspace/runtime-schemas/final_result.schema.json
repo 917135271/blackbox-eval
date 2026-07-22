@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "audit-result.schema.json",
+  "title": "Unified Audit Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["anomaly_ids", "record_ids", "answer", "citations"],
+  "properties": {
+    "anomaly_ids": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "record_ids": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^R[0-9]{6}$"},
+      "uniqueItems": true
+    },
+    "answer": {"type": "string", "minLength": 1},
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["doc_id", "clause_no"],
+        "properties": {
+          "doc_id": {"type": "string", "minLength": 1},
+          "clause_no": {"type": "string", "minLength": 1}
+        }
+      },
+      "uniqueItems": true
+    }
+  }
+}

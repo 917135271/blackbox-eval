@@ -1,0 +1,38 @@
+{
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "候选答案明确认定重复报销，无矛盾表述。",
+      "answer_evidence": "answer: '该行为构成重复报销违规。'",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis",
+      "value": 1,
+      "reason": "引用01_expense_reimbursement_2025.md第十条，条款有效且直接支持结论。",
+      "answer_evidence": "citations: [{'doc_id': '01_expense_reimbursement_2025.md', 'clause_no': '第十条'}]",
+      "trace_evidence": "search_policy返回第十条内容'同一发票最多报销1次'，get_policy_excerpt确认",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-same-invoice",
+      "value": 1,
+      "reason": "明确识别同一发票被重复使用。",
+      "answer_evidence": "answer: '发票FP202500000020被两次用于报销'",
+      "trace_evidence": "find_invoice_usage返回两条记录，invoice_no均为FP202500000020",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "金额669.5元与记录一致。",
+      "answer_evidence": "answer: '金额各669.50元'",
+      "trace_evidence": "get_expense_detail R000020和R004203的amount均为669.5",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交在所有检查项上均满足要求，结论、制度依据和推理事实均正确且证据充分。",
+  "confidence": 1.0
+}

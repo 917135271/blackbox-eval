@@ -1,31 +1,37 @@
 {
-  "task_id": "TRAP-005",
   "audit_scope": {
-    "object": "发票FP202500000005的重复使用记录",
-    "period": "2025-03-10至2025-08-05",
-    "organization": "员工E0022刘冬梅，部门D007信息技术部",
-    "data_scope": "通过find_reused_invoices(min_usage_count=2)检索全部重复使用发票，聚焦FP202500000005对应记录R000005和R004202"
+    "task_id": "TRAP-005",
+    "records": ["R004239", "R004240"],
+    "employee": "E0008 杨丹 (D1/部门经理)",
+    "department": "D008 合规风控部",
+    "period": "2025-10-25 ~ 2025-10-26",
+    "rules_checked": ["重复报销", "拆分报销", "业务招待费超标准"]
   },
   "verified_facts": [
-    "R000005: 员工E0022刘冬梅，local_transport，金额88.83元，expense_date=2025-06-07，invoice_date=2025-06-07，reimburse_date=2025-08-05，审批人E0007(部门经理)，状态approved",
-    "R004202: 员工E0022刘冬梅，local_transport，金额88.83元，expense_date=2025-03-10，invoice_date=2025-06-07，reimburse_date=2025-03-18，审批人E0007(部门经理)，状态approved，reason='重复发票注入样本:青竹系统测试交通费'",
-    "两记录共用发票FP202500000005，发票金额88.83元，发票日期2025-06-07",
-    "R004202在发票签发(2025-06-07)前已完成报销(2025-03-18)，时序上物理不可行"
+    "R004239: 2025-10-25, 业务招待费, 540元, 3人, 发票FP2025X0004233(嘉禾餐饮), 事由:客户甲产品方案交流招待费, 状态:approved, 审批:部门经理/AR-01",
+    "R004240: 2025-10-26, 业务招待费, 545元, 3人, 发票FP2025X0004234(嘉禾餐饮), 事由:客户乙投行业务沟通招待费, 状态:approved, 审批:部门经理/AR-01",
+    "两笔发票不同,各发票在全库中使用次数均为1",
+    "E0008在2025年10月仅有此2笔业务招待费,另有1笔市内交通费(R004226, 92元)",
+    "两笔记录均无专项审批(special_approval=0)"
   ],
   "applicable_policies": [
-    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条", "content": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。"},
-    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条", "content": "本办法自二〇二五年一月一日起施行。原2022版同时废止。"}
+    {"doc_id": "01_expense_reimbursement_2025.md", "clauses": ["第十条", "第十一条", "第十二条", "第十四条"]},
+    {"doc_id": "06_business_entertainment.md", "clauses": ["第二条", "第三条", "第四条"]},
+    {"doc_id": "03_authorization_management.md", "clauses": ["附件二"]}
   ],
   "findings": [],
-  "conclusion": "无异常。R004202为合成注入样本（发票未签发即已完成报销且reason字段显式标注'重复发票注入样本'），不构成真实违规。R000005为合法报销。",
   "impact": "无",
   "recommendations": [],
   "anomaly_ids": [],
-  "record_ids": ["R000005", "R004202"],
+  "record_ids": ["R004239", "R004240"],
   "citations": [
     {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"},
-    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条"}
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第二条"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第三条"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第四条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
   ],
-  "answer": "经核查，TRAP-005涉及的记录（R000005、R004202）不构成异常。R004202虽与R000005共用发票FP202500000005，但其发票日期(2025-06-07)晚于报销日期(2025-03-18)，时序上物理不可行，且reason字段明确标注'重复发票注入样本'，属于合成测试数据而非真实违规。R000005（expense_date=2025-06-07与invoice_date一致，金额88.83元，部门经理审批合规）为合法报销。结论：无异常。",
-  "limitations": ["R004202为明确标注的注入样本，审计中仅核查其与R000005的关系，未对其进行扩展调查"]
+  "answer": "无异常。经核查R004239和R004240,结论如下:\n\n一、重复报销核查:两笔记录使用不同发票(R004239:FP2025X0004233,R004240:FP2025X0004234),各发票在全库中仅使用1次,不违反《费用报销管理办法》第十条\"同一发票最多报销1次\"的规定。\n\n二、拆分报销核查:(1)两笔记录事由不同——R004239为客户甲产品方案交流,R004240为客户乙投行业务沟通,涉及不同客户,不违反《业务招待费管理办法》第四条\"同一客户拜访或同一会议安排不得拆分为多个报销事项\"。(2)两笔合计1085元(540+545),远低于《授权管理办法》附件二AR-02审批线3000元,不触发《费用报销管理办法》第十一条拆分核查条件。\n\n三、业务招待费超标准核查:(1)单次金额:R004239为540元,R004240为545元,均未超过《业务招待费管理办法》第二条5000元上限。(2)人均金额:R004239人均180元(540/3),R004240人均181.67元(545/3),均未超过第三条300元限额。\n\n综上,R004239和R004240不构成重复报销、拆分报销或业务招待费超标准,审计结论为无异常。",
+  "limitations": []
 }

@@ -1,98 +1,79 @@
 {
-  "task_scope": {
-    "task_id": "L2-013",
-    "type": "policy_data_comparison",
-    "question": "结合制度和业务数据,核查以R004223为线索的超标准异常,返回异常ID和记录ID集合。",
+  "task_id": "L2-013",
+  "task_type": "policy_data_comparison",
+  "question": "结合制度和业务数据，核查以R004223为线索的超标准异常，返回发现ID和record_id集合，并说明费用类型、金额、适用标准和制度依据。",
+  "scope": {
+    "audit_object": "培训费(training_fee)超标异常",
     "clue_record": "R004223",
-    "audit_object": "training_fee expense records exceeding policy standards",
-    "business_period": "2025年",
-    "organization_scope": "全公司",
-    "requested_deliverable": "anomaly_ids, record_ids, answer, citations"
+    "expense_types": ["training_fee"],
+    "business_period": "2025年全年",
+    "applicable_policies": ["05_training_expense.md", "01_expense_reimbursement_2025.md", "03_authorization_management.md"]
   },
   "policy_questions": [
     {
-      "id": "PQ-01",
-      "question": "培训课程费每人每期的金额上限是多少？",
-      "relevant_policy": "05_training_expense.md",
-      "expected_answer": "3500元/人/期"
+      "id": "PQ-1",
+      "question": "培训课程费的标准限额是多少？",
+      "policy_doc": "05_training_expense.md",
+      "clause": "第二条",
+      "answer": "每人每期不超过3500元"
     },
     {
-      "id": "PQ-02",
-      "question": "无专项审批时报销金额是否可以超过制度标准？",
-      "relevant_policy": "01_expense_reimbursement_2025.md",
-      "expected_answer": "不可超过1.0倍标准（第十二条）"
-    },
-    {
-      "id": "PQ-03",
-      "question": "2025年费用报销适用哪个版本的政策？",
-      "relevant_policy": "01_expense_reimbursement_2025.md",
-      "expected_answer": "2025修订版，自2025年1月1日起施行，2022版同时废止"
+      "id": "PQ-2",
+      "question": "无专项审批时报销金额的标准倍数限制？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十二条",
+      "answer": "不得超过对应制度标准的1.0倍"
     }
   ],
   "data_questions": [
     {
-      "id": "DQ-01",
-      "question": "R004223的记录详情、金额、费用类型、审批状态和专项审批标识是什么？",
-      "tables": ["reimbursement_records"],
-      "fields": ["record_id", "amount", "expense_type", "status", "special_approval", "employee_id", "department_id"]
+      "id": "DQ-1",
+      "question": "所有training_fee记录中哪些金额超过3500元？",
+      "method": "expense_query_list_expenses with expense_type=training_fee, min_amount=3500.01",
+      "expected_fields": ["record_id", "amount", "employee_id", "expense_date", "status", "special_approval"]
     },
     {
-      "id": "DQ-02",
-      "question": "全公司范围内所有2025年training_fee类型且金额超过3500元且无专项审批的记录有哪些？",
-      "tables": ["reimbursement_records"],
-      "fields": ["record_id", "amount", "expense_type", "special_approval", "employee_id", "status"],
-      "filters": "expense_type=training_fee, amount>3500, special_approval=0 or null, budget_year=2025"
+      "id": "DQ-2",
+      "question": "R004223的审批链是否完整？",
+      "method": "expense_query_list_approvals(record_id=R004223)",
+      "expected_fields": ["approver_role", "approval_status", "tier_id"]
     }
   ],
+  "evidence_requirements": [
+    "培训费制度标准（05_training_expense.md 第二条）",
+    "R004223详情（金额3700 vs 标准3500）",
+    "所有training_fee记录的超标筛查结果",
+    "R004223审批链信息"
+  ],
   "execution_steps": [
-    {
-      "step": 1,
-      "name": "政策研究",
-      "description": "查阅培训费管理办法和费用报销管理办法，确认培训费标准和超标判定规则",
-      "agent": "main",
-      "stopping_condition": "明确培训费标准3500元、无专项审批不得超标、2025版政策适用"
-    },
-    {
-      "step": 2,
-      "name": "数据分析",
-      "description": "以R004223为线索，批量查询全公司training_fee类型且金额>3500且special_approval≠1的记录",
-      "agent": "data_analyst_subagent",
-      "reason_code": "MULTI_RECORD_SCOPE",
-      "stopping_condition": "获得完整超标记录列表及每条记录关键字段"
-    },
-    {
-      "step": 3,
-      "name": "证据复核",
-      "description": "将数据发现与制度条款逐条核对，形成证据矩阵",
-      "agent": "main",
-      "stopping_condition": "每项异常均有记录ID、制度引用和事实支撑"
-    },
-    {
-      "step": 4,
-      "name": "报告与提交",
-      "description": "生成审计报告、校验并提交",
-      "agent": "main",
-      "stopping_condition": "valid=true且提交成功"
-    }
+    {"step": 1, "action": "查询R004223详情，确认费用类型、金额、审批状态", "tool": "get_expense_detail"},
+    {"step": 2, "action": "查询培训费制度标准", "tool": "get_policy_doc(05_training_expense.md)"},
+    {"step": 3, "action": "查询通用报销制度相关条款", "tool": "get_policy_excerpt(01_expense_reimbursement_2025.md)"},
+    {"step": 4, "action": "批量筛查所有training_fee记录中超过3500的记录", "tool": "list_expenses"},
+    {"step": 5, "action": "查询R004223审批链", "tool": "list_approvals"},
+    {"step": 6, "action": "进行证据覆盖检查", "tool": "evidence-coverage-check"},
+    {"step": 7, "action": "进行误报复核", "tool": "false-positive-review"},
+    {"step": 8, "action": "生成审计报告", "tool": "audit-report"},
+    {"step": 9, "action": "结果校验", "tool": "result-validator"},
+    {"step": 10, "action": "提交结果", "tool": "validate_audit_result + submit_audit_result"}
   ],
   "complexity": {
     "score": 2,
     "reasons": [
-      "涉及培训费管理办法和费用报销管理办法两个制度",
-      "需要进行批量数据筛选（training_fee > 3500）",
-      "涉及金额阈值和专项审批豁免边界"
+      "单一规则（培训课程费≤3500）",
+      "需要批量筛查training_fee记录",
+      "存在金额阈值（3500元）",
+      "无政策版本冲突",
+      "无豁免/例外复杂情况"
     ]
   },
   "subagent_plan": {
-    "planned_roles": [
-      {
-        "role": "data_analyst",
-        "reason_code": "MULTI_RECORD_SCOPE",
-        "task": "批量查询所有2025年training_fee类型且金额超过3500元且无专项审批的报销记录，返回record_id、amount、employee_id、status、special_approval等关键字段",
-        "artifact_paths": ["work/audit_plan.json"],
-        "requested_token_budget": 4000
-      }
-    ]
+    "selected": false,
+    "reason": "复杂度2，单规则批量筛查无需子智能体；主智能体可直接完成所有查询和分析"
   },
-  "unresolved_items": []
+  "stopping_conditions": [
+    "所有training_fee记录已完整筛查（578条，分2页检查完毕）",
+    "R004223的金额和政策标准已确认",
+    "审批链已检查"
+  ]
 }

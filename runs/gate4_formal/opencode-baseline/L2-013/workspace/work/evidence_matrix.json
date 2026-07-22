@@ -10,23 +10,52 @@
         {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
       ],
       "facts": [
-        "R004223 expense_type为training_fee，金额3700.00元",
-        "培训费管理办法第二条规定培训课程费每人每期不超过3500元",
-        "special_approval=0，无专项审批",
-        "3700元超出3500元标准200元"
+        "R004223记录为培训费(training_fee),报销金额3,700元,费用事由为外部专业培训课程费,申请人为E0009张婷(D1/部门经理),状态为已批准",
+        "该记录无专项审批(special_approval=0)",
+        "培训费管理办法(05_training_expense.md)第二条规定:培训课程费按人次控制,每人每期不超过3,500元",
+        "3,700元 > 3,500元,超出标准200元(超标比例5.7%)",
+        "费用报销管理办法(01_expense_reimbursement_2025.md)第十二条规定:无专项审批时,报销金额不得超过对应制度标准的1.0倍"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    },
+    {
+      "anomaly_id": "ANOM-L2-013-002",
+      "record_ids": ["R004212", "R004213"],
+      "citations": [
+        {"doc_id": "04_travel_expense.md", "clause_no": "第三条"},
+        {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+      ],
+      "facts": [
+        "R004212与R004213均为差旅住宿费(travel_lodging),金额各5,100元,费用事由为项目现场住宿费,申请人为E0009张婷(D1/部门经理)",
+        "两笔记录城市档位均为一类城市(A),住宿天数均为7晚,无专项审批(special_approval=0)",
+        "差旅费管理办法(04_travel_expense.md)第三条规定:住宿标准按员工职级和城市档位确定;员工E0009的职位为部门经理,属于经理级",
+        "差旅费管理办法(04_travel_expense.md)第四条规定:经理级在一类城市的差旅住宿标准为650元/人/晚",
+        "650元/晚 × 7晚 = 4,550元标准上限;实际5,100元超过标准550元(超标比例12.1%)",
+        "费用报销管理办法(01_expense_reimbursement_2025.md)第十二条规定:无专项审批时,报销金额不得超过对应制度标准的1.0倍"
       ],
       "fact_supported": true,
       "rule_supported": true,
       "coverage_status": "pass"
     }
   ],
-  "candidate_record_ids": ["R004223"],
-  "submitted_record_ids": ["R004223"],
+  "candidate_record_ids": ["R004223", "R004212", "R004213"],
+  "submitted_record_ids": ["R004223", "R004212", "R004213"],
   "unowned_record_ids": [],
   "unused_candidate_record_ids": [],
   "unused_citations": [],
   "missing_evidence": [],
-  "no_anomaly_coverage": {},
-  "reconciled_figures": {},
+  "no_anomaly_coverage": {
+    "complete": true,
+    "background_checked": ["R004229", "R004234", "R004235"]
+  },
+  "reconciled_figures": {
+    "total_candidate_records": 3,
+    "anomaly_records": 3,
+    "total_anomalies": 2,
+    "total_excess_amount": 1300
+  },
   "unresolved_items": []
 }

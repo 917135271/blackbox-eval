@@ -1,0 +1,40 @@
+{
+  "audit_scope": {
+    "object": "2025全年XX证券费用报销记录",
+    "period": "2025-01-01至2025-12-31",
+    "organization": "XX证券全部门、全员工",
+    "rule": "重复报销（同一发票多次报销）",
+    "data_scope": "全部4240条报销记录，全量发票"
+  },
+  "verified_facts": [
+    "2025全年共4240条报销记录",
+    "通过SQL GROUP BY发票编号与API交叉验证，发现6张发票被重复使用，每张使用2次，涉及12条记录",
+    "未发现使用次数>=3的发票",
+    "全部12条记录special_approval=0，无特殊审批豁免",
+    "全部记录状态为approved"
+  ],
+  "applicable_policies": [
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "clause_no": "第十条",
+      "clause_text": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的，应认定为重复报销风险。",
+      "effective_date": "2025-01-01"
+    }
+  ],
+  "findings": [
+    {"anomaly_id": "DUP-FP202500000002", "invoice_no": "FP202500000002", "record_ids": ["R000002","R004201"], "amount": 423.79, "expense_type": "office_supplies", "employee": "E0050姚瑜"},
+    {"anomaly_id": "DUP-FP202500000005", "invoice_no": "FP202500000005", "record_ids": ["R000005","R004202"], "amount": 88.83, "expense_type": "local_transport", "employee": "E0022刘冬梅"},
+    {"anomaly_id": "DUP-FP202500000020", "invoice_no": "FP202500000020", "record_ids": ["R000020","R004203"], "amount": 669.50, "expense_type": "travel_lodging", "employee": "E0028杜丹"},
+    {"anomaly_id": "DUP-FP202500000028", "invoice_no": "FP202500000028", "record_ids": ["R000028","R004204"], "amount": 165.58, "expense_type": "communication", "employee": "E0036张林"},
+    {"anomaly_id": "DUP-FP202500000037", "invoice_no": "FP202500000037", "record_ids": ["R000037","R004205"], "amount": 84.72, "expense_type": "local_transport", "employee": "E0027唐静"},
+    {"anomaly_id": "DUP-FP202500000055", "invoice_no": "FP202500000055", "record_ids": ["R000055","R004206"], "amount": 999.76, "expense_type": "business_entertainment", "employee": "E0020陈洋"}
+  ],
+  "impact": "6张发票被重复报销，涉及金额合计2432.18元，涉及6名员工",
+  "recommendations": "建议对6组重复报销进行逐一核实，确认是否为系统录入错误或恶意重复申报，并追回多报销款项",
+  "anomaly_ids": ["DUP-FP202500000002","DUP-FP202500000005","DUP-FP202500000020","DUP-FP202500000028","DUP-FP202500000037","DUP-FP202500000055"],
+  "record_ids": ["R000002","R004201","R000005","R004202","R000020","R004203","R000028","R004204","R000037","R004205","R000055","R004206"],
+  "citations": [{"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}],
+  "answer": "全量扫描方法：对2025全年4240条报销记录按发票编号(invoice_id)进行GROUP BY聚合，筛选出使用次数>=2的发票组。同时通过find_reused_invoices API交叉验证，并对usage_count>=3做补充查询排除遗漏。扫描发现6张发票各被2笔报销记录重复使用，涉及12条记录。\n\n制度依据：《XX证券费用报销管理办法(2025修订版)》（XX证财规〔2025〕甲号）第十条明确规定\"同一发票最多报销1次。发现同一发票在不同报销单中重复出现的，应认定为重复报销风险\"。该办法自2025年1月1日起施行，原2022版同时废止，覆盖审计期间全部记录。第十条为禁止性规定，适用于全部费用类型，未设豁免条款。经逐条核实，全部12条记录均无特殊审批(special_approval=0)，无撤销或取消状态，确认构成重复报销风险。\n\n发现ID及关联记录：\nDUP-FP202500000002 → [R000002, R004201] office_supplies ¥423.79\nDUP-FP202500000005 → [R000005, R004202] local_transport ¥88.83\nDUP-FP202500000020 → [R000020, R004203] travel_lodging ¥669.50\nDUP-FP202500000028 → [R000028, R004204] communication ¥165.58\nDUP-FP202500000037 → [R000037, R004205] local_transport ¥84.72\nDUP-FP202500000055 → [R000055, R004206] business_entertainment ¥999.76",
+  "limitations": []
+}

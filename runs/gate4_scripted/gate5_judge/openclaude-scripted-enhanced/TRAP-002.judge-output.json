@@ -1,0 +1,78 @@
+{
+  "checklist": [
+    {
+      "id": "clean-conclusion",
+      "value": 1,
+      "reason": "候选提交明确结论为无异常，无矛盾表述",
+      "answer_evidence": "最终答案中写明“本次核查结论为无异常”",
+      "trace_evidence": "无工具调用直接相关，基于最终答案",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-invoice",
+      "value": 1,
+      "reason": "准确说明了两条记录发票不同",
+      "answer_evidence": "答案中写明R004234发票FP2025X0004228，R004235发票FP2025X0004229",
+      "trace_evidence": "get_expense_detail返回R004234的invoice_no为FP2025X0004228，R004235为FP2025X0004229",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "准确计算了7天内合计500元",
+      "answer_evidence": "答案中写明“两笔合计金额为500元（250元+250元）”",
+      "trace_evidence": "list_expenses返回记录金额均为250元，合计确认",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 0,
+      "reason": "审批线数值错误，应为10000元，候选者错误引用为3000元",
+      "answer_evidence": "答案中比较为“远低于附件二中AR-02档的较高审批线3000元”",
+      "trace_evidence": "get_policy_doc显示附件二AR-02为3000-10000，AR-03为10000-50000；预期审批线为10000元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-invoice",
+      "value": 1,
+      "reason": "工具轨迹中get_expense_detail和find_invoice_usage明确显示R004234对应发票FP2025X0004228，R004235对应FP2025X0004229，两张发票不同，且各被使用1次，证明不构成重复发票。",
+      "answer_evidence": "候选答案指出“R004234对应发票FP2025X0004228，R004235对应发票FP2025X0004229，两张发票编号不同”。",
+      "trace_evidence": "get_expense_detail返回invoice_amount字段显示不同号码；find_invoice_usage分别查询得到usage_count均为1，确认无重复使用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "工具轨迹中get_expense_detail分别返回amount=250，list_expenses合计500元，候选答案也明示合计500元。",
+      "answer_evidence": "候选答案指出“两笔合计金额为500元（250元+250元）”。",
+      "trace_evidence": "get_expense_detail返回R004234和R004235的amount均为250.0；list_expenses记录中两笔金额相加亦为500。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 0,
+      "reason": "候选答案错误地将合计金额与3000元审批线比较，而非预期的10000元。虽然结论未触发异常，但未正确比较10000元审批线。",
+      "answer_evidence": "候选答案称“远低于...较高审批线3000元”，而预期应比较10000元。",
+      "trace_evidence": "get_policy_doc返回附件二明确AR-03档位为10000元及以上，较高审批线为10000元，但答案未据此比较。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "候选答案引用了01_expense_reimbursement_2025.md第十条和第十一条，满足制度依据要求。",
+      "answer_evidence": "citations中包含{doc_id: '01_expense_reimbursement_2025.md', clause_no: '第十条'}和{clause_no: '第十一条'}。",
+      "trace_evidence": "无额外工具调用需求，答案直接引用已足够。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "准确引用了03_authorization_management.md#附件二",
+      "answer_evidence": "答案中明确提及《XX证券授权管理办法》（doc_id: 03_authorization_management.md）附件二，并引用其审批线AR-02档3000元。citations中包含{\"doc_id\": \"03_authorization_management.md\", \"clause_no\": \"附件二\"}。",
+      "trace_evidence": "工具调用get_policy_doc获取了03_authorization_management.md全文，其中包含附件二审批权限表；get_policy_excerpt查询附件二相关内容。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交结论正确但第4项引用审批线错误，应使用10000元线，扣一分；候选答案正确识别发票不同和合计金额，但错误使用3000元审批线比较，未达到预期10000元标准。；检查项通过，候选提交准确引用了所需制度依据。",
+  "confidence": 0.9666666666666667
+}

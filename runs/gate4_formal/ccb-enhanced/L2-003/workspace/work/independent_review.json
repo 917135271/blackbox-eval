@@ -2,26 +2,34 @@
   "decision": "pass",
   "challenged_findings": [
     {
-      "anomaly_id": "ANO-001",
-      "challenge": "Could R004203 be exempted from Article 10 via special approval or exception?",
-      "result": "No exemption applies. Both records have special_approval=0. Article 10 contains no exception clauses. The rule is absolute: 同一发票最多报销1次."
+      "anomaly_id": "L2-003-DUP-001",
+      "challenge": "Special approval exemption",
+      "result": "Both R000020 and R004203 have special_approval=0. No exemption applies."
+    },
+    {
+      "anomaly_id": "L2-003-DUP-001",
+      "challenge": "Correction/reversal of first claim",
+      "result": "Both records are status='approved' with different record numbers, expense dates, and reimbursement dates. Not a correction. BX2025X004203's 'X' suffix is a numbering convention, not a cancellation marker."
+    },
+    {
+      "anomaly_id": "L2-003-DUP-001",
+      "challenge": "Policy exception for travel_lodging or time-separated reuse",
+      "result": "Article 10 is absolute: '同一发票最多报销1次'. No time exception, no expense-type exception, no travel_lodging exception exists in the 2025 policy. The 95-day gap between expense dates does not create a compliant explanation."
+    },
+    {
+      "anomaly_id": "L2-003-DUP-001",
+      "challenge": "Budget or threshold boundary",
+      "result": "Not a budget/threshold rule — Article 10 is a binary duplicate check. Each claim individually is under AR-01 (<3000). No boundary applies."
     }
   ],
   "supporting_evidence": [
-    "R004203 special_approval=0 - no special approval to override Article 10",
-    "R000020 special_approval=0 - no special approval on original record either",
-    "Article 10 has no listed exceptions, exemptions, or override conditions",
-    "Both records use identical invoice INV000020 with same amount 669.5 CNY",
-    "R004203 reason explicitly identifies as duplicate injection sample"
+    "SQLite query: both records use INV000020 (FP202500000020)",
+    "Both records: status=approved, special_approval=0",
+    "Policy Article 10: absolute prohibition on same-invoice reuse"
   ],
   "opposing_evidence": [],
-  "exceptions_or_boundaries": {
-    "special_approval_check": "Both records: special_approval=0. No exemption applies.",
-    "date_boundary_check": "Both records (2025-01-05, 2025-04-10) within 2025 policy effective period. No transition issue.",
-    "threshold_boundary_check": "Not applicable - Article 10 is absolute, not threshold-based.",
-    "employee_role_check": "Both records: same employee E0028, position_role=员工, employee_level=E1. No role-based exemption."
-  },
+  "exceptions_or_boundaries": [],
   "required_changes": [],
-  "rationale": "Article 10 of the 2025 expense reimbursement policy absolutely prohibits the same invoice from being reimbursed more than once. Invoice INV000020 (FP202500000020) appears in two approved expense records (R000020 and R004203). No special approval, policy exception, or boundary issue could exempt this duplicate. The finding is confirmed as a valid anomaly.",
+  "rationale": "Invoice FP202500000020 was reimbursed twice by the same employee (E0028 杜丹) in two separate approved claims (R000020 and R004203). Neither record has special approval, reversal, or cancellation status. Article 10 of the 2025 Expense Reimbursement Policy is an absolute prohibition without time-based or expense-type exceptions. The finding is confirmed as a genuine duplicate reimbursement violation.",
   "unresolved_conflicts": []
 }

@@ -3,55 +3,36 @@
   "coverage_percent": 100,
   "evidence_rows": [
     {
-      "anomaly_id": "ANO-L2-008-SPLIT-001",
-      "record_ids": [
-        "R004212",
-        "R004213"
-      ],
+      "anomaly_id": "ANO-L2-008-001",
+      "record_ids": ["R004212", "R004213"],
       "citations": [
-        {
-          "doc_id": "01_expense_reimbursement_2025.md",
-          "clause_no": "第十一条"
-        },
-        {
-          "doc_id": "03_authorization_management.md",
-          "clause_no": "附件二"
-        }
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
       ],
       "facts": [
-        "R004212：员工E0009(张婷)，差旅住宿，2025-04-10，金额5100元，发票FP2025X0004206，审批档位AR-02",
-        "R004213：同一员工E0009(张婷)，差旅住宿，2025-04-15，金额5100元，发票FP2025X0004207，审批档位AR-02",
-        "两笔报销间隔5天（在7天内），同一费用类型travel_lodging，合计金额10200元",
-        "AR-02档位覆盖3000-9999元（部门经理审批），AR-03档位覆盖10000-49999元（部门总经理审批）",
-        "合并金额10200元达到AR-03档位，但拆分后每笔5100元仅需AR-02审批",
-        "两笔报销原因均标注'拆分报销注入样本3'，明确为拆分报销测试样本"
+        "R004212：员工E0009（张婷），travel_lodging，¥5100，发票FP2025X0004206，2025-04-10，供应商安程酒店管理有限公司，审批AR-02仅部门经理",
+        "R004213：员工E0009（张婷），travel_lodging，¥5100，发票FP2025X0004207，2025-04-15，供应商安程酒店管理有限公司，审批AR-02仅部门经理",
+        "两笔报销为同一员工、同一费用类型、同一供应商、同一事由（项目现场住宿费），间隔5天，在7天核查窗口内",
+        "合计金额¥10200达到附件二AR-03审批线（≥10000元），需部门总经理审批，但两笔均仅以AR-02（部门经理）审批通过，实际规避了部门总经理审批",
+        "两笔报销均未完成AR-02要求的财务复核"
       ],
       "fact_supported": true,
       "rule_supported": true,
       "coverage_status": "pass"
     }
   ],
-  "candidate_record_ids": [
-    "R004212",
-    "R004213"
-  ],
-  "submitted_record_ids": [
-    "R004212",
-    "R004213"
-  ],
+  "candidate_record_ids": ["R004212", "R004213"],
+  "submitted_record_ids": ["R004212", "R004213"],
   "unowned_record_ids": [],
   "unused_candidate_record_ids": [],
   "unused_citations": [],
   "missing_evidence": [],
-  "no_anomaly_coverage": {
-    "complete": true
-  },
+  "no_anomaly_coverage": {},
   "reconciled_figures": {
-    "R004212_amount": 5100.0,
-    "R004213_amount": 5100.0,
-    "combined_amount": 10200.0,
-    "AR-02_upper_bound": 10000,
-    "AR-03_lower_bound": 10000
+    "total_amount": 10200,
+    "date_window_start": "2025-04-10",
+    "date_window_end": "2025-04-15",
+    "date_window_days": 5
   },
   "unresolved_items": []
 }

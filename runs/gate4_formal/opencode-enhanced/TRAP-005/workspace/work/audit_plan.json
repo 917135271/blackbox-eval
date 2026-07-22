@@ -1,64 +1,85 @@
 {
   "task_id": "TRAP-005",
   "task_type": "clean_but_suspicious",
-  "audit_scope": "核查TRAP-005涉及的记录是否构成异常",
-  "audit_period": "2025年度",
+  "question": "核查R004239和R004240是否构成重复报销、拆分报销或业务招待费超标准",
+  "scope": {
+    "record_ids": ["R004239", "R004240"],
+    "audit_period": "2025-10-25 to 2025-10-30",
+    "expense_types": ["business_entertainment"],
+    "organization_scope": "E0008, D008",
+    "requested_rules": ["duplicate_reimbursement", "split_reimbursement", "business_entertainment_standard_exceeded"]
+  },
   "policy_questions": [
     {
-      "rule": "Article 7 - 60天报销时限",
-      "policy_ref": "01_expense_reimbursement_2025.md",
-      "clause": "第七条",
-      "question": "记录R004238的报销延迟正好60天，是否违反60天内提交的规定？"
+      "question_id": "PQ-01",
+      "rule": "重复报销",
+      "policy_docs": ["01_expense_reimbursement_2025.md"],
+      "clauses": ["第十条"],
+      "boundaries": "同一发票最多报销1次，同一发票在不同报销单中重复出现应认定为重复报销风险"
     },
     {
-      "rule": "Article 11 - 禁止拆分报销",
-      "policy_ref": "01_expense_reimbursement_2025.md",
-      "clause": "第十一条",
-      "question": "R004234/R004235同日同额不同发票、R004236/R004237相隔8日同员工同类型报销是否构成拆分规避审批？"
+      "question_id": "PQ-02",
+      "rule": "拆分报销",
+      "policy_docs": ["01_expense_reimbursement_2025.md", "06_business_entertainment.md", "03_authorization_management.md"],
+      "clauses": ["报销办法第十一条", "招待费办法第四条", "授权办法附件二"],
+      "boundaries": "同一员工同一费用类型7天内2笔及以上，合计达到较高审批线(AR-02: 3000元)；同一客户不得拆分"
     },
     {
-      "rule": "Article 5 - 审批权限",
-      "policy_ref": "03_authorization_management.md, 附件二",
-      "clause": "第五条",
-      "question": "R004233金额9990元是否触发正确的审批层级？"
-    },
-    {
-      "rule": "Article 12 - 报销金额标准",
-      "policy_ref": "01_expense_reimbursement_2025.md",
-      "clause": "第十二条",
-      "question": "记录金额是否超过对应制度标准？"
+      "question_id": "PQ-03",
+      "rule": "业务招待费超标准",
+      "policy_docs": ["06_business_entertainment.md"],
+      "clauses": ["第二条", "第三条"],
+      "boundaries": "单次活动费用≤5000元；人均≤300元"
     }
   ],
   "data_questions": [
     {
-      "records": ["R004233", "R004234", "R004235", "R004236", "R004237", "R004238", "R004239", "R004240"],
-      "fields_needed": ["record_id", "employee_id", "expense_date", "reimburse_date", "expense_type", "amount", "reason", "invoice_no", "status", "special_approval", "city_tier", "nights", "days", "participants"]
+      "question_id": "DQ-01",
+      "description": "发票是否重复使用",
+      "method": "find_invoice_usage for FP2025X0004233, FP2025X0004234",
+      "expected": "Each invoice used only once by respective record"
+    },
+    {
+      "question_id": "DQ-02",
+      "description": "核实两笔报销的日期、金额、参与人数、客户、事由",
+      "method": "get_expense_detail for R004239, R004240",
+      "expected": "Different dates, different clients, different invoices, different amounts"
+    },
+    {
+      "question_id": "DQ-03",
+      "description": "部门预算是否充足",
+      "method": "get_department_budget for D008",
+      "expected": "Budget available"
     }
+  ],
+  "execution_steps": [
+    "1. 已获取两条记录详情、发票使用、制度全文和审批权限表",
+    "2. 逐条分析重复报销：发票各自独立，各使用一次，不构成重复",
+    "3. 逐条分析拆分报销：不同客户、不同事由、合计金额未突破AR-01审批线，不触发拆分核查",
+    "4. 逐条分析招待费超标：单次<5000元、人均<300元，均未超标",
+    "5. 形成初步结论：无异常",
+    "6. 执行evidence-coverage-check",
+    "7. 执行false-positive-review",
+    "8. 执行audit-report",
+    "9. 执行result-validator",
+    "10. validate_audit_result",
+    "11. submit_audit_result"
   ],
   "complexity": 3,
   "complexity_reasons": [
-    "涉及多个陷阱样本记录需要逐条核查",
-    "涉及多条款判定(时限、拆分、审批权限、金额标准)",
-    "日期边界判定(正好60日、相隔8日)",
-    "需要聚合计算(同日同额合计)"
+    "涉及两个制度文件(报销管理办法+业务招待费办法) +1",
+    "涉及三条业务规则(重复报销、拆分报销、招待费超标) +1",
+    "涉及阈值判定(7天窗口、审批线、人均/单次限额) +1"
   ],
   "subagent_plan": {
-    "required": false,
-    "reason": "记录数量可控（8条），可通过直接查询完成全部核查，无需专业子智能体"
+    "planned": false,
+    "reason": "复杂度3可申请一个专业子智能体，但两笔记录的数据分析简单直接，阈值判定仅需与审批权限表比对，无需额外数据分析或制度版本冲突判定。紧凑模式已足够完成全部核查。"
   },
-  "execution_steps": [
-    "检查所有陷阱样本记录的完整详情",
-    "逐条对照政策条款核查",
-    "特别关注: R004238的60日边界判定、R004234/235的合计金额是否达到AR-02线、R004236/237的8日间隔判定",
-    "检查各类型费用标准上限",
-    "证据覆盖检查",
-    "假阳性复核",
-    "生成审计报告",
-    "验证并提交"
-  ],
   "stopping_conditions": [
-    "所有8条陷阱样本记录逐条核查完毕",
-    "所有相关条款已引用"
+    "所有三个规则问题均有基于制度条文和数据的明确结论",
+    "evidence_matrix覆盖率100%且状态pass",
+    "validation_report状态pass",
+    "validate_audit_result返回valid=true"
   ],
-  "unresolved_items": []
+  "preliminary_finding": "无异常"
 }

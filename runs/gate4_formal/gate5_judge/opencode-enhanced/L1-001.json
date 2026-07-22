@@ -1,116 +1,148 @@
 {
+  "group": "opencode-enhanced",
+  "task_id": "L1-001",
   "case_family": "policy_and_version",
-  "case_score": 100.0,
-  "case_score_raw": 100.0,
   "category": "policy_qa",
-  "criteria": [
+  "graded_at": "2026-07-21T21:02:03+08:00",
+  "checklist_passed": 8,
+  "checklist_total": 8,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
     {
-      "answer_evidence": "单笔费用报销金额达到10000元(1万元)且小于50000元时需要部门总经理审批",
-      "id": "current-threshold",
-      "reason": "金额为10000元，且明确包含边界（大于等于10000元），完全正确。",
-      "score": 45.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用；答案源自提交JSON中的final_answer。"
+      "id": "current-threshold-amount",
+      "value": 1,
+      "reason": "明确给出部门总经理审批金额10000元",
+      "answer_evidence": "单笔报销金额大于等于10000元且小于50000元的，需要部门总经理审批。",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "《XX证券费用报销管理办法(2025修订版)》",
+      "id": "current-threshold-inclusive",
+      "value": 1,
+      "reason": "明确说明达到或等于10000元即适用",
+      "answer_evidence": "大于等于10000元且小于50000元",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
+    },
+    {
       "id": "current-version",
-      "reason": "明确识别2025修订版为现行制度。",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用；答案中自述。"
+      "value": 1,
+      "reason": "明确识别现行版本为2025修订版",
+      "answer_evidence": "现行制度为《XX证券费用报销管理办法(2025修订版)》（XX证财规〔2025〕甲号）与《XX证券授权管理办法》（XX证综规〔2025〕丙号），均自2025年1月1日起施行。",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "依据《XX证券授权管理办法》附件二费用报销审批权限表AR-03档位...由《XX证券费用报销管理办法(2025修订版)》第五条引用确认",
-      "id": "policy-citation",
-      "reason": "引用授权管理办法附件二和费用报销管理办法第五条，有效支持10000元。",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用；提交JSON中citations包含01_expense_reimbursement_2025.md第五条和03_authorization_management.md附件二。"
+      "id": "policy-citation-expense-rule",
+      "value": 1,
+      "reason": "引用了费用报销办法第五条",
+      "answer_evidence": "费用报销办法第五条明确规定...",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "2022版旧制度规定8000元但已废止。",
+      "id": "policy-citation-authorization",
+      "value": 1,
+      "reason": "引用了授权管理办法附件二",
+      "answer_evidence": "授权管理办法附件二AR-03：大于等于10000元且小于50000元，部门总经理审批",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-cross-reference",
+      "value": 1,
+      "reason": "说明了审批金额由费用报销办法第五条指向授权管理办法附件二",
+      "answer_evidence": "费用报销办法第五条明确规定\"单笔费用报销的审批权限，不在本办法正文列示具体金额，统一按《XX证券授权管理办法》附件二执行\"。",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
+    },
+    {
       "id": "old-value-control",
-      "reason": "明确排除旧版8000元，仅将10000元作为当前值。",
-      "score": 10.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用；答案自述。"
+      "value": 1,
+      "reason": "明确排除了旧版8000元审批线",
+      "answer_evidence": "旧版8000元审批线已失效，不再适用。",
+      "trace_evidence": "无工具调用",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "",
       "id": "submission",
+      "value": 1,
       "reason": "统一提交已接受且Schema有效",
-      "score": 5.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "未使用任何record_id，不触发伪造ID。",
-      "score_cap": 20,
-      "source": "llm_judge"
-    },
-    {
-      "id": "deprecated-policy-as-current",
-      "triggered": false,
-      "reason": "未使用已废止制度形成当前结论，且明确排除旧版。",
-      "score_cap": 40,
-      "source": "llm_judge"
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 254.454,
+    "expected_anomaly_ids": [],
     "actual_anomaly_ids": [],
-    "actual_record_ids": [],
     "anomaly_metrics": {
-      "actual_types": {},
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
       "count_exact": true,
       "expected_types": {},
-      "f1": 1.0,
-      "precision": 1.0,
-      "recall": 1.0
+      "actual_types": {}
     },
-    "citation_count": 3,
-    "elapsed_seconds": 211.936,
-    "expected_anomaly_ids": [],
     "expected_record_ids": null,
+    "actual_record_ids": [],
     "record_metrics": null,
-    "required_citations": [
-      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive"
-    ],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
     "trap_tokens_in_conclusion": [],
-    "unknown_record_ids": []
+    "citation_count": 6,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第五条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T22:29:54+08:00",
-  "group": "opencode-enhanced",
   "judge": {
-    "attempt": 1,
-    "confidence": 1.0,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "回答准确，依据清晰，完整满足要求，无异常。",
     "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选回答完全符合所有检查项，准确给出了审批金额、版本、制度依据和交叉引用，并排除了旧值。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 1484,
-      "completion_tokens_details": {
-        "reasoning_tokens": 965
-      },
-      "prompt_cache_hit_tokens": 1024,
-      "prompt_cache_miss_tokens": 972,
-      "prompt_tokens": 1996,
-      "prompt_tokens_details": {
-        "cached_tokens": 1024
-      },
-      "total_tokens": 3480
-    }
+      "prompt_tokens": 2690,
+      "completion_tokens": 1740,
+      "total_tokens": 4430,
+      "prompt_cache_hit_tokens": 2688,
+      "prompt_cache_miss_tokens": 2
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 2690,
+          "completion_tokens": 1740,
+          "total_tokens": 4430,
+          "prompt_tokens_details": {
+            "cached_tokens": 2688
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1201
+          },
+          "prompt_cache_hit_tokens": 2688,
+          "prompt_cache_miss_tokens": 2
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 7
+      }
+    ]
   },
-  "passed": true,
-  "run_path": "runs/gate4_formal/opencode-enhanced/L1-001",
-  "task_id": "L1-001"
+  "run_path": "runs/gate4_formal/opencode-enhanced/L1-001"
 }

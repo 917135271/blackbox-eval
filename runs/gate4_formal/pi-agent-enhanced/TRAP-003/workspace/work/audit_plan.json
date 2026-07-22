@@ -1,0 +1,69 @@
+{
+  "task_id": "TRAP-003",
+  "task_type": "clean_but_suspicious",
+  "question": "请核查R004236和R004237是否构成7天内拆分报销。必须按费用发生日期计算间隔并核对合计金额；若不构成异常，请明确说明无异常、原因和制度依据。",
+  "scope": {
+    "audit_object": "R004236和R004237两笔报销记录",
+    "rule": "《XX证券费用报销管理办法(2025修订版)》第十一条 - 拆分报销",
+    "expense_types": ["travel_lodging"],
+    "business_period": "2025-10-01 至 2025-10-09",
+    "organization_scope": "员工E0010（闭想），部门D010（人力资源部）"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ1",
+      "question": "拆分报销规则中'7天内'如何界定？费用发生日期间隔应为多少天？",
+      "source": "01_expense_reimbursement_2025.md 第十一条"
+    },
+    {
+      "id": "PQ2",
+      "question": "合计金额需要达到哪个审批线才构成拆分规避？",
+      "source": "03_authorization_management.md 附件二"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ1",
+      "question": "R004236和R004237的费用发生日期、金额、费用类型、员工是否相同？",
+      "data": "已获取"
+    }
+  ],
+  "required_fields": ["record_id", "expense_date", "amount", "expense_type", "employee_id"],
+  "evidence_needs": [
+    "R004236和R004237的完整报销详情",
+    "拆分报销制度原文（第十一条）",
+    "授权审批线原文（附件二）",
+    "日期间隔计算结果"
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "获取R004236和R004237详情", "status": "completed"},
+    {"step": 2, "action": "获取拆分报销制度原文和授权审批线", "status": "completed"},
+    {"step": 3, "action": "计算费用发生日期间隔", "status": "pending"},
+    {"step": 4, "action": "核对合计金额与审批线", "status": "pending"},
+    {"step": 5, "action": "形成结论", "status": "pending"},
+    {"step": 6, "action": "证据覆盖检查", "status": "pending"},
+    {"step": 7, "action": "虚假阳性复核", "status": "pending"},
+    {"step": 8, "action": "生成审计报告", "status": "pending"},
+    {"step": 9, "action": "结果校验", "status": "pending"},
+    {"step": 10, "action": "验证并提交", "status": "pending"}
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "单一规则（拆分报销第十一条）",
+      "两条已知记录，仅需简单日期计算",
+      "无政策版本冲突（2025版明确适用）",
+      "无多表关联或聚合需求"
+    ]
+  },
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "复杂度为1，仅两条记录单一规则，主智能体可直接完成"
+  },
+  "stopping_conditions": [
+    "完成日期间隔计算",
+    "确认拆分报销规则是否触发",
+    "提交最终结果"
+  ],
+  "unresolved_items": []
+}

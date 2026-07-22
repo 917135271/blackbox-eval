@@ -1,0 +1,158 @@
+{
+  "checklist": [
+    {
+      "id": "finding-type-count-count",
+      "value": 0,
+      "reason": "候选提交发现数量为5，预期为6，缺少一项。",
+      "answer_evidence": "候选提交中anomaly_ids数量为5，预期为6。",
+      "trace_evidence": "candidate_submission.anomaly_ids长度为5。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004224",
+      "value": 0,
+      "reason": "候选提交的record_ids未包含R004224。",
+      "answer_evidence": "候选提交record_ids为['R004221','R004222','R004223','R004225','R004226']，缺少R004224。",
+      "trace_evidence": "candidate_submission.record_ids中无'R004224'。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "记录R004221归属于发现L3-003-A01，符合预期分组。",
+      "answer_evidence": "发现L3-003-A01关联记录R004221，类型OVERSTD，符合预期。",
+      "trace_evidence": "evidence_matrix中L3-003-A01的record_ids为['R004221']。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "记录R004222归属于发现L3-003-A02，符合预期分组。",
+      "answer_evidence": "发现L3-003-A02关联记录R004222，类型OVERSTD，符合预期。",
+      "trace_evidence": "evidence_matrix中L3-003-A02的record_ids为['R004222']。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "候选答案明确将R004223列为发现L3-003-A03，属于同一项OVERSTD发现。",
+      "answer_evidence": "候选答案中列出L3-003-A03关联R004223，并在培训费部分描述该记录。",
+      "trace_evidence": "candidate_evidence_matrix中anomaly_id L3-003-A03对应record_ids ['R004223']，facts中包含R004223的具体数据。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 0,
+      "reason": "候选答案未包含记录R004224，没有将其归入任何发现，不符合要求。",
+      "answer_evidence": "候选答案中record_ids列表为['R004221','R004222','R004223','R004225','R004226']，未出现R004224。",
+      "trace_evidence": "tool_trace_summary中扫描未涉及R004224，candidate_evidence_matrix中也无对应条目，缺失该记录。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 1,
+      "reason": "候选答案明确将R004225列为发现L3-003-A04，属于同一项OVERSTD发现。",
+      "answer_evidence": "候选答案中列出L3-003-A04关联R004225，并在差旅住宿费部分描述该记录。",
+      "trace_evidence": "candidate_evidence_matrix中anomaly_id L3-003-A04对应record_ids ['R004225']，facts中包含具体超标数据。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 1,
+      "reason": "候选答案明确将R004226列为发现L3-003-A05，属于同一项OVERSTD发现。",
+      "answer_evidence": "候选答案中列出L3-003-A05关联R004226，并在市内交通费部分描述该记录。",
+      "trace_evidence": "candidate_evidence_matrix中anomaly_id L3-003-A05对应record_ids ['R004226']，facts中包含具体超标数据。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "候选提交声称对全年4240条已审批记录全量扫描，工具轨迹显示多次分页调用list_expenses获取全部approved记录，覆盖完整年度。",
+      "answer_evidence": "候选答案：“对全年4240条已审批费用记录进行单笔超标准专项扫描”。",
+      "trace_evidence": "工具轨迹：调用list_expenses 5次，含page=1, page_size=500, status='approved'及page=2等，逐页获取全部记录。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-approval",
+      "value": 0,
+      "reason": "扫描方法仅按费用类型和金额阈值过滤，未提及排除special_approval=1的记录，违反应排除已有专项审批的规则。",
+      "answer_evidence": "扫描方法描述：“SQL全量过滤 expense_type='...' AND amount > ...”，未提及special_approval字段。",
+      "trace_evidence": "工具调用中未出现special_approval相关过滤或检查操作。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-office",
+      "value": 1,
+      "reason": "办公用品明确使用单笔金额>600元的口径，与制度月度上限600元一致。",
+      "answer_evidence": "答案：“办公用品...单笔报销金额与月度上限600元比较... amount > 600”。",
+      "trace_evidence": "无需特殊轨迹，答案已明确声明。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-communication",
+      "value": 1,
+      "reason": "通讯费用明确使用单笔金额>300元的口径，与制度月度上限300元一致。",
+      "answer_evidence": "答案：“通讯费用...单笔报销金额与月度上限300元比较... amount > 300”。",
+      "trace_evidence": "无需特殊轨迹，答案已明确声明。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-training",
+      "value": 1,
+      "reason": "培训课程费明确按单次金额超过3500元才计入，且实际发现R004223金额3700元，符合条件。",
+      "answer_evidence": "提交中写明“单笔培训课程费与每人每期上限3500元比较...SQL全量过滤 expense_type='training_fee' AND amount > 3500”，发现L3-003-A03，R004223，金额3700.00元。",
+      "trace_evidence": "工具调用get_policy_doc('05_training_expense.md')返回第二条“每人每期不超过3500元”；list_expenses遍历全量记录，过滤条件为training_fee且amount>3500，与提交一致。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-entertainment",
+      "value": 0,
+      "reason": "业务招待费仅核查了单次5000元上限，未核查人均300元标准，不满足双标准要求。",
+      "answer_evidence": "提交中仅写明“单次活动费用与上限5000元比较...SQL全量过滤 expense_type='business_entertainment' AND amount > 5000”，未提及人均300元标准。",
+      "trace_evidence": "工具调用get_policy_doc('06_business_entertainment.md')返回第三条“人均不得超过300元”，但list_expenses和提交结论中未见依据该标准的过滤或判断。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-travel",
+      "value": 1,
+      "reason": "差旅住宿费核查同时使用了员工职级、城市档位和住宿晚数，计算每人每晚费用与职级×城市标准比较。",
+      "answer_evidence": "提交中写明“单笔住宿费按nights字段折算每人每晚费用，与职级×城市档位的住宿标准比较...计算per_night=amount/nights”，并列出职级-城市标准矩阵。",
+      "trace_evidence": "工具调用list_expenses返回记录含employee_id、city_tier、nights字段；list_employees返回职级；get_policy_doc('04_travel_expense.md')第四条给出职级×城市住宿标准。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-transport",
+      "value": 1,
+      "reason": "市内交通费核查同时使用了城市档位和出差天数，计算每人每日费用与城市日标准比较。",
+      "answer_evidence": "提交中写明“单笔交通费按days字段折算每人每日费用，与城市档位日标准比较...计算per_day=amount/days”，并列出城市档位日标准。",
+      "trace_evidence": "工具调用list_expenses返回记录含city_tier、days字段；get_policy_doc('04_travel_expense.md')第六条给出城市档位日标准。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 0,
+      "reason": "候选提交仅发现5条异常，缺失R004224，中间统计与最终5项一致，但要求中间统计为6条且与最终6项发现一致。",
+      "answer_evidence": "candidate_evidence_matrix.reconciled_figures.total_anomalies=5，最终提交anomaly_ids数量为5。",
+      "trace_evidence": "工具调用list_expenses等未捕获R004224，导致数量不足6。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 0,
+      "reason": "未引用超标准总则条款（01_expense_reimbursement_2025.md#第十二条）。",
+      "answer_evidence": "citations仅包含04、05、07文档，无01文档引用。",
+      "trace_evidence": "get_policy_doc获取了01文档，但提交未包含该条款。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-special",
+      "value": 0,
+      "reason": "缺少业务招待费专项标准引用（06_business_entertainment.md），citations未覆盖所有费用类型。",
+      "answer_evidence": "citations中缺失06文档，而required_citations要求包含06。",
+      "trace_evidence": "工具调用get_policy_doc获取了06，但提交未引用。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交缺少对R004224的超标准发现，发现数量不足6项，其他分组匹配正确。；候选答案覆盖了6项预期记录中的5项，遗漏了R004224，导致一个发现分组不完整。；扫描覆盖全年全量记录，办公与通讯费用按单笔超上限正确，但未排除专项审批记录，此点不满足要求。；候选人完成了培训费、差旅住宿费和市内交通费的合规扫描，均满足复合标准。但业务招待费遗漏了人均不得超过300元的核查要求，未按题目要求同时执行单次和人均双标准，因此该项不通过。；候选提交遗漏记录R004224，且制度引用不全，需补充超标准总则及业务招待费标准引用。",
+  "confidence": 0.97
+}

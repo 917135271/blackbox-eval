@@ -1,97 +1,107 @@
 {
+  "task_id": "L3-001",
   "audit_scope": {
-    "task_id": "L3-001",
-    "audit_object": "全年费用报销数据的重复报销专项扫描",
-    "audit_period": {"start": "2025-01-01", "end": "2025-12-31"},
-    "organization_scope": "XX证券全部门及全体员工",
-    "data_population": "全年4240条报销记录",
-    "rule_scope": "仅《XX证券费用报销管理办法(2025修订版)》第十条（同一发票最多报销1次）"
+    "object": "全年度重复报销专项扫描",
+    "period": "2025-01-01 至 2025-12-31",
+    "organization": "XX证券全部部门及员工",
+    "data_scope": "全年4240条报销记录，4234张发票",
+    "rule": "《XX证券费用报销管理办法(2025修订版)》第十条"
   },
   "verified_facts": [
-    "通过find_reused_invoices工具扫描全年4240条记录，发现6张发票存在重复使用",
-    "每张重复发票均被使用2次，涉及12条报销记录",
-    "所有记录状态均为approved，无专项审批(special_approval=0)",
-    "6张重复使用的发票分别属于办公用品、市内交通费、差旅住宿费、通讯费、业务招待费",
-    "每对重复记录中，第二笔记录（R004201-R004206）的事由均标注'重复发票注入样本'"
+    "全年共发现6张发票被重复使用，每张发票关联2条独立报销记录，涉及12条记录",
+    "所有重复报销记录的special_approval均为0，无特殊审批",
+    "所有重复报销记录状态均为approved，无撤销或冲销",
+    "每对重复记录由同一员工、同一发票、同一事由构成，但费用日期和报销日期不同",
+    "2025修订版制度自2025年1月1日起施行，2022版同时废止，制度版本无争议"
   ],
   "applicable_policies": [
     {
       "doc_id": "01_expense_reimbursement_2025.md",
-      "clause_no": "第十条",
+      "title": "XX证券费用报销管理办法(2025修订版)",
+      "document_number": "XX证财规〔2025〕甲号",
+      "clause": "第十条",
       "text": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。"
     }
   ],
   "findings": [
     {
-      "anomaly_id": "ANOM-001",
+      "anomaly_id": "DUP-001",
       "invoice_no": "FP202500000002",
+      "expense_type": "办公用品",
       "amount": 423.79,
-      "expense_type": "office_supplies",
       "record_ids": ["R000002", "R004201"],
-      "description": "发票FP202500000002被员工姚瑜(E0050)在合规风控部报销2次，分别对应BX2025000002和BX2025X004201"
+      "employee": "E0050 姚瑜",
+      "department": "合规风控部",
+      "impact": "重复报销金额423.79元"
     },
     {
-      "anomaly_id": "ANOM-002",
+      "anomaly_id": "DUP-002",
       "invoice_no": "FP202500000005",
+      "expense_type": "市内交通",
       "amount": 88.83,
-      "expense_type": "local_transport",
       "record_ids": ["R000005", "R004202"],
-      "description": "发票FP202500000005被员工刘冬梅(E0022)在信息技术部报销2次，分别对应BX2025000005和BX2025X004202"
+      "employee": "E0022 刘冬梅",
+      "department": "信息技术部",
+      "impact": "重复报销金额88.83元"
     },
     {
-      "anomaly_id": "ANOM-003",
+      "anomaly_id": "DUP-003",
       "invoice_no": "FP202500000020",
+      "expense_type": "差旅住宿",
       "amount": 669.50,
-      "expense_type": "travel_lodging",
       "record_ids": ["R000020", "R004203"],
-      "description": "发票FP202500000020被员工杜丹(E0028)在财务管理部报销2次，分别对应BX2025000020和BX2025X004203"
+      "employee": "E0028 杜丹",
+      "department": "财务管理部",
+      "impact": "重复报销金额669.50元"
     },
     {
-      "anomaly_id": "ANOM-004",
+      "anomaly_id": "DUP-004",
       "invoice_no": "FP202500000028",
+      "expense_type": "通讯费",
       "amount": 165.58,
-      "expense_type": "communication",
       "record_ids": ["R000028", "R004204"],
-      "description": "发票FP202500000028被员工张林(E0036)在人力资源部报销2次，分别对应BX2025000028和BX2025X004204"
+      "employee": "E0036 张林",
+      "department": "人力资源部",
+      "impact": "重复报销金额165.58元"
     },
     {
-      "anomaly_id": "ANOM-005",
+      "anomaly_id": "DUP-005",
       "invoice_no": "FP202500000037",
+      "expense_type": "市内交通",
       "amount": 84.72,
-      "expense_type": "local_transport",
       "record_ids": ["R000037", "R004205"],
-      "description": "发票FP202500000037被员工唐静(E0027)在信息技术部报销2次，分别对应BX2025000037和BX2025X004205"
+      "employee": "E0027 唐静",
+      "department": "信息技术部",
+      "impact": "重复报销金额84.72元"
     },
     {
-      "anomaly_id": "ANOM-006",
+      "anomaly_id": "DUP-006",
       "invoice_no": "FP202500000055",
+      "expense_type": "业务招待",
       "amount": 999.76,
-      "expense_type": "business_entertainment",
       "record_ids": ["R000055", "R004206"],
-      "description": "发票FP202500000055被员工陈洋(E0020)在合规风控部报销2次，分别对应BX2025000055和BX2025X004206"
+      "employee": "E0020 陈洋",
+      "department": "合规风控部",
+      "impact": "重复报销金额999.76元"
     }
   ],
-  "impact": [
-    "涉及6张发票重复报销，重复报销总金额2432.18元（每张发票被重复报销1次）",
-    "涉及5个部门：合规风控部2起、信息技术部2起、财务管理部1起、人力资源部1起",
-    "所有重复报销均已通过部门经理审批"
-  ],
+  "impact": {
+    "total_duplicate_groups": 6,
+    "total_records": 12,
+    "total_duplicate_amount": 2431.18,
+    "affected_employees": 6,
+    "affected_departments": 5
+  },
   "recommendations": [
-    "追回6笔重复报销款项，合计2432.18元",
-    "核查费用报销系统中发票唯一性校验机制，防止同一发票号被多次提交",
-    "对涉及重复报销的员工进行费用报销制度再培训"
+    "对涉及的6组重复报销进行逐笔核查，确认重复支付金额并启动追回程序",
+    "排查费用系统是否存在同一发票号允许二次提交的系统缺陷",
+    "对涉及的6名员工和相关审批人进行制度培训"
   ],
-  "anomaly_ids": ["ANOM-001","ANOM-002","ANOM-003","ANOM-004","ANOM-005","ANOM-006"],
-  "record_ids": ["R000002","R004201","R000005","R004202","R000020","R004203","R000028","R004204","R000037","R004205","R000055","R004206"],
+  "anomaly_ids": ["DUP-001", "DUP-002", "DUP-003", "DUP-004", "DUP-005", "DUP-006"],
+  "record_ids": ["R000002", "R004201", "R000005", "R004202", "R000020", "R004203", "R000028", "R004204", "R000037", "R004205", "R000055", "R004206"],
   "citations": [
-    {
-      "doc_id": "01_expense_reimbursement_2025.md",
-      "clause_no": "第十条"
-    }
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
   ],
-  "answer": "经对2025年全年4240条费用报销记录进行重复报销专项扫描，依据《XX证券费用报销管理办法(2025修订版)》第十条"同一发票最多报销1次"的规定，共发现6起重复报销异常：ANOM-001（FP202500000002，办公用品423.79元）、ANOM-002（FP202500000005，市内交通费88.83元）、ANOM-003（FP202500000020，差旅住宿费669.50元）、ANOM-004（FP202500000028，通讯费165.58元）、ANOM-005（FP202500000037，市内交通费84.72元）、ANOM-006（FP202500000055，业务招待费999.76元），涉及12条报销记录。",
-  "limitations": [
-    "扫描基于发票号码精确匹配，若同一发票以不同号码录入则无法检测",
-    "未对制度第十一条（拆分报销规避审批）进行专项核查，该条不在本次重复报销专项扫描范围内"
-  ]
+  "answer": "全量扫描方法：通过find_reused_invoices工具对全年4234张发票进行usage_count统计，筛选出usage_count≥2的发票共6张，逐张获取关联的全部报销记录明细（共12条），交叉核验每对记录的发票号、员工、事由、审批状态和特殊审批标记。制度依据：《XX证券费用报销管理办法(2025修订版)》（XX证财规〔2025〕甲号）第十条明确规定'同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。'该制度自2025年1月1日起施行，原2022版同时废止。本次扫描覆盖2025全年度全部费用类型和全部部门，共发现6组重复报销违规。",
+  "limitations": []
 }

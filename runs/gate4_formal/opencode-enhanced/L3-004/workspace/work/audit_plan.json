@@ -1,78 +1,77 @@
 {
   "task_id": "L3-004",
   "task_type": "full_year_rule_audit",
-  "audit_object": "全部门年度超预算",
-  "business_period": "2025-01-01 至 2025-12-31",
-  "scope": "全部门(department budget)年度累计费用 vs 年度预算额度",
+  "question": "对全年数据做超预算专项扫描。按reimburse_date和record_id依次累计部门已批准费用，每个超预算部门形成1项发现，以首次使累计支出超过年度预算且无专项审批的记录作为关键record_id。",
+  "scope": {
+    "audit_period": "full year (all approved expenses)",
+    "audit_object": "department budget overrun without special approval",
+    "expense_types": "all types",
+    "status": "approved",
+    "organization_scope": "all departments"
+  },
   "policy_questions": [
     {
-      "question": "部门累计费用达到年度预算额度1.0倍后是否允许继续报销？",
-      "clauses": ["08_budget_management/第3条", "01_expense_reimbursement_2025/第13条"],
-      "answer": "原则上不得继续报销；确需发生须履行专项审批。"
-    },
-    {
-      "question": "超预算支出需要何种审批？",
-      "clauses": ["08_budget_management/第4条", "01_expense_reimbursement_2025/第13条"],
-      "answer": "因监管要求、客户服务或经营连续性确需超预算支出的，应履行专项审批(special_approval)。"
+      "question": "What policy governs department budget limits and over-budget special approval?",
+      "applicable_policies": ["08_budget_management.md", "01_expense_reimbursement_2025.md"],
+      "relevant_clauses": [
+        {"doc_id": "08_budget_management.md", "clause_no": "第二条-第四条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十三条"}
+      ]
     }
   ],
   "data_questions": [
-    {
-      "question": "哪些部门的年度累计报销金额超过年度预算额度？",
-      "method": "summarize_department_budgets + 逐部门核对 cumulative vs budget"
-    },
-    {
-      "question": "对于超预算部门，哪些报销记录位于预算耗尽点之后？",
-      "method": "按部门列出全部已批准报销记录，按日期排序，计算累计金额，标识预算耗尽点前后的记录"
-    },
-    {
-      "question": "超预算的记录是否有专项审批(special_approval)？",
-      "method": "检查每条记录的special_approval字段"
-    }
+    "List all approved expenses for the full year, ordered by reimburse_date and record_id",
+    "Get annual budget for each department",
+    "Compute cumulative approved spending per department",
+    "Identify first record per department where cumulative > budget AND special_approval is false",
+    "Check if any over-budget department had special_approval on all subsequent records"
   ],
   "required_fields": [
-    "record_id", "department_id", "amount", "expense_date", "status",
-    "special_approval", "annual_budget", "cumulative_amount"
+    "record_id", "employee_id", "department_id", "amount", "reimburse_date",
+    "expense_date", "status", "special_approval", "expense_type",
+    "department_budget", "department_annual_budget"
   ],
   "evidence_requirements": [
-    "各部门年度预算额度和累计使用金额",
-    "超预算部门全部已批准报销记录明细",
-    "超预算记录的审批状态(special_approval)",
-    "政策引用: 08_budget_management/第3条+第4条, 01_expense_reimbursement_2025/第13条"
+    "All approved expense records across all departments and dates",
+    "Department annual budgets",
+    "Cumulative spending computation per department",
+    "Special approval status for over-budget records"
   ],
   "execution_steps": [
-    "1. 获取全部部门预算汇总，识别超预算部门",
-    "2. 对每个超预算部门，列出全部已批准(approved)报销记录(按日期排序)",
-    "3. 计算每个部门的累计使用额，标识预算耗尽分界点",
-    "4. 检查预算耗尽点之后记录的special_approval状态",
-    "5. 无special_approval的记录构成超预算异常",
-    "6. 形成证据矩阵",
-    "7. 独立复核",
-    "8. 生成报告与校验",
-    "9. 提交"
+    "1. Plan and record checkpoint (current step)",
+    "2. Authorize and launch data analyst subagent for batch aggregation",
+    "3. Perform policy version check (policy-version-check skill)",
+    "4. Wait for subagent result, then complete_audit_subagent",
+    "5. Run evidence-coverage-check",
+    "6. Run false-positive-review if applicable",
+    "7. Run audit-report",
+    "8. Run result-validator",
+    "9. Record validation_ready checkpoint",
+    "10. Call validate_audit_result, then submit_audit_result"
   ],
-  "complexity_score": 5,
-  "complexity_reasons": [
-    "多政策协同: 01_expense_reimbursement_2025 + 08_budget_management (+1)",
-    "聚合计算: 按部门累计求和，识别预算耗尽分界点 (+1)",
-    "多业务规则: 预算上限 + 专项审批豁免 (+1)",
-    "阈值判定: 1.0倍预算额度边界 (+1)",
-    "全部门全年综合审计报告 (+1)"
-  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "policy version check needed: confirm 2025 policy applies",
+      "aggregation/grouping/batch: cumulative sum by department across all records",
+      "thresholds/exemptions: budget threshold, special_approval exemption"
+    ]
+  },
   "subagent_plan": {
-    "data_analyst": {
-      "role": "data_analyst",
-      "reason_code": "AGGREGATION_REQUIRED",
-      "task": "Execute batch analysis: for each over-budget department (D001,D002,D003,D004,D005,D006), list all approved expenses, compute cumulative sums, identify records beyond budget threshold, and note special_approval status.",
-      "artifact_paths": ["work/audit_plan.json"]
-    }
+    "role": "data_analyst",
+    "reason_code": "AGGREGATION_REQUIRED",
+    "task": "Compute cumulative approved spending per department ordered by reimburse_date and record_id, compare to annual budgets, and identify the first record per department where cumulative exceeds budget without special approval. Also identify departments that exceed budget but have special_approval on all over-budget records (then those are exempt).",
+    "expected_artifacts": [
+      "work/subagents/data_analyst/detailed_analysis.json",
+      "work/subagents/data_analyst/summary.json"
+    ]
   },
   "stopping_conditions": [
-    "全部6个超预算部门的报销记录已完整检索",
-    "每家超预算部门的累计金额已精确计算并核实",
-    "每条超预算记录special_approval状态已确认",
-    "异常发现与政策条款均有明确对应",
-    "无异常部门已确认排除"
+    "All approved expenses retrieved and processed",
+    "All department budgets retrieved",
+    "Cumulative sums computed and verified",
+    "All over-budget findings identified with key record_ids",
+    "All artifacts validated and submitted"
   ],
   "unresolved_items": []
 }

@@ -1,119 +1,152 @@
 {
+  "group": "codex-enhanced",
+  "task_id": "L1-001",
   "case_family": "policy_and_version",
-  "case_score": 95.0,
-  "case_score_raw": 95.0,
   "category": "policy_qa",
-  "criteria": [
+  "graded_at": "2026-07-21T20:54:39+08:00",
+  "checklist_passed": 8,
+  "checklist_total": 8,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
     {
-      "answer_evidence": "答案明确写明“单笔金额大于等于10,000元且小于50,000元为AR-03档位”。",
-      "id": "current-threshold",
-      "reason": "金额10000元且包含边界（大于等于），完全正确。",
-      "score": 45.0,
-      "source": "llm_judge",
-      "trace_evidence": "轨迹中get_policy_excerpt(03_authorization_management)返回表格“AR-03 | 大于等于10000元且小于50000元 | 部门总经理”。"
+      "id": "current-threshold-amount",
+      "value": 1,
+      "reason": "明确给出部门总经理审批线为10000元",
+      "answer_evidence": "候选答案：“单笔费用报销金额大于等于10000元且小于50000元的，必要审批角色为部门总经理”",
+      "trace_evidence": "工具get_policy_excerpt返回：“| AR-03 | 大于等于10000元且小于50000元 | 部门总经理 |”",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "答案引用了“《XX证券费用报销管理办法(2025修订版)》”。",
+      "id": "current-threshold-inclusive",
+      "value": 1,
+      "reason": "明确说明达到或等于10000元即适用",
+      "answer_evidence": "候选答案：“大于等于10000元”",
+      "trace_evidence": "同上，附件二描述明确包含等于10000元",
+      "source": "llm_judge"
+    },
+    {
       "id": "current-version",
-      "reason": "明确依据2025修订版，且轨迹仅查询了现行制度。",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "list_policy_docs列出01_expense_reimbursement_2025.md和02_expense_reimbursement_2022_deprecated.md，但候选只使用了2025版。"
+      "value": 1,
+      "reason": "明确识别现行版本为2025修订版",
+      "answer_evidence": "候选答案：“现行有效的费用报销审批制度为《XX证券费用报销管理办法(2025修订版)》”",
+      "trace_evidence": "工具list_policy_docs返回文档列表，其中01_expense_reimbursement_2025.md标题含“2025修订版”；工具get_policy_doc获取该文档内容开头注明2025修订版",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "答案中注明“依据《XX证券费用报销管理办法(2025修订版)》第五条及《XX证券授权管理办法》第二条(附件二)”。",
-      "id": "policy-citation",
-      "reason": "引用了费用报销管理办法第五条和授权管理办法附件二，均支持10000元门槛。",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "轨迹get_policy_excerpt(01_expense_reimbursement_2025.md)返回第五条，get_policy_excerpt(03_authorization_management.md)返回附件二表格。"
+      "id": "policy-citation-expense-rule",
+      "value": 1,
+      "reason": "引用了费用报销办法第五条",
+      "answer_evidence": "候选答案引用“《XX证券费用报销管理办法(2025修订版)》第五条”",
+      "trace_evidence": "工具get_policy_excerpt返回：“第五条 单笔费用报销的审批权限,不在本办法正文列示具体金额,统一按《XX证券授权管理办法》附件二执行”",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "答案仅提及10000元，未涉及8000元。",
+      "id": "policy-citation-authorization",
+      "value": 1,
+      "reason": "引用了授权管理办法附件二",
+      "answer_evidence": "候选答案引用“《XX证券授权管理办法》附件二”",
+      "trace_evidence": "工具get_policy_excerpt返回附件二内容，包含AR-03行",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-citation-cross-reference",
+      "value": 1,
+      "reason": "说明了审批金额由费用报销办法第五条指向授权管理办法附件二取得",
+      "answer_evidence": "候选答案：“《XX证券费用报销管理办法(2025修订版)》第五条：...统一按《XX证券授权管理办法》附件二执行”",
+      "trace_evidence": "工具get_policy_excerpt返回第五条原文，证实该交叉引用关系",
+      "source": "llm_judge"
+    },
+    {
       "id": "old-value-control",
-      "reason": "未明确排除旧值8000元，但当前值正确。",
-      "score": 5.0,
-      "source": "llm_judge",
-      "trace_evidence": "无排除旧值的语句。"
+      "value": 1,
+      "reason": "明确排除8000元旧值，指出其已失效",
+      "answer_evidence": "候选答案：“旧版8000元审批线已完全失效，现行审批线以授权管理办法附件二10000元为准”",
+      "trace_evidence": "工具search_policy和get_policy_excerpt返回2022版第二条“旧版制度曾规定,单笔报销金额达到8000元的,应提交部门总经理审批”及第四条“本办法的审批金额已被后续制度替代,不得作为现行审批依据”",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "",
       "id": "submission",
+      "value": 1,
       "reason": "统一提交已接受且Schema有效",
-      "score": 5.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "提交的R004207和R004212均在数据库存在，且未被用作核心结论唯一支撑。",
-      "score_cap": 20,
-      "source": "llm_judge"
-    },
-    {
-      "id": "deprecated-policy-as-current",
-      "triggered": false,
-      "reason": "未使用废弃制度，始终依据2025修订版。",
-      "score_cap": 40,
-      "source": "llm_judge"
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
-    "actual_anomaly_ids": [],
-    "actual_record_ids": [
-      "R004207",
-      "R004212"
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 317.401,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [
+      "NONE"
     ],
     "anomaly_metrics": {
-      "actual_types": {},
-      "count_exact": true,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "count_exact": false,
       "expected_types": {},
-      "f1": 1.0,
-      "precision": 1.0,
-      "recall": 1.0
+      "actual_types": {}
     },
-    "citation_count": 2,
-    "elapsed_seconds": 255.523,
-    "expected_anomaly_ids": [],
     "expected_record_ids": null,
-    "record_metrics": null,
-    "required_citations": [
-      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive"
+    "actual_record_ids": [
+      "R004233"
     ],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "record_metrics": null,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
     "trap_tokens_in_conclusion": [],
-    "unknown_record_ids": []
+    "citation_count": 7,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第五条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T22:25:59+08:00",
-  "group": "codex-enhanced",
   "judge": {
-    "attempt": 1,
-    "confidence": 1.0,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "候选正确回答现行审批线为10000元，引用有效制度，未犯关键错误。",
     "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "所有检查项均满足：候选答案正确给出10000元审批线，包含等于边界，识别现行版本，引用所需制度条款并说明交叉引用，且明确排除了旧版8000元。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 1752,
-      "completion_tokens_details": {
-        "reasoning_tokens": 1163
-      },
-      "prompt_cache_hit_tokens": 1024,
-      "prompt_cache_miss_tokens": 3162,
-      "prompt_tokens": 4186,
-      "prompt_tokens_details": {
-        "cached_tokens": 1024
-      },
-      "total_tokens": 5938
-    }
+      "prompt_tokens": 6830,
+      "completion_tokens": 1959,
+      "total_tokens": 8789,
+      "prompt_cache_hit_tokens": 6784,
+      "prompt_cache_miss_tokens": 46
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 6830,
+          "completion_tokens": 1959,
+          "total_tokens": 8789,
+          "prompt_tokens_details": {
+            "cached_tokens": 6784
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1227
+          },
+          "prompt_cache_hit_tokens": 6784,
+          "prompt_cache_miss_tokens": 46
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 7
+      }
+    ]
   },
-  "passed": true,
-  "run_path": "runs/gate4_formal/codex-enhanced/L1-001",
-  "task_id": "L1-001"
+  "run_path": "runs/gate4_formal/codex-enhanced/L1-001"
 }

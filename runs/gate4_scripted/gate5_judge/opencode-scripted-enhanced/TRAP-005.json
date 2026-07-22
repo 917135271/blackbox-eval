@@ -1,0 +1,386 @@
+{
+  "group": "opencode-scripted-enhanced",
+  "task_id": "TRAP-005",
+  "case_family": "clean_trap",
+  "category": "clean_but_suspicious",
+  "graded_at": "2026-07-22T01:02:03+08:00",
+  "checklist_passed": 14,
+  "checklist_total": 25,
+  "checklist_pass_rate": 56.0,
+  "checklist": [
+    {
+      "id": "clean-conclusion",
+      "value": 1,
+      "reason": "Candidate explicitly states no anomaly",
+      "answer_evidence": "经核查，R004239与R004240不构成重复报销、拆分报销或业务招待费超标准，结果为无异常。",
+      "trace_evidence": "无工具调用记录，但提交的evidence_matrix显示已查询明细和发票",
+      "source": "llm_judge"
+    },
+    {
+      "id": "record-scope-include-r004239",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-include-r004240",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "case-specific-reason-business-context",
+      "value": 1,
+      "reason": "Clearly distinguishes two customers and two different business matters",
+      "answer_evidence": "两笔招待对象不同（客户甲 vs 客户乙）、事由不同（产品方案交流 vs 投行业务沟通）",
+      "trace_evidence": "无工具调用记录，但提交的evidence_matrix中list_expenses可能揭示了业务细节",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-date-window",
+      "value": 1,
+      "reason": "Confirms dates are 1 day apart and checks 7-day window",
+      "answer_evidence": "发生在7天内（2025-10-25和2025-10-26）",
+      "trace_evidence": "无工具调用记录，但提交的evidence_matrix中list_expenses已包含日期筛选",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-invoice",
+      "value": 1,
+      "reason": "Notes distinct invoice numbers",
+      "answer_evidence": "R004239使用发票FP2025X0004233，R004240使用发票FP2025X0004234，两张发票号不同",
+      "trace_evidence": "无工具调用记录，但提交的evidence_matrix中find_invoice_usage检查了发票使用次数",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-amounts",
+      "value": 1,
+      "reason": "两笔金额均准确",
+      "answer_evidence": "R004239单次540元、R004240单次545元",
+      "trace_evidence": "无工具调用痕迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-participants",
+      "value": 0,
+      "reason": "未明确说明参与人数为3",
+      "answer_evidence": "答案仅通过人均金额隐含人数，未直接说明",
+      "trace_evidence": "无工具调用痕迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-per-capita",
+      "value": 1,
+      "reason": "两笔人均金额均准确",
+      "answer_evidence": "R004239人均180元，R004240人均约181.67元",
+      "trace_evidence": "无工具调用痕迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-standard",
+      "value": 1,
+      "reason": "正确比较单次5000元和人均300元标准",
+      "answer_evidence": "均未超过单次活动5000元上限和人均300元上限",
+      "trace_evidence": "无工具调用痕迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-split",
+      "value": 0,
+      "reason": "候选回答未明确说明两笔合计未达到10000元审批线，仅提及3000元审批线",
+      "answer_evidence": "answer中提及“合计金额1085元未超过AR-01审批线（3000元）”，但预期需要说明未达到10000元审批线",
+      "trace_evidence": "工具轨迹为空，无相关数据支持",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-business-context",
+      "value": 0,
+      "reason": "工具轨迹为空，无独立核验过程证明业务活动区分",
+      "answer_evidence": "answer中说明R004239对应客户甲产品方案交流，R004240对应客户乙投行业务沟通",
+      "trace_evidence": "工具轨迹为空，无独立核验数据来源或计算过程",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-date-window",
+      "value": 0,
+      "reason": "工具轨迹为空，无日期间隔及7天窗口核查",
+      "answer_evidence": "answer中说明费用发生日期为2025-10-25和2025-10-26，相隔1天",
+      "trace_evidence": "工具轨迹为空，无日期间隔核对过程",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-invoice",
+      "value": 0,
+      "reason": "工具轨迹为空，无独立核验发票不同",
+      "answer_evidence": "answer中说明发票号不同（FP2025X0004233与FP2025X0004234）",
+      "trace_evidence": "工具轨迹为空，无发票使用情况核查",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-amounts",
+      "value": 0,
+      "reason": "工具轨迹未调用任何工具，无独立数据来源或计算过程证明两笔金额准确",
+      "answer_evidence": "候选回答声称金额为540元和545元，但未展示计算过程或引用工具结果",
+      "trace_evidence": "工具轨迹摘要显示call_count=0，未记录任何工具调用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-participants",
+      "value": 0,
+      "reason": "工具轨迹未调用任何工具，无独立数据来源或计算过程证明参与人数为3人",
+      "answer_evidence": "候选回答声称两次活动均为3人，但未提供核查过程",
+      "trace_evidence": "工具轨迹摘要显示call_count=0，未记录任何工具调用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-per-capita",
+      "value": 0,
+      "reason": "工具轨迹未调用任何工具，无独立数据来源或计算过程证明人均金额",
+      "answer_evidence": "候选回答声称人均180元和约181.67元，但未展示计算",
+      "trace_evidence": "工具轨迹摘要显示call_count=0，未记录任何工具调用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-standard",
+      "value": 0,
+      "reason": "工具轨迹未调用任何工具，无独立数据来源或计算过程证明与标准比较",
+      "answer_evidence": "候选回答声称未超过单次5000元、人均300元标准，但未提供比较过程",
+      "trace_evidence": "工具轨迹摘要显示call_count=0，未记录任何工具调用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-split",
+      "value": 0,
+      "reason": "未提及10000元审批线，仅比较了3000元AR-01审批线，未证明正确排除拆分规避审批。",
+      "answer_evidence": "候选答案：“合计金额1085元未超过AR-01审批线（3000元）”，未提及10000元。",
+      "trace_evidence": "工具轨迹为空，无额外计算。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用了01_expense_reimbursement_2025.md的第十条和第十一条。",
+      "answer_evidence": "引用列表包含{'doc_id': '01_expense_reimbursement_2025.md', 'clause_no': '第十条'}和{'doc_id': '01_expense_reimbursement_2025.md', 'clause_no': '第十一条'}。",
+      "trace_evidence": "轨迹中无相关工具调用，但提交的引用直接可用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "准确引用了06_business_entertainment.md的第二条至第四条。",
+      "answer_evidence": "引用列表包含{'doc_id': '06_business_entertainment.md', 'clause_no': '第二条'}、第三条和第四条。",
+      "trace_evidence": "轨迹中无工具调用，但提交的引用直接可用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-3",
+      "value": 0,
+      "reason": "未引用03_authorization_management.md的附件二。",
+      "answer_evidence": "候选提交的引用中无该文档。",
+      "trace_evidence": "工具轨迹无相关调用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-unsupported-output",
+      "value": 1,
+      "reason": "未提交异常ID",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 103.894,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": [
+      "R004239",
+      "R004240"
+    ],
+    "actual_record_ids": [
+      "R004239",
+      "R004240"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 5,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条、第十一条"
+      },
+      {
+        "doc_id": "06_business_entertainment.md",
+        "clause_no": "第二条至第四条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 0.9400000000000001,
+    "overall_comment": "候选提交准确判断无异常，并给出了充分理由，符合所有检查项。；候选答案在金额和标准比较上正确，但未明确说明参与人数，导致一项检查未通过。；候选提交结论正确，但缺少必要的工具轨迹证据支持多项客观检查，导致检查项均不通过；候选模型未调用任何工具，无法证明对金额、人数、人均和招待费标准进行了独立核验，四项检查均不通过。；候选提交对重复报销和招待费标准的分析基本正确，但未核对10000元审批线且遗漏03_authorization_management.md附件二的制度引用。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 11839,
+      "completion_tokens": 7427,
+      "total_tokens": 19266,
+      "prompt_cache_hit_tokens": 4736,
+      "prompt_cache_miss_tokens": 7103
+    },
+    "batch_count": 5,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 2296,
+          "completion_tokens": 1116,
+          "total_tokens": 3412,
+          "prompt_tokens_details": {
+            "cached_tokens": 896
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 683
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 1400
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 2283,
+          "completion_tokens": 1614,
+          "total_tokens": 3897,
+          "prompt_tokens_details": {
+            "cached_tokens": 896
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1277
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 1387
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 2389,
+          "completion_tokens": 1636,
+          "total_tokens": 4025,
+          "prompt_tokens_details": {
+            "cached_tokens": 896
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1249
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 1493
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 2423,
+          "completion_tokens": 1117,
+          "total_tokens": 3540,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 683
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 1399
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 2448,
+          "completion_tokens": 1944,
+          "total_tokens": 4392,
+          "prompt_tokens_details": {
+            "cached_tokens": 1024
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1463
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 1424
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "max_tokens": 4096,
+        "shape_attempt": 1,
+        "criteria_count": 4
+      }
+    ]
+  },
+  "run_path": "runs/gate4_scripted/opencode-scripted-enhanced/TRAP-005"
+}

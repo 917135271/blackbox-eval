@@ -1,0 +1,38 @@
+{
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "答案明确认定“构成重复报销违规”，无矛盾表述。",
+      "answer_evidence": "“经核查，发票FP202500000020（INV000020）被重复使用报销两次，构成重复报销违规。”",
+      "trace_evidence": "检查项主要依据最终答案，无对应工具调用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis",
+      "value": 1,
+      "reason": "引用了《XX证券费用报销管理办法(2025修订版)》第十条，条款直接支持重复报销认定。",
+      "answer_evidence": "“违反了《XX证券费用报销管理办法(2025修订版)》第十条‘同一发票最多报销1次...应认定为重复报销风险’”。",
+      "trace_evidence": "search_policy和get_policy_excerpt均返回第十条完整内容：“同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-same-invoice",
+      "value": 1,
+      "reason": "答案明确指出同一发票FP202500000020被用于两个报销单。",
+      "answer_evidence": "“于2025-01-05提交报销单R000020...发票FP202500000020；随后又于2025-04-10以同一张发票FP202500000020提交报销单R004203”。",
+      "trace_evidence": "find_invoice_usage对FP202500000020返回两条记录，record_id分别为R000020和R004203，金额均为669.5。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "答案中两个报销单金额均为669.50元，与记录一致。",
+      "answer_evidence": "“报销杭州住宿费669.50元...报销金额同为669.50元”。",
+      "trace_evidence": "get_expense_detail对R000020和R004203返回的amount字段均为669.5。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交正确识别了重复报销异常，明确引用制度条款，事实推断与工具调用结果一致，所有检查项均通过。",
+  "confidence": 1.0
+}

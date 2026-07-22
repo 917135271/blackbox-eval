@@ -1,0 +1,74 @@
+{
+  "task_scope": {
+    "task_id": "DEV-006",
+    "audit_object": "R900013",
+    "expense_type": "travel_lodging",
+    "question": "核查R900013的差旅住宿费是否超标，结合员工职级、城市档位和住宿晚数计算"
+  },
+  "audit_period": {
+    "expense_date": "2025-07-10",
+    "budget_year": 2025
+  },
+  "policy_questions": [
+    {
+      "question": "经理级员工在一类城市的住宿标准是多少？",
+      "policy_doc_id": "04_travel_expense.md",
+      "clause": "第四条",
+      "standard": "650元/人/晚"
+    },
+    {
+      "question": "超标如何处理？",
+      "policy_doc_id": "04_travel_expense.md",
+      "clause": "第五条",
+      "rule": "超过住宿标准且无专项审批的，不得报销超出部分"
+    }
+  ],
+  "data_questions": [
+    {
+      "question": "R900013的住宿晚数、城市档位、金额、员工职级、特殊审批状态",
+      "source": "get_expense_detail",
+      "result": {
+        "employee_level": "经理级",
+        "city_tier": "A",
+        "nights": 2,
+        "amount": 1400,
+        "special_approval": 0,
+        "per_night": 700
+      }
+    }
+  ],
+  "required_fields": ["record_id", "employee_level", "city_tier", "nights", "amount", "special_approval", "expense_type"],
+  "evidence_requirements": [
+    "Policy clause establishing standard (第四条)",
+    "Policy clause on exceeding standard (第五条)",
+    "Expense record showing actual amounts and attributes"
+  ],
+  "execution_steps": [
+    "1. Plan: create audit_plan.json and record planning_completed checkpoint",
+    "2. Investigate: verify policy standard and compute threshold (650 * 2 = 1300 vs 1400 actual)",
+    "3. Evidence: run evidence-coverage-check",
+    "4. Report: run audit-report",
+    "5. Validate: run result-validator",
+    "6. Submit: validate_audit_result then submit_audit_result"
+  ],
+  "complexity": {
+    "score": 1,
+    "reasons": [
+      "Single known record R900013",
+      "Single rule: travel lodging standard",
+      "Single policy document",
+      "No aggregation, no date boundary ambiguity",
+      "Compact threshold calculation with no subagent"
+    ]
+  },
+  "subagent_plan": {
+    "subagent_required": false,
+    "reason": "Complexity 1: compact threshold calculation; no native subagent needed"
+  },
+  "stopping_conditions": [
+    "Evidence coverage 100% with pass status",
+    "Validation report passes",
+    "validate_audit_result returns valid=true"
+  ],
+  "unresolved_items": []
+}

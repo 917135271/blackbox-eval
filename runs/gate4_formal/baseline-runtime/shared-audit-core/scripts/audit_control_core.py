@@ -5,6 +5,7 @@ import hashlib
 import os
 import re
 import sqlite3
+import tempfile
 import time
 import uuid
 from copy import deepcopy
@@ -72,12 +73,17 @@ def _load_json(path: Path) -> dict[str, Any]:
 
 def _atomic_write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    temp = path.with_suffix(path.suffix + ".tmp")
-    temp.write_text(
-        json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-    os.replace(temp, path)
+    payload = json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    fd, raw_temp = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
+    temp = Path(raw_temp)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp, path)
+    finally:
+        temp.unlink(missing_ok=True)
 
 
 def _sha256(path: Path) -> str:
@@ -143,6 +149,7 @@ def _read_state(state_path: Path, task_id: str) -> dict[str, Any]:
             "phase": "initialized",
             "event_sequence": 0,
             "subagent_calls": {},
+            "subagent_rejections": {},
             "subagent_invocations": {},
             "submission_attempts": 0,
             "submission_status": "not_submitted",
@@ -324,8 +331,42 @@ def authorize_subagent(
         summary={"complexity": complexity, "requested_token_budget": requested_token_budget},
         artifact_paths=artifact_paths or [],
     )
-    def reject(code: str, message: str) -> dict[str, Any]:
-        result = {"authorized": False, "code": code, "message": message}
+    def reject(
+        code: str,
+        message: str,
+        *,
+        allowed_reason_codes: list[str] | None = None,
+    ) -> dict[str, Any]:
+        max_rejections = int(rules.get("max_rejected_attempts_per_role", 2))
+        control_dir, state_path = _control_paths(work_dir)
+        with _state_lock(control_dir):
+            state = _read_state(state_path, task_id)
+            rejections = state.setdefault("subagent_rejections", {})
+            previous_count = int(rejections.get(role, 0))
+            if previous_count >= max_rejections:
+                result_code = "ROLE_REJECTION_LIMIT"
+                result_message = (
+                    f"{role} has reached the rejected authorization limit; "
+                    "continue in the main agent or repair the audit plan."
+                )
+                rejection_count = previous_count
+            else:
+                result_code = code
+                result_message = message
+                rejection_count = previous_count + 1
+                rejections[role] = rejection_count
+                _atomic_write_json(state_path, state)
+        retryable = rejection_count < max_rejections
+        result = {
+            "authorized": False,
+            "code": result_code,
+            "message": result_message,
+            "retryable": retryable,
+            "rejection_count": rejection_count,
+            "max_rejected_attempts": max_rejections,
+        }
+        if allowed_reason_codes:
+            result["allowed_reason_codes"] = allowed_reason_codes
         record_event(
             work_dir=work_dir,
             task_id=task_id,
@@ -333,8 +374,13 @@ def authorize_subagent(
             source="audit_control",
             role=role,
             reason_code=reason_code,
-            error_code=code,
-            summary={"complexity": complexity},
+            error_code=result_code,
+            summary={
+                "complexity": complexity,
+                "retryable": retryable,
+                "rejection_count": rejection_count,
+                "allowed_reason_codes": allowed_reason_codes or [],
+            },
         )
         return result
 
@@ -348,7 +394,12 @@ def authorize_subagent(
         int(role_rule.get("max_token_budget", 12000)),
     )
     if reason_code not in role_rule.get("allowed_reason_codes", []):
-        return reject("INVALID_REASON_CODE", f"{reason_code} is not allowed for {role}")
+        allowed_reason_codes = list(role_rule.get("allowed_reason_codes", []))
+        return reject(
+            "INVALID_REASON_CODE",
+            f"{reason_code} is not allowed for {role}; use one of the returned allowed_reason_codes.",
+            allowed_reason_codes=allowed_reason_codes,
+        )
     if complexity < int(role_rule.get("minimum_complexity", 0)):
         return reject(
             "COMPLEXITY_TOO_LOW",

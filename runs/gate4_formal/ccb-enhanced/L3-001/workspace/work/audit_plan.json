@@ -1,79 +1,86 @@
 {
   "task_id": "L3-001",
   "task_type": "full_year_rule_audit",
-  "audit_object": "全年费用报销数据的重复报销专项扫描",
-  "audit_period": {
-    "start": "2025-01-01",
-    "end": "2025-12-31",
-    "description": "2025年全年"
+  "audit_scope": {
+    "rule": "Article 10 — Duplicate Invoice Reimbursement Prohibition",
+    "policy": "XX证券费用报销管理办法(2025修订版) (XX证财规〔2025〕甲号)",
+    "effective_date": "2025-01-01",
+    "period": "2025-01-01 to 2025-12-31 (full year)",
+    "expense_types": "all",
+    "organization": "all departments and employees"
   },
-  "organization_scope": "XX证券全部门及全体员工",
-  "requested_deliverable": "返回全部异常ID和记录ID集合",
-
   "policy_questions": [
     {
-      "id": "Q1",
-      "rule": "第十条 同一发票最多报销1次",
-      "question": "是否有同一发票在不同报销单中重复出现的情况？",
-      "boundaries": {
-        "condition": "同一发票(invoice_no)在多个record中出现",
-        "exemptions": "无",
-        "exception_conditions": "无"
-      }
+      "id": "PQ-01",
+      "question": "What is the applicable policy version for 2025 expenses?",
+      "resolution": "XX证券费用报销管理办法(2025修订版), effective 2025-01-01. 2022 version repealed."
+    },
+    {
+      "id": "PQ-02",
+      "question": "What does the policy say about duplicate invoice reimbursement?",
+      "resolution": "Article 10: 同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。"
+    },
+    {
+      "id": "PQ-03",
+      "question": "Are there any exemptions or exceptions to the duplicate invoice rule?",
+      "resolution": "No exemptions found in the policy. No special approval mechanism for duplicate invoices."
     }
   ],
-
   "data_questions": [
     {
-      "id": "DQ1",
-      "table": "expense records",
-      "fields": ["record_id", "record_no", "employee_id", "employee_name", "department_id", "department_name", "expense_date", "reimburse_date", "expense_type", "amount", "reason", "invoice_no", "status"],
-      "query": "查找所有invoice_no出现次数>=2的记录，并获取每对重复记录的详细信息",
-      "evidence_required": "每对重复发票的完整记录信息"
+      "id": "DQ-01",
+      "question": "How many invoices have usage_count > 1 across the full year?",
+      "resolution": "Use find_reused_invoices to get all invoices with usage_count >= 2."
+    },
+    {
+      "id": "DQ-02",
+      "question": "For each reused invoice, what are the detailed records?",
+      "resolution": "Use get_expense_detail for each record_id in the reused invoice groups."
     }
   ],
-
+  "required_fields": [
+    "invoice_id", "invoice_no", "vendor_name", "invoice_date", "invoice_amount",
+    "record_id", "record_no", "employee_id", "employee_name", "department_name",
+    "expense_date", "reimburse_date", "expense_type", "amount", "reason",
+    "status", "special_approval", "usage_count"
+  ],
   "evidence_requirements": [
-    "每对重复报销记录的完整字段信息",
-    "制度第十条原文引用",
-    "确认记录状态（是否为approved）",
-    "确认无豁免或例外情况"
+    "Policy document text (Article 10)",
+    "Reused invoice list with usage_count",
+    "Detailed records for each reused invoice",
+    "Cross-reference: same employee, same invoice_no, different record_no → duplicate"
   ],
-
-  "execution_steps": [
-    {"step": 1, "action": "audit-query-planner", "status": "completed", "artifact": "work/audit_plan.json"},
-    {"step": 2, "action": "获取重复发票详细记录", "status": "pending"},
-    {"step": 3, "action": "policy-version-check (触发：确认2025版制度为现行有效制度)", "status": "pending"},
-    {"step": 4, "action": "batch-expense-analysis (触发：验证find_reused_invoices结果完整性)", "status": "pending"},
-    {"step": 5, "action": "evidence-coverage-check", "status": "pending"},
-    {"step": 6, "action": "false-positive-review (触发：确认是否有豁免/例外)", "status": "pending"},
-    {"step": 7, "action": "audit-report", "status": "pending"},
-    {"step": 8, "action": "result-validator", "status": "pending"},
-    {"step": 9, "action": "validate_audit_result + submit_audit_result", "status": "pending"}
-  ],
-
   "complexity": {
-    "score": 1,
+    "score": 2,
     "reasons": [
-      "单一规则（第十条 重复发票检测）",
-      "find_reused_invoices工具已提供候选结果",
-      "无需跨制度版本判断（2025版为现行有效制度）",
-      "无金额阈值、日期边界或豁免条件",
-      "无多表JOIN或复杂聚合"
+      "Single rule (Article 10 duplicate reimbursement)",
+      "Full-year batch scan with aggregation/grouping",
+      "No policy version ambiguity — 2025 policy covers entire year",
+      "No material exemptions or threshold interpretations needed"
     ]
   },
-
   "subagent_plan": {
-    "required": false,
-    "reason": "复杂度为1，按路由规则保留在主智能体中处理"
+    "use_subagent": false,
+    "reason": "Complexity 2 with straightforward data — find_reused_invoices returns all 6 groups directly. No multi-rule analysis, no policy version conflict, no complex joins needed. Main agent can handle all investigation."
   },
-
-  "stopping_conditions": [
-    "所有重复发票对已确认并获取详细记录",
-    "制度适用性已确认",
-    "证据覆盖率达到100%",
-    "验证报告通过"
+  "execution_steps": [
+    "1. Plan (audit-query-planner) — COMPLETE",
+    "2. Policy research: read 2025 reimbursement policy, confirm Article 10 — COMPLETE",
+    "3. Data analysis: find_reused_invoices for full year — COMPLETE (6 groups found)",
+    "4. Evidence collection: get_expense_detail for all 12 records — COMPLETE",
+    "5. Policy-version-check: confirm 2025 policy applies to entire year",
+    "6. Evidence-coverage-check: verify all findings have complete evidence",
+    "7. False-positive-review: challenge each duplicate pair for potential legitimate explanations",
+    "8. Audit-report: produce final findings with stable anomaly IDs",
+    "9. Result-validator: validate against schema",
+    "10. Submit via audit_control"
   ],
-
+  "stopping_conditions": [
+    "All invoices with usage_count >= 2 have been identified",
+    "All associated records have been retrieved and verified",
+    "Policy basis (Article 10) confirmed and cited",
+    "Evidence matrix passes coverage check at 100%",
+    "Validation report passes with valid=true"
+  ],
   "unresolved_items": []
 }

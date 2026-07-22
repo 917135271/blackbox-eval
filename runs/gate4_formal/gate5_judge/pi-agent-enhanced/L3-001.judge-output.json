@@ -1,0 +1,94 @@
+{
+  "checklist": [
+    {
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "发现DUP-FP202500000002对应记录R000002和R004201",
+      "answer_evidence": "answer中列出DUP-FP202500000002 → [R000002, R004201]",
+      "trace_evidence": "find_reused_invoices返回INV000002的记录IDs包含R000002和R004201",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "发现DUP-FP202500000005对应记录R000005和R004202",
+      "answer_evidence": "answer中列出DUP-FP202500000005 → [R000005, R004202]",
+      "trace_evidence": "find_reused_invoices返回INV000005的记录IDs包含R000005和R004202",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "发现DUP-FP202500000020对应记录R000020和R004203",
+      "answer_evidence": "answer中列出DUP-FP202500000020 → [R000020, R004203]",
+      "trace_evidence": "find_reused_invoices返回INV000020的记录IDs包含R000020和R004203，详情调用证实",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 1,
+      "reason": "发现DUP-FP202500000028对应记录R000028和R004204",
+      "answer_evidence": "answer中列出DUP-FP202500000028 → [R000028, R004204]",
+      "trace_evidence": "find_reused_invoices返回INV000028的记录IDs包含R000028和R004204，详情调用证实",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 1,
+      "reason": "发现DUP-FP202500000037对应记录R000037和R004205",
+      "answer_evidence": "answer中列出DUP-FP202500000037 → [R000037, R004205]",
+      "trace_evidence": "find_reused_invoices返回INV000037的记录IDs包含R000037和R004205",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 1,
+      "reason": "发现DUP-FP202500000055对应记录R000055和R004206",
+      "answer_evidence": "answer中列出DUP-FP202500000055 → [R000055, R004206]",
+      "trace_evidence": "find_reused_invoices返回INV000055的记录IDs包含R000055和R004206",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "查询覆盖全年4240条记录，非抽样",
+      "answer_evidence": "answer中写明‘对2025全年4240条报销记录’全量扫描",
+      "trace_evidence": "find_reused_invoices调用无日期过滤，candidate_evidence_matrix中scan_completeness为100%",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-invoice-key",
+      "value": 1,
+      "reason": "以invoice_id作为重复判断键",
+      "answer_evidence": "answer描述‘按发票编号(invoice_id)进行GROUP BY’",
+      "trace_evidence": "find_reused_invoices返回结果以invoice_id分组，包含重复记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-grouping",
+      "value": 1,
+      "reason": "每个重复发票组形成一项发现",
+      "answer_evidence": "发现列表显示一个发票号对应两个record_ids，无拆分",
+      "trace_evidence": "find_reused_invoices返回6个组，每个组对应一个发现",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 1,
+      "reason": "中间查询结果为6组，最终提交6项发现，数量一致",
+      "answer_evidence": "answer列出6项发现，与发票组数量匹配",
+      "trace_evidence": "find_reused_invoices返回6个发票组，无遗漏或多余",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis",
+      "value": 1,
+      "reason": "引用第十条并落实为重复发票分组查询",
+      "answer_evidence": "answer和citations引用第十条，查询条件为重复发票分组",
+      "trace_evidence": "search_policy找到第十条内容‘同一发票最多报销1次’，find_reused_invoices按invoice_id分组，条款与查询对应",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "全量扫描方法、分组记录和制度依据均正确满足要求，所有检查项通过。",
+  "confidence": 1.0
+}

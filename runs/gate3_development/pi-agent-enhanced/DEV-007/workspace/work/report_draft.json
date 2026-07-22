@@ -1,0 +1,54 @@
+{
+  "audit_scope": {
+    "audit_object": "个人办公用品(office_supplies)与通讯费(communication)月度标准超限检查",
+    "period": "2025年度(2025-01至2025-12)",
+    "organization": "全公司(D901部门,员工E9001开发员工甲、E9002开发经理乙)",
+    "data_scope": "expense_records表中expense_type为office_supplies和communication的全部8条记录"
+  },
+  "verified_facts": [
+    "数据库共8条目标费用记录:office_supplies 5条,communication 3条",
+    "涉及2名员工:E9001开发员工甲(员工级)、E9002开发经理乙(经理级)",
+    "发现重复发票FPDEV900001被R900001和R900002两次报销,去重后按480元计入月度合计",
+    "E9001于2025年4月报销办公用品650元(R900007),超过月度标准600元",
+    "E9001于2025年9月报销通讯费合计340元(R900014:180元+R900015:160元),超过月度标准300元",
+    "所有超标记录special_approval=0,无专项审批豁免"
+  ],
+  "applicable_policies": [
+    {"doc_id": "07_office_communication.md", "clause_no": "第二条", "rule": "个人办公用品每人每月不超过600元"},
+    {"doc_id": "07_office_communication.md", "clause_no": "第三条", "rule": "通讯费每人每月不超过300元"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条", "rule": "无专项审批时报销金额不得超过制度标准1.0倍"}
+  ],
+  "findings": [
+    {
+      "anomaly_id": "ANOM-001",
+      "type": "办公用品月度超标准",
+      "employee": "E9001开发员工甲",
+      "month": "2025-04",
+      "total_amount": 650.00,
+      "threshold": 600.00,
+      "excess": 50.00,
+      "record_ids": ["R900007"],
+      "policy": "07_office_communication.md第二条"
+    },
+    {
+      "anomaly_id": "ANOM-002",
+      "type": "通讯费月度超标准",
+      "employee": "E9001开发员工甲",
+      "month": "2025-09",
+      "total_amount": 340.00,
+      "threshold": 300.00,
+      "excess": 40.00,
+      "record_ids": ["R900014", "R900015"],
+      "policy": "07_office_communication.md第三条"
+    }
+  ],
+  "anomaly_ids": ["ANOM-001", "ANOM-002"],
+  "record_ids": ["R900007", "R900014", "R900015"],
+  "citations": [
+    {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+    {"doc_id": "07_office_communication.md", "clause_no": "第三条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
+  ],
+  "answer": "审计发现2项月度超标准异常:(1)E9001开发员工甲2025年4月办公用品报销650元(R900007),超过月度标准600元;(2)E9001开发员工甲2025年9月通讯费报销合计340元(R900014:180元+R900015:160元),超过月度标准300元。两项异常均无专项审批豁免。另发现重复发票FPDEV900001(R900001和R900002)经去重处理后未构成月度超标准,但属于重复报销风险。",
+  "limitations": ["重复发票FPDEV900001的风险标记超出本次月度标准审计范围,未纳入异常报告"]
+}

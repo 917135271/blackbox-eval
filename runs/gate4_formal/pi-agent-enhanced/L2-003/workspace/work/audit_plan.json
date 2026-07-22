@@ -1,0 +1,61 @@
+{
+  "task_id": "L2-003",
+  "task_scope": "以R000020为线索的重复报销异常核查",
+  "audit_object": "R000020及其关联的发票FP202500000020的重复报销",
+  "audit_period": "2025-01-01至2025-04-18（覆盖两笔报销记录的时间范围）",
+  "organization_scope": "E0028 杜丹，财务管理部D009",
+  "policy_questions": [
+    {
+      "id": "PQ-01",
+      "question": "同一发票是否可以报销多次？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十条",
+      "expected_answer": "同一发票最多报销1次，重复出现应认定为重复报销风险"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ-01",
+      "question": "FP202500000020发票被哪些报销记录使用？",
+      "tables": ["expenses", "invoices"],
+      "method": "find_invoice_usage",
+      "expected_fields": ["record_id", "employee_id", "amount", "expense_date", "invoice_no"]
+    }
+  ],
+  "required_fields": ["record_id", "employee_id", "employee_name", "department_id", "expense_date", "reimburse_date", "expense_type", "amount", "invoice_no", "invoice_id", "status", "reason"],
+  "evidence_requirements": [
+    "R000020和R004203的完整报销记录",
+    "发票FP202500000020的使用记录（usage_count=2）",
+    "制度第十条原文"
+  ],
+  "execution_steps": [
+    { "step": 1, "action": "audit-query-planner", "status": "completed" },
+    { "step": 2, "action": "获取R000020详情及关联发票", "status": "completed" },
+    { "step": 3, "action": "查找发票FP202500000020的所有使用记录", "status": "completed" },
+    { "step": 4, "action": "获取R004203完整详情", "status": "completed" },
+    { "step": 5, "action": "获取制度第十条原文", "status": "completed" },
+    { "step": 6, "action": "policy-version-check（如触发）", "status": "pending" },
+    { "step": 7, "action": "evidence-coverage-check", "status": "pending" },
+    { "step": 8, "action": "false-positive-review（如触发）", "status": "pending" },
+    { "step": 9, "action": "audit-report", "status": "pending" },
+    { "step": 10, "action": "result-validator", "status": "pending" }
+  ],
+  "complexity": 1,
+  "complexity_reasons": [
+    "单规则任务（仅涉及第十条重复报销）",
+    "明确的已知记录线索R000020",
+    "一次发票使用查询即可完成数据覆盖",
+    "现行制度，无版本冲突",
+    "无阈值、豁免或例外判断"
+  ],
+  "subagent_plan": {
+    "required": false,
+    "reason": "复杂度为1，保持在主智能体内处理"
+  },
+  "stopping_conditions": [
+    "FP202500000020的所有使用记录已全部获取",
+    "制度第十条已引用",
+    "evidence_matrix覆盖率100%"
+  ],
+  "unresolved_items": []
+}

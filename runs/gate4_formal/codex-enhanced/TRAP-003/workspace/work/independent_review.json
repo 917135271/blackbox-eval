@@ -1,46 +1,26 @@
 {
   "decision": "pass",
-  "challenged_findings": [
-    {
-      "finding": "AR-02审批缺少财务复核",
-      "challenge": "policy说AR-02需'部门经理,并经财务复核',但数据库中无任何财务复核记录",
-      "resolution": "SQL验证全库approvals表0条财务复核记录,95条AR-02记录均仅1条部门经理审批。系统级行为非个案,不构成R000003单独异常"
-    },
-    {
-      "finding": "金额3209.78接近AR-02下限3000",
-      "challenge": "金额仅超3000门槛209.78元,是否故意突破AR-01进入AR-02以规避更严格审批?",
-      "resolution": "AR-02要求部门经理+财务复核,审批层级高于AR-01(仅部门经理),进入更高审批档位不构成规避;且3209.78<培训标准3500,金额合理"
-    },
-    {
-      "finding": "R000003与R003369间隔7天",
-      "challenge": "两笔培训费在7天边界,是否构成拆分?",
-      "resolution": "培训课程完全不同(客户服务运营规范vs北辰项目管理),属于不同事项;合计4711.63<AR-03门槛10000,拆分规则不触发"
-    }
-  ],
+  "challenged_findings": [],
   "supporting_evidence": [
-    "SQL: SELECT COUNT(*) FROM approvals WHERE approver_role='财务复核' RETURNED 0",
-    "SQL: 95 AR-02 records all have exactly 1 approval",
-    "get_expense_detail R000003: amount 3209.78, training standard 3500",
-    "find_invoice_usage FP202500000003: usage_count=1",
-    "get_department_budget D008: usage_rate 0.7786"
+    "Expense date difference is 8 days (2025-10-01 to 2025-10-09), exceeding the 7-day threshold in Article 11",
+    "No other E0010 travel_lodging records exist within ±7 days of either record (only R004236 and R004237 in full Sep 24 – Oct 16 window)",
+    "Different invoices: FP2025X0004230 and FP2025X0004231 — no duplicate invoice",
+    "No special_approval on either record, and none needed since rule not triggered"
   ],
-  "opposing_evidence": [],
+  "opposing_evidence": [
+    "Same employee (E0010), same expense type (travel_lodging), same vendor (安程酒店管理有限公司), same amount (¥5,200), same nights (7) — pattern is suggestive",
+    "Combined ¥10,400 reaches AR-03 higher approval threshold",
+    "Sequential stays (Oct 1-8 and Oct 9-16) suggest a continuous project presence",
+    "8-day interval is very close to the 7-day boundary"
+  ],
   "exceptions_or_boundaries": [
     {
-      "type": "threshold_boundary",
-      "detail": "R000003金额3209.78仅超AR-02下限3000元209.78元",
-      "resolved": true,
-      "resolution": "进入更高档位不构成违规,且符合培训费标准"
-    },
-    {
       "type": "date_boundary",
-      "detail": "R000003(03-15)与R003369(03-22)间隔7天整",
-      "resolved": true,
-      "resolution": "不同培训课程,不属同一事项拆分"
+      "detail": "8 days vs 7-day threshold. Even with most conservative inclusive counting (Oct 1 = day 1, Oct 9 = day 9), the span is 9 days, exceeding 7. The interval of 8 days is a genuine exceedance."
     }
   ],
   "required_changes": [],
   "supplemental_query": null,
-  "rationale": "R000003表面上存在两个可疑点:金额逼近3000门槛和缺少财务复核审批。经全面SQL分析确认财务复核缺失为系统级行为(全库0条),并非R000003个案。金额虽接近门槛但仍在培训费标准内且进入的是更高审批档位。关联记录排查不存在拆分、重复发票、超时、超预算等问题。综合判定:无异常。",
+  "rationale": "The Article 11 split reimbursement rule requires ALL three conditions: (1) same employee + same expense type, (2) within 7 days, (3) combined amount reaches higher approval line. Condition (2) is not met: the 8-day gap between expense dates (2025-10-01 and 2025-10-09) exceeds the 7-day threshold. While the pattern is suspicious (same vendor, same amount, sequential stays suggesting continuous project presence), the rule's text is clear and the boundary is genuinely exceeded. No anomaly.",
   "unresolved_conflicts": []
 }

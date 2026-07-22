@@ -1,0 +1,38 @@
+{
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "answer明确认定构成重复报销且无矛盾表述",
+      "answer_evidence": "answer中‘四、审计结论’明确认定‘R000020与R004203使用同一张发票FP202500000020分别报销，违反第十条重复报销禁止性规定，认定为一笔重复报销异常’",
+      "trace_evidence": "无矛盾表述",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis",
+      "value": 1,
+      "reason": "条款有效且直接支持结论",
+      "answer_evidence": "answer中‘二、制度依据’明确引用‘01_expense_reimbursement_2025.md第十条’并说明其适用性",
+      "trace_evidence": "search_policy和get_policy_excerpt均返回第十条内容‘同一发票最多报销1次’",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-same-invoice",
+      "value": 1,
+      "reason": "明确识别同一发票被重复使用",
+      "answer_evidence": "answer中‘三、关键业务事实’指出‘发票FP202500000020使用次数为2次’，‘四、审计结论’指出‘R000020与R004203使用同一张发票FP202500000020’",
+      "trace_evidence": "find_invoice_usage返回该发票在R000020和R004203中使用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "金额669.5元与记录一致",
+      "answer_evidence": "answer中‘三、关键业务事实’明确列出R000020和R004203金额均为669.50元",
+      "trace_evidence": "get_expense_detail R000020和R004203均返回amount:669.5",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "所有检查项均满足，候选提交准确识别重复报销异常，制度引用正确，事实描述清晰。",
+  "confidence": 1.0
+}

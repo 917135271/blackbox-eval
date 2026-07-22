@@ -1,123 +1,178 @@
 {
+  "group": "opencode-baseline",
+  "task_id": "L3-010",
   "case_family": "retrieval_and_report",
-  "case_score": 100.0,
-  "case_score_raw": 100.0,
   "category": "audit_report",
-  "criteria": [
+  "graded_at": "2026-07-21T21:02:01+08:00",
+  "checklist_passed": 11,
+  "checklist_total": 11,
+  "checklist_pass_rate": 100.0,
+  "checklist": [
     {
-      "answer_evidence": "2025版（现行有效）的审批线...AR-03（10000≤金额<50000）：部门总经理",
-      "id": "current-threshold",
-      "reason": "明确指出现行2025版部门总经理审批线为10000元",
-      "score": 30.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用，所有证据来自答案正文"
+      "id": "current-threshold-version",
+      "value": 1,
+      "reason": "明确指出2025修订版为现行版本",
+      "answer_evidence": "候选答案中写明“现行《XX证券费用报销管理办法(2025修订版)》”",
+      "trace_evidence": "无工具调用痕迹",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "2022版（已废止）的审批线 - 单笔报销金额≥8000元：需部门总经理审批",
-      "id": "old-threshold-status",
-      "reason": "正确指出2022版8000元审批线已废止",
-      "score": 25.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用"
+      "id": "current-threshold-amount",
+      "value": 1,
+      "reason": "明确给出现行审批线10000元",
+      "answer_evidence": "候选答案中列出“AR-03档——10000元≤金额<50000元，必要审批角色为部门总经理”",
+      "trace_evidence": "无工具调用痕迹",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "2025版（现行有效）的审批线（依据《XX证券授权管理办法》附件二）",
-      "id": "cross-reference",
-      "reason": "明确说明报销办法通过授权管理办法附件二取得现行审批金额",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用"
+      "id": "old-threshold-status-amount",
+      "value": 1,
+      "reason": "明确给出旧版金额8000元",
+      "answer_evidence": "候选答案中写明“旧版...单笔报销金额达到8000元提交部门总经理审批”",
+      "trace_evidence": "无工具调用痕迹",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "若审计人员以2022版为审计依据，将错误地将该区间内的合规记录判定为\"缺少部门总经理审批\"...建议：审计底稿应明确标注所依据的制度版本及生效日期；费用系统应增加版本标识字段；审计人员上岗前应培训考核",
-      "id": "risk-explanation",
-      "reason": "解释了使用旧线会导致错误判定缺少审批，并提出了版本标注、培训等校验措施",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用"
+      "id": "old-threshold-status-status",
+      "value": 1,
+      "reason": "明确说明旧版已废止",
+      "answer_evidence": "候选答案中写明“该办法已于2025年1月1日废止，...不得作为现行审批依据”",
+      "trace_evidence": "无工具调用痕迹",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "标题为版本陷阱审计说明，分背景、差异、陷阱、实证、结论建议，anomaly_ids和record_ids对应",
+      "id": "cross-reference-expense",
+      "value": 1,
+      "reason": "引用了费用报销办法第五条",
+      "answer_evidence": "候选答案中写明“2025版报销管理办法第五条是交叉引用的核心链条”，并在citations中引用01_expense_reimbursement_2025.md第五条",
+      "trace_evidence": "无工具调用痕迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "cross-reference-relation",
+      "value": 1,
+      "reason": "正确说明制度关系：第五条将金额授权给附件二",
+      "answer_evidence": "候选答案中写明“第五条不再在正文中列示具体金额，统一按《XX证券授权管理办法》附件二执行”",
+      "trace_evidence": "无工具调用痕迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "cross-reference-authorization",
+      "value": 1,
+      "reason": "引用了授权管理办法附件二",
+      "answer_evidence": "候选答案中多次引用“附件二”，并在citations中引用03_authorization_management.md附件二",
+      "trace_evidence": "无工具调用痕迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "risk-explanation-risk",
+      "value": 1,
+      "reason": "具体说明了旧线造成的误判方向：将部门经理审批错误升级为部门总经理",
+      "answer_evidence": "候选答案中写明“在8000-9999元区间，若适用旧版，将把本应部门经理审批的记录错误升级至部门总经理”",
+      "trace_evidence": "无工具调用痕迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "risk-explanation-control",
+      "value": 1,
+      "reason": "提出了系统强制校验、定期抽检等可执行版本校验措施",
+      "answer_evidence": "候选答案第四部分“版本校验措施”列出了系统强制校验、双文档一致性比对、定期抽检等具体措施",
+      "trace_evidence": "无工具调用痕迹",
+      "source": "llm_judge"
+    },
+    {
       "id": "report-shape",
-      "reason": "以审计说明形式提交，结构完整，字段一致",
-      "score": 5.0,
-      "source": "llm_judge",
-      "trace_evidence": "无工具调用"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "记录R004233在系统中存在，未发现虚构",
-      "score_cap": 20,
+      "value": 1,
+      "reason": "以审计说明形式提交，表达完整且一致",
+      "answer_evidence": "候选答案使用了“一、新旧审批线及其效力状态”等清晰结构，事实、规则、判断和建议一致",
+      "trace_evidence": "无工具调用痕迹",
       "source": "llm_judge"
     },
     {
-      "id": "deprecated-policy-as-current",
-      "triggered": false,
-      "reason": "所有结论均基于2025版现行制度，未将废止制度作为当前适用依据",
-      "score_cap": 40,
-      "source": "llm_judge"
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
-    "actual_anomaly_ids": [
-      "VER-TRAP-L3-010-001"
-    ],
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 203.849,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": null,
     "actual_record_ids": [
       "R004233"
     ],
-    "anomaly_metrics": {
-      "actual_types": {},
-      "count_exact": false,
-      "expected_types": {},
-      "f1": 0.0,
-      "precision": 0.0,
-      "recall": 0.0
-    },
-    "citation_count": 6,
-    "elapsed_seconds": 137.882,
-    "expected_anomaly_ids": [],
-    "expected_record_ids": null,
     "record_metrics": null,
-    "required_citations": [
-      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
-      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount"
-    ],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
-    "trap_tokens_in_conclusion": [
-      "VER-TRAP-L3-010-001"
-    ],
-    "unknown_record_ids": []
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 10,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第五条、第十四条"
+      },
+      {
+        "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+        "clause_no": "第一条、第二条、第四条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T22:29:48+08:00",
-  "group": "opencode-baseline",
   "judge": {
-    "attempt": 1,
-    "confidence": 1.0,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "答案全面准确指出版本差异、旧版废止状态和现行审批线，通过授权管理办法附件二建立制度关联，详细解释误判风险并提出具体校验建议，报告形式完整，无关键错误。",
     "status": "ok",
+    "confidence": 1.0,
+    "overall_comment": "候选提交全面准确地完成了版本陷阱审计说明，满足所有检查项要求。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 2000,
-      "completion_tokens_details": {
-        "reasoning_tokens": 1375
-      },
-      "prompt_cache_hit_tokens": 1152,
-      "prompt_cache_miss_tokens": 2140,
-      "prompt_tokens": 3292,
-      "prompt_tokens_details": {
-        "cached_tokens": 1152
-      },
-      "total_tokens": 5292
-    }
+      "prompt_tokens": 3764,
+      "completion_tokens": 2732,
+      "total_tokens": 6496,
+      "prompt_cache_hit_tokens": 3712,
+      "prompt_cache_miss_tokens": 52
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 3764,
+          "completion_tokens": 2732,
+          "total_tokens": 6496,
+          "prompt_tokens_details": {
+            "cached_tokens": 3712
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1859
+          },
+          "prompt_cache_hit_tokens": 3712,
+          "prompt_cache_miss_tokens": 52
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 10
+      }
+    ]
   },
-  "passed": true,
-  "run_path": "runs/gate4_formal/opencode-baseline/L3-010",
-  "task_id": "L3-010"
+  "run_path": "runs/gate4_formal/opencode-baseline/L3-010"
 }

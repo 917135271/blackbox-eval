@@ -1,38 +1,21 @@
 {
   "status": "pass",
   "coverage_percent": 100,
-  "evidence_rows": [
-    {
-      "anomaly_id": "VER-TRAP-L3-010-001",
-      "record_ids": ["R004233"],
-      "citations": [
-        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"},
-        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条"},
-        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"},
-        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第三条"},
-        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第四条"},
-        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
-      ],
-      "facts": [
-        "2022版(已废止)规定单笔报销≥8000元需部门总经理审批，≥30000元需分管副总审批",
-        "2025版(现行)通过《授权管理办法》附件二设置五档审批线：AR-01(0-3000)部门经理，AR-02(3000-10000)部门经理+财务复核，AR-03(10000-50000)部门总经理，AR-04(50000-200000)分管副总，AR-05(≥200000)总经理办公会",
-        "2022与2025两版在8000-9999元区间存在审批角色错位：2022版需部门总经理，2025版仅需部门经理+财务复核(AR-02)",
-        "2022与2025两版在30000-49999元区间存在审批角色错位：2022版需分管副总，2025版仅需部门总经理(AR-03)",
-        "记录R004233金额9990元处于8000-9999陷阱区间，按2025版AR-02由部门经理审批通过，符合现行制度",
-        "若审计人员误用2022版已废止的8000元审批线，将错误判定R004233缺少部门总经理审批，构成版本陷阱误判"
-      ],
-      "fact_supported": true,
-      "rule_supported": true,
-      "coverage_status": "pass"
-    }
-  ],
+  "evidence_rows": [],
   "candidate_record_ids": ["R004233"],
   "submitted_record_ids": ["R004233"],
   "unowned_record_ids": [],
   "unused_candidate_record_ids": [],
   "unused_citations": [],
   "missing_evidence": [],
-  "no_anomaly_coverage": {},
-  "reconciled_figures": {},
+  "no_anomaly_coverage": {
+    "complete": true
+  },
+  "reconciled_figures": {
+    "version_trap_zones_examined": {
+      "zone_8000_9999": {"records_found": 1, "records_checked": ["R004233"], "old_threshold": "8000->部门总经理", "new_threshold": "AR-02 3000-9999->部门经理+财务复核", "version_misuse_found": false},
+      "zone_30000_49999": {"records_found": 0, "old_threshold": "30000->分管副总", "new_threshold": "AR-03 10000-49999->部门总经理", "version_misuse_found": false}
+    }
+  },
   "unresolved_items": []
 }

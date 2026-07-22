@@ -19,6 +19,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import run_gate3_development as runtime  # noqa: E402
+from formal_eval_plan import (  # noqa: E402
+    FORMAL_TASK_COUNT,
+    MODEL_NAME,
+    TASK_TIMEOUT_SECONDS,
+)
 
 
 FORMAL = ROOT / "data" / "formal_case_rubric"
@@ -44,9 +49,9 @@ def verify_frozen_configuration() -> dict[str, Any]:
             errors.append(f"missing:{relative}")
         elif _sha256(path) != expected:
             errors.append(f"hash_mismatch:{relative}")
-    if freeze.get("formal_task_count_per_group") != 15:
+    if freeze.get("formal_task_count_per_group") != FORMAL_TASK_COUNT:
         errors.append("formal_task_count_per_group")
-    if freeze.get("task_timeout_seconds") != 900:
+    if freeze.get("task_timeout_seconds") != TASK_TIMEOUT_SECONDS:
         errors.append("task_timeout_seconds")
     if tuple(freeze.get("groups", [])) != GROUPS:
         errors.append("groups")
@@ -164,12 +169,38 @@ def task_prompt(task: dict[str, Any], enhanced: bool, framework: str | None = No
 
 def configure_runtime() -> None:
     runtime.DEV = FORMAL
-    runtime.DEV_DB = ROOT / "data" / "expense.db"
+    runtime.DEV_DB = FORMAL / "expense_formal.db"
     runtime.RUN_ROOT = RUN_ROOT
     runtime.load_tasks = load_tasks
     runtime.safe_reset = safe_reset
     runtime.archive_retry_task = archive_retry_task
     runtime.task_prompt = task_prompt
+
+
+def formal_mount_policy() -> dict[str, Any]:
+    configure_runtime()
+    placeholder = RUN_ROOT / ".mount-policy-check"
+    arguments = runtime.common_volumes(placeholder / "workspace", placeholder / "artifacts")
+    sources = {
+        Path(value.split(":/", 1)[0]).resolve()
+        for index, value in enumerate(arguments)
+        if index > 0 and arguments[index - 1] == "-v" and ":/" in value
+    }
+    required = {
+        (FORMAL / "expense_formal.db").resolve(),
+        (ROOT / "data" / "corpus").resolve(),
+    }
+    forbidden = {
+        (ROOT / "data" / "ground_truth.yaml").resolve(),
+        (ROOT / "data" / "evals.json").resolve(),
+        (FORMAL / "cases.json").resolve(),
+        (FORMAL / "evals.json").resolve(),
+    }
+    return {
+        "sources": sorted(path.as_posix() for path in sources),
+        "required_present": required <= sources,
+        "hidden_absent": not bool(forbidden & sources),
+    }
 
 
 def collect_full_results() -> list[dict[str, Any]]:
@@ -203,7 +234,7 @@ def main() -> int:
     parser.add_argument("--groups", nargs="+", choices=GROUPS, default=list(GROUPS))
     parser.add_argument("--task-id", action="append", default=[])
     parser.add_argument("--workers", type=int, default=8)
-    parser.add_argument("--timeout", type=int, default=900)
+    parser.add_argument("--timeout", type=int, default=TASK_TIMEOUT_SECONDS)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--retry-reason", default="")
@@ -217,7 +248,9 @@ def main() -> int:
         raise SystemExit("--resume requires --retry-reason for the formal rerun registry")
     freeze = verify_frozen_configuration()
     if args.timeout != int(freeze["task_timeout_seconds"]):
-        raise SystemExit("GATE4 timeout must match the frozen 900-second budget")
+        raise SystemExit(
+            f"GATE4 timeout must match the frozen {TASK_TIMEOUT_SECONDS}-second budget"
+        )
 
     configure_runtime()
     if args.resume:
@@ -246,7 +279,7 @@ def main() -> int:
                     "CODEX_DEEPSEEK_PROXY_HOST": "0.0.0.0",
                     "CODEX_DEEPSEEK_PROXY_PORT": str(runtime.PROXY_PORT),
                     "CODEX_PROXY_TRACE": str(proxy_dir / "trace.jsonl"),
-                    "LLM_MODEL_NAME": "deepseek-v4-pro",
+                    "LLM_MODEL_NAME": MODEL_NAME,
                 }
             )
             proxy_out = (proxy_dir / "stdout.log").open("w", encoding="utf-8")

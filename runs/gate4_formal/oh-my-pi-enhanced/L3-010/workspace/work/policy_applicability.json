@@ -1,21 +1,22 @@
 {
-  "task_id": "L3-010",
   "applicable_policies": [
-    {
-      "doc_id": "03_authorization_management.md",
-      "title": "XX证券授权管理办法",
-      "status": "current",
-      "effective_date": "2025-01-01",
-      "applicable_clauses": ["附件二-AR-01至AR-05"],
-      "reason": "2025版费用报销管理办法第五条引用本办法附件二作为现行审批线"
-    },
     {
       "doc_id": "01_expense_reimbursement_2025.md",
       "title": "XX证券费用报销管理办法(2025修订版)",
       "status": "current",
       "effective_date": "2025-01-01",
-      "applicable_clauses": ["第五条", "第十一条"],
-      "reason": "现行有效版本,审批权限引用03号文档附件二"
+      "expiry_date": null,
+      "applicable_clauses": ["第五条", "第十一条", "第十四条"],
+      "applicability_reason": "现行有效制度，自2025年1月1日起施行"
+    },
+    {
+      "doc_id": "03_authorization_management.md",
+      "title": "XX证券授权管理办法",
+      "status": "current",
+      "effective_date": "2025-01-01",
+      "expiry_date": null,
+      "applicable_clauses": ["第二条", "第五条", "附件二"],
+      "applicability_reason": "现行有效制度，附件二为费用报销审批权限的法定依据"
     }
   ],
   "excluded_policies": [
@@ -23,42 +24,35 @@
       "doc_id": "02_expense_reimbursement_2022_deprecated.md",
       "title": "XX证券费用报销管理办法(2022版)",
       "status": "repealed",
+      "effective_date": "2022年(从发文字号XX证财规〔2022〕乙号推断)",
       "repeal_date": "2025-01-01",
-      "reason": "2025修订版第十四条明确废止;正文标注仅作制度沿革留档,不得作为现行审批依据"
+      "exclusion_reason": "已被2025版第十四条明文废止，且第四条自述审批金额已被后续制度替代，不得作为现行审批依据"
     }
   ],
-  "version_trap_analysis": {
-    "old_approval_lines": {
-      "source": "02_expense_reimbursement_2022_deprecated.md",
-      "lines": [
-        {"threshold": 8000, "required_role": "部门总经理", "clause": "第二条"},
-        {"threshold": 30000, "required_role": "分管副总", "clause": "第三条"}
-      ]
-    },
-    "new_approval_lines": {
-      "source": "03_authorization_management.md 附件二",
-      "lines": [
-        {"range": "[0, 3000)", "required_role": "部门经理", "code": "AR-01"},
-        {"range": "[3000, 10000)", "required_role": "部门经理,并经财务复核", "code": "AR-02"},
-        {"range": "[10000, 50000)", "required_role": "部门总经理", "code": "AR-03"},
-        {"range": "[50000, 200000)", "required_role": "分管副总", "code": "AR-04"},
-        {"range": "[200000, ∞)", "required_role": "总经理办公会", "code": "AR-05"}
-      ]
-    },
-    "version_trap_intervals": [
-      {
-        "interval": "[8000, 10000)",
-        "old_requires": "部门总经理",
-        "new_requires": "部门经理(财务复核)",
-        "misjudgment_risk": "用旧版标准审计,会错误地认为这些报销缺少部门总经理审批"
-      },
-      {
-        "interval": "[30000, 50000)",
-        "old_requires": "分管副总",
-        "new_requires": "部门总经理",
-        "misjudgment_risk": "用旧版标准审计,会错误地认为这些报销缺少分管副总审批"
-      }
+  "threshold_comparison": {
+    "old_2022": [
+      {"range": "[8000, 30000)", "approver": "部门总经理", "clause": "第二条"},
+      {"range": "[30000, ∞)", "approver": "分管副总", "clause": "第三条"}
+    ],
+    "new_2025": [
+      {"range": "[0, 3000)", "approver": "部门经理", "clause": "附件二 AR-01"},
+      {"range": "[3000, 10000)", "approver": "部门经理 + 财务复核", "clause": "附件二 AR-02"},
+      {"range": "[10000, 50000)", "approver": "部门总经理", "clause": "附件二 AR-03"},
+      {"range": "[50000, 200000)", "approver": "分管副总", "clause": "附件二 AR-04"},
+      {"range": "[200000, ∞)", "approver": "总经理办公会", "clause": "附件二 AR-05"}
     ]
   },
-  "unresolved_items": []
+  "version_trap_zones": [
+    {"range_cny": "0至2,999.99元", "old_approver": "无明确规定", "new_approver": "部门经理", "risk": "2025版新增明确审批要求"},
+    {"range_cny": "3,000至7,999.99元", "old_approver": "无明确规定", "new_approver": "部门经理+财务复核", "risk": "2025版新增审批及财务复核双重控制"},
+    {"range_cny": "8,000至9,999.99元", "old_approver": "部门总经理", "new_approver": "部门经理+财务复核", "risk": "审批层级降级(部门总经理→部门经理)，但增加财务复核"},
+    {"range_cny": "30,000至49,999.99元", "old_approver": "分管副总", "new_approver": "部门总经理", "risk": "审批层级降级(分管副总→部门总经理)"},
+    {"range_cny": "200,000元及以上", "old_approver": "分管副总", "new_approver": "总经理办公会", "risk": "新增最高集体审批层级，旧版无此限制"}
+  ],
+  "cross_reference_chain": "2025版费用报销管理办法第五条 → 授权管理办法附件二 → AR-01至AR-05五档审批权限表。2025版第十一条(拆分规避)同样交叉引用附件二较高审批线作为合计触发阈值。",
+  "conflicts": [],
+  "unresolved_items": [
+    "2022版未声明自身生效日期，仅从发文字号推断",
+    "2022版未定义8000元以下审批要求"
+  ]
 }

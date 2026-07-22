@@ -1,0 +1,87 @@
+{
+  "anomaly_ids": [
+    "ANOMALY-DUP-001",
+    "ANOMALY-SPL-001",
+    "ANOMALY-STD-001",
+    "ANOMALY-STD-002",
+    "ANOMALY-STD-003",
+    "ANOMALY-STD-004",
+    "ANOMALY-STD-005",
+    "ANOMALY-STD-006",
+    "ANOMALY-OVD-001",
+    "ANOMALY-BDG-001"
+  ],
+  "answer": "对开发库全部21条报销记录执行五项规则综合审计，发现10项异常，涉及12条记录。\n\n一、重复报销（ANOMALY-DUP-001）：发票FPDEV900001（480元，办公用品）在R900001（2025-01-05）和R900002（2025-01-06）中重复使用，违反《XX证券费用报销管理办法(2025修订版)》(01_expense_reimbursement_2025.md)第十条“同一发票最多报销1次”的规定。\n\n二、拆分报销（ANOMALY-SPL-001）：员工E9001将同一客户路演交通费拆分为R900003（2025-02-03,5200元）和R900004（2025-02-06,5200元），两笔间隔3天（7天内），合计10400元。单笔属AR-02档（3000-10000元，部门经理+财务复核），合并后属AR-03档（>=10000元，部门总经理审批），属于规避较高审批权限的拆分行为，违反《XX证券费用报销管理办法(2025修订版)》第十一条，审批档位依据《XX证券授权管理办法》(03_authorization_management.md)附件二。\n\n三、超标准报销（6项）：\n  ANOMALY-STD-001：R900007办公用品650元，超出《XX证券办公与通讯费用管理办法》(07_office_communication.md)第二条每人每月600元标准，无专项审批，违反费用报销管理办法第十二条。\n  ANOMALY-STD-002：R900001（480元）与R900002（480元）同为E9001一月办公用品，月累计960元超出600元标准，违反同上第二条及费用报销管理办法第十二条。\n  ANOMALY-STD-003：R900013经理级一类城市住宿两晚1400元，标准650元/晚x2=1300元，超100元，违反《XX证券差旅费管理办法》(04_travel_expense.md)第四条及第五条，无专项审批，违反费用报销管理办法第十二条。\n  ANOMALY-STD-004：R900016内部培训综合费用一天850元，超出《XX证券培训费管理办法》(05_training_expense.md)第三条每日800元标准50元，违反费用报销管理办法第十二条。\n  ANOMALY-STD-005：R900017业务招待费5200元（20人，人均260元），超出《XX证券业务招待费管理办法》(06_business_entertainment.md)第二条单次5000元标准200元，违反费用报销管理办法第十二条。\n  ANOMALY-STD-006：R900014（180元）与R900015（160元）同为E9001九月通讯费，月累计340元，超出《XX证券办公与通讯费用管理办法》第三条每人每月300元标准，违反费用报销管理办法第十二条。\n\n四、超期报销（ANOMALY-OVD-001）：R900006费用发生日期2025-03-01，报销日期2025-05-05，间隔65天，超过《XX证券费用报销管理办法(2025修订版)》第七条60天时限。\n\n五、超预算报销（ANOMALY-BDG-001）：开发审计二部(D902)年度预算50000元。R900018（45000元）使累计至45000元未超标；R900019（6000元）使累计达51000元超出预算且无专项审批（special_approval=0），违反《XX证券费用报销管理办法(2025修订版)》第十三条及《XX证券预算管理办法》(08_budget_management.md)第二、三条。R900020（5000元）虽在超预算后发生但持有专项审批，按预算管理办法第四条豁免。\n\n其余9条记录（R900005、R900008、R900009、R900010、R900011、R900012、R900018、R900020、R900021）经核查确认未触发上述五项规则异常条件。",
+  "citations": [
+    {
+      "clause_no": "第十条",
+      "doc_id": "01_expense_reimbursement_2025.md"
+    },
+    {
+      "clause_no": "第十一条",
+      "doc_id": "01_expense_reimbursement_2025.md"
+    },
+    {
+      "clause_no": "附件二",
+      "doc_id": "03_authorization_management.md"
+    },
+    {
+      "clause_no": "第七条",
+      "doc_id": "01_expense_reimbursement_2025.md"
+    },
+    {
+      "clause_no": "第十二条",
+      "doc_id": "01_expense_reimbursement_2025.md"
+    },
+    {
+      "clause_no": "第十三条",
+      "doc_id": "01_expense_reimbursement_2025.md"
+    },
+    {
+      "clause_no": "第四条",
+      "doc_id": "04_travel_expense.md"
+    },
+    {
+      "clause_no": "第五条",
+      "doc_id": "04_travel_expense.md"
+    },
+    {
+      "clause_no": "第三条",
+      "doc_id": "05_training_expense.md"
+    },
+    {
+      "clause_no": "第二条",
+      "doc_id": "06_business_entertainment.md"
+    },
+    {
+      "clause_no": "第二条",
+      "doc_id": "07_office_communication.md"
+    },
+    {
+      "clause_no": "第三条",
+      "doc_id": "07_office_communication.md"
+    },
+    {
+      "clause_no": "第二条",
+      "doc_id": "08_budget_management.md"
+    },
+    {
+      "clause_no": "第三条",
+      "doc_id": "08_budget_management.md"
+    }
+  ],
+  "record_ids": [
+    "R900001",
+    "R900002",
+    "R900003",
+    "R900004",
+    "R900006",
+    "R900007",
+    "R900013",
+    "R900014",
+    "R900015",
+    "R900016",
+    "R900017",
+    "R900019"
+  ]
+}

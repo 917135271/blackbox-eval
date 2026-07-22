@@ -1,46 +1,134 @@
 {
-  "criteria": [
+  "checklist": [
     {
-      "id": "travel-policy",
-      "score": 25,
-      "reason": "答案明确指出差旅住宿适用差旅费管理办法，场景为公务出差",
-      "answer_evidence": "“《XX证券差旅费管理办法》(04_travel_expense.md)”",
-      "trace_evidence": "get_policy_doc获取04_travel_expense.md，内容含第四条住宿标准"
+      "id": "travel-dimensions-policy",
+      "value": 1,
+      "reason": "明确提及适用差旅费管理办法",
+      "answer_evidence": "答案中写明“差旅住宿：适用《XX证券差旅费管理办法》”",
+      "trace_evidence": "search_policy和get_policy_doc调用了04_travel_expense.md",
+      "source": "llm_judge"
     },
     {
-      "id": "training-policy",
-      "score": 25,
-      "reason": "答案明确指出培训住宿适用培训费管理办法，场景为培训期间住宿",
-      "answer_evidence": "“《XX证券培训费管理办法》(05_training_expense.md)”",
-      "trace_evidence": "get_policy_doc获取05_training_expense.md，内容含第五条住宿标准"
+      "id": "travel-dimensions-job-level",
+      "value": 1,
+      "reason": "明确包含员工职级维度",
+      "answer_evidence": "答案标准维度写明“员工职级（员工级/经理级/部门负责人级/高管级）”",
+      "trace_evidence": "tool_trace中制度第三条显示“住宿标准按员工职级和城市档位确定”",
+      "source": "llm_judge"
     },
     {
-      "id": "no-mixing",
-      "score": 25,
-      "reason": "详细说明了标准结构、金额、适用场景差异，并引用制度互引禁止条款，场景与数值差异均说明",
-      "answer_evidence": "“标准结构不同...金额不同...适用场景不同...制度互引禁止”",
-      "trace_evidence": "无需轨迹证据，答案已充分说明"
+      "id": "travel-dimensions-city-tier",
+      "value": 1,
+      "reason": "明确包含城市档位维度",
+      "answer_evidence": "答案标准维度写明“城市档位（一类/二类/三类）”",
+      "trace_evidence": "tool_trace中制度第三条显示“城市档位包括一类城市、二类城市和三类城市”",
+      "source": "llm_judge"
     },
     {
-      "id": "comparison-evidence",
-      "score": 20,
-      "reason": "答案引用了04_travel_expense.md和05_training_expense.md，给出具体条款和数值比较，证据完整",
-      "answer_evidence": "引用第四条、第七条与第五条、第六条，并列出具体金额",
-      "trace_evidence": "trace中成功获取两份文档全文，验证了制度存在"
+      "id": "training-values-policy",
+      "value": 1,
+      "reason": "正确识别培训费管理办法",
+      "answer_evidence": "答案中写明“培训住宿：适用《XX证券培训费管理办法》”",
+      "trace_evidence": "search_policy和get_policy_doc调用了05_training_expense.md",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-tier-a",
+      "value": 1,
+      "reason": "一类城市数值和单位均正确",
+      "answer_evidence": "答案表格中“一类城市 500元”",
+      "trace_evidence": "get_policy_doc返回05_training_expense.md中“一类城市 | 500元”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-tier-b",
+      "value": 1,
+      "reason": "二类城市数值和单位均正确",
+      "answer_evidence": "答案表格中“二类城市 420元”",
+      "trace_evidence": "get_policy_doc返回05_training_expense.md中“二类城市 | 420元”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-tier-c",
+      "value": 1,
+      "reason": "三类城市数值和单位均正确",
+      "answer_evidence": "答案表格中“三类城市 350元”",
+      "trace_evidence": "get_policy_doc返回05_training_expense.md中“三类城市 | 350元”",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-scenario",
+      "value": 1,
+      "reason": "对照场景的城市档位和差旅职级均明确",
+      "answer_evidence": "答案中以“一类城市为例”，列出员工级和经理级",
+      "trace_evidence": "无直接trace，答案自有内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-travel-value",
+      "value": 1,
+      "reason": "差旅住宿标准与制度表一致",
+      "answer_evidence": "答案示例中员工级450元，经理级650元",
+      "trace_evidence": "get_policy_doc返回04_travel_expense.md中一类城市员工级450元，经理级650元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-training-value",
+      "value": 1,
+      "reason": "培训住宿标准与制度表一致",
+      "answer_evidence": "答案示例中培训住宿500元",
+      "trace_evidence": "get_policy_doc返回05_training_expense.md中一类城市500元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-same-tier",
+      "value": 1,
+      "reason": "培训与差旅数值属于同一城市档位",
+      "answer_evidence": "比较均在一类城市档位下进行",
+      "trace_evidence": "答案和tool_trace显示对比均基于一类城市",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-mixing-scenario",
+      "value": 1,
+      "reason": "明确区分培训和差旅场景",
+      "answer_evidence": "答案引用制度互斥条款，说明培训期间不适用差旅住宿表",
+      "trace_evidence": "无直接trace，答案基于制度条文",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-mixing-dimensions",
+      "value": 1,
+      "reason": "指出培训只按城市而差旅还按职级",
+      "answer_evidence": "答案写明“培训住宿不区分职级”和“差旅双维度”",
+      "trace_evidence": "无直接trace，答案自有分析",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-mixing-conclusion",
+      "value": 1,
+      "reason": "明确作出不得混用结论",
+      "answer_evidence": "答案明确指出“不能按‘哪个高用哪个’或‘习惯沿用差旅表’处理”",
+      "trace_evidence": "无直接trace，答案自有总结",
+      "source": "llm_judge"
+    },
+    {
+      "id": "comparison-evidence-travel",
+      "value": 1,
+      "reason": "差旅制度及关键条款完整",
+      "answer_evidence": "引用了04_travel_expense.md第三条、第四条、第七条",
+      "trace_evidence": "tool_trace中get_policy_doc获取了04_travel_expense.md，内容包含相应条款",
+      "source": "llm_judge"
+    },
+    {
+      "id": "comparison-evidence-training",
+      "value": 1,
+      "reason": "培训制度及关键条款完整",
+      "answer_evidence": "引用了05_training_expense.md第五条、第六条",
+      "trace_evidence": "tool_trace中get_policy_doc获取了05_training_expense.md，内容包含相应条款",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "未提交任何record_id，不存在虚构记录"
-    },
-    {
-      "id": "deprecated-policy-as-current",
-      "triggered": false,
-      "reason": "使用的制度均为现行版本，无废止制度"
-    }
-  ],
-  "overall_comment": "候选答案准确比较了差旅与培训住宿标准，依据制度说明不能混用，证据充分，关键要素齐全",
-  "confidence": 0.95
+  "overall_comment": "候选答案完整回答了所有要求，包括制度适用、维度区分、数值对照、同档位比较及不混用结论，且引用制度准确，无遗漏。",
+  "confidence": 1.0
 }

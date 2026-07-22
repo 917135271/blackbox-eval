@@ -3,62 +3,38 @@
   "coverage_percent": 100.0,
   "evidence_rows": [
     {
-      "anomaly_id": "SPLIT-001",
-      "record_ids": [
-        "R004212",
-        "R004213"
-      ],
+      "anomaly_id": "L2-008-SPLIT-001",
+      "record_ids": ["R004212", "R004213"],
       "citations": [
-        {
-          "doc_id": "01_expense_reimbursement_2025.md",
-          "clause_no": "第十一条"
-        },
-        {
-          "doc_id": "01_expense_reimbursement_2025.md",
-          "clause_no": "第五条"
-        },
-        {
-          "doc_id": "03_authorization_management.md",
-          "clause_no": "附件二"
-        }
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
       ],
       "facts": [
-        "E0009(travel_lodging) in 2025-04-10/04-15, 5 days apart within 7-day window",
-        "Each record 5100 yuan, individually AR-02",
-        "Combined 10200 yuan reaches AR-03 threshold (>=10000)",
-        "Both records only AR-02 approval, no AR-03 approval",
-        "Both records reason: split reimbursement injection sample 3, different invoices each used once"
+        "R004212: 员工E0009张婷，travel_lodging，5100元，2025-04-10，发票FP2025X0004206，审批AR-02(部门经理E0009自审批)",
+        "R004213: 员工E0009张婷，travel_lodging，5100元，2025-04-15，发票FP2025X0004207，审批AR-02(部门经理E0009自审批)",
+        "两笔记录间隔5天，在7天窗口内",
+        "合计金额10200元，达到AR-03线(≥10000元)，应经部门总经理审批",
+        "两笔均仅经部门经理(E0009)审批，且为自审批",
+        "事由相同(项目现场住宿费)，供应商相同(安程酒店管理有限公司)，构成拆分报销"
       ],
       "fact_supported": true,
       "rule_supported": true,
       "coverage_status": "pass"
     }
   ],
-  "candidate_record_ids": [
-    "R004212",
-    "R004213"
-  ],
-  "submitted_record_ids": [
-    "R004212",
-    "R004213"
-  ],
+  "candidate_record_ids": ["R004212", "R004213"],
+  "submitted_record_ids": ["R004212", "R004213"],
   "unowned_record_ids": [],
   "unused_candidate_record_ids": [],
   "unused_citations": [],
   "missing_evidence": [],
   "no_anomaly_coverage": {},
   "reconciled_figures": {
-    "combined_amount": 10200.0,
-    "individual_amounts": [
-      5100.0,
-      5100.0
-    ],
-    "delta_days": 5,
-    "individual_tiers": [
-      "AR-02",
-      "AR-02"
-    ],
-    "combined_tier": "AR-03"
+    "combined_amount": 10200.00,
+    "individual_amounts": [5100.00, 5100.00],
+    "date_window_days": 5,
+    "threshold_crossed": "AR-02→AR-03",
+    "higher_approval_required": "部门总经理"
   },
   "unresolved_items": []
 }

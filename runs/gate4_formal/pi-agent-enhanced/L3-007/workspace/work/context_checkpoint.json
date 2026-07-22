@@ -1,0 +1,163 @@
+{
+  "artifact_paths": [
+    "final_submission.json",
+    "submission_receipt.json",
+    "traces/context_events.jsonl",
+    "traces/events.jsonl",
+    "traces/native_events.jsonl",
+    "traces/subagents.jsonl",
+    "traces/tool_calls.jsonl",
+    "work/artifact_index.json",
+    "work/audit_plan.json",
+    "work/context_checkpoint.json",
+    "work/decision_log.jsonl",
+    "work/evidence_index.json",
+    "work/evidence_matrix.json",
+    "work/final_result.json",
+    "work/policy_applicability.json",
+    "work/report_draft.json",
+    "work/task_state.json",
+    "work/validation_report.json"
+  ],
+  "compacted": false,
+  "context_usage_percent": 0.0,
+  "created_at": 1784622126.2637289,
+  "estimation_method": "outer_runner_finalization",
+  "retained_state": {
+    "applicable_policies": [
+      "01_expense_reimbursement_2025.md",
+      "03_authorization_management.md"
+    ],
+    "artifact_index": [
+      "final_submission.json",
+      "submission_receipt.json",
+      "traces/context_events.jsonl",
+      "traces/events.jsonl",
+      "traces/native_events.jsonl",
+      "traces/subagents.jsonl",
+      "traces/tool_calls.jsonl",
+      "work/artifact_index.json",
+      "work/audit_plan.json",
+      "work/context_checkpoint.json",
+      "work/decision_log.jsonl",
+      "work/evidence_index.json",
+      "work/evidence_matrix.json",
+      "work/final_result.json",
+      "work/policy_applicability.json",
+      "work/report_draft.json",
+      "work/task_state.json",
+      "work/validation_report.json"
+    ],
+    "audit_plan": {
+      "complexity": {
+        "reasons": [
+          "单一规则参考查询，无版本冲突（2025版明确废止2022版）",
+          "仅两条政策交叉引用，无需聚合、分组或连接",
+          "无阈值边界、日期边界或豁免判断",
+          "无需批量数据分析",
+          "无需综合审计报告"
+        ],
+        "score": 0
+      },
+      "data_questions": [],
+      "evidence_requirements": [
+        "01_expense_reimbursement_2025.md 第五条（交叉引用条款）",
+        "03_authorization_management.md 附件二（审批权限表）"
+      ],
+      "execution_steps": [
+        {
+          "action": "policy_research",
+          "artifact": "work/audit_plan.json",
+          "detail": "读取01_expense_reimbursement_2025.md确认第五条交叉引用",
+          "step": 1
+        },
+        {
+          "action": "policy_research",
+          "artifact": "work/audit_plan.json",
+          "detail": "读取03_authorization_management.md附件二获取审批档位",
+          "step": 2
+        },
+        {
+          "action": "evidence_review",
+          "artifact": "work/evidence_matrix.json",
+          "detail": "运行evidence-coverage-check",
+          "step": 3
+        },
+        {
+          "action": "reporting",
+          "artifact": "work/final_result.json",
+          "detail": "运行audit-report生成最终答案",
+          "step": 4
+        },
+        {
+          "action": "validation",
+          "artifact": "work/validation_report.json",
+          "detail": "运行result-validator",
+          "step": 5
+        },
+        {
+          "action": "submission",
+          "artifact": "work/final_result.json",
+          "detail": "validate_audit_result → submit_audit_result",
+          "step": 6
+        }
+      ],
+      "policy_questions": [
+        {
+          "expected_answer": "第五条明确不在本办法正文列示，统一按《授权管理办法》附件二执行",
+          "id": "PQ1",
+          "question": "2025版报销管理办法是否直接列示审批金额？"
+        },
+        {
+          "expected_answer": "AR-01至AR-05五档，含金额区间和必要审批角色",
+          "id": "PQ2",
+          "question": "《授权管理办法》附件二中费用报销审批权限的具体档位是什么？"
+        }
+      ],
+      "required_fields": [
+        "doc_id",
+        "clause_no",
+        "approval_tier",
+        "amount_range",
+        "required_roles"
+      ],
+      "scope": {
+        "audit_object": "单笔费用审批档位（审批权限表）",
+        "business_period": "2025年至今",
+        "expense_types": "全部",
+        "organization_scope": "XX证券全部部门"
+      },
+      "stopping_conditions": [
+        "成功找到审批档位表并记录citations",
+        "evidence矩阵覆盖率达100%",
+        "validation_report状态为pass",
+        "submit_audit_result成功"
+      ],
+      "subagent_plan": {
+        "planned": false,
+        "reason": "复杂度0，紧凑模式足够"
+      },
+      "task_id": "L3-007",
+      "task_question": "报销办法没有直接列审批金额时,请通过交叉引用找到单笔费用审批档位。",
+      "task_type": "two_hop_retrieval",
+      "unresolved_items": []
+    },
+    "constraints": [
+      "isolated GATE3 workspace",
+      "formal answer assets prohibited",
+      "outer runner timeout enforced"
+    ],
+    "evidence_status": "pass",
+    "record_ids": [],
+    "remaining_budget": {
+      "elapsed_seconds": 193.575,
+      "remaining_seconds": 706.425,
+      "timeout_seconds": 900
+    },
+    "submission_status": "accepted",
+    "task": "你正在执行 GATE4 正式证券费用审计评测，当前为领域增强组。\n\n任务ID：L3-007\n题型：two_hop_retrieval\n问题：报销办法没有直接列审批金额时,请通过交叉引用找到单笔费用审批档位。\n\n必须遵循已安装的证券费用审计 Skills；先规划并记录Checkpoint，再按触发条件调查、复核、校验并通过统一工具提交。若复杂度至少为2且存在符合路由规则的角色，必须先授权原生子智能体，并在角色结束后登记结构化摘要和产物。\n\n\n要求：\n1. 必须查询制度和只读业务库后作答，可以使用 Shell、Python、SQLite 和当前工作区临时文件。\n2. 只处理当前独立任务。禁止读取 ground_truth、cases.json、Rubric、判卷代码、历史答案、其他任务或候选轨迹，也不得访问与题目无关的互联网。\n3. anomaly_ids 必须与审计发现一一对应、稳定且类型明确；不得为了迎合未知答案猜测隐藏编号。record_ids 必须完整、准确且只覆盖本题范围。\n4. 有异常时，record_ids 只包含参与本题所问违规的记录，不含累计计算背景、有效豁免或无关规则记录；无异常时仍保留题目直接核查或结论覆盖的记录，并在 answer 中明确写“无异常”。\n5. 必须维护 work/final_result.json、work/evidence_matrix.json 和 work/validation_report.json 三个预置文件。对应Schema的绝对路径分别是 /runtime-schemas/final_result.schema.json、/runtime-schemas/evidence_matrix.schema.json 和 /runtime-schemas/validation_report.schema.json；当前工作区兼容路径分别是 /workspace/runtime-schemas/final_result.schema.json、/workspace/runtime-schemas/evidence_matrix.schema.json 和 /workspace/runtime-schemas/validation_report.schema.json。当前目录已经是 /workspace，禁止拼成 /workspace/workspace，也禁止把 .schema.json 猜成普通 .json。\n6. 先调用 audit_control.validate_audit_result；取得 valid=true 后，再以 result_path=\"work/final_result.json\" 调用 audit_control.submit_audit_result。不得把完整结果直接打印出来代替提交。\n7. 提交成功后最终只输出 GATE4_TASK_PASS；无法提交时只输出 GATE4_TASK_FAIL。\n",
+    "unresolved_items": []
+  },
+  "stage": "submission_ready",
+  "task_id": "L3-007"
+}

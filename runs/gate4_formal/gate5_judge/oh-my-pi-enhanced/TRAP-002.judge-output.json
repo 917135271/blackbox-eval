@@ -1,41 +1,78 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "clean-conclusion",
-      "score": 0,
-      "reason": "候选结论基于R000002和R004201得出无异常，但本题应核查的记录是R004234和R004235，候选未针对本题记录进行判断，结论实质无效。",
-      "answer_evidence": "answer: '经核查，TRAP-002涉及的记录R000002和R004201不构成异常。'",
-      "trace_evidence": "trace中仅对FP202500000002的使用记录(R000002, R004201)进行了核查，未涉及R004234,R004235。"
+      "value": 1,
+      "reason": "答案明确以“无异常”开头，且无矛盾表述，完全满足通过条件",
+      "answer_evidence": "“无异常。\n\n经核查，R004234与R004235不构成重复报销，也不构成拆分报销”",
+      "trace_evidence": "",
+      "source": "llm_judge"
     },
     {
-      "id": "record-scope",
-      "score": 0,
-      "reason": "预期核查记录为R004234和R004235，候选提交的记录为R000002和R004201，完全错误。",
-      "answer_evidence": "submitted_json record_ids: ['R000002', 'R004201']",
-      "trace_evidence": "trace中调用了find_reused_invoices和find_invoice_usage，针对的是FP202500000002，未调用获取R004234或R004235详情的工具。"
+      "id": "case-specific-reason-invoice",
+      "value": 1,
+      "reason": "准确说明两条记录发票不同，构成不重复发票",
+      "answer_evidence": "“R004234使用发票FP2025X0004228，R004235使用发票FP2025X0004229，两笔记录使用不同发票”",
+      "trace_evidence": "find_invoice_usage分别查询FP2025X0004228和FP2025X0004229，各返回usage_count=1且关联不同记录，证明发票不同",
+      "source": "llm_judge"
     },
     {
-      "id": "case-specific-reason",
-      "score": 0,
-      "reason": "期望原因为'发票不同且合计低于审批线'，候选给出的原因是测试注入样本和正常报销，与期望原因完全不符。",
-      "answer_evidence": "answer: 'R004201明确标注为重复发票注入样本... R000002为正常业务报销。'",
-      "trace_evidence": "trace中没有核查发票差异或合计金额是否低于审批线的内容。"
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "准确计算并说明7天内合计金额为500元",
+      "answer_evidence": "“单笔250.00元……合计金额500.00元”",
+      "trace_evidence": "list_expenses在7天窗口内返回R004234和R004235，amount均为250，合计500",
+      "source": "llm_judge"
     },
     {
-      "id": "reverse-check",
-      "score": 0,
-      "reason": "轨迹中没有针对本题边界条件（如核对R004234与R004235的发票号是否相同、合计金额、日期跨度等）的核查。",
-      "answer_evidence": "无",
-      "trace_evidence": "trace中主要围绕FP202500000002的重复使用，以及查询政策第十条，未涉及本题记录的发票比较或金额汇总。"
+      "id": "case-specific-reason-threshold",
+      "value": 1,
+      "reason": "正确比较合计金额与审批线，指出500元未达到AR-02（≥3000元），即未达到较高审批线",
+      "answer_evidence": "“合计金额500.00元仍处于AR-01档，未达到较高审批线AR-02(≥3000元)”",
+      "trace_evidence": "get_policy_doc获取03_authorization_management.md附件二，明确AR-02为3000-10000，候选正确引用并比较",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-invoice",
+      "value": 1,
+      "reason": "工具轨迹直接证明发票不同，且candidate_answer准确反映",
+      "answer_evidence": "",
+      "trace_evidence": "find_invoice_usage调用返回两个不同发票号，且各自仅关联一条记录，无重复使用",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "工具轨迹显示同一员工同类费用7天内合计金额计算正确，为500元",
+      "answer_evidence": "",
+      "trace_evidence": "list_expenses参数：employee_id=E0009, expense_type=office_supplies, date_from=2025-10-13, date_to=2025-10-27；返回两条记录金额均为250，合计500",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 1,
+      "reason": "工具轨迹包含审批线数据，且候选正确指出合计未超过AR-02，满足推理要求",
+      "answer_evidence": "",
+      "trace_evidence": "get_policy_doc('03_authorization_management.md')返回附件二表格，显示AR-02为≥3000，而合计500<3000，未触及较高审批线",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用了01_expense_reimbursement_2025.md中的第十条和第十一条",
+      "answer_evidence": "citations包含{'doc_id': '01_expense_reimbursement_2025.md', 'clause_no': '第十条'}和{'doc_id': '01_expense_reimbursement_2025.md', 'clause_no': '第十一条'}",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "准确引用了03_authorization_management.md中的附件二",
+      "answer_evidence": "citations包含{'doc_id': '03_authorization_management.md', 'clause_no': '附件二'}",
+      "trace_evidence": "",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": true,
-      "reason": "候选使用R000002和R004201这些与本题无关的记录来支撑核心结论，而非核查预期的R004234和R004235。"
-    }
-  ],
-  "overall_comment": "候选完全未核查本题指定的记录(R004234, R004235)，而是错误地聚焦于另一张发票(FP202500000002)的重复使用，导致所有评判维度均不得分。触发critical failure，得分上限为20，最终得分0。",
-  "confidence": 0.95
+  "overall_comment": "提交答案完全符合要求：明确无异常，正确说明发票不同、合计500元、未达审批线，制度引用完整，工具轨迹证实所有数据与推理。",
+  "confidence": 1.0
 }

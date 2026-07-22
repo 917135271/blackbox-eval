@@ -1,104 +1,60 @@
 {
   "task_id": "L1-001",
   "task_type": "policy_qa",
-  "question": "现行制度下,单笔费用报销达到多少金额需要部门总经理审批?",
-  "scope": {
-    "audit_object": "单笔费用报销的部门总经理审批金额阈值",
-    "expense_types": ["所有费用报销类型"],
-    "business_period": "现行制度有效期间 (2025修订版)",
-    "organization_scope": "全公司",
-    "deliverable": "金额阈值及对应的制度条款引用"
+  "task_scope": {
+    "question": "现行制度下，单笔费用报销达到多少金额需要部门总经理审批？请说明适用版本、金额边界及费用报销办法与授权管理办法中的制度依据，并说明旧版审批线是否仍适用。",
+    "audit_period": "现行制度（2025年起）",
+    "organization_scope": "XX证券全公司"
   },
   "policy_questions": [
     {
-      "id": "PQ-1",
-      "question": "现行制度下,单笔费用报销达到多少金额需要部门总经理审批?",
-      "boundaries": {
-        "dates": "现行(2025修订版)制度有效期间",
-        "amounts": "部门总经理审批的最低金额阈值",
-        "conditions": "审批层级: 部门总经理",
-        "exemptions": "待确认",
-        "exceptions": "待确认"
-      }
+      "id": "PQ-01",
+      "question": "现行费用报销制度中，部门总经理审批的单笔金额阈值是多少？",
+      "relevant_policies": ["01_expense_reimbursement_2025.md", "03_authorization_management.md"],
+      "boundaries": "金额边界：大于等于10000元且小于50000元（AR-03）"
     },
     {
-      "id": "PQ-2",
-      "question": "是否需要确认制度版本适用性(2025版 vs 2022版)?",
-      "boundaries": {
-        "versions": "2025修订版(现行) vs 2022版(已废止)"
-      }
+      "id": "PQ-02",
+      "question": "旧版（2022版）审批线是否仍适用？",
+      "relevant_policies": ["02_expense_reimbursement_2022_deprecated.md"],
+      "boundaries": "旧版8000元已被废止"
     }
   ],
   "data_questions": [],
-  "required_fields": [
-    "doc_id",
-    "clause_no",
-    "approval_threshold_amount",
-    "approver_role",
-    "policy_version",
-    "effective_date"
-  ],
-  "evidence_requirements": [
-    "现行制度文本中明确规定部门总经理审批金额阈值的条款",
-    "确认该制度为现行有效版本的依据",
-    "如涉及多个审批层级,需完整记录各级审批阈值"
-  ],
-  "execution_steps": [
-    {
-      "step": 1,
-      "action": "policy-version-check",
-      "description": "确认现行制度版本(2025 vs 2022),确定适用的制度文档",
-      "output": "确认doc_id=01_expense_reimbursement_2025.md为现行版本"
-    },
-    {
-      "step": 2,
-      "action": "query_policy",
-      "description": "在现行制度中搜索部门总经理审批金额阈值",
-      "output": "包含阈值金额和条款编号的制度节选"
-    },
-    {
-      "step": 3,
-      "action": "evidence-coverage-check",
-      "description": "验证证据覆盖",
-      "output": "work/evidence_matrix.json"
-    },
-    {
-      "step": 4,
-      "action": "audit-report",
-      "description": "生成审计报告",
-      "output": "work/final_result.json"
-    },
-    {
-      "step": 5,
-      "action": "result-validator",
-      "description": "校验最终结果",
-      "output": "work/validation_report.json"
-    },
-    {
-      "step": 6,
-      "action": "validate_and_submit",
-      "description": "预验证通过后提交",
-      "output": "提交成功"
-    }
-  ],
-  "complexity": {
-    "score": 0,
-    "reasons": [
-      "单一制度政策事实问题",
-      "仅需一次制度查询,无需数据聚合或批量过滤",
-      "无需跨制度比较",
-      "2022版已明确标记为废止,无版本歧义"
-    ]
+  "required_fields": ["doc_id", "clause_no", "amount_threshold", "effective_date", "repeal_status"],
+  "evidence_requirements": {
+    "current_threshold": "03_authorization_management.md 附件二 AR-03",
+    "expense_policy_delegation": "01_expense_reimbursement_2025.md 第五条",
+    "old_threshold_and_repeal": "02_expense_reimbursement_2022_deprecated.md 第二条、第四条"
   },
+  "execution_steps": [
+    {"step": 1, "name": "audit-query-planner", "description": "规划并记录Checkpoint", "artifact": "work/audit_plan.json"},
+    {"step": 2, "name": "policy_research", "description": "查询现行费用报销办法和授权管理办法，确认审批阈值", "artifact": "policy citations"},
+    {"step": 3, "name": "version_check", "description": "核查旧版审批线是否已废止", "artifact": "version applicability conclusion"},
+    {"step": 4, "name": "investigation_completed", "description": "记录调查完成Checkpoint"},
+    {"step": 5, "name": "evidence_coverage_check", "description": "证据覆盖检查", "artifact": "work/evidence_matrix.json"},
+    {"step": 6, "name": "review_ready", "description": "记录复核就绪Checkpoint"},
+    {"step": 7, "name": "false_positive_review", "description": "如触发条件则执行假阳性复核"},
+    {"step": 8, "name": "audit_report", "description": "生成审计报告", "artifact": "work/final_result.json"},
+    {"step": 9, "name": "result_validator", "description": "校验结果", "artifact": "work/validation_report.json"},
+    {"step": 10, "name": "validate_and_submit", "description": "先调用validate_audit_result，通过后调用submit_audit_result"}
+  ],
+  "complexity": 3,
+  "complexity_reasons": [
+    "policy_version: 需判断新旧版本审批线适用性",
+    "multi_policy: 涉及费用报销办法与授权管理办法两份制度",
+    "threshold_boundary: 需明确金额边界（>=10000且<50000）",
+    "version_applicability: 旧版8000元是否仍适用"
+  ],
   "subagent_plan": {
-    "required": false,
-    "reason": "复杂度0,主Agent直接处理"
+    "use_subagent": false,
+    "reason": "政策文档结构清晰，主代理可直接完成政策查询和版本适用性判断，无需拆分子任务"
   },
   "stopping_conditions": [
-    "找到明确的部门总经理审批金额阈值条款",
-    "确认适用的制度版本为现行有效版本",
-    "证据覆盖检查通过",
-    "校验通过并成功提交"
+    "policy_threshold_identified: 已从授权管理办法附件二中确认部门总经理审批线",
+    "version_applicability_resolved: 已确认旧版审批线已被废止",
+    "coverage_100_percent: evidence_matrix覆盖率100%",
+    "validation_pass: validation_report通过"
   ],
   "unresolved_items": []
 }

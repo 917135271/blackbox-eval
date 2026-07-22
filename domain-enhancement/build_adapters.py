@@ -16,6 +16,7 @@ ADAPTERS = {
     "openclaude": ROOT / "adapters" / "openclaude" / "securities-expense-audit",
     "opencode": ROOT / "adapters" / "opencode" / "securities-expense-audit",
     "oh-my-pi": ROOT / "adapters" / "oh-my-pi" / "securities-expense-audit",
+    "pi-agent": ROOT / "adapters" / "pi-agent" / "securities-expense-audit",
 }
 GENERATED_NAMES = ("skills", "shared")
 

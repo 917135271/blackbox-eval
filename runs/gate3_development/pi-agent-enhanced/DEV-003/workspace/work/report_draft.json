@@ -1,0 +1,37 @@
+{
+  "audit_scope": {
+    "task_id": "DEV-003",
+    "audit_object": "R900001及其同发票FPDEV900001关联记录",
+    "period": "2025-01",
+    "organization": "D901/开发审计一部"
+  },
+  "verified_facts": [
+    "发票FPDEV900001由开发供应商01开具，金额480元，发票日期2025-01-05",
+    "R900001（BXDEV900001）：员工E9001开发员工甲，费用日期2025-01-05，报销日期2025-01-12，金额480元，状态approved",
+    "R900002（BXDEV900002）：员工E9001开发员工甲，费用日期2025-01-06，报销日期2025-01-13，金额480元，状态approved",
+    "两笔报销均无特殊审批标记(special_approval=0)"
+  ],
+  "applicable_policies": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条", "rule": "同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险。"}
+  ],
+  "findings": [
+    {
+      "anomaly_id": "ANOM-DEV003-001",
+      "type": "重复报销",
+      "invoice_no": "FPDEV900001",
+      "records": ["R900001", "R900002"],
+      "amount_per_record": 480,
+      "total_duplicate_amount": 960,
+      "excess_amount": 480
+    }
+  ],
+  "impact": "同一发票FPDEV900001被重复报销，产生480元超额支付",
+  "recommendations": "追回其中一笔报销款480元，核实重复报销原因",
+  "anomaly_ids": ["ANOM-DEV003-001"],
+  "record_ids": ["R900001", "R900002"],
+  "citations": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"}
+  ],
+  "answer": "经核查，发票FPDEV900001被R900001和R900002两笔报销单重复使用，违反第十条同一发票最多报销1次的规定，构成重复报销。",
+  "limitations": []
+}

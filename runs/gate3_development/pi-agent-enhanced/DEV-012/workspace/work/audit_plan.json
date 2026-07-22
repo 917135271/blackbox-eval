@@ -1,0 +1,93 @@
+{
+  "task_id": "DEV-012",
+  "task_type": "audit_report",
+  "complexity": 4,
+  "complexity_reasons": [
+    "aggregation, grouping, joins, batch filtering",
+    "five business rules (duplicate, split, over-standard, overdue, over-budget)",
+    "thresholds, dates, exemptions, exceptions",
+    "comprehensive audit report"
+  ],
+  "audit_scope": {
+    "object": "XX证券完整开发库综合费用审计",
+    "period": "2025-01-01 to 2025-12-31",
+    "budget_year": 2025,
+    "organization": "all departments (DEP-001, DEP-002)",
+    "expense_types": ["business_entertainment", "communication", "office_supplies", "other", "training_fee", "training_lodging", "travel_lodging", "travel_transport"],
+    "record_count": 21,
+    "employee_count": 4,
+    "department_count": 2
+  },
+  "applicable_policies": [
+    {"doc_id": "01_expense_reimbursement_2025.md", "title": "XX证券费用报销管理办法(2025修订版)", "effective": "2025-01-01", "status": "active"},
+    {"doc_id": "03_authorization_management.md", "title": "XX证券授权管理办法", "effective": "2025-01-01", "status": "active"},
+    {"doc_id": "04_travel_expense.md", "title": "XX证券差旅费管理办法", "status": "active"},
+    {"doc_id": "05_training_expense.md", "title": "XX证券培训费管理办法", "status": "active"},
+    {"doc_id": "06_business_entertainment.md", "title": "XX证券业务招待费管理办法", "status": "active"},
+    {"doc_id": "07_office_communication.md", "title": "XX证券办公与通讯费用管理办法", "status": "active"},
+    {"doc_id": "08_budget_management.md", "title": "XX证券预算管理办法", "status": "active"}
+  ],
+  "policy_questions": [
+    {"rule": "重复报销", "policy": "01_expense_reimbursement_2025.md", "clause": "第十条", "description": "同一发票最多报销1次"},
+    {"rule": "拆分报销", "policy": "01_expense_reimbursement_2025.md", "clause": "第十一条", "description": "同一员工、同一费用类型7天内≥2笔且合计金额达较高审批线"},
+    {"rule": "超标准", "policy": "01_expense_reimbursement_2025.md", "clause": "第十二条", "description": "无专项审批时不超过制度标准1.0倍"},
+    {"rule": "超期", "policy": "01_expense_reimbursement_2025.md", "clause": "第七条", "description": "费用发生后60天内提交报销"},
+    {"rule": "超预算", "policy": "01_expense_reimbursement_2025.md, 08_budget_management.md", "clause": "第十三条, 第三条", "description": "部门年度预算不足时不得继续报销"}
+  ],
+  "standard_thresholds": {
+    "travel_lodging": {"doc_id": "04_travel_expense.md", "clause": "第四条", "thresholds": {"员工级": {"一类": 450, "二类": 380, "三类": 300}, "经理级": {"一类": 650, "二类": 550, "三类": 450}, "部门负责人级": {"一类": 850, "二类": 700, "三类": 600}, "高管级": {"一类": 1100, "二类": 900, "三类": 750}}, "unit": "元/人/晚"},
+    "training_lodging": {"doc_id": "05_training_expense.md", "clause": "第五条", "thresholds": {"一类": 500, "二类": 420, "三类": 350}, "unit": "元/人/晚"},
+    "training_fee": {"doc_id": "05_training_expense.md", "clause": "第二条", "threshold": 3500, "unit": "元/人/期"},
+    "business_entertainment": {"doc_id": "06_business_entertainment.md", "clauses": ["第二条", "第三条"], "thresholds": {"per_event": 5000, "per_person": 300}, "unit": "元"},
+    "office_supplies": {"doc_id": "07_office_communication.md", "clause": "第二条", "threshold": 600, "unit": "元/人/月"},
+    "communication": {"doc_id": "07_office_communication.md", "clause": "第三条", "threshold": 300, "unit": "元/人/月"}
+  },
+  "data_questions": [
+    "Find invoices used more than once (duplicate reimbursement)",
+    "Find same employee, same expense_type within 7-day windows with total >= 3000",
+    "Compare lodging amounts against per-night standards by employee level and city tier",
+    "Compare business entertainment per-event and per-person against standards",
+    "Aggregate office_supplies and communication by employee-month and compare against caps",
+    "Compare training fee and training lodging against standards",
+    "Calculate reimburse_date - expense_date and find records > 60 days",
+    "Calculate department cumulative expenses and compare against annual budgets"
+  ],
+  "execution_steps": [
+    {"step": 1, "name": "audit-query-planner", "action": "Create audit plan", "output": "work/audit_plan.json"},
+    {"step": 2, "name": "planning_completed_checkpoint", "action": "Record planning completed checkpoint"},
+    {"step": 3, "name": "authorize_data_analyst", "action": "Authorize data_analyst subagent"},
+    {"step": 4, "name": "invoke_data_analyst", "action": "Invoke native subagent for comprehensive data analysis"},
+    {"step": 5, "name": "complete_data_analyst", "action": "Register subagent completion"},
+    {"step": 6, "name": "policy_check", "action": "Compact policy version check (all policies 2025, no conflict)"},
+    {"step": 7, "name": "evidence_coverage_check", "action": "Build evidence matrix"},
+    {"step": 8, "name": "false_positive_review", "action": "Compact review in main context"},
+    {"step": 9, "name": "audit_report", "action": "Produce draft report"},
+    {"step": 10, "name": "result_validator", "action": "Validate and submit"}
+  ],
+  "subagent_plan": {
+    "role": "data_analyst",
+    "reason_code": "AGGREGATION_REQUIRED",
+    "complexity": 4,
+    "context": {
+      "task": "Run comprehensive data analysis on /benchmark/data/expense.db for all five audit rules. Save all SQL queries in work/sql/, results in work/analysis/.",
+      "rules": [
+        {"rule": "duplicate_reimbursement", "description": "Find invoices (invoice_id or invoice_no) used in more than one expense_records record"},
+        {"rule": "split_reimbursement", "description": "For each employee + expense_type pair, find records within 7-day windows where count >= 2 and total amount >= 3000 (AR-02 threshold)"},
+        {"rule": "over_standard", "description": "Check: (a) travel_lodging: amount/nights vs standard by employee_level + city_tier; (b) training_lodging: amount/nights vs standard by city_tier; (c) training_fee: amount vs 3500/人; (d) business_entertainment: amount vs 5000/次 also amount/participants vs 300/人; (e) office_supplies: sum by employee-month vs 600; (f) communication: sum by employee-month vs 300"},
+        {"rule": "overdue", "description": "Calculate julianday(reimburse_date) - julianday(expense_date) > 60"},
+        {"rule": "over_budget", "description": "For each department, order by expense_date, calculate cumulative spend, identify first record that exceeds annual_budget. Records before crossing are context, first crossing record is anomalous unless special_approval=1"}
+      ],
+      "exemptions": ["special_approval=1 exempts from over_standard and over_budget (per policy clause 12, 13)"],
+      "output": "Save detailed analysis in work/analysis/data_findings.json"
+    },
+    "requested_token_budget": 8000,
+    "artifact_paths": ["work/analysis/data_findings.json", "work/sql/"]
+  },
+  "stopping_conditions": [
+    "All five rules independently checked",
+    "All candidate records verified against database",
+    "Evidence matrix 100% coverage",
+    "Validation report passes"
+  ],
+  "unresolved_items": []
+}

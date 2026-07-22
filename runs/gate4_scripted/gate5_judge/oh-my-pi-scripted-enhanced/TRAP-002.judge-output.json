@@ -1,0 +1,78 @@
+{
+  "checklist": [
+    {
+      "id": "clean-conclusion",
+      "value": 1,
+      "reason": "候选明确判定“无异常”，无矛盾表述。",
+      "answer_evidence": "答案首句：“无异常。R004234和R004235不构成重复报销或拆分报销。”",
+      "trace_evidence": "N/A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-invoice",
+      "value": 1,
+      "reason": "候选准确指出两笔报销对应不同发票，并说明各自仅使用一次，不构成重复报销。",
+      "answer_evidence": "理由(1)：“两笔报销对应不同发票（FP2025X0004228 vs FP2025X0004229），各自仅使用一次”。",
+      "trace_evidence": "list_invoices工具返回：FP2025X0004228对应R004234，FP2025X0004229对应R004235，usage_count均为1。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "候选准确计算7天内合计金额为500元。",
+      "answer_evidence": "理由(2)：“两笔合计金额500元”。",
+      "trace_evidence": "get_expense_detail工具返回：两笔金额均为250元，合计500元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 0,
+      "reason": "候选未说明500元未达到10000元审批线，而是错误引用3000元线，与预期不符。",
+      "answer_evidence": "理由(2)：“合计金额500元未达到...AR-02起线为3,000元”，未提及10000元线。",
+      "trace_evidence": "get_policy_doc(03_authorization_management.md)显示AR-03起线为10000元，但候选未取用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-invoice",
+      "value": 1,
+      "reason": "工具轨迹独立验证发票号不同，FP2025X0004228对应R004234，FP2025X0004229对应R004235，且候选答案明确说明发票不同。",
+      "answer_evidence": "候选答案：两笔报销对应不同发票（FP2025X0004228 vs FP2025X0004229）",
+      "trace_evidence": "list_invoices工具调用结果：FP2025X0004228对应record_ids ['R004234']，FP2025X0004229对应record_ids ['R004235']，发票不同。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "工具轨迹独立计算7天内合计金额500元，候选答案明确说明合计500元。",
+      "answer_evidence": "候选答案：两笔合计金额500元",
+      "trace_evidence": "list_expenses工具调用返回两条记录：金额均为250元，合计500元。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 0,
+      "reason": "候选答案比较的审批线为3000元（AR-02起线），未与预期审批线10000元比较，不符合检查要求。",
+      "answer_evidence": "候选答案：未达到附件二较高审批线（AR-02起线为3,000元），未提及10000元审批线。",
+      "trace_evidence": "get_policy_doc获取附件二内容包含AR-03起线10000元，但候选未使用此阈值进行金额比较。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "候选准确引用了01_expense_reimbursement_2025.md第十条、第十一条，以及03_authorization_management.md附件二。",
+      "answer_evidence": "citations中明确列出01_expense_reimbursement_2025.md第十条、第十一条，03_authorization_management.md附件二。",
+      "trace_evidence": "search_policy和get_policy_excerpt返回第十条、第十一条内容；get_policy_doc返回附件二内容。候选引用正确。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "候选提交的citations中明确包含了doc_id: 03_authorization_management.md和clause_no: 附件二，准确引用了所需制度依据。",
+      "answer_evidence": "candidate_submission的citations中含有{\"clause_no\": \"附件二\", \"doc_id\": \"03_authorization_management.md\"}。",
+      "trace_evidence": "工具调用trace中get_policy_doc使用了doc_id: 03_authorization_management.md并返回了附件二的内容。",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "结论无异常正确，但审批线比较错误（应说明未达到10000元线），导致阈值推理项扣分。；候选正确识别发票不同和合计金额500元，但审批线比较错误，未使用预期10000元阈值。；该检查项通过，候选提交准确引用了03_authorization_management.md#附件二。",
+  "confidence": 0.9500000000000001
+}

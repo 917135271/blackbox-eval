@@ -1,0 +1,35 @@
+{
+  "task_id": "PI-GATE2-002",
+  "task_scope": "GATE2 governance chain verification - policy applicability check for expense audit governance",
+  "audit_period": {"start": "2024-01-01", "end": "2024-12-31"},
+  "policy_questions": [
+    "Which policy versions govern expense reimbursements during the audit period?",
+    "Are there any conflicting or overlapping policy clauses?"
+  ],
+  "data_questions": [],
+  "required_fields": ["policy_id", "policy_name", "effective_date", "expiry_date", "clauses"],
+  "evidence_requirements": ["policy_applicability.json"],
+  "execution_steps": [
+    "Create audit plan",
+    "Checkpoint planning_completed",
+    "Authorize policy_researcher subagent",
+    "Invoke policy-researcher subagent to determine policy applicability",
+    "Complete subagent and validate results"
+  ],
+  "complexity": 2,
+  "complexity_reasons": [
+    "MULTI_POLICY_VERSION_CHECK: need to determine which policy versions apply",
+    "Possible historical/repealed policy relationships"
+  ],
+  "subagent_plan": {
+    "policy_researcher": {
+      "reason_code": "MULTI_POLICY_VERSION_CHECK",
+      "role_task": "Determine which policy versions and clauses apply to expense audit governance for the 2024 calendar year. Examine available policy documents, extract effective dates, identify version relationships and conflicts. Write work/subagents/policy_researcher/policy_applicability.json with applicable_policies, excluded_policies, version_relationships, conflicts, and unresolved_items."
+    }
+  },
+  "stopping_conditions": [
+    "Policy applicability determined and documented",
+    "Subagent completed with valid summary"
+  ],
+  "unresolved_items": []
+}

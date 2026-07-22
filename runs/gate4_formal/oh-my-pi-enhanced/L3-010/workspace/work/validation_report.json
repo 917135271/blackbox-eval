@@ -3,28 +3,34 @@
   "errors": [],
   "warnings": [],
   "field_checks": {
-    "anomaly_ids_present": true,
-    "record_ids_present": true,
-    "answer_present": true,
-    "citations_present": true,
-    "no_extra_fields": true,
-    "record_ids_pattern_valid": true
+    "anomaly_ids": {"present": true, "type": "array", "empty": true, "valid": true},
+    "record_ids": {"present": true, "type": "array", "count": 1, "pattern_match": true, "valid": true},
+    "answer": {"present": true, "type": "string", "min_length_ok": true, "contains_no_anomaly": true, "valid": true},
+    "citations": {"present": true, "type": "array", "count": 8, "valid": true}
   },
   "id_checks": {
-    "record_ids_in_database": true,
-    "doc_ids_in_corpus": true,
-    "anomaly_ids_empty_consistent": true
+    "record_ids_in_db": {"R004233": true},
+    "doc_ids_in_corpus": {
+      "01_expense_reimbursement_2025.md": true,
+      "02_expense_reimbursement_2022_deprecated.md": true,
+      "03_authorization_management.md": true
+    },
+    "record_ids_unique": true,
+    "anomaly_ids_unique": true
   },
   "evidence_checks": {
-    "evidence_status_pass": true,
-    "coverage_100_percent": true,
+    "evidence_status": "pass",
+    "coverage_percent": 100,
     "submitted_matches_evidence": true,
-    "no_unowned_records": true
+    "no_orphan_records": true,
+    "no_unused_candidates": true
   },
   "answer_consistency_checks": {
-    "no_anomaly_matches_answer": true,
-    "answer_contains_wuyichang": true,
-    "record_ids_in_answer_scope": true
+    "anomaly_ids_match_answer": true,
+    "record_ids_match_answer": true,
+    "no_anomaly_explicit": true,
+    "thresholds_stated": true,
+    "observed_values_stated": true
   },
   "repair_count": 0,
   "repairable_fields": [],

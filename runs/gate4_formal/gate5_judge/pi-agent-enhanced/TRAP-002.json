@@ -1,0 +1,209 @@
+{
+  "group": "pi-agent-enhanced",
+  "task_id": "TRAP-002",
+  "case_family": "clean_trap",
+  "category": "clean_but_suspicious",
+  "graded_at": "2026-07-21T21:10:24+08:00",
+  "checklist_passed": 12,
+  "checklist_total": 14,
+  "checklist_pass_rate": 85.714,
+  "checklist": [
+    {
+      "id": "clean-conclusion",
+      "value": 1,
+      "reason": "明确输出无异常，无矛盾表述。",
+      "answer_evidence": "answer: '无异常。R004234与R004235不构成重复报销，也不构成拆分报销。'",
+      "trace_evidence": "候选提交anomaly_ids为空，answer明确无异常。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "record-scope-include-r004234",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-include-r004235",
+      "value": 1,
+      "reason": "期望record_id已提交",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "record-scope-no-extra",
+      "value": 1,
+      "reason": "没有范围外record_id",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "case-specific-reason-invoice",
+      "value": 1,
+      "reason": "准确说明两张发票不同。",
+      "answer_evidence": "answer: 'R004234使用发票FP2025X0004228，R004235使用发票FP2025X0004229，为不同发票'",
+      "trace_evidence": "工具list_invoices分别返回FP2025X0004228和FP2025X0004229，发票不同。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "准确计算7天内合计500元。",
+      "answer_evidence": "answer: '合计金额500元'",
+      "trace_evidence": "工具get_expense_detail显示R004234金额250，R004235金额250，日期均为2025-10-20，间隔0天，合计500。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 0,
+      "reason": "未将合计金额与10000元审批线比较，而是与3000元比较，不符合预期。",
+      "answer_evidence": "answer: '合计金额500元未达到《授权管理办法》附件二较高审批线（AR-02为≥3000元）'，未提及10000元。",
+      "trace_evidence": "候选推理中使用的较高审批线为3000，非预期10000。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-invoice",
+      "value": 1,
+      "reason": "工具轨迹独立核验了发票不同。",
+      "answer_evidence": "工具list_invoices分别查询两张发票，发票号不同。",
+      "trace_evidence": "list_invoices: INV004228 vs INV004229，usage_count均为1。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "工具轨迹独立核验了7天内合计500元。",
+      "answer_evidence": "工具获取两条记录金额250+250=500，日期相同，间隔0天。",
+      "trace_evidence": "get_expense_detail返回amount:250 for both，list_expenses确认日期。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 0,
+      "reason": "工具轨迹未证明500元未达到10000元审批线；证据中较高审批线设为3000，非10000。",
+      "answer_evidence": "candidate_evidence_matrix中reconciled_figures.higher_approval_line为3000，未提及10000。",
+      "trace_evidence": "工具get_policy_doc返回03_authorization_management.md包含AR-03 10000元，但候选未引用该线比较。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用了01_expense_reimbursement_2025.md第十条、第十一条。",
+      "answer_evidence": "citations: {doc_id: '01_expense_reimbursement_2025.md', clause_no: '第十条'} 和 第十一条。",
+      "trace_evidence": "工具search_policy和get_policy_doc返回01_expense_reimbursement_2025.md第十条、第十一条内容。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "准确引用了03_authorization_management.md附件二。",
+      "answer_evidence": "citations: {doc_id: '03_authorization_management.md', clause_no: '附件二'}",
+      "trace_evidence": "工具get_policy_doc返回03_authorization_management.md包含附件二。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-unsupported-output",
+      "value": 1,
+      "reason": "未提交异常ID",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    },
+    {
+      "id": "submission",
+      "value": 1,
+      "reason": "统一提交已接受且Schema有效",
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
+    }
+  ],
+  "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 216.704,
+    "expected_anomaly_ids": [],
+    "actual_anomaly_ids": [],
+    "anomaly_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count_exact": true,
+      "expected_types": {},
+      "actual_types": {}
+    },
+    "expected_record_ids": [
+      "R004234",
+      "R004235"
+    ],
+    "actual_record_ids": [
+      "R004234",
+      "R004235"
+    ],
+    "record_metrics": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact": true,
+      "missing_count": 0,
+      "extra_count": 0
+    },
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
+    "trap_false_positive": false,
+    "trap_tokens_in_conclusion": [],
+    "citation_count": 4,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十条、第十一条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
+  },
+  "judge": {
+    "status": "ok",
+    "confidence": 0.9,
+    "overall_comment": "大部分检查项通过，但case-specific-reason-threshold和reverse-check-threshold因未与10000元审批线比较而扣分。",
+    "model": "deepseek-v4-pro",
+    "usage": {
+      "prompt_tokens": 6265,
+      "completion_tokens": 3640,
+      "total_tokens": 9905,
+      "prompt_cache_hit_tokens": 6144,
+      "prompt_cache_miss_tokens": 121
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 6265,
+          "completion_tokens": 3640,
+          "total_tokens": 9905,
+          "prompt_tokens_details": {
+            "cached_tokens": 6144
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 2734
+          },
+          "prompt_cache_hit_tokens": 6144,
+          "prompt_cache_miss_tokens": 121
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 9
+      }
+    ]
+  },
+  "run_path": "runs/gate4_formal/pi-agent-enhanced/TRAP-002"
+}

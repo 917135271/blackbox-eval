@@ -1,0 +1,63 @@
+{
+  "decision": "pass",
+  "key_findings": [
+    "RULE 1 (重复报销, 第十条): CONFIRMED PASS. FP2025X0004233 and FP2025X0004234 are distinct invoices from 嘉禾餐饮服务有限公司, each used exactly once (usage_count=1). No duplicate reimbursement.",
+    "RULE 2 (拆分报销-7日+审批线, 第十一条): CONFIRMED PASS. E0008 杨丹 submitted two business_entertainment records 1 day apart (2025-10-25 and 2025-10-26). Combined amount 1085.00 does NOT reach the AR-02 higher approval line of 3000.00 required by the clause to trigger investigation. There is no '规避审批权限' because the combined amount would still fall under AR-01 (部门经理 only), the same tier as individual records. Even if treated as one event, no approval tier is circumvented.",
+    "RULE 3 (拆分报销-同一客户, 招待第四条): CONFIRMED PASS. R004239 reason='客户甲产品方案交流招待费', R004240 reason='客户乙投行业务沟通招待费'. Records explicitly name different clients and different business purposes. The clause prohibits splitting '同一客户拜访或同一会议安排' — different clients with different purposes do not trigger this. NOTE: same vendor (嘉禾餐饮), consecutive weekend dates (Saturday/Sunday), nearly identical amounts (540 vs 545), and identical participant counts (3 each) create a suspicious pattern, but the stated reasons are facially distinct.",
+    "RULE 4 (单次活动上限, 招待第二条): CONFIRMED PASS. R004239=540, R004240=545, both well below the 5000 single-event cap.",
+    "RULE 5 (人均上限, 招待第三条): CONFIRMED PASS. R004239: 540/3=180.00 per person; R004240: 545/3=181.67 per person. Both under the 300 per-person cap. Participant counts are self-reported (3 each); no independent verification possible from available data.",
+    "RULE 6 (SELF-APPROVAL): FLAGGED AS CONTROL WEAKNESS — NOT A POLICY VIOLATION. Both R004239 and R004240 were approved by E0008 (杨丹) herself in her role as 部门经理. The reimbursement policy Article 3 establishes separate roles: 经办人真实性承诺 + 部门负责人业务审核, implying segregation. However, no policy document explicitly prohibits self-approval, and Article 5 requires the system to auto-derive approvers per 附件二 — E0008 IS the sole 部门经理 of D008, so the system correctly derived her. D008 has E0012 (杨丽华, 分管副总, X1) who could serve as alternate approver, but no policy requires escalation when the department manager is the claimant. This is a control design gap, not a rule violation.",
+    "RULE 7 (预算上限, 08_budget_management.md): CONFIRMED PASS. D008 annual budget=381,600; cumulative=297,095.29 (77.8%); remaining=84,504.71. No budget constraint issue.",
+    "RULE 8 (时限, 第七条): CONFIRMED PASS. Reimbursements submitted Oct 29 and Oct 30, within 60 days of expense dates Oct 25 and Oct 26.",
+    "ADDITIONAL OBSERVATION — Weekend Pattern: Both expenses fall on a weekend (2025-10-25 Saturday, 2025-10-26 Sunday). While not prohibited by any policy, business entertainment for '产品方案交流' and '投行业务沟通' on consecutive weekend days at the same vendor with identical participant counts and near-identical amounts is an unusual pattern. The stated different clients and purposes make this facially compliant, but the factual accuracy of the self-reported reasons cannot be independently verified from available records."
+  ],
+  "record_ids": [
+    "R004239",
+    "R004240"
+  ],
+  "citations": [
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第十条"
+    },
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第十一条"
+    },
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第三条"
+    },
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第五条"
+    },
+    {
+      "doc_id": "01_expense_reimbursement_2025.md",
+      "clause_no": "第七条"
+    },
+    {
+      "doc_id": "06_business_entertainment.md",
+      "clause_no": "第二条"
+    },
+    {
+      "doc_id": "06_business_entertainment.md",
+      "clause_no": "第三条"
+    },
+    {
+      "doc_id": "06_business_entertainment.md",
+      "clause_no": "第四条"
+    },
+    {
+      "doc_id": "03_authorization_management.md",
+      "clause_no": "附件二"
+    }
+  ],
+  "unresolved_items": [
+    "SELF-APPROVAL CONTROL GAP: E0008 approved her own expenses as 部门经理. No policy prohibits this, but Article 3 of 01_expense_reimbursement_2025.md implies role separation. Recommend formal clarification of escalation path when the department manager is the claimant.",
+    "FACTUAL VERIFICATION: Client identities (客户甲, 客户乙) and participant counts (3 each) are self-reported. The suspicious pattern (same vendor, consecutive weekend days, near-identical amounts, identical participant counts) cannot be resolved with available records. If an investigation confirms that 客户甲 and 客户乙 are the same client or that the two events were a single activity, this would trigger 招待第四条 (same-client split)."
+  ],
+  "artifact_paths": [
+    "work/subagents/independent_reviewer/review_findings.json"
+  ]
+}

@@ -1,39 +1,94 @@
 {
-  "criteria": [
+  "checklist": [
     {
-      "id": "full-scan-method",
-      "score": 15,
-      "reason": "使用了find_reused_invoices工具对全年数据进行重复发票扫描，逐项核实了所有重复记录，扫描范围完整且可复核。",
-      "answer_evidence": "“全年重复报销专项扫描共发现6项异常”",
-      "trace_evidence": "调用find_reused_invoices（min_usage_count=2）获取全年所有重复发票，随后对每个涉及记录的record_id调用get_expense_detail确认详情。"
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "候选提交中 anomaly_id L3-001-DUP-001 明确将 R000002 和 R004201 归为同一组",
+      "answer_evidence": "L3-001-DUP-001：发票FP202500000002（办公用品423.79元）被R000002和R004201两次报销",
+      "trace_evidence": "find_reused_invoices 返回 invoice INV000002 的 record_ids: [\"R000002\", \"R004201\"]",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "候选提交中 anomaly_id L3-001-DUP-002 明确将 R000005 和 R004202 归为同一组",
+      "answer_evidence": "L3-001-DUP-002：发票FP202500000005（市内交通88.83元）被R000005和R004202两次报销",
+      "trace_evidence": "find_reused_invoices 返回 invoice INV000005 的 record_ids: [\"R000005\", \"R004202\"]",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "候选提交中 anomaly_id L3-001-DUP-003 明确将 R000020 和 R004203 归为同一组",
+      "answer_evidence": "L3-001-DUP-003：发票FP202500000020（差旅住宿669.50元）被R000020和R004203两次报销",
+      "trace_evidence": "find_reused_invoices 返回 invoice INV000020 的 record_ids: [\"R000020\", \"R004203\"]",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 1,
+      "reason": "候选提交中 anomaly_id L3-001-DUP-004 明确将 R000028 和 R004204 归为同一组",
+      "answer_evidence": "L3-001-DUP-004：发票FP202500000028（通讯费165.58元）被R000028和R004204两次报销",
+      "trace_evidence": "find_reused_invoices 返回 invoice INV000028 的 record_ids: [\"R000028\", \"R004204\"]",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 1,
+      "reason": "候选提交中 anomaly_id L3-001-DUP-005 明确将 R000037 和 R004205 归为同一组",
+      "answer_evidence": "L3-001-DUP-005：发票FP202500000037（市内交通84.72元）被R000037和R004205两次报销",
+      "trace_evidence": "find_reused_invoices 返回 invoice INV000037 的 record_ids: [\"R000037\", \"R004205\"]",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 1,
+      "reason": "候选提交中 anomaly_id L3-001-DUP-006 明确将 R000055 和 R004206 归为同一组",
+      "answer_evidence": "L3-001-DUP-006：发票FP202500000055（业务招待费999.76元）被R000055和R004206两次报销",
+      "trace_evidence": "find_reused_invoices 返回 invoice INV000055 的 record_ids: [\"R000055\", \"R004206\"]",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "find_reused_invoices 未限制日期，默认扫描全库全年记录",
+      "answer_evidence": "使用 expense_query.find_reused_invoices 接口...对全年发票数据进行全量扫描",
+      "trace_evidence": "find_reused_invoices 调用时 min_usage_count=2，无日期过滤参数，返回多张发票的重复记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-invoice-key",
+      "value": 1,
+      "reason": "查询以 invoice_id 作为重复判断键",
+      "answer_evidence": "检索所有被2个及以上报销记录使用的发票",
+      "trace_evidence": "find_reused_invoices 返回每个发票的 invoice_id 和 usage_count",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-grouping",
+      "value": 1,
+      "reason": "每张重复发票对应一个发现，共6组",
+      "answer_evidence": "全年共发现6组重复报销",
+      "trace_evidence": "find_reused_invoices 返回6张发票，每张对应2条记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 1,
+      "reason": "find_reused_invoices 返回6组，与最终6项发现一致",
+      "answer_evidence": "共发现6张被重复使用的发票...每张发票恰好被2条报销记录引用",
+      "trace_evidence": "find_reused_invoices(min_usage_count=2) 返回 invoices 数组长度为6",
+      "source": "llm_judge"
     },
     {
       "id": "policy-basis",
-      "score": 10,
-      "reason": "明确引用了《XX证券费用报销管理办法(2025修订版)》第十条“同一发票最多报销1次”，且查询条件（按重复发票扫描）与该条款对应。",
-      "answer_evidence": "“违反《XX证券费用报销管理办法(2025修订版)》第十条“同一发票最多报销1次”的规定”",
-      "trace_evidence": "search_policy查询“重复报销 重复提交 同一发票 多次报销”，获取并阅读01_expense_reimbursement_2025.md，确认第十条内容。"
-    },
-    {
-      "id": "false-positive-control",
-      "score": 15,
-      "reason": "提交的异常记录ID集合与预期完全一致，未混入其他规则异常、TRAP记录或无关业务记录，无误报。",
-      "answer_evidence": "提交的record_ids列表：R000002, R004201, R000005, R004202, R000020, R004203, R000028, R004204, R000037, R004205, R000055, R004206，与预期相符。",
-      "trace_evidence": "find_reused_invoices仅返回6对重复记录，每对均经详细核实，无额外异常；rule_diagnostics显示precision/recall均为1.0。"
+      "value": 1,
+      "reason": "引用了第十条，查询条件 min_usage_count=2 对应最多1次报销",
+      "answer_evidence": "第十条 同一发票最多报销1次。发现同一发票在不同报销单中重复出现的,应认定为重复报销风险",
+      "trace_evidence": "get_policy_excerpt 返回第十条内容；find_reused_invoices 设置 min_usage_count=2",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "提交的所有record_id均存在于数据库中，且工具调用均能返回对应详情。"
-    },
-    {
-      "id": "partial-scan-presented-as-complete",
-      "triggered": false,
-      "reason": "find_reused_invoices对全年数据执行了全量扫描，未做月份或样例限制。"
-    }
-  ],
-  "overall_comment": "候选答案完全覆盖了全年重复报销专项扫描的要求，方法完整、制度引用准确、无任何误报或遗漏，整体表现优秀。",
+  "overall_comment": "候选提交分组正确，扫描方法覆盖全年，以 invoice_id 为键，每组形成一项发现，数量一致，制度依据充分。所有检查项通过。",
   "confidence": 1.0
 }

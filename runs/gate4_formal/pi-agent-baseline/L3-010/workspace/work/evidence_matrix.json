@@ -1,0 +1,44 @@
+{
+  "status": "pass",
+  "coverage_percent": 100,
+  "evidence_rows": [
+    {
+      "anomaly_id": "VERSION_TRAP_APPROVAL_THRESHOLD",
+      "record_ids": ["R004233"],
+      "citations": [
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"},
+        {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第三条"},
+        {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第四条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "第二条"},
+        {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
+      ],
+      "facts": [
+        "旧版制度（2022版）第二条规定单笔≥8000元需部门总经理审批，第三条规定单笔≥30000元需分管副总审批",
+        "2022版第四条自认审批金额已被后续制度替代，2025修订版第十四条明确废止2022版",
+        "现行2025修订版第五条将审批权限统一委托至《授权管理办法》附件二执行",
+        "附件二现行审批线：AR-02档3000-9999元需部门经理+财务复核，AR-03档10000-49999元需部门总经理，AR-04档50000-199999元需分管副总",
+        "版本陷阱区间一（8000-9999元）：旧版要求部门总经理，现行AR-02仅需部门经理+财务复核，存在审批角色错位风险",
+        "版本陷阱区间二（30000-49999元）：旧版要求分管副总，现行AR-03仅需部门总经理，存在审批层级错位风险",
+        "记录R004233金额9990元落入第一陷阱区间，系统档位AR-02，若误用旧版标准将造成缺少部门总经理审批的误判"
+      ],
+      "fact_supported": true,
+      "rule_supported": true,
+      "coverage_status": "pass"
+    }
+  ],
+  "candidate_record_ids": ["R004233"],
+  "submitted_record_ids": ["R004233"],
+  "unowned_record_ids": [],
+  "unused_candidate_record_ids": [],
+  "unused_citations": [],
+  "missing_evidence": [],
+  "no_anomaly_coverage": {},
+  "reconciled_figures": {
+    "anomaly_count": 1,
+    "record_count": 1,
+    "citation_count": 7
+  },
+  "unresolved_items": []
+}

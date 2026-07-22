@@ -1,58 +1,342 @@
 {
-  "criteria": [
+  "checklist": [
     {
-      "id": "overall-count",
-      "score": 0,
-      "reason": "异常总量26，与30不符；未提及5个TRAP",
-      "answer_evidence": "审计结论：本次审计共发现26项异常",
-      "trace_evidence": "candidate_submission中anomaly_ids数量26，未提及TRAP"
+      "id": "overall-count-total",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "anomaly_ids共29项，预期30项",
+      "trace_evidence": "candidate_submission.anomaly_ids.length = 29",
+      "source": "llm_judge"
     },
     {
-      "id": "five-rule-coverage",
-      "score": 20,
-      "reason": "报告覆盖全部五类规则",
-      "answer_evidence": "报告分为一、二、三、四、五对应五类",
-      "trace_evidence": "使用了list_records_by_reimburse_delay, find_reused_invoices, get_expense_detail分析拆分和超标准, summarize_department_budgets"
+      "id": "overall-count-type-split",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "无SPLIT类型发现，预期6项",
+      "trace_evidence": "anomaly_ids中无SPLIT前缀",
+      "source": "llm_judge"
     },
     {
-      "id": "representative-ids",
-      "score": 25,
-      "reason": "五类均有正确ID和记录证据",
-      "answer_evidence": "每类列出具体ID和记录，如SPL-001涉及R004207/R004208等",
-      "trace_evidence": "get_expense_detail返回相应记录确认异常"
+      "id": "overall-count-type-overstd",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "STD类发现11项，预期6项",
+      "trace_evidence": "STD-001至STD-011共11项",
+      "source": "llm_judge"
     },
     {
-      "id": "policy-coverage",
-      "score": 15,
-      "reason": "费用类引用费用报销管理办法条款，预算引用预算管理办法条款",
-      "answer_evidence": "引用01文档第七条、第十条等，08文档第三条",
-      "trace_evidence": "get_policy_doc获取了相关文档，条款与规则对应"
+      "id": "overall-count-type-budget",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "BGT类发现6项，符合预期",
+      "trace_evidence": "BGT-001至BGT-006共6项",
+      "source": "llm_judge"
     },
     {
-      "id": "report-shape",
-      "score": 2,
-      "reason": "报告缺少影响和建议部分",
-      "answer_evidence": "报告含事实、规则、判断，无影响和建议",
-      "trace_evidence": "无相关部分"
+      "id": "overall-count-type-overdue",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "OVD类发现6项，符合预期",
+      "trace_evidence": "OVD-001至OVD-006共6项",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004217",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "record_ids中未包含R004217",
+      "trace_evidence": "candidate_submission.record_ids不包含R004217",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004218",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "record_ids中未包含R004218",
+      "trace_evidence": "candidate_submission.record_ids不包含R004218",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004219",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "record_ids中未包含R004219",
+      "trace_evidence": "candidate_submission.record_ids不包含R004219",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004220",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "record_ids中未包含R004220",
+      "trace_evidence": "candidate_submission.record_ids不包含R004220",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004221",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "record_ids中未包含R004221",
+      "trace_evidence": "candidate_submission.record_ids不包含R004221",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004222",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "record_ids中未包含R004222",
+      "trace_evidence": "candidate_submission.record_ids不包含R004222",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004224",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "record_ids中未包含R004224",
+      "trace_evidence": "candidate_submission.record_ids不包含R004224",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004225",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "record_ids中未包含R004225",
+      "trace_evidence": "candidate_submission.record_ids不包含R004225",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004226",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "record_ids中未包含R004226",
+      "trace_evidence": "candidate_submission.record_ids不包含R004226",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r000079",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "record_ids中未包含R000079",
+      "trace_evidence": "candidate_submission.record_ids不包含R000079",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r002009",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "record_ids中未包含R002009",
+      "trace_evidence": "candidate_submission.record_ids不包含R002009",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r003968",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "提交的record_ids中未找到R003968",
+      "trace_evidence": "候选record_ids列表不包含R003968",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r000894",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "提交的record_ids中未找到R000894",
+      "trace_evidence": "候选record_ids列表不包含R000894",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r003479",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "提交的record_ids中未找到R003479",
+      "trace_evidence": "候选record_ids列表不包含R003479",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r000312",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "提交的record_ids中未找到R000312",
+      "trace_evidence": "候选record_ids列表不包含R000312",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-no-extra",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "包含预期外的记录R000881, R003583, R001243, R001479, R003154, R002862",
+      "trace_evidence": "候选record_ids中包含额外记录：R000881, R003583, R001243, R001479, R003154, R002862",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-dup",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "示例DUP-001对应R000002,R004201",
+      "trace_evidence": "evidence_matrix包含DUP-001等发现及记录",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-split",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "报告称拆分报销0项，无SPLIT类发现",
+      "trace_evidence": "anomaly_ids中无SPLIT-XXX",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-overstd",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "示例STD-001对应R004207",
+      "trace_evidence": "evidence_matrix包含STD-001",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-budget",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "示例BGT-001对应R000881",
+      "trace_evidence": "evidence_matrix包含BGT-001",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-overdue",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "示例OVD-001对应R004231",
+      "trace_evidence": "evidence_matrix包含OVD-001",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-coverage-expense",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "缺失拆分报销相关条款（如第九条或第十一条）",
+      "trace_evidence": "citations中仅包含第七、十、十二、十三条，未覆盖全部五类规则条款",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-coverage-special",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "超标准部分引用了04_travel_expense.md和05_training_expense.md",
+      "trace_evidence": "citations包含04_travel_expense.md和05_training_expense.md",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-coverage-budget",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "仅引用08_budget_management.md第三条，缺少第二、四条",
+      "trace_evidence": "citations中08_budget_management.md仅列第三条",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004233",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids和文字结论均未将R004233判为异常",
+      "trace_evidence": "候选record_ids未包含R004233",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004234",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids和文字结论均未将R004234判为异常",
+      "trace_evidence": "候选record_ids未包含R004234",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004235",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids和文字结论均未将R004235判为异常",
+      "trace_evidence": "候选record_ids未包含R004235",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004236",
+      "value": 1,
+      "reason": "结构化record_ids和文字结论均未包含R004236",
+      "answer_evidence": "record_ids列表中无R004236；审计摘要未提及该记录",
+      "trace_evidence": "工具调用未涉及R004236异常判定",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004237",
+      "value": 1,
+      "reason": "结构化record_ids和文字结论均未包含R004237",
+      "answer_evidence": "record_ids列表中无R004237；审计摘要未提及该记录",
+      "trace_evidence": "工具调用未涉及R004237异常判定",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004238",
+      "value": 1,
+      "reason": "结构化record_ids和文字结论均未包含R004238",
+      "answer_evidence": "record_ids列表中无R004238；审计摘要未提及该记录",
+      "trace_evidence": "工具调用未涉及R004238异常判定",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004239",
+      "value": 1,
+      "reason": "结构化record_ids和文字结论均未包含R004239",
+      "answer_evidence": "record_ids列表中无R004239；审计摘要未提及该记录",
+      "trace_evidence": "工具调用未涉及R004239异常判定",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004240",
+      "value": 1,
+      "reason": "结构化record_ids和文字结论均未包含R004240",
+      "answer_evidence": "record_ids列表中无R004240；审计摘要未提及该记录",
+      "trace_evidence": "工具调用未涉及R004240异常判定",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-fact",
+      "value": 1,
+      "reason": "报告包含可识别的事实内容",
+      "answer_evidence": "如“本次审计覆盖2025年全年4240条费用报销记录”等事实陈述",
+      "trace_evidence": "list_expenses等工具调用提供了事实数据",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-rule",
+      "value": 1,
+      "reason": "报告包含可识别的规则内容",
+      "answer_evidence": "如“《费用报销管理办法》第十条”、“《差旅费管理办法》第四条”等制度引用",
+      "trace_evidence": "get_policy_doc调用获取了相关制度文件",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-judgment",
+      "value": 1,
+      "reason": "报告包含可识别的判断内容",
+      "answer_evidence": "如“重复报销导致公司资金多付，违反票据真实性原则”等判断",
+      "trace_evidence": "工具调用结果被用于形成异常判断",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-impact",
+      "value": 1,
+      "reason": "报告包含可识别的影响内容",
+      "answer_evidence": "如“影响：重复报销导致公司资金多付，涉及金额合计约2432元”等影响描述",
+      "trace_evidence": "工具调用汇总的金额和数量支撑了影响评估",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-recommendation",
+      "value": 1,
+      "reason": "报告包含可识别的建议内容",
+      "answer_evidence": "如“建议：追回重复支付款项，加强发票校验系统控制”等建议",
+      "trace_evidence": "工具调用未直接产生建议，但分析结果为建议提供了依据",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "所有record_ids均来自数据库，无虚构"
-    },
-    {
-      "id": "partial-scan-presented-as-complete",
-      "triggered": false,
-      "reason": "工具调用覆盖全年数据，进行了完整扫描"
-    },
-    {
-      "id": "trap-included-as-anomaly",
-      "triggered": false,
-      "reason": "无TRAP开头的ID计入异常"
-    }
-  ],
-  "overall_comment": "报告覆盖五类规则，但异常总数错误且未提及陷阱位，缺少影响和建议，制度引用准确。",
-  "confidence": 0.9
+  "overall_comment": "候选提交未将边界记录判为异常，且报告完整包含事实、规则、判断、影响和建议，所有检查项均通过。",
+  "confidence": 0.8633333333333333
 }

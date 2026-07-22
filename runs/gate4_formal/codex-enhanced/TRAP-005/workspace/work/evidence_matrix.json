@@ -2,29 +2,35 @@
   "status": "pass",
   "coverage_percent": 100,
   "evidence_rows": [],
-  "candidate_record_ids": ["R000005", "R004202"],
-  "submitted_record_ids": ["R000005", "R004202"],
+  "candidate_record_ids": ["R004239", "R004240"],
+  "submitted_record_ids": ["R004239", "R004240"],
   "unowned_record_ids": [],
   "unused_candidate_record_ids": [],
   "unused_citations": [],
   "missing_evidence": [],
   "no_anomaly_coverage": {
     "complete": true,
-    "searched_population": "发票 FP202500000005 的所有使用记录（通过 find_reused_invoices 和 find_invoice_usage 查询）",
-    "query_conditions": "min_usage_count=2, invoice_no=FP202500000005",
-    "checked_rules": ["01_expense_reimbursement_2025.md 第十条（同一发票最多报销1次）", "01_expense_reimbursement_2025.md 第十四条（2025版政策自2025-01-01生效）"],
+    "searched_population": "E0008(杨丹) 2025年10月全部报销记录 + 嘉禾餐饮全部发票使用记录 + 全库重复发票检查",
+    "query_conditions": "list_expenses(employee_id=E0008, date_from=2025-10-01, date_to=2025-10-31); get_expense_detail(R004239, R004240); list_invoices(invoice_no=FP2025X0004233, FP2025X0004234); list_invoices(vendor_name_contains=嘉禾); find_reused_invoices(min_usage_count=2)",
+    "checked_rules": [
+      "重复报销(01_expense_reimbursement_2025.md第十条): R004239发票FP2025X0004233与R004240发票FP2025X0004234不同,各发票使用次数均为1",
+      "拆分报销(01_expense_reimbursement_2025.md第十一条): 7天内2笔合计1085元,未达AR-02审批线3000元,不触发重点核查",
+      "拆分报销(06_business_entertainment.md第四条): 客户甲vs客户乙,不同客户拜访,不构成拆分",
+      "业务招待费超标准(06_business_entertainment.md第二条): 单次540/545元均未超5000元上限",
+      "业务招待费超标准(06_business_entertainment.md第三条): 人均180/181.67元均未超300元限额"
+    ],
     "population_count": 2,
-    "conclusion": "R004202为合成注入样本：发票日期2025-06-07晚于报销日期2025-03-18（物理不可行），reason字段明确标注'重复发票注入样本'。该记录属于测试数据而非真实报销。R000005为合法报销，expense_date与invoice_date一致（均为2025-06-07）。不存在真实重复报销违规。",
-    "records_examined": [
-      {"record_id": "R000005", "disposition": "合法报销", "reason": "expense_date=2025-06-07与invoice_date=2025-06-07一致，审批合规"},
-      {"record_id": "R004202", "disposition": "合成注入样本，非真实违规", "reason": "发票日期晚于报销日期3个月，reason标注'重复发票注入样本'"}
-    ]
+    "conclusion": "无异常 - R004239和R004240使用不同发票、涉及不同客户、人均和单次金额均在制度标准范围内,不构成重复报销、拆分报销或业务招待费超标准"
   },
   "reconciled_figures": {
-    "total_records_checked": 2,
-    "anomaly_count": 0,
-    "legitimate_count": 1,
-    "injection_sample_count": 1
+    "R004239_amount": 540.0,
+    "R004239_per_person": 180.0,
+    "R004240_amount": 545.0,
+    "R004240_per_person": 181.67,
+    "combined_total": 1085.0,
+    "per_person_limit": 300,
+    "per_event_limit": 5000,
+    "ar02_threshold": 3000
   },
   "unresolved_items": []
 }

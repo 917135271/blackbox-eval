@@ -3,29 +3,28 @@
   "errors": [],
   "warnings": [],
   "field_checks": {
-    "anomaly_ids": {"valid": true, "type": "array", "non_empty_strings": true, "unique": true},
-    "record_ids": {"valid": true, "type": "array", "pattern_match": true, "unique": true},
-    "answer": {"valid": true, "type": "string", "non_empty": true},
-    "citations": {"valid": true, "type": "array", "required_fields_present": true}
+    "anomaly_ids": {"valid": true, "type": "array", "non_empty": true, "unique": true, "items_non_empty_string": true},
+    "record_ids": {"valid": true, "type": "array", "pattern_match": true, "unique": true, "all_exist_in_db": true},
+    "answer": {"valid": true, "non_empty": true, "type": "string"},
+    "citations": {"valid": true, "type": "array", "items_complete": true, "doc_ids_valid": true},
+    "no_extra_fields": true
   },
   "id_checks": {
-    "record_ids_in_db": {"R000020": true, "R004203": true},
-    "anomaly_ids_consistent": true
+    "anomaly_ids_consistency": {"valid": true, "evidence_rows_match": true, "report_match": true},
+    "record_ids_consistency": {"valid": true, "match_submitted": true, "evidence_rows_match": true},
+    "unowned_record_ids": {"valid": true, "empty": true}
   },
   "evidence_checks": {
-    "evidence_status": "pass",
+    "matrix_status": "pass",
     "coverage_percent": 100,
-    "record_ids_match": true,
-    "anomaly_ids_match": true,
-    "citations_match": true,
-    "unowned_check": "no unowned records",
-    "unused_candidate_check": "no unused candidates"
+    "all_rows_pass": true
   },
   "answer_consistency_checks": {
-    "anomaly_ids_in_answer": true,
-    "invoice_referenced_in_answer": true,
-    "policy_clause_referenced_in_answer": true,
-    "no_unrelated_findings": true
+    "anomaly_id_mentioned": true,
+    "record_ids_mentioned": true,
+    "policy_clause_cited": true,
+    "positive_result_correct": true,
+    "only_violation_records": true
   },
   "repair_count": 0,
   "repairable_fields": [],

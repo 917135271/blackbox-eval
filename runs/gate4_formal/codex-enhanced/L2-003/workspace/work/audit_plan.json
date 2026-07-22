@@ -1,54 +1,57 @@
 {
-  "task_id": "L2-003",
   "task_scope": {
-    "audit_object": "重复报销异常",
-    "entry_point": "R000020",
+    "task_id": "L2-003",
+    "audit_object": "以R000020为线索的重复报销异常",
     "expense_types": ["travel_lodging"],
-    "period": "2025",
-    "organization": "D009 / E0028"
+    "business_period": "2025-01至2025-04",
+    "organization_scope": "D009-财务管理部，员工E0028-杜丹",
+    "deliverable": "发现ID、record_id集合、关键业务事实和制度依据"
   },
   "policy_questions": [
     {
-      "question": "同一发票是否允许多次报销？",
-      "policy_doc": "01_expense_reimbursement_2025.md",
-      "clause": "第十条"
+      "question": "同一发票是否可以多次报销？",
+      "applicable_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十条",
+      "boundary": "2025-01-01起施行，除另有规定"
     }
   ],
   "data_questions": [
     {
-      "question": "发票FP202500000020/INV000020是否被多个报销记录使用？",
-      "method": "find_invoice_usage",
-      "fields": ["record_id", "employee_id", "amount", "expense_date", "invoice_no"]
+      "question": "发票FP202500000020是否在多个报销记录中被使用？",
+      "tables": ["expense_record", "invoice"],
+      "fields": ["record_id", "invoice_no", "employee_id", "amount", "expense_date", "status"]
     }
   ],
-  "required_fields": ["record_id", "employee_id", "department_id", "expense_type", "amount", "invoice_no", "invoice_id", "expense_date", "reimburse_date", "status"],
-  "evidence_requirements": {
-    "policy": "01_expense_reimbursement_2025.md 第十条 - 同一发票最多报销1次",
-    "data_points": "R000020 and R004203 both use FP202500000020 with identical amount 669.5"
-  },
+  "evidence_requirements": [
+    "发票FP202500000020的使用记录",
+    "R000020和R004203的完整报销详情",
+    "制度第10条原文"
+  ],
   "execution_steps": [
-    {"step": "planning", "status": "completed"},
-    {"step": "policy_check", "status": "pending"},
-    {"step": "batch_data_analysis", "status": "completed"},
-    {"step": "evidence_coverage", "status": "pending"},
-    {"step": "false_positive_review", "status": "pending"},
-    {"step": "report", "status": "pending"},
-    {"step": "validation", "status": "pending"},
-    {"step": "submission", "status": "pending"}
+    {"step": "查询R000020详情并追踪发票FP202500000020的使用", "status": "completed"},
+    {"step": "检索制度中关于重复报销的规定", "status": "completed"},
+    {"step": "获取关联记录R004203详情", "status": "completed"},
+    {"step": "政策版本确认", "status": "pending"},
+    {"step": "证据覆盖检查", "status": "pending"},
+    {"step": "误报复核", "status": "pending"},
+    {"step": "审计报告", "status": "pending"},
+    {"step": "结果校验与提交", "status": "pending"}
   ],
   "complexity": {
     "score": 1,
     "reasons": [
-      "单一规则（重复报销）",
-      "已知线索记录R000020",
-      "仅需一次发票查重即可覆盖"
+      "单规则任务（重复报销）",
+      "单一制度依据（2025版费用报销管理办法第10条）",
+      "已知线索记录R000020，仅需追踪关联发票使用"
     ]
   },
-  "subagent_plan": null,
+  "subagent_plan": {
+    "use_subagent": false,
+    "reason": "复杂度0-1，主智能体可直接完成"
+  },
   "stopping_conditions": [
-    "所有关联发票使用记录已核查",
-    "制度规则已确认",
-    "证据覆盖率达到100%"
-  ],
-  "unresolved_items": []
+    "确认FP202500000020的所有使用记录",
+    "确认制度适用版本和条款",
+    "完成证据覆盖、误报复核、校验后提交"
+  ]
 }

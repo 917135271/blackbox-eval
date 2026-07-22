@@ -1,119 +1,152 @@
 {
+  "group": "codex-enhanced",
+  "task_id": "L3-006",
   "case_family": "policy_and_version",
-  "case_score": 100.0,
-  "case_score_raw": 100.0,
   "category": "version_trap",
-  "criteria": [
+  "graded_at": "2026-07-21T20:54:49+08:00",
+  "checklist_passed": 7,
+  "checklist_total": 8,
+  "checklist_pass_rate": 87.5,
+  "checklist": [
     {
-      "answer_evidence": "部门总经理审批线为单笔报销金额≥10000元(AR-03档位:大于等于10000元且小于50000元)",
       "id": "current-value",
-      "reason": "现行值准确为10000元",
-      "score": 30.0,
-      "source": "llm_judge",
-      "trace_evidence": "调用get_policy_doc获取03_authorization_management.md，返回附件二显示AR-03对应大于等于10000元且小于50000元，部门总经理审批"
+      "value": 1,
+      "reason": "明确指出现行部门总经理审批线为大于等于10,000元且小于50,000元，现行值准确。",
+      "answer_evidence": "现行部门总经理审批线为：单笔报销金额大于等于10,000元且小于50,000元，由部门总经理审批。",
+      "trace_evidence": "get_policy_excerpt 返回附件二 AR-03：大于等于10000元且小于50000元 | 部门总经理。",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "原2022版已被第十四条明示废止且自承不得作为现行审批依据",
-      "id": "deprecated-value",
-      "reason": "8000元已废止，金额和废止状态均正确",
-      "score": 25.0,
-      "source": "llm_judge",
-      "trace_evidence": "调用get_policy_doc获取02_expense_reimbursement_2022_deprecated.md，其中第二条明确旧审批线8000元，第四条声明不得作为现行审批依据"
+      "id": "deprecated-value-amount",
+      "value": 0,
+      "reason": "虽然引用了2022版文档，但在最终答案中未明确给出8000元这一金额。",
+      "answer_evidence": "答案中未出现“8000元”字样，仅说明2022版已废止和留档性质。",
+      "trace_evidence": "get_policy_doc 02 显示第二条：“旧版制度曾规定,单笔报销金额达到8000元的,应提交部门总经理审批。”",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "费用报销审批线应采用2025修订版(《XX证券费用报销管理办法(2025修订版)》,发文字号XX证财规〔2025〕甲号),原2022版已被第十四条明示废止",
+      "id": "deprecated-value-status",
+      "value": 1,
+      "reason": "明确说明2022版已失效、不再有效。",
+      "answer_evidence": "2022版已失效。...第四条声明其审批金额已被后续制度替代，不得作为现行审批依据。",
+      "trace_evidence": "02 第一条：“仅作为制度沿革留档”；第四条：“审批金额已被后续制度替代，不得作为现行审批依据。”",
+      "source": "llm_judge"
+    },
+    {
       "id": "applicable-version",
-      "reason": "明确采用2025修订版，并说明2022版废止",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "工具调用获取2025版和2022版，2025版第十四条废止旧版，候选据此推理"
+      "value": 1,
+      "reason": "正确选择2025修订版，并说明自2025年1月1日起施行、同时废止2022版，明确时间适用关系。",
+      "answer_evidence": "费用报销审批线应采用《XX证券费用报销管理办法(2025修订版)》。...第十四条明确自2025年1月1日起施行，同时废止原2022版。",
+      "trace_evidence": "01 第十四条：“自2025年1月1日起施行，同时废止原2022版。”",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "citations包含01_expense_reimbursement_2025.md和02_expense_reimbursement_2022_deprecated.md",
-      "id": "two-version-evidence",
-      "reason": "提供了新旧两份制度文档的可核查出处",
-      "score": 20.0,
-      "source": "llm_judge",
-      "trace_evidence": "工具调用list_policy_docs列出所有文档，然后get_policy_doc分别获取了01和02文档内容"
+      "id": "two-version-evidence-current",
+      "value": 1,
+      "reason": "引用了2025修订版第十四条作为施行和废止旧版的效力依据。",
+      "answer_evidence": "该办法第十四条明确自2025年1月1日起施行，同时废止原2022版。",
+      "trace_evidence": "get_policy_doc 01 返回第十四条内容。",
+      "source": "llm_judge"
     },
     {
-      "answer_evidence": "",
+      "id": "two-version-evidence-deprecated",
+      "value": 1,
+      "reason": "引用了2022版的第一条、第四条，明确其仅为留档且已被替代，表明废止状态。",
+      "answer_evidence": "2022版第一条声明其仅为制度沿革留档，第四条声明其审批金额已被后续制度替代，不得作为现行审批依据。",
+      "trace_evidence": "get_policy_doc 02 第一条和第四条。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-version-evidence-amount",
+      "value": 1,
+      "reason": "引用了授权管理办法附件二，并提及档位AR-03的10,000元审批档位。",
+      "answer_evidence": "该金额出自《XX证券授权管理办法》附件二费用报销审批权限表档位AR-03。",
+      "trace_evidence": "get_policy_excerpt 显示附件二 AR-03：“大于等于10000元且小于50000元 | 部门总经理”。",
+      "source": "llm_judge"
+    },
+    {
       "id": "submission",
+      "value": 1,
       "reason": "统一提交已接受且Schema有效",
-      "score": 5.0,
-      "source": "rule",
-      "trace_evidence": "规则程序计算"
-    }
-  ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "未提交任何记录ID，不存在虚构或无关记录",
-      "score_cap": 20,
-      "source": "llm_judge"
-    },
-    {
-      "id": "deprecated-policy-as-current",
-      "triggered": false,
-      "reason": "未将废止制度作为现行依据，明确指出了废止",
-      "score_cap": 40,
-      "source": "llm_judge"
+      "answer_evidence": "",
+      "trace_evidence": "规则程序计算",
+      "source": "rule"
     }
   ],
   "diagnostics": {
+    "submission_accepted": true,
+    "schema_valid": true,
+    "timed_out": false,
+    "elapsed_seconds": 392.137,
+    "expected_anomaly_ids": [],
     "actual_anomaly_ids": [],
-    "actual_record_ids": [],
     "anomaly_metrics": {
-      "actual_types": {},
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
       "count_exact": true,
       "expected_types": {},
-      "f1": 1.0,
-      "precision": 1.0,
-      "recall": 1.0
+      "actual_types": {}
     },
-    "citation_count": 5,
-    "elapsed_seconds": 206.49,
-    "expected_anomaly_ids": [],
     "expected_record_ids": null,
+    "actual_record_ids": [],
     "record_metrics": null,
-    "required_citations": [
-      "policy:approval_tiers.expense_reimbursement.tiers.AR-03.amount_min_inclusive",
-      "policy:deprecated_values.approval_tiers_2022.obsolete_department_general_manager_min_amount",
-      "document:01_expense_reimbursement_2025.md",
-      "document:02_expense_reimbursement_2022_deprecated.md"
-    ],
-    "schema_valid": true,
-    "submission_accepted": true,
-    "timed_out": false,
+    "excluded_record_ids": [],
+    "excluded_record_ids_in_submission": [],
+    "unknown_record_ids": [],
     "trap_false_positive": false,
     "trap_tokens_in_conclusion": [],
-    "unknown_record_ids": []
+    "citation_count": 7,
+    "required_citations": [
+      {
+        "doc_id": "01_expense_reimbursement_2025.md",
+        "clause_no": "第十四条"
+      },
+      {
+        "doc_id": "02_expense_reimbursement_2022_deprecated.md",
+        "clause_no": "第一条、第二条、第四条"
+      },
+      {
+        "doc_id": "03_authorization_management.md",
+        "clause_no": "附件二"
+      }
+    ]
   },
-  "graded_at": "2026-07-16T22:26:13+08:00",
-  "group": "codex-enhanced",
   "judge": {
-    "attempt": 1,
-    "confidence": 1.0,
-    "finish_reason": "stop",
-    "model": "deepseek-v4-pro",
-    "overall_comment": "候选准确判断了制度版本，正确识别部门总经理审批线为10000元，并提供了充分的制度证据，无错误。",
     "status": "ok",
+    "confidence": 0.95,
+    "overall_comment": "除未在答案中明确给出2022版具体金额8000元外，其余各项判断准确，引用了正确的制度文件和条款。",
+    "model": "deepseek-v4-pro",
     "usage": {
-      "completion_tokens": 2102,
-      "completion_tokens_details": {
-        "reasoning_tokens": 1503
-      },
-      "prompt_cache_hit_tokens": 1024,
-      "prompt_cache_miss_tokens": 2475,
-      "prompt_tokens": 3499,
-      "prompt_tokens_details": {
-        "cached_tokens": 1024
-      },
-      "total_tokens": 5601
-    }
+      "prompt_tokens": 5499,
+      "completion_tokens": 2434,
+      "total_tokens": 7933,
+      "prompt_cache_hit_tokens": 5376,
+      "prompt_cache_miss_tokens": 123
+    },
+    "batch_count": 1,
+    "batches": [
+      {
+        "model": "deepseek-v4-pro",
+        "usage": {
+          "prompt_tokens": 5499,
+          "completion_tokens": 2434,
+          "total_tokens": 7933,
+          "prompt_tokens_details": {
+            "cached_tokens": 5376
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1568
+          },
+          "prompt_cache_hit_tokens": 5376,
+          "prompt_cache_miss_tokens": 123
+        },
+        "finish_reason": "stop",
+        "attempt": 1,
+        "shape_attempt": 1,
+        "criteria_count": 7
+      }
+    ]
   },
-  "passed": true,
-  "run_path": "runs/gate4_formal/codex-enhanced/L3-006",
-  "task_id": "L3-006"
+  "run_path": "runs/gate4_formal/codex-enhanced/L3-006"
 }

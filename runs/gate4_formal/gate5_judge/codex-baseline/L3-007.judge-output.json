@@ -1,46 +1,70 @@
 {
-  "criteria": [
+  "checklist": [
     {
-      "id": "threshold",
-      "score": 35,
-      "reason": "金额和边界正确，给出部门总经理审批线10000元，区间为[10000,50000)。",
-      "answer_evidence": "答案明确列出“AR-03([10000,50000)部门总经理)”。",
-      "trace_evidence": "get_policy_doc('03_authorization_management.md') 返回附件二表格：AR-03 >=10000且<50000，必要审批角色部门总经理。"
+      "id": "threshold-amount",
+      "value": 0,
+      "reason": "答案未明确给出部门总经理审批线10000元。",
+      "answer_evidence": "候选答案仅提及AR-02档位（3000-10000），未表述部门总经理审批线。",
+      "trace_evidence": "无证据显示候选答案中给出金额10000元。",
+      "source": "llm_judge"
     },
     {
-      "id": "two-hop-path",
-      "score": 30,
-      "reason": "两跳路径完整可复核，从费用报销管理办法第五条交叉引用到授权管理办法附件二。",
-      "answer_evidence": "答案写道：“XX证券费用报销管理办法(2025修订版)第五条明确规定...统一按《XX证券授权管理办法》附件二执行。”",
-      "trace_evidence": "get_policy_doc('01_expense_reimbursement_2025.md') 返回第五条文字；get_policy_doc('03_authorization_management.md') 显示附件二。"
+      "id": "threshold-inclusive",
+      "value": 0,
+      "reason": "答案未说明达到10000元即进入部门总经理审批档位。",
+      "answer_evidence": "候选答案未提及10000元边界或部门总经理审批档位。",
+      "trace_evidence": "无相关表述。",
+      "source": "llm_judge"
     },
     {
-      "id": "citations",
-      "score": 20,
-      "reason": "两份证据均有效，引用了01_expense_reimbursement_2025.md和03_authorization_management.md。",
-      "answer_evidence": "citations中包含{\"doc_id\":\"01_expense_reimbursement_2025.md\",\"clause_no\":\"第五条\"}，{\"doc_id\":\"03_authorization_management.md\",\"clause_no\":\"第二条\"}，{\"doc_id\":\"03_authorization_management.md\",\"clause_no\":\"附件二\"}。",
-      "trace_evidence": "工具调用获取了01_expense_reimbursement_2025.md和03_authorization_management.md，并显示相关条款。"
+      "id": "two-hop-path-first",
+      "value": 1,
+      "reason": "明确引用费用报销办法第五条。",
+      "answer_evidence": "答案中写“经交叉引用《XX证券费用报销管理办法(2025修订版)》第五条”。",
+      "trace_evidence": "轨迹调用了get_policy_doc，doc_id为01_expense_reimbursement_2025.md，查看了第五条。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-relation",
+      "value": 1,
+      "reason": "说明了第五条指向授权管理办法附件二的交叉引用关系。",
+      "answer_evidence": "答案中提及“第五条与《XX证券授权管理办法》附件二”。",
+      "trace_evidence": "轨迹显示阅读第五条后立即调用了get_policy_doc获取03_authorization_management.md。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "two-hop-path-second",
+      "value": 1,
+      "reason": "完成了第二跳，定位到授权管理办法附件二。",
+      "answer_evidence": "答案引用“授权管理办法附件二”。",
+      "trace_evidence": "轨迹调用了get_policy_doc，doc_id为03_authorization_management.md，并查看了附件二。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-expense",
+      "value": 1,
+      "reason": "引用费用报销办法第五条。",
+      "answer_evidence": "submitted_json的citations中包含01_expense_reimbursement_2025.md第五条。",
+      "trace_evidence": "轨迹中get_policy_doc读取了该制度，且submitted_json引用了该条款。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "citations-authorization",
+      "value": 1,
+      "reason": "引用授权管理办法附件二。",
+      "answer_evidence": "submitted_json的citations中包含03_authorization_management.md附件二。",
+      "trace_evidence": "轨迹中get_policy_doc读取了该制度，且submitted_json引用了该附件。",
+      "source": "llm_judge"
     },
     {
       "id": "no-premature-stop",
-      "score": 10,
-      "reason": "轨迹证明继续检索，未因首份制度未列金额而停止。",
-      "answer_evidence": "答案中引用了两份文档并进行了交叉引用，表明未提前停止。",
-      "trace_evidence": "轨迹中先搜索政策，获取03_authorization_management.md和01_expense_reimbursement_2025.md，随后继续列出费用、获取详情，未提前结束。"
+      "value": 1,
+      "reason": "未因首份制度未列金额而停止检索，继续追踪了交叉引用。",
+      "answer_evidence": "轨迹显示读取01第五条后，随即调用了03_authorization_management.md。",
+      "trace_evidence": "调用序列：get_policy_doc(01) → get_policy_doc(03)，证明继续检索。",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "所有record_ids均存在于数据库，无捏造痕迹。"
-    },
-    {
-      "id": "deprecated-policy-as-current",
-      "triggered": false,
-      "reason": "未使用废止制度作为现行依据，全部引用现行有效版本。"
-    }
-  ],
-  "overall_comment": "候选正确识别并通过交叉引用给出了审批阈值，路径和证据完整，无关键错误。",
+  "overall_comment": "候选答案未按要求给出部门总经理审批线金额，但完整执行了交叉引用路径。",
   "confidence": 1.0
 }

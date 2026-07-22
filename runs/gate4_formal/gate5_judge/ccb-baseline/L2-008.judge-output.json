@@ -1,34 +1,54 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "audit-conclusion",
-      "score": 20,
-      "reason": "结论准确判定为拆分报销，异常类型正确，与预期一致。",
-      "answer_evidence": "异常编号ANO-SPLIT-001，明确认定为拆分报销规避审批权限。",
-      "trace_evidence": "工具调用获取R004212、R004213详情，确认同员工、同费用类型、短期拆分。"
+      "value": 1,
+      "reason": "answer中明确认定构成拆分报销，无矛盾表述",
+      "answer_evidence": "发现拆分报销异常1项...两笔间隔5天,在7天窗口内...应重点核查拆分规避",
+      "trace_evidence": "answer明确认定拆分报销",
+      "source": "llm_judge"
     },
     {
-      "id": "policy-basis",
-      "score": 15,
-      "reason": "引用了现行有效的《费用报销管理办法》第十一条（对应评分要求6.2），且直接支撑结论。",
-      "answer_evidence": "引用01_expense_reimbursement_2025.md第十一条和03_authorization_management.md附件二。",
-      "trace_evidence": "search_policy返回第十一条禁止拆分报销的条文，get_policy_doc完整获取制度文本。"
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "引用了拆分报销规则条款",
+      "answer_evidence": "制度依据为《XX证券费用报销管理办法(2025修订版)》第十一条",
+      "trace_evidence": "citations包含01_expense_reimbursement_2025.md第十一条",
+      "source": "llm_judge"
     },
     {
-      "id": "case-reasoning",
-      "score": 20,
-      "reason": "清晰展示了7天内（间隔5天）合计10200元超过10000元审批线的事实，逻辑完整无矛盾。",
-      "answer_evidence": "两笔金额5100元，合计10200元，达到AR-03审批线，规避部门总经理审批。",
-      "trace_evidence": "get_expense_detail显示金额和日期，find_invoice_usage确认发票不同，list_expenses确认同一员工仅这两笔住宿费。"
-    }
-  ],
-  "critical_failures": [
+      "id": "policy-basis-authorization",
+      "value": 1,
+      "reason": "引用了10000元审批线出处",
+      "answer_evidence": "制度依据为《XX证券授权管理办法》附件二",
+      "trace_evidence": "citations包含03_authorization_management.md附件二",
+      "source": "llm_judge"
+    },
     {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "提交的R004212和R004213均为有效记录，无虚构。"
+      "id": "case-reasoning-window",
+      "value": 1,
+      "reason": "正确计算为5天，位于7天窗口内",
+      "answer_evidence": "两笔间隔5天,在7天窗口内",
+      "trace_evidence": "两笔报销日期为2025-04-10和2025-04-15，间隔5天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-sum",
+      "value": 1,
+      "reason": "合计金额计算为10200元",
+      "answer_evidence": "两笔合计10200元",
+      "trace_evidence": "两笔各5100元，合计10200元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-threshold",
+      "value": 1,
+      "reason": "将合计金额与10000元审批线正确比较",
+      "answer_evidence": "超过AR-03审批线(10000元)",
+      "trace_evidence": "合计10200元，超过AR-03的10000元线",
+      "source": "llm_judge"
     }
   ],
-  "overall_comment": "候选提交准确识别了拆分报销异常，制度引用和事实推理均正确，无关键错误。",
+  "overall_comment": "所有检查项均满足要求，拆分报销异常判断正确，制度依据完整，推理清晰。",
   "confidence": 1.0
 }

@@ -1,0 +1,54 @@
+{
+  "checklist": [
+    {
+      "id": "audit-conclusion",
+      "value": 1,
+      "reason": "answer明确认定构成拆分报销",
+      "answer_evidence": "发现拆分报销异常：...将同一项目现场住宿费拆分为两笔报销...构成规避审批权限的拆分报销",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-expense",
+      "value": 1,
+      "reason": "引用01_expense_reimbursement_2025.md第十一条",
+      "answer_evidence": "制度依据：《XX证券费用报销管理办法(2025修订版)》第十一条",
+      "trace_evidence": "tool_trace中search_policy和get_policy_doc获取并确认了第十一条内容",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-authorization",
+      "value": 1,
+      "reason": "引用03_authorization_management.md附件二",
+      "answer_evidence": "制度依据：...《XX证券授权管理办法》附件二",
+      "trace_evidence": "tool_trace中get_policy_doc(03_authorization_management.md)获取了附件二审批权限表",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-window",
+      "value": 1,
+      "reason": "正确计算为5天，在7天窗口内",
+      "answer_evidence": "日期窗口5天（在7天内）",
+      "trace_evidence": "get_expense_detail获取R004212日期2025-04-10，R004213日期2025-04-15，间隔5天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-sum",
+      "value": 1,
+      "reason": "合计金额计算为10200元",
+      "answer_evidence": "合计金额¥10,200",
+      "trace_evidence": "get_expense_detail获取两笔金额均为5100，合计10200",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-threshold",
+      "value": 1,
+      "reason": "合计金额10200元与10000元审批线正确比较",
+      "answer_evidence": "达到AR-03审批线（≥¥10,000需部门总经理审批）",
+      "trace_evidence": "get_policy_doc(03_authorization_management.md)附件二显示AR-03为≥10000元",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "候选提交完整识别了拆分报销异常，正确引用了制度条款，准确计算了日期窗口和合计金额，并与审批线进行了比较，所有检查项均满足。",
+  "confidence": 1.0
+}

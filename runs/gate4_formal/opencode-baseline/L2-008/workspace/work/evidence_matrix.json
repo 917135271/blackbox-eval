@@ -3,31 +3,39 @@
   "coverage_percent": 100,
   "evidence_rows": [
     {
-      "anomaly_id": "L2-008-SPLIT-001",
+      "anomaly_id": "ANO-L2-008-001",
       "record_ids": ["R004212", "R004213"],
       "citations": [
         {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
         {"doc_id": "03_authorization_management.md", "clause_no": "附件二"}
       ],
       "facts": [
-        "R004212和R004213均为员工E0009(张婷)的差旅住宿费用报销,金额各5100元",
-        "两笔报销发生时间分别为2025-04-10和2025-04-15,间隔5天,在7天内",
-        "两笔报销合计金额10200元,达到《授权管理办法》附件二AR-03档位(≥10000元)审批线",
-        "两笔报销实际审批档位均为AR-02(部门经理+财务复核),未达到AR-03(部门总经理)审批要求",
-        "两笔报销事由均为'拆分报销注入样本3',明确表明拆分意图"
+        "员工E0009(张婷)在2025-04-10提交报销记录R004212，旅行住宿费¥5,100，7晚，发票FP2025X0004206，供应商安程酒店管理有限公司",
+        "员工E0009(张婷)在2025-04-15提交报销记录R004213，旅行住宿费¥5,100，7晚，发票FP2025X0004207，供应商安程酒店管理有限公司",
+        "两笔记录日期间隔5天（2025-04-10至2025-04-15），落在7天窗口内",
+        "两笔记录为同一员工(E0009)、同一费用类型(travel_lodging)、同一理由(项目现场住宿费)、同一供应商(安程酒店管理有限公司)、相同金额(¥5,100)",
+        "两笔合计金额¥10,200，达到《授权管理办法》附件二AR-03档位(≥¥10,000需部门总经理审批)",
+        "每笔单独¥5,100仅触发AR-02档位(<¥10,000需部门经理审批)",
+        "两笔记录均由E0009本人自批自审(approver_employee_id=E0009),仅通过AR-02审批层级,未经过部门总经理审批"
       ],
       "fact_supported": true,
       "rule_supported": true,
       "coverage_status": "pass"
     }
   ],
-  "candidate_record_ids": [],
+  "candidate_record_ids": ["R004212", "R004213"],
   "submitted_record_ids": ["R004212", "R004213"],
   "unowned_record_ids": [],
   "unused_candidate_record_ids": [],
   "unused_citations": [],
   "missing_evidence": [],
-  "no_anomaly_coverage": {},
-  "reconciled_figures": {},
+  "no_anomaly_coverage": {
+    "complete": false
+  },
+  "reconciled_figures": {
+    "total_combined_amount": 10200,
+    "record_count": 2,
+    "date_window_days": 5
+  },
   "unresolved_items": []
 }

@@ -1,0 +1,38 @@
+{
+  "created_at": 1784651734.3604403,
+  "experiment_group": "codex-scripted-enhanced",
+  "framework": "codex",
+  "model_responsibilities": [
+    "retrieve policy and business evidence",
+    "interpret policy applicability and exceptions",
+    "decide audit findings",
+    "produce the four-field final result",
+    "map each finding to its actual records, policy clauses, and verified facts",
+    "record the searched population and query conditions for no-anomaly conclusions"
+  ],
+  "question": "请基于全年数据形成费用异常审计摘要，覆盖重复报销、拆分报销、超标准、超预算和超期报销五类规则。发现口径为：重复报销按重复发票组计1项；拆分报销按同一员工、同一费用类型7天窗口聚合组计1项；超标准只计单笔或单次即可确认的异常，办公用品和通讯费用不评价多笔月度累计；超预算按部门计1项，以按reimburse_date和record_id累计时首次使累计支出超过预算且无专项审批的记录作为关键记录；超期报销按记录计1项。请按规则类型生成稳定的发现ID，说明各类发现数量，在record_ids中返回全部异常发现涉及的记录，并在审计说明中至少逐类给出一个发现与record_id的对应示例，同时说明制度依据、影响和建议；不得把仅接近阈值但实际合规的记录计入异常。",
+  "route": {
+    "category": "audit_report",
+    "reason": "A comprehensive report needs planning, complete analysis, review, and synthesis.",
+    "route": "comprehensive_audit_report",
+    "skills": [
+      "audit-query-planner",
+      "policy-version-check",
+      "batch-expense-analysis",
+      "false-positive-review",
+      "audit-report"
+    ],
+    "subagent_is_mandatory": false,
+    "subagent_role": "data_analyst",
+    "workflow_version": "scripted-enhancement-v1.2"
+  },
+  "script_responsibilities": [
+    "workflow routing",
+    "initial and final task-state snapshots",
+    "stage checkpoints",
+    "evidence input normalization and consistency checks",
+    "schema and identifier validation",
+    "submission preparation"
+  ],
+  "task_id": "L3-009"
+}

@@ -1,55 +1,77 @@
 {
   "task_id": "L3-006",
   "task_type": "version_trap",
+  "question": "请判断费用报销审批线应采用2022版还是2025修订版，指出部门总经理审批线，并提供新旧版本效力状态及现行金额出处。",
   "scope": {
-    "question": "请判断费用报销审批线应采用2022版还是2025修订版,并指出部门总经理审批线",
-    "audit_object": "费用报销审批线版本认定",
-    "policy_docs_in_scope": [
-      "01_expense_reimbursement_2025.md",
-      "02_expense_reimbursement_2022_deprecated.md",
-      "03_authorization_management.md"
-    ],
-    "business_period": "当前（2025年1月1日起）",
-    "organization_scope": "XX证券全司"
+    "audit_object": "费用报销审批线版本适用性判定",
+    "expense_types": "全部",
+    "organization_scope": "XX证券",
+    "business_period": "全时段",
+    "deliverable": "版本适用结论、部门总经理审批线金额、新旧版本效力状态、现行金额出处"
   },
   "policy_questions": [
-    "2022版和2025修订版的生效日期与废止关系",
-    "2025修订版是否明确废止2022版",
-    "费用报销审批权限表（附件二）中部门总经理的审批线"
+    {
+      "id": "PQ1",
+      "question": "2025修订版与2022版各自的施行日期与废止关系是什么？",
+      "doc_ids": ["01_expense_reimbursement_2025.md", "02_expense_reimbursement_2022_deprecated.md"]
+    },
+    {
+      "id": "PQ2",
+      "question": "2025修订版中审批权限的具体金额在何处规定？",
+      "doc_ids": ["01_expense_reimbursement_2025.md", "03_authorization_management.md"]
+    },
+    {
+      "id": "PQ3",
+      "question": "部门总经理审批线的现行有效金额是多少？依据哪个制度的哪一条款？",
+      "doc_ids": ["03_authorization_management.md"]
+    },
+    {
+      "id": "PQ4",
+      "question": "2022版审批金额的效力状态如何？",
+      "doc_ids": ["02_expense_reimbursement_2022_deprecated.md"]
+    }
   ],
   "data_questions": [],
-  "required_fields": [
-    "policy effective_date",
-    "policy repeal_clause",
-    "approval threshold for department GM"
-  ],
-  "evidence_requirements": [
-    "2025版生效日期条",
-    "2022版废止声明",
-    "授权管理办法附件二审批权限表"
-  ],
+  "required_fields": ["doc_id", "clause_no", "amount_threshold", "effective_date", "status"],
+  "evidence_requirements": {
+    "policy_evidence": [
+      "2025修订版条文五（审批权限引用授权管理办法附件二）",
+      "2025修订版条文十四（施行日期与废止声明）",
+      "授权管理办法附件二 AR-03 行（部门总经理审批线）",
+      "授权管理办法条文二（附件二为现行有效审批线）",
+      "2022版条文二（旧版8000元审批线）",
+      "2022版条文四（审批金额已被替代声明）"
+    ]
+  },
   "execution_steps": [
-    {"step": 1, "action": "查询两份制度文档的生效日期与废止关系", "status": "pending"},
-    {"step": 2, "action": "查询授权管理办法附件二的审批线", "status": "pending"},
-    {"step": 3, "action": "形成初步结论", "status": "pending"},
-    {"step": 4, "action": "证据覆盖检查", "status": "pending"},
-    {"step": 5, "action": "校验与提交", "status": "pending"}
+    {"step": 1, "name": "查询全部相关制度原文", "action": "policy_query_get_policy_doc", "targets": ["01_expense_reimbursement_2025.md", "02_expense_reimbursement_2022_deprecated.md", "03_authorization_management.md"], "expected": "获得三个制度全文"},
+    {"step": 2, "name": "授权并启动policy_researcher子智能体", "action": "authorize_audit_subagent + complete", "expected": "子智能体对比版本、确定审批线与出处"},
+    {"step": 3, "name": "证据覆盖检查", "action": "evidence-coverage-check", "expected": "coverage 100%"},
+    {"step": 4, "name": "生成审计报告", "action": "audit-report", "expected": "含版本结论与金额出处的报告"},
+    {"step": 5, "name": "结果校验", "action": "result-validator", "expected": "格式与证据一致性通过"},
+    {"step": 6, "name": "预检与提交", "action": "validate_audit_result + submit_audit_result", "expected": "valid=true 后提交"}
   ],
   "complexity": {
-    "score": 2,
+    "score": 3,
     "reasons": [
-      "存在制度版本、生效日期与废止关系(+1)",
-      "存在审批阈值门槛(+1)"
+      "存在政策版本选择与废止关系（2022 vs 2025）",
+      "涉及两份以上制度（费用报销2022、费用报销2025、授权管理办法）",
+      "涉及审批金额阈值边界"
     ]
   },
   "subagent_plan": {
-    "subagent_required": false,
-    "reason": "仅需查询制度文档，无需批量数据分析或跨表关联。复杂级2但任务可直接完成，不启动子智能体。"
+    "role": "policy_researcher",
+    "reason_code": "MULTI_POLICY_VERSION_CHECK",
+    "task_description": "对比2022版与2025修订版费用报销管理办法的审批线，确认现行有效版本及部门总经理审批线金额，查明金额出处",
+    "context": {
+      "policies": ["01_expense_reimbursement_2025.md", "02_expense_reimbursement_2022_deprecated.md", "03_authorization_management.md"]
+    }
   },
-  "stopping_conditions": [
-    "确认2025版生效并废止2022版",
-    "确认部门总经理审批线金额区间",
-    "所有证据覆盖检查通过"
-  ],
+  "stopping_conditions": {
+    "version_determined": "明确回答适用2022版还是2025修订版",
+    "threshold_identified": "给出部门总经理审批线的具体金额与出处",
+    "status_stated": "明确新旧版本各自的效力状态",
+    "no_data_needed": "本题不涉及费用记录数据查询"
+  },
   "unresolved_items": []
 }

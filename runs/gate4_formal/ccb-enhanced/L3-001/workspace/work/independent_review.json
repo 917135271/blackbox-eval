@@ -1,0 +1,64 @@
+{
+  "decision": "pass",
+  "reviewed_findings": [
+    {
+      "anomaly_id": "DUP-001",
+      "challenged": true,
+      "plausible_explanation": "Correction or reversal of original claim",
+      "verdict": "reject_explanation",
+      "reason": "Both R000002 and R004201 are approved with no indication of reversal. Record R004201 has expense_date 2025-02-10 but invoice_date 2025-08-19 (invoice dated after expense), inconsistent with a legitimate claim. No special approval (special_approval=0). Both records share same employee, same invoice, same reason."
+    },
+    {
+      "anomaly_id": "DUP-002",
+      "challenged": true,
+      "plausible_explanation": "Amendment or supplementary claim",
+      "verdict": "reject_explanation",
+      "reason": "R004202 has reimburse_date 2025-03-18 but invoice_date 2025-06-07 (reimbursed before invoice exists), physically impossible. No special approval. Both records share same employee, same invoice, same reason."
+    },
+    {
+      "anomaly_id": "DUP-003",
+      "challenged": true,
+      "plausible_explanation": "Multi-trip hotel billing",
+      "verdict": "reject_explanation",
+      "reason": "Same invoice FP202500000020 used for two different trips (expense_date 2025-01-05 vs 2025-04-10). Policy Article 10 prohibits using same invoice more than once regardless of trip count. No special approval."
+    },
+    {
+      "anomaly_id": "DUP-004",
+      "challenged": true,
+      "plausible_explanation": "Recurring communication expense",
+      "verdict": "reject_explanation",
+      "reason": "Same invoice FP202500000028 with same amount 165.58 used for two different periods (2025-03-09 vs 2025-05-10). Each claim should have its own distinct invoice. No special approval."
+    },
+    {
+      "anomaly_id": "DUP-005",
+      "challenged": true,
+      "plausible_explanation": "Separate trips under same transport receipt",
+      "verdict": "reject_explanation",
+      "reason": "Same invoice FP202500000037 used for two different dates (2025-03-30 vs 2025-06-10). Article 10 is absolute: one invoice, one reimbursement. No special approval."
+    },
+    {
+      "anomaly_id": "DUP-006",
+      "challenged": true,
+      "plausible_explanation": "Multi-event entertainment billing",
+      "verdict": "reject_explanation",
+      "reason": "Same invoice FP202500000055 for 999.76 used at two different events (2025-04-03 vs 2025-07-10). Article 10 prohibits duplicate use. No special approval."
+    }
+  ],
+  "exceptions_or_boundaries_checked": [
+    "special_approval field: all 0 (no special approval)",
+    "status field: all 'approved' (not reversed or cancelled)",
+    "Policy exemptions: none found in Article 10 or elsewhere in 2025 policy",
+    "Correction/reversal: no record has status indicating reversal or correction",
+    "Record number format: BX2025X prefix does not correlate to any policy exemption",
+    "Date boundaries: all records within 2025 policy effective period"
+  ],
+  "required_changes": [],
+  "supporting_evidence": [
+    "All 6 invoices appear in find_reused_invoices output with usage_count=2",
+    "All 12 records retrieved via get_expense_detail confirm matching invoice_no, employee, and reason",
+    "Article 10 text: 同一发票最多报销1次"
+  ],
+  "opposing_evidence": [],
+  "rationale": "All 6 duplicate invoice groups are confirmed violations of Article 10. No legitimate explanation found for any group. No special approval, no reversal, no policy exemption applies. The BX2025X record number prefix does not denote any policy-recognized exception.",
+  "unresolved_conflicts": []
+}

@@ -1,123 +1,50 @@
 {
   "decision": "pass",
   "key_findings": [
-    "R01发票重复报销: 发现6张发票被重复使用,涉及12条记录,包括办公用品(FP202500000002,423.79元)、市内交通(FP202500000005,88.83元/FP202500000037,84.72元)、差旅住宿(FP202500000020,669.50元)、通讯费(FP202500000028,165.58元)、业务招待(FP202500000055,999.76元)",
-    "R02拆分报销: 发现6组注入拆分样本(14条记录),均为差旅住宿费同日或相近日期拆分,单笔AR-02级别但合计达AR-03级别(10200-10500元)。另发现5个高风险非注入拆分群组,涉及培训费在7天内多笔合计超6000元",
-    "R03超标准报销: 发现6条超标记录,涵盖办公用品(650>600)、通讯费(330>300)、培训费(3700>3500)、招待费人均(350>300)、差旅住宿(900>850)、市内交通(92>80)",
-    "R04预算超支: 6个部门全年预算使用率超过150%,投资银行部(157.82%)、固定收益部(153.02%)、财富管理部(158.65%)、研究所(154.34%)、机构业务部(155.61%)、运营管理部(155.51%)",
-    "R05超期报销: 发现6条超期报销记录,延迟65-120天,涉及信息技术部(李丽娟)、合规风控部(杨丹)、财务管理部(张婷)、人力资源部(闭想)"
+    "Total population: 4,240 approved expense records (2025), 80 employees, 10 departments, 4,234 unique invoices. All records have status='approved', special_approval=0, budget_year=2025.",
+    "Rule 1 (重复报销): 6 duplicate invoice groups identified. Each of 6 invoices (FP202500000002, 005, 020, 028, 037, 055) was used in 2 reimbursement records. 12 records involved total. Original records (R000002-R000055) and duplicate records (R004201-R004206).",
+    "Rule 2 (拆分报销): 78 split reimbursement groups found using greedy non-overlapping sliding window algorithm (7-day window, consecutive records with date_diff <= 6 days, combined >= 3000). 70 groups are training_fee, 8 groups are travel_lodging. 168 unique records involved.",
+    "Rule 3 (超标准): 5 records exceed policy standards: R004221 (office_supplies 650 > 600), R004222 (communication 330 > 300), R004223 (training_fee 3700 > 3500), R004224 (business_entertainment 350/person > 300), R004225 (travel_lodging 900/night > 850 for D1 tier A).",
+    "Rule 4 (超预算): 6 departments exceed annual budget: D001 投资银行部, D002 固定收益部, D003 财富管理部, D004 研究所, D005 机构业务部, D006 运营管理部. 4 departments (D007-D010) remain within budget.",
+    "Rule 5 (超期报销): 6 records with reimbursement delay > 60 days, ranging from 65 to 120 days. All are communication expense type from extra test records (R004227-R004232).",
+    "Total: 101 anomalies (6 + 78 + 5 + 6 + 6) involving 197 unique records across all rules. No overlap between rule populations."
   ],
   "record_ids": [
-    "R000002",
-    "R000005",
-    "R000020",
-    "R000028",
-    "R000037",
-    "R000055",
-    "R000105",
-    "R000241",
-    "R000306",
-    "R000578",
-    "R000629",
-    "R000712",
-    "R001240",
-    "R001875",
-    "R001937",
-    "R001994",
-    "R002175",
-    "R002239",
-    "R003498",
-    "R004201",
-    "R004202",
-    "R004203",
-    "R004204",
-    "R004205",
-    "R004206",
-    "R004207",
-    "R004208",
-    "R004209",
-    "R004210",
-    "R004211",
-    "R004212",
-    "R004213",
-    "R004214",
-    "R004215",
-    "R004216",
-    "R004217",
-    "R004218",
-    "R004219",
-    "R004220",
-    "R004221",
-    "R004222",
-    "R004223",
-    "R004224",
-    "R004225",
-    "R004226",
-    "R004227",
-    "R004228",
-    "R004229",
-    "R004230",
-    "R004231",
-    "R004232"
+    "R000002","R000005","R000020","R000028","R000037","R000055",
+    "R004201","R004202","R004203","R004204","R004205","R004206",
+    "R004221","R004222","R004223","R004224","R004225",
+    "R000079","R002009","R003968","R000894","R003479","R000312",
+    "R004227","R004228","R004229","R004230","R004231","R004232"
   ],
   "citations": [
-    {
-      "doc_id": "01_expense_reimbursement_2025.md",
-      "clause_no": "第七条"
-    },
-    {
-      "doc_id": "01_expense_reimbursement_2025.md",
-      "clause_no": "第十条"
-    },
-    {
-      "doc_id": "01_expense_reimbursement_2025.md",
-      "clause_no": "第十一条"
-    },
-    {
-      "doc_id": "01_expense_reimbursement_2025.md",
-      "clause_no": "第十二条"
-    },
-    {
-      "doc_id": "01_expense_reimbursement_2025.md",
-      "clause_no": "第十三条"
-    },
-    {
-      "doc_id": "03_authorization_management.md",
-      "clause_no": "附件二"
-    },
-    {
-      "doc_id": "04_travel_expense.md",
-      "clause_no": "第四条"
-    },
-    {
-      "doc_id": "05_training_expense.md",
-      "clause_no": "第二条"
-    },
-    {
-      "doc_id": "06_business_entertainment.md",
-      "clause_no": "第二条"
-    },
-    {
-      "doc_id": "06_business_entertainment.md",
-      "clause_no": "第三条"
-    },
-    {
-      "doc_id": "07_office_communication.md",
-      "clause_no": "第二条"
-    },
-    {
-      "doc_id": "07_office_communication.md",
-      "clause_no": "第三条"
-    },
-    {
-      "doc_id": "08_budget_management.md",
-      "clause_no": "第三条"
-    }
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十一条"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第七条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "AR-02"},
+    {"doc_id": "04_travel_expense.md", "clause_no": "第四条"},
+    {"doc_id": "05_training_expense.md", "clause_no": "第二条"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第二条"},
+    {"doc_id": "06_business_entertainment.md", "clause_no": "第三条"},
+    {"doc_id": "07_office_communication.md", "clause_no": "第二条"},
+    {"doc_id": "08_budget_management.md", "clause_no": "第三条"}
   ],
-  "unresolved_items": [],
+  "unresolved_items": [
+    "Rule 2 split reimbursement window algorithm: used greedy non-overlapping sliding window approach (78 findings). Alternative overlapping-window approach yields 96 findings. The non-overlapping interpretation is more conservative but may miss some edge cases where overlapping windows are valid per policy.",
+    "Training fee records have no nights/days/participants populated for main records (R000001-R004200), so per-night accommodation and comprehensive training sub-rules could not be applied to those records. Only test record R004223 triggered the training fee standard check.",
+    "The 40 extra records (R004201-R004240) appear to be synthetic test cases deliberately designed to trigger rule violations. They are included in the analysis per the 'in-scope population' directive."
+  ],
   "artifact_paths": [
-    "work/subagents/data_analyst/findings.json",
-    "work/subagents/data_analyst/summary.json",
-    "work/subagents/data_analyst/all_records.json"
+    "work/analysis/data_findings.json",
+    "work/analysis/rule1_duplicate.sql",
+    "work/analysis/rule2_input.csv",
+    "work/analysis/rule2_findings.json",
+    "work/analysis/rule3_standards.sql",
+    "work/analysis/rule3_findings.json",
+    "work/analysis/rule4_budget.sql",
+    "work/analysis/rule4_running.csv",
+    "work/analysis/rule5_late.sql",
+    "work/analysis/all_records_full.csv",
+    "work/analysis/employees.csv",
+    "work/subagents/data_analyst/summary.json"
   ]
 }

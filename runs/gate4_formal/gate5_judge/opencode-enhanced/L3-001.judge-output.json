@@ -1,39 +1,94 @@
 {
-  "criteria": [
+  "checklist": [
     {
-      "id": "full-scan-method",
-      "score": 0,
-      "reason": "工具轨迹中未执行任何查询或计算，无法证明对全年数据进行了可复核的重复报销扫描。",
-      "answer_evidence": "答案中仅声称“全年重复报销专项扫描”，未提供扫描方法或查询语句。",
-      "trace_evidence": "工具调用次数为0，无任何全量扫描的查询或统计证据。"
+      "id": "finding-record-mapping-group-1",
+      "value": 1,
+      "reason": "候选提交中明确将发票FP202500000002的记录R000002和R004201归为同一异常DUP-FP202500000002，符合发现分组要求。",
+      "answer_evidence": "发现6组重复报销：1. DUP-FP202500000002：...记录R000002和R004201",
+      "trace_evidence": "无可用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-2",
+      "value": 1,
+      "reason": "候选提交中明确将发票FP202500000005的记录R000005和R004202归为同一异常DUP-FP202500000005。",
+      "answer_evidence": "2. DUP-FP202500000005：...记录R000005和R004202",
+      "trace_evidence": "无可用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-3",
+      "value": 1,
+      "reason": "候选提交中明确将发票FP202500000020的记录R000020和R004203归为同一异常DUP-FP202500000020。",
+      "answer_evidence": "3. DUP-FP202500000020：...记录R000020和R004203",
+      "trace_evidence": "无可用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-4",
+      "value": 1,
+      "reason": "候选提交中明确将发票FP202500000028的记录R000028和R004204归为同一异常DUP-FP202500000028。",
+      "answer_evidence": "4. DUP-FP202500000028：...记录R000028和R004204",
+      "trace_evidence": "无可用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-5",
+      "value": 1,
+      "reason": "候选提交中明确将发票FP202500000037的记录R000037和R004205归为同一异常DUP-FP202500000037。",
+      "answer_evidence": "5. DUP-FP202500000037：...记录R000037和R004205",
+      "trace_evidence": "无可用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "finding-record-mapping-group-6",
+      "value": 1,
+      "reason": "候选提交中明确将发票FP202500000055的记录R000055和R004206归为同一异常DUP-FP202500000055。",
+      "answer_evidence": "6. DUP-FP202500000055：...记录R000055和R004206",
+      "trace_evidence": "无可用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-scope",
+      "value": 1,
+      "reason": "候选提交声明使用find_reused_invoices对2025全年数据进行全量扫描，且发现的重复记录时间覆盖全年，无抽样痕迹。",
+      "answer_evidence": "全量扫描方法：使用find_reused_invoices工具对2025全年数据进行全量扫描",
+      "trace_evidence": "无可用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-invoice-key",
+      "value": 1,
+      "reason": "候选提交明确以发票号（invoice_id）作为重复判断键，检索被2次及以上报销使用的发票。",
+      "answer_evidence": "检索所有被2次及以上报销使用的发票...6组重复发票（FP202500000002、...）",
+      "trace_evidence": "无可用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-grouping",
+      "value": 1,
+      "reason": "每个重复发票组均形成一个独立的发现ID，共6组，与预期一致。",
+      "answer_evidence": "扫描返回6组重复发票...发现6组重复报销：...每组关联2条报销记录",
+      "trace_evidence": "无可用轨迹",
+      "source": "llm_judge"
+    },
+    {
+      "id": "full-scan-method-reconcile",
+      "value": 1,
+      "reason": "候选提交的中间统计（6组发票，12条记录）与最终提交的6项异常完全一致。",
+      "answer_evidence": "扫描返回6组重复发票...发现6组重复报销，共12条记录",
+      "trace_evidence": "无可用轨迹",
+      "source": "llm_judge"
     },
     {
       "id": "policy-basis",
-      "score": 5,
-      "reason": "引用了制度“第十条”（对应费用报销管理办法-6.1），但工具轨迹中无查询条件落实该制度的证据，仅有引用而无对应计算。",
-      "answer_evidence": "答案明确引用“第十条”并说明“同一发票最多报销1次”，citations中包含该条款。",
-      "trace_evidence": "轨迹中无任何查询语句或计算逻辑展示如何落实该制度。"
-    },
-    {
-      "id": "false-positive-control",
-      "score": 15,
-      "reason": "提交的异常ID和记录ID与预期完全一致，无任何误报或混入其他规则、TRAP记录。",
-      "answer_evidence": "anomaly_ids和record_ids与预期集合精确匹配，未出现无关项。",
-      "trace_evidence": "规则诊断显示precision=1.0, recall=1.0，无未知记录或陷阱误报。"
+      "value": 1,
+      "reason": "候选提交引用了《01_expense_reimbursement_2025.md》第十条关于同一发票最多报销1次的规定，并将规则落实为查询条件（min_usage_count=2）。",
+      "answer_evidence": "制度依据：XX证券...第十条规定...同一发票最多报销1次...；扫描设置min_usage_count=2",
+      "trace_evidence": "无可用轨迹",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "提交的所有record_id均存在于数据库中，且为核心结论的正确支撑记录。"
-    },
-    {
-      "id": "partial-scan-presented-as-complete",
-      "triggered": true,
-      "reason": "工具轨迹完全为空，无任何全量数据查询或计算的证据，却将结果表述为全年完整扫描，严重违反可复核性要求。"
-    }
-  ],
-  "overall_comment": "结果准确性极高，误报控制完美，但扫描方法缺乏任何工具调用证据，无法证明全量执行，制度规则也未通过查询条件落实，因此方法项不得分，制度依据部分得分。触发关键失败“部分扫描冒充完整”，但总分未触及cap限制。",
-  "confidence": 0.95
+  "overall_comment": "候选提交全面覆盖了预期发现，分组准确，扫描方法和制度依据完备，所有检查项均通过。",
+  "confidence": 1.0
 }

@@ -1,28 +1,38 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "audit-conclusion",
-      "score": 20,
-      "reason": "结论明确为重复报销，异常类型为DUP，与预期一致。",
-      "answer_evidence": "发现以R000020为线索的重复报销异常:发票FP202500000020在R000020和R004203两笔报销记录中重复使用...异常ID为DUP-INV-001。",
-      "trace_evidence": "工具调用无记录，但提交答案直接陈述。"
+      "value": 1,
+      "reason": "答案明确认定构成重复报销且无矛盾表述",
+      "answer_evidence": "“上述两条记录构成重复报销违规”",
+      "trace_evidence": "无工具调用轨迹，依据候选提交answer",
+      "source": "llm_judge"
     },
     {
       "id": "policy-basis",
-      "score": 15,
-      "reason": "引用了《XX证券费用报销管理办法(2025修订版)》第十条，即同一发票最多报销1次，条款有效且直接支持结论。",
-      "answer_evidence": "违反《XX证券费用报销管理办法(2025修订版)》第十条'同一发票最多报销1次'的规定。",
-      "trace_evidence": "无工具调用，但提交的citations中包含第十条。"
+      "value": 1,
+      "reason": "条款有效且直接支持结论",
+      "answer_evidence": "“依据《XX证券费用报销管理办法(2025修订版)》（01_expense_reimbursement_2025.md）第十条...”",
+      "trace_evidence": "无工具调用，candidate_evidence_matrix确认引用",
+      "source": "llm_judge"
     },
     {
-      "id": "case-reasoning",
-      "score": 20,
-      "reason": "明确指出发票FP202500000020在R000020和R004203重复使用，金额均为669.5元，事实完整且与数据一致。",
-      "answer_evidence": "发票FP202500000020在R000020和R004203两笔报销记录中重复使用；R000020使用发票FP202500000020报销旅行住宿费669.5元；R004203使用同一发票报销旅行住宿费669.5元。",
-      "trace_evidence": "evidence_matrix中facts包含相同内容。"
+      "id": "case-reasoning-same-invoice",
+      "value": 1,
+      "reason": "明确识别同一发票FP202500000020被重复使用",
+      "answer_evidence": "“发票FP202500000020...被员工E0028...在两条已批准的差旅住宿费报销记录中重复使用”",
+      "trace_evidence": "无工具调用，候选提交明确说明",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-reasoning-amount",
+      "value": 1,
+      "reason": "金额669.5元与记录一致",
+      "answer_evidence": "“两条记录金额均为669.50元”",
+      "trace_evidence": "无工具调用，候选提交明确说明",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [],
-  "overall_comment": "候选答案正确识别了重复报销异常，引用制度条款准确，推理事实清晰。",
+  "overall_comment": "所有检查项均满足通过条件，候选提交明确识别重复报销并使用正确制度依据。",
   "confidence": 1.0
 }

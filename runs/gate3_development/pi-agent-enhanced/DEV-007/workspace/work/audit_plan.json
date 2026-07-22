@@ -1,0 +1,93 @@
+{
+  "task_scope": {
+    "audit_object": "个人办公用品(office_supplies)和通讯费(communication)月度标准超限",
+    "expense_types": ["office_supplies", "communication"],
+    "business_period": "2025-01-01 至 2025-12-31",
+    "organization_scope": "全公司(all departments and employees)",
+    "deliverable": "按员工和自然月聚合的超标准异常记录列表"
+  },
+  "policy_questions": [
+    {
+      "id": "PQ1",
+      "question": "个人办公用品月度标准是多少？",
+      "policy_doc": "07_office_communication.md",
+      "clause": "第二条",
+      "rule": "每人每月不超过600元"
+    },
+    {
+      "id": "PQ2",
+      "question": "通讯费月度标准是多少？",
+      "policy_doc": "07_office_communication.md",
+      "clause": "第三条",
+      "rule": "每人每月不超过300元"
+    },
+    {
+      "id": "PQ3",
+      "question": "专项审批(special_approval)是否可以豁免月度标准？",
+      "policy_doc": "01_expense_reimbursement_2025.md",
+      "clause": "第十二条",
+      "rule": "无专项审批时,报销金额不得超过对应制度标准的1.0倍"
+    },
+    {
+      "id": "PQ4",
+      "question": "月度标准是按单笔还是按月聚合？",
+      "policy_doc": "07_office_communication.md",
+      "clause": "第二条、第三条",
+      "rule": "每人每月——按员工和自然月聚合后比较"
+    }
+  ],
+  "data_questions": [
+    {
+      "id": "DQ1",
+      "question": "查询所有office_supplies和communication记录,按employee_id和自然月聚合金额",
+      "tables": ["expense_records", "employees", "departments"],
+      "fields": ["record_id", "employee_id", "expense_date", "expense_type", "amount", "special_approval", "status"]
+    },
+    {
+      "id": "DQ2",
+      "question": "对每个(employee_id, expense_type, month)组合,合计金额并与阈值比较",
+      "aggregation": "GROUP BY employee_id, expense_type, strftime('%Y-%m', expense_date)"
+    }
+  ],
+  "execution_steps": [
+    {"step": 1, "action": "audit-query-planner", "output": "work/audit_plan.json"},
+    {"step": 2, "action": "checkpoint planning_completed"},
+    {"step": 3, "action": "authorize_audit_subagent data_analyst + invoke subagent"},
+    {"step": 4, "action": "policy-version-check (compact, single unambiguous policy)"},
+    {"step": 5, "action": "complete_audit_subagent"},
+    {"step": 6, "action": "evidence-coverage-check"},
+    {"step": 7, "action": "false-positive-review (check special_approval exemptions)"},
+    {"step": 8, "action": "audit-report"},
+    {"step": 9, "action": "result-validator + validate_audit_result"},
+    {"step": 10, "action": "submit_audit_result"}
+  ],
+  "complexity": {
+    "score": 3,
+    "reasons": [
+      "aggregation/grouping/joins required (按月、按员工聚合)",
+      "two business rules (办公用品+通讯费两个独立月度标准)",
+      "thresholds with date-boundary (月度阈值比较)"
+    ]
+  },
+  "subagent_plan": {
+    "role": "data_analyst",
+    "reason_code": "AGGREGATION_REQUIRED",
+    "complexity": 3,
+    "context": {
+      "task": "扫描开发库中所有office_supplies和communication记录,按employee_id和自然月(strftime('%Y-%m', expense_date))聚合金额,将每人每月合计金额与标准(office_supplies≤600, communication≤300)比较,返回全部超标准异常。注意:special_approval=1的记录需检查是否豁免。输出每个超标组合包含的所有record_id。",
+      "database_path": "/benchmark/data/expense.db",
+      "expense_types": ["office_supplies", "communication"],
+      "thresholds": {"office_supplies": 600, "communication": 300},
+      "special_approval_note": "检查01_expense_reimbursement_2025.md第十二条:无专项审批时不得超过制度标准1.0倍。如果记录有special_approval=1,该记录可能豁免,需从超标中排除。但月度聚合规则来自07_office_communication.md第二、三条,special_approval对月度聚合的影响需仔细判断。"
+    },
+    "artifact_paths": ["work/audit_plan.json"],
+    "requested_token_budget": 8000
+  },
+  "stopping_conditions": [
+    "所有office_supplies和communication记录已按员工和月份聚合完毕",
+    "每个超标组合的record_ids和超标金额已确认",
+    "special_approval豁免已处理",
+    "evidence_coverage达到100%"
+  ],
+  "unresolved_items": []
+}

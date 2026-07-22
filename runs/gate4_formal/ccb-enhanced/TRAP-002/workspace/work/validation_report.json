@@ -3,23 +3,30 @@
   "errors": [],
   "warnings": [],
   "field_checks": {
-    "anomaly_ids": "valid empty array for no-anomaly",
-    "record_ids": "valid - 2 records matching pattern",
-    "answer": "valid non-empty string containing 无异常",
-    "citations": "valid - 1 citation with doc_id and clause_no"
+    "anomaly_ids": {"present": true, "type": "array", "empty": true, "valid": true},
+    "record_ids": {"present": true, "type": "array", "pattern_match": true, "duplicates": false, "valid": true},
+    "answer": {"present": true, "type": "string", "non_empty": true, "contains_wu_yichang": true, "valid": true},
+    "citations": {"present": true, "type": "array", "non_empty": true, "each_has_doc_id_and_clause_no": true, "valid": true}
   },
   "id_checks": {
-    "record_ids_exist": "R000002 and R004201 confirmed in database",
-    "doc_ids_exist": "01_expense_reimbursement_2025.md confirmed in corpus"
+    "record_ids_in_database": true,
+    "submitted_ids_match_evidence": true,
+    "citation_doc_ids_exist": true,
+    "all_checks_pass": true
   },
   "evidence_checks": {
-    "evidence_status": "pass",
-    "coverage_percent": 100,
-    "consistency": "final_result matches evidence_matrix"
+    "evidence_status_is_pass": true,
+    "coverage_percent_is_100": true,
+    "evidence_matrix_exists": true,
+    "no_anomaly_coverage_complete": true,
+    "all_checks_pass": true
   },
   "answer_consistency_checks": {
-    "anomaly_answer_match": "empty anomaly_ids matches 无异常 answer",
-    "record_ids_match": "final_result record_ids match evidence_matrix submitted_record_ids"
+    "anomaly_ids_empty_matches_no_anomaly_answer": true,
+    "threshold_values_stated": true,
+    "record_ids_match_answer_content": true,
+    "citations_match_answer_clauses": true,
+    "all_checks_pass": true
   },
   "repair_count": 0,
   "repairable_fields": [],

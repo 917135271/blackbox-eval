@@ -3,18 +3,19 @@
   "coverage_percent": 100,
   "evidence_rows": [
     {
-      "anomaly_id": "ANOMALY-L2-013-001",
+      "anomaly_id": "AN-L2-013-001",
       "record_ids": ["R004223"],
       "citations": [
         {"doc_id": "05_training_expense.md", "clause_no": "第二条"},
         {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十二条"}
       ],
       "facts": [
-        "R004223为培训费(training_fee)报销记录，金额3700.00元，费用发生日期2025-05-18",
-        "培训费管理办法第二条规定培训课程费每人每期不超过3500元，R004223金额3700元超出标准200元",
-        "R004223的special_approval=0，无专项审批",
-        "费用报销管理办法第十二条规定无专项审批时报销金额不得超过制度标准的1.0倍",
-        "全量扫描578条training_fee记录，仅R004223一条超过3500元且无专项审批"
+        "R004223为培训费(training_fee)报销记录，金额3700.00元，员工E0009(张婷)，部门D009(财务管理部)，费用日期2025-05-18",
+        "培训课程费制度标准为每人每期不超过3500元（05_training_expense.md第二条）",
+        "R004223金额3700元超出标准3500元，超出200元（5.7%）",
+        "R004223无专项审批(special_approval=0)，依据01_expense_reimbursement_2025.md第十二条，报销金额不得超过制度标准的1.0倍",
+        "全量578条training_fee记录中仅R004223超过3500元标准",
+        "R004223审批链仅有部门经理(E0009自审批)，AR-02档位要求部门经理并经财务复核，缺少财务复核环节"
       ],
       "fact_supported": true,
       "rule_supported": true,
@@ -27,14 +28,13 @@
   "unused_candidate_record_ids": [],
   "unused_citations": [],
   "missing_evidence": [],
-  "no_anomaly_coverage": {
-    "complete": false
-  },
+  "no_anomaly_coverage": {},
   "reconciled_figures": {
-    "total_violations": 1,
-    "total_excess_amount": 200.00,
-    "standard_amount": 3500.00,
-    "population_scanned": 578
+    "total_training_fee_records": 578,
+    "exceeding_standard_count": 1,
+    "r004223_amount": 3700.0,
+    "applicable_standard": 3500.0,
+    "excess_amount": 200.0
   },
   "unresolved_items": []
 }

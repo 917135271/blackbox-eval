@@ -10,16 +10,27 @@
   "missing_evidence": [],
   "no_anomaly_coverage": {
     "complete": true,
-    "searched_population": "全量approved报销记录,金额区间[8000,10000)和[30000,50000)",
-    "query_conditions": "list_expenses status=approved, min_amount=8000/max_amount=9999.99; min_amount=30000/max_amount=49999.99; boundary-widened verification [29000,51000]",
-    "checked_rules": ["2022版审批线: ≥8000→部门总经理, ≥30000→分管副总", "2025版审批线: AR-02 [3000,10000)→部门经理+财务复核, AR-03 [10000,50000)→部门总经理, AR-04 [50000,200000)→分管副总"],
+    "searched_population": "全部已批准报销记录，按金额区间[7000-11000]、[25000-55000]、[50000+]分段查询",
+    "query_conditions": [
+      "min_amount=7000, max_amount=11000: 覆盖旧版8000阈值",
+      "min_amount=25000, max_amount=55000: 覆盖旧版30000与新版50000阈值",
+      "min_amount=50000: 覆盖新版50000阈值"
+    ],
+    "checked_rules": [
+      "2025版第五条：审批权限引用授权管理办法附件二",
+      "2025版第十四条：2022版废止条款",
+      "2022版第二条/第三条：旧审批线",
+      "授权管理办法附件二：现行五档审批线",
+      "2022版第四条：自述不得作为现行审批依据"
+    ],
     "population_count": 1,
-    "conclusion": "版本陷阱区间[8000,10000)内发现1条记录R004233(¥9,990),在旧版标准下会被误判为缺少部门总经理审批,但在现行2025版标准下正确适用AR-02审批线。区间[30000,50000)内无记录。无实际违规,仅存在版本误判风险需审计注意。"
+    "conclusion": "版本陷阱审计说明完成。2022版与2025版审批线存在显著差异，2022版已废止。R004233(9990元)为边界实例，现行AR-02审批正确。无违规异常。"
   },
   "reconciled_figures": {
-    "trap_8000_10000_count": 1,
-    "trap_30000_50000_count": 0,
-    "total_checked": 1
+    "boundary_record_count": 1,
+    "boundary_record_id": "R004233",
+    "boundary_amount": 9990.00,
+    "version_trap_zones_identified": 5
   },
   "unresolved_items": []
 }

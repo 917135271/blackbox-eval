@@ -1,0 +1,222 @@
+{
+  "checklist": [
+    {
+      "id": "overall-count-total",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交的anomaly_ids共计86项（DUP-001至DUP-006为6项，SPL-001至SPL-064为64项，STD-001至STD-004为4项，BUD-001至BUD-006为6项，LATE-001至LATE-006为6项），而非要求的30项。",
+      "trace_evidence": "无相关工具调用，直接根据候选最终提交判断。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "overall-count-type-split",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交中拆分报销类（SPL-001至SPL-064）共64项发现，而非要求的6项。",
+      "trace_evidence": "无相关工具调用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "overall-count-type-overstd",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交中超标准类（STD-001至STD-004）共4项发现，而非要求的6项。",
+      "trace_evidence": "无相关工具调用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004225",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids列表中未包含R004225。",
+      "trace_evidence": "无相关工具调用。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-include-r004226",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "提交的record_ids列表包含R004226。",
+      "trace_evidence": "候选提交的record_ids字段中直接列出R004226。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "all-record-ids-no-extra",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "提交的record_ids包含大量预期外的记录，如R000070、R000074等。",
+      "trace_evidence": "候选提交的record_ids列表超出了预期记录列表的范围。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-dup",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "DUP类给出示例：发票FP202500000002被员工姚瑜在R000002和R004201中重复报销。",
+      "trace_evidence": "候选提交的answer及anomaly_ids中DUP-001对应记录R000002和R004201。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-split",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "SPLIT类给出示例：员工刘丽丽分3笔培训费报销（R003610、R003638、R001515）。",
+      "trace_evidence": "候选提交的answer及anomaly_ids中SPL-007对应记录R003610、R003638、R001515。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-overstd",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "答案中OVERSTD部分示例：“示例1（办公用品）：R004221，员工李丽娟，办公用品650.00元，超出...”，对应发现ID STD-001。",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-budget",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "答案中BUDGET部分示例：“投资银行部(D001)...关键记录R000079”，对应发现ID BUD-001。",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "representative-evidence-overdue",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "答案中OVERDUE部分示例：“R004227，员工李丽娟，通讯费181.00元...延迟65天”，对应发现ID LATE-001。",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-coverage-expense",
+      "value": 0,
+      "reason": "",
+      "answer_evidence": "候选提交citations中引用了01_expense_reimbursement_2025.md的第七条、第十条、第十一条、第十二条、第十三条，但未引用第九条，不满足预期要求。",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-coverage-special",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "报告中超标准示例引用了《办公与通讯费用管理办法》第二条/第三条、《培训费管理办法》第二条、《业务招待费管理办法》第三条。",
+      "trace_evidence": "candidate_submission的citations中包含doc_id: 05_training_expense.md clause_no:第二条、06_business_entertainment.md clause_no:第三条、07_office_communication.md clause_no:第二条和第三条。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-coverage-budget",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "超预算部分引用了《预算管理办法》第三条。",
+      "trace_evidence": "citations中包含doc_id: 08_budget_management.md clause_no:第三条。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004233",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids列表中无R004233，且审计摘要中未提及R004233。",
+      "trace_evidence": "candidate_submission.record_ids不包含'R004233'。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004234",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids列表中无R004234，且审计摘要中未提及R004234。",
+      "trace_evidence": "candidate_submission.record_ids不包含'R004234'。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004235",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids列表不含R004235，审计说明未提及R004235",
+      "trace_evidence": "record_ids列表不含R004235",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004236",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids列表不含R004236，审计说明未提及R004236",
+      "trace_evidence": "record_ids列表不含R004236",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004237",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids列表不含R004237，审计说明未提及R004237",
+      "trace_evidence": "record_ids列表不含R004237",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004238",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "record_ids列表不含R004238，审计说明未提及R004238",
+      "trace_evidence": "record_ids列表不含R004238",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004239",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids数组和candidate_evidence_matrix的record_ids中均未包含R004239；answer文本中未提及R004239。",
+      "trace_evidence": "submitted_json中record_ids列表不含R004239，final_answer全文未出现R004239。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "trap-control-r004240",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "候选提交的record_ids数组和candidate_evidence_matrix的record_ids中均未包含R004240；answer文本中未提及R004240。",
+      "trace_evidence": "submitted_json中record_ids列表不含R004240，final_answer全文未出现R004240。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-fact",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "answer中明确描述了重复报销示例：发票FP202500000002被员工姚瑜在R000002和R004201中重复报销，金额423.79元。",
+      "trace_evidence": "final_answer中'发票FP202500000002被员工姚瑜在R000002和R004201中重复报销，金额423.79元'构成可识别事实。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-rule",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "answer中多处引用制度条款，如'《费用报销管理办法》第十条'、'《费用报销管理办法》第十一条'等。",
+      "trace_evidence": "final_answer中'依据《费用报销管理办法》第十条'组成可识别规则内容。",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-judgment",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "发现6张发票存在重复报销，每张发票被报销2次，共涉及12条记录。",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-impact",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "影响：重复报销导致公司资金多付，涉及金额合计2,432.18元。",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    },
+    {
+      "id": "report-shape-recommendation",
+      "value": 1,
+      "reason": "",
+      "answer_evidence": "建议：在费用系统中增加发票号码唯一性校验，对已报销发票自动拦截重复提交。",
+      "trace_evidence": "",
+      "source": "llm_judge"
+    }
+  ],
+  "overall_comment": "",
+  "confidence": 0.8
+}

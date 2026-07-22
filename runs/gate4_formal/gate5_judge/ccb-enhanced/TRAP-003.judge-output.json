@@ -1,46 +1,94 @@
 {
-  "criteria": [
+  "checklist": [
     {
       "id": "clean-conclusion",
-      "score": 30,
-      "reason": "候选明确判断无异常，anomaly_ids为空，答案结论与预期一致，无矛盾表述。",
-      "answer_evidence": "答案中明确“无异常”，anomaly_ids为空。",
-      "trace_evidence": "工具最终输出与提交一致，无异常标记。"
+      "value": 1,
+      "reason": "候选提交明确给出无异常结论，无矛盾表述",
+      "answer_evidence": "无异常。R004236... 不构成拆分报销。",
+      "trace_evidence": "工具轨迹显示调用get_expense_detail获取记录，search_policy获取政策，最终结论与提交一致",
+      "source": "llm_judge"
     },
     {
-      "id": "record-scope",
-      "score": 0,
-      "reason": "提交的record_ids包含8条记录，超出了预期的R004236与R004237，加入了无关记录。",
-      "answer_evidence": "提交的record_ids为R004233-R004240共8条，多出6条。",
-      "trace_evidence": "工具调用获取了多条expense详情，但未局限于预期核心记录。"
+      "id": "case-specific-reason-gap",
+      "value": 1,
+      "reason": "明确说明两条记录费用发生日期间隔为8天",
+      "answer_evidence": "R004236（费用发生日期2025-10-01）与R004237（费用发生日期2025-10-09）的费用发生日期间隔为8个日历日",
+      "trace_evidence": "get_expense_detail返回expense_date字段，计算间隔为8天",
+      "source": "llm_judge"
     },
     {
-      "id": "case-specific-reason",
-      "score": 25,
-      "reason": "针对核心记录明确指出了超出7天聚合窗口（outside aggregation window）的合规原因，解释完整。",
-      "answer_evidence": "答案中说明“R004236与R004237日期相隔8天...超出第十一条7天拆分核查窗口”。",
-      "trace_evidence": "工具调用包括list_expenses与get_expense_detail，结合政策条款进行了日期比对。"
+      "id": "case-specific-reason-window",
+      "value": 1,
+      "reason": "明确说明8天超出7天聚合窗口",
+      "answer_evidence": "超过《XX证券费用报销管理办法(2025修订版)》第十一条规定的'7天内'条件",
+      "trace_evidence": "search_policy返回第十一条包含'7天内'条件",
+      "source": "llm_judge"
     },
     {
-      "id": "reverse-check",
-      "score": 15,
-      "reason": "轨迹中调用了find_reused_invoices、get_expense_detail等工具，对阈值、日期、发票进行了反向核查，未仅凭提示直接下结论。",
-      "answer_evidence": "答案中展示了具体的金额、日期、发票号及政策条款比对。",
-      "trace_evidence": "轨迹中多次调用get_expense_detail获取记录详情，并使用find_reused_invoices核查发票重复情况。"
+      "id": "case-specific-reason-sum",
+      "value": 1,
+      "reason": "明确给出合计金额10400元",
+      "answer_evidence": "合计金额(10,400元)",
+      "trace_evidence": "get_expense_detail返回amount 5200，合计10400",
+      "source": "llm_judge"
+    },
+    {
+      "id": "case-specific-reason-threshold",
+      "value": 1,
+      "reason": "明确说明金额达到审批线但因时间窗口不满足故不构成拆分",
+      "answer_evidence": "合计金额(10,400元)达到附件二AR-03较高审批线(10,000元)，但'7天内'为拆分报销的必要条件，该条件不满足则第十一条不触发。",
+      "trace_evidence": "search_policy返回附件二审批线；证据矩阵显示higher_approval_threshold: 10000",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-gap",
+      "value": 1,
+      "reason": "工具轨迹显示从记录中获取日期并计算间隔为8天",
+      "answer_evidence": "",
+      "trace_evidence": "get_expense_detail返回expense_date: '2025-10-01'和'2025-10-09'；candidate_validation_report确认日期间隔计算为8天",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-window",
+      "value": 1,
+      "reason": "工具搜索政策返回'7天内'条件，证据矩阵显示间隔大于7",
+      "answer_evidence": "",
+      "trace_evidence": "search_policy返回snippet'同一员工、同一费用类型在7天内...'；reconciled_figures中threshold_7_days: 7，date_interval_days: 8",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-sum",
+      "value": 1,
+      "reason": "工具返回两个记录金额各5200，合计10400",
+      "answer_evidence": "",
+      "trace_evidence": "get_expense_detail返回amount: 5200.0 for both；candidate_validation_report field_checks提及金额",
+      "source": "llm_judge"
+    },
+    {
+      "id": "reverse-check-threshold",
+      "value": 1,
+      "reason": "策略搜索返回附件二审批线，计算显示合计超过10000但时间窗口不满足",
+      "answer_evidence": "",
+      "trace_evidence": "search_policy结果包含'## 附件二 费用报销审批权限表'；reconciled_figures显示total_amount: 10400, higher_approval_threshold: 10000；evidence_matrix checked_conditions.total_reaches_higher_threshold: true",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-1",
+      "value": 1,
+      "reason": "准确引用01_expense_reimbursement_2025.md#第十一条",
+      "answer_evidence": "citations中包含{'clause_no': '第十一条', 'doc_id': '01_expense_reimbursement_2025.md'}",
+      "trace_evidence": "tool_trace中search_policy调用并确认第十一条存在",
+      "source": "llm_judge"
+    },
+    {
+      "id": "policy-basis-source-2",
+      "value": 1,
+      "reason": "准确引用03_authorization_management.md#附件二",
+      "answer_evidence": "citations中包含{'clause_no': '附件二', 'doc_id': '03_authorization_management.md'}",
+      "trace_evidence": "tool_trace中search_policy调用并确认附件二存在",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "所有提交的record_id均存在于数据库中，无虚构记录。"
-    },
-    {
-      "id": "trap-false-positive",
-      "triggered": false,
-      "reason": "候选将记录正确判定为无异常，未误报成异常。"
-    }
-  ],
-  "overall_comment": "候选准确判断无异常并给出合规原因，但核查范围超出预期，引入了无关记录，导致record-scope失分。其余项表现良好。",
-  "confidence": 0.95
+  "overall_comment": "候选提交正确判断无异常，理由充分，引用到位，轨迹支持所有核验点。",
+  "confidence": 1.0
 }

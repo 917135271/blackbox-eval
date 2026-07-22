@@ -1,44 +1,55 @@
 {
   "task_id": "L3-006",
   "audit_scope": {
-    "object": "费用报销审批权限版本适用性",
-    "period": "2025年1月1日起",
-    "organization": "XX证券各部门、分支机构及全体员工",
-    "data_scope": "政策文档01、02、03"
+    "audit_object": "费用报销审批制度版本确定",
+    "period": "2022版至2025修订版过渡",
+    "organization": "XX证券全部门",
+    "data_scope": "政策文档库（三份制度文件），无数据库记录查询需求"
   },
   "verified_facts": [
-    "2025修订版(XX证财规〔2025〕甲号)第十四条规定自2025年1月1日起施行,同时废止2022版",
-    "2025修订版第五条规定审批权限按《授权管理办法》附件二执行",
-    "2022版(XX证财规〔2022〕乙号)第一条声明仅作为制度沿革留档,现行制度以2025修订版为准",
-    "2022版第四条声明审批金额已被后续制度替代,不得作为现行审批依据",
-    "授权管理办法(XX证综规〔2025〕丙号)附件二AR-03规定:单笔金额≥10000元且<50000元,必要审批角色为部门总经理",
-    "授权管理办法第五条明确自2025年1月1日起施行"
+    "2025修订版第十四条明确规定自2025年1月1日起施行，并同时废止2022版",
+    "2025修订版第五条将审批金额委托至《XX证券授权管理办法》附件二，不在正文列示具体金额",
+    "2022版第一条自述仅作制度沿革留档，现行制度以2025修订版为准",
+    "2022版第二条记载旧版部门总经理审批线为8000元",
+    "2022版第四条声明审批金额已被后续制度替代，不得作为现行审批依据",
+    "授权管理办法第二条确认附件二是现行有效审批线",
+    "授权管理办法附件二AR-03档载明部门总经理审批金额区间为≥10000元且<50000元",
+    "授权管理办法第五条明确自2025年1月1日起施行，与2025修订版同日生效"
   ],
   "applicable_policies": [
-    {"doc_id": "01_expense_reimbursement_2025.md", "clauses": ["第五条", "第十四条"]},
-    {"doc_id": "03_authorization_management.md", "clauses": ["第二条", "第五条"]}
-  ],
-  "excluded_policies": [
-    {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "reason": "已被2025修订版第十四条废止,仅作制度沿革留档,审批金额已被替代不得作为现行依据"}
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条", "effect": "审批权限委托至授权管理办法附件二"},
+    {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条", "effect": "施行日期2025-01-01，废止2022版"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "第二条", "effect": "附件二为现行有效审批线"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二", "effect": "AR-03: ≥10000元且<50000元→部门总经理"}
   ],
   "findings": [
     {
-      "type": "无异常",
-      "description": "费用报销审批线应适用2025修订版而非2022版。2022版已被明文废止,其规定的8000元部门总经理审批线已失效。现行部门总经理审批线为AR-03:≥10000元且<50000元。"
+      "finding_id": "F-001",
+      "type": "版本适用性判断",
+      "conclusion": "应采用2025修订版",
+      "detail": "2025修订版自2025年1月1日起施行，同日废止2022版。2022版已明确仅作留档、不得作为审批依据。",
+      "applicable_threshold": "当前日期2026-07-21，在2025修订版有效期内"
+    },
+    {
+      "finding_id": "F-002",
+      "type": "部门总经理审批线",
+      "conclusion": "≥10000元且<50000元（AR-03档）",
+      "detail": "旧版8000元已失效。现行金额通过2025修订版第五条→授权管理办法附件二→AR-03档逐级引用确定。",
+      "threshold_observed": "AR-03: ≥10000元（含）且<50000元"
     }
   ],
-  "impact": "无违规事项,无需整改",
-  "recommendations": [],
   "anomaly_ids": [],
   "record_ids": [],
   "citations": [
     {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第五条"},
     {"doc_id": "01_expense_reimbursement_2025.md", "clause_no": "第十四条"},
-    {"doc_id": "03_authorization_management.md", "clause_no": "第二条"},
-    {"doc_id": "03_authorization_management.md", "clause_no": "第五条"},
     {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第一条"},
-    {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第四条"}
+    {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第二条"},
+    {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "clause_no": "第四条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "第二条"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "附件二"},
+    {"doc_id": "03_authorization_management.md", "clause_no": "第五条"}
   ],
-  "answer": "无异常。费用报销审批线应采用2025修订版(XX证财规〔2025〕甲号),2022版(XX证财规〔2022〕乙号)已被第十四条明文废止,仅作制度沿革留档。部门总经理审批线为AR-03:单笔金额大于等于10000元且小于50000元,必要审批角色为部门总经理,依据《XX证券授权管理办法》(XX证综规〔2025〕丙号)第二条及附件二。",
-  "limitations": []
+  "answer": "无异常。应采用2025修订版，2022版已废止。部门总经理审批线：≥10000元且<50000元（授权管理办法附件二AR-03）。",
+  "limitations": ["本题为纯政策版本判断，未涉及具体费用记录核查"]
 }

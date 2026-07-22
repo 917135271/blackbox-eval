@@ -2,39 +2,38 @@
   "status": "pass",
   "coverage_percent": 100,
   "evidence_rows": [],
-  "candidate_record_ids": ["R000003", "R003369", "R003915"],
-  "submitted_record_ids": ["R000003", "R003369", "R003915"],
+  "candidate_record_ids": ["R004236", "R004237"],
+  "submitted_record_ids": ["R004236", "R004237"],
   "unowned_record_ids": [],
   "unused_candidate_record_ids": [],
   "unused_citations": [],
   "missing_evidence": [],
   "no_anomaly_coverage": {
     "complete": true,
-    "searched_population": "R000003及其同员工E0061 2025年3-4月全部培训费记录(R003369,R003915)",
-    "query_conditions": "employee_id=E0061, expense_type=training_fee, date 2025-03-01~2025-04-30; invoice_no=FP202500000003全库查重; D008部门预算查询; approvals表全库财务复核角色统计",
+    "searched_population": "Records R004236 and R004237 (direct lookup by record_id)",
+    "query_conditions": "Retrieved expense details for R004236 and R004237 via get_expense_detail; searched policy corpus for split reimbursement rules",
     "checked_rules": [
-      "培训费标准(05_training_expense.md第二条 ≤3500元)",
-      "审批档位(03_authorization_management.md第二条附件二AR-02)",
-      "拆分规避审批(01_expense_reimbursement_2025.md第十一条)",
-      "重复发票(01_expense_reimbursement_2025.md第十条)",
-      "报销时限(01_expense_reimbursement_2025.md第七条 60天)",
-      "预算超支(01_expense_reimbursement_2025.md第十三条)"
+      {
+        "rule": "Split reimbursement within 7 days (Article 11, 01_expense_reimbursement_2025.md)",
+        "conditions": {
+          "same_employee": {"met": true, "value": "E0010"},
+          "same_expense_type": {"met": true, "value": "travel_lodging"},
+          "within_7_days": {"met": false, "value": "8 days (2025-10-01 to 2025-10-09)"},
+          "combined_amount_meets_higher_approval": {"met": true, "value": 10400, "threshold": "AR-03 (≥10000)"}
+        },
+        "conclusion": "Not a violation — date interval (8 days) exceeds 7-day threshold"
+      }
     ],
-    "population_count": 3,
-    "conclusion": "无异常 - 六项制度检查全部通过，疑似问题(财务复核缺失)经SQL验证属系统级行为"
+    "population_count": 2,
+    "conclusion": "No anomaly. R004236 and R004237 share the same employee (E0010), same expense type (travel_lodging), and same vendor (安程酒店管理有限公司), with combined amount ¥10,400 reaching the AR-03 higher approval line. However, their expense dates (2025-10-01 and 2025-10-09) are 8 days apart, exceeding the 7-day threshold defined in Article 11 of 费用报销管理办法. The split reimbursement rule's three conditions are not all satisfied; therefore no violation exists."
   },
   "reconciled_figures": {
-    "R000003_amount": 3209.78,
-    "training_standard_cap": 3500,
-    "AR02_lower_threshold": 3000,
-    "AR02_upper_threshold": 10000,
-    "AR03_lower_threshold": 10000,
-    "combined_R000003_R003369": 4711.63,
-    "D008_annual_budget": 381600,
-    "D008_used_amount": 297095.29,
-    "D008_usage_rate": 0.7786,
-    "R000003_expense_to_reimburse_days": 42,
-    "FP202500000003_usage_count": 1
+    "r004236_amount": 5200,
+    "r004237_amount": 5200,
+    "combined_amount": 10400,
+    "date_diff_days": 8,
+    "r004236_expense_date": "2025-10-01",
+    "r004237_expense_date": "2025-10-09"
   },
   "unresolved_items": []
 }

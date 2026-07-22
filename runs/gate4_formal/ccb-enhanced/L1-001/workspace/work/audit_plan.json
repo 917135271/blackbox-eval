@@ -1,47 +1,111 @@
 {
   "task_id": "L1-001",
   "task_type": "policy_qa",
-  "question": "现行制度下,单笔费用报销达到多少金额需要部门总经理审批?",
-  "audit_scope": {
-    "audit_object": "policy_threshold",
-    "expense_types": ["差旅", "培训", "招待", "办公", "通讯"],
-    "business_period": "current (2025-01-01 onward)",
-    "organization_scope": "XX证券全体部门",
-    "deliverable": "policy answer with supporting citations"
+  "question": "现行制度下，单笔费用报销达到多少金额需要部门总经理审批？请说明适用版本、金额边界及费用报销办法与授权管理办法中的制度依据，并说明旧版审批线是否仍适用。",
+  "scope": {
+    "audit_object": "费用报销审批金额阈值",
+    "business_period": "现行制度（2025修订版）与旧版（2022版）对比",
+    "organization_scope": "XX证券全公司",
+    "deliverable": "政策问答：部门总经理审批金额线、制度依据、版本适用性"
   },
   "policy_questions": [
-    "现行制度下,部门总经理审批的单笔报销金额阈值是多少?"
-  ],
-  "relevant_policies": [
-    {"doc_id": "01_expense_reimbursement_2025.md", "reason": "现行费用报销制度,第五条将审批权限委托至授权管理办法附件二"},
-    {"doc_id": "03_authorization_management.md", "reason": "附件二包含费用报销审批权限表(现行有效审批线)"},
-    {"doc_id": "02_expense_reimbursement_2022_deprecated.md", "reason": "旧版已废止,仅作排除参考"}
+    {
+      "id": "PQ1",
+      "question": "现行费用报销管理办法(2025修订版)中，单笔费用报销达到多少金额需要部门总经理审批？",
+      "boundaries": ["金额阈值", "审批层级：部门总经理"],
+      "source": "01_expense_reimbursement_2025.md"
+    },
+    {
+      "id": "PQ2",
+      "question": "授权管理办法中对部门总经理的费用审批权限是如何规定的？",
+      "boundaries": ["授权范围", "金额边界"],
+      "source": "03_authorization_management.md"
+    },
+    {
+      "id": "PQ3",
+      "question": "旧版费用报销管理办法(2022版)中的部门总经理审批线是多少？与现行版本是否有差异？",
+      "boundaries": ["版本对比", "废止/替代关系"],
+      "source": "02_expense_reimbursement_2022_deprecated.md"
+    },
+    {
+      "id": "PQ4",
+      "question": "旧版审批线在当前是否仍适用？制度中是否有过渡或废止条款？",
+      "boundaries": ["政策废止", "生效日期", "过渡安排"],
+      "source": "01_expense_reimbursement_2025.md 和 02_expense_reimbursement_2022_deprecated.md"
+    }
   ],
   "data_questions": [],
-  "required_fields": ["policy_doc_id", "clause_no", "approval_threshold_amount"],
+  "required_fields": [
+    "审批金额阈值",
+    "审批层级（部门总经理）",
+    "制度版本号",
+    "生效日期",
+    "制度原文引用",
+    "废止/替代条款"
+  ],
+  "evidence_requirements": [
+    "2025版费用报销管理办法中部门总经理审批金额原文",
+    "授权管理办法中部门总经理金额权限原文",
+    "2022版费用报销管理办法中对应审批线原文",
+    "2025版中关于旧版废止的条款"
+  ],
   "execution_steps": [
-    {"step": "policy_query", "description": "查询现行费用报销制度和授权管理办法,定位部门总经理审批金额阈值", "agent": "main"},
-    {"step": "policy_applicability", "description": "确认为现行制度,排除已废止的2022版", "agent": "main"},
-    {"step": "evidence_build", "description": "建立证据矩阵", "agent": "main"},
-    {"step": "result_build", "description": "生成最终结果", "agent": "main"},
-    {"step": "validation", "description": "校验并提交", "agent": "main"}
+    {
+      "step": 1,
+      "name": "audit_query_planning",
+      "description": "编写审计计划，确定复杂度、路由和停止条件",
+      "artifact": "work/audit_plan.json",
+      "stopping_condition": "计划编写完成，scope/rules/fields/evidence/routing明确"
+    },
+    {
+      "step": 2,
+      "name": "policy_version_check",
+      "description": "查询三份制度文档：2025版费用报销办法、2022版费用报销办法、授权管理办法，提取审批金额线及版本适用关系",
+      "artifact": "work/policy_findings.json",
+      "stopping_condition": "所有政策问题有明确原文引用和答案"
+    },
+    {
+      "step": 3,
+      "name": "evidence_coverage_check",
+      "description": "检查证据是否覆盖所有政策问题",
+      "artifact": "work/evidence_matrix.json (更新)",
+      "stopping_condition": "coverage_percent=100, status=pass"
+    },
+    {
+      "step": 4,
+      "name": "audit_report",
+      "description": "输出最终审计结论",
+      "artifact": "work/final_result.json (更新)",
+      "stopping_condition": "answer字段包含完整的政策问答结论"
+    },
+    {
+      "step": 5,
+      "name": "result_validation",
+      "description": "校验final_result的schema合规性",
+      "artifact": "work/validation_report.json (更新)",
+      "stopping_condition": "validation_report.status=pass"
+    },
+    {
+      "step": 6,
+      "name": "submit",
+      "description": "调用validate_audit_result取得valid=true后提交",
+      "artifact": "提交成功",
+      "stopping_condition": "submit_audit_result成功"
+    }
   ],
   "complexity": {
-    "score": 0,
+    "score": 1,
     "reasons": [
-      "纯政策事实类问题,单规则查询",
-      "一条现行政策明确给出答案,无版本冲突",
-      "无需聚合、分组、批处理或跨表连接",
-      "无阈值/日期边界判断"
-    ]
+      "政策版本比较（现行vs旧版）",
+      "两份制度交叉引用（费用报销+授权管理）",
+      "金额阈值判定"
+    ],
+    "calibration": "政策事实问答，无数据批量分析，无聚合/分组/联表操作。虽有版本对比和两份政策，但本质为政策条文查询，复杂度1。"
   },
   "subagent_plan": {
-    "required": false,
-    "reason": "复杂度0,无需子智能体"
+    "use_subagent": false,
+    "reason": "复杂度1，无批量数据分析或聚合需求，主智能体直接查询政策文档即可完成所有政策问题。"
   },
-  "stopping_conditions": [
-    "取得现行有效审批权限表中的部门总经理审批金额阈值",
-    "确认2025版为现行制度,2022版已废止"
-  ],
+  "stopping_conditions": "所有四个政策问题有明确的制度原文引用和金额答案；evidence_matrix coverage_percent=100且status=pass；validation_report.status=pass；final_result通过validate_audit_result获得valid=true并提交成功。",
   "unresolved_items": []
 }

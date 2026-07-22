@@ -1,46 +1,134 @@
 {
-  "criteria": [
+  "checklist": [
     {
-      "id": "travel-policy",
-      "score": 25,
-      "reason": "制度和场景均正确，明确指出差旅住宿适用差旅费管理办法。",
-      "answer_evidence": "差旅住宿标准（04_travel_expense.md 第四条）按「职级×城市档位」双重维度设定...",
-      "trace_evidence": "调用 get_policy_doc 获取 04_travel_expense.md，内容包含差旅住宿标准表。"
+      "id": "travel-dimensions-policy",
+      "value": 1,
+      "reason": "明确识别差旅住宿适用《XX证券差旅费管理办法》",
+      "answer_evidence": "答案首段：差旅住宿：适用《XX证券差旅费管理办法》(04_travel_expense.md, XX证行规〔2025〕丁号)",
+      "trace_evidence": "get_policy_doc获取04_travel_expense.md，确认制度名称",
+      "source": "llm_judge"
     },
     {
-      "id": "training-policy",
-      "score": 25,
-      "reason": "制度和场景均正确，明确指出培训住宿适用培训费管理办法。",
-      "answer_evidence": "培训住宿标准（05_training_expense.md 第五条）仅按「城市档位」单维度设定...",
-      "trace_evidence": "调用 get_policy_doc 获取 05_training_expense.md，内容包含培训住宿标准表。"
+      "id": "travel-dimensions-job-level",
+      "value": 1,
+      "reason": "明确包含员工职级维度",
+      "answer_evidence": "答案：差旅住宿：二维标准体系——同时按员工职级(员工级/经理级/部门负责人级/高管级)和城市档位确定",
+      "trace_evidence": "get_policy_doc返回第三条：住宿标准按员工职级和城市档位确定",
+      "source": "llm_judge"
     },
     {
-      "id": "no-mixing",
-      "score": 25,
-      "reason": "说明了场景互斥（差旅出差 vs 培训期间）和数值差异（如经理级一类城市650 vs 500），两个差异均明确。",
-      "answer_evidence": "差旅住宿标准适用于公务出差期间的住宿...培训住宿标准适用于培训期间住宿...两者适用场景互斥。数值差异显著：以经理级为例，差旅一类城市650元高于培训500元30%。",
-      "trace_evidence": ""
+      "id": "travel-dimensions-city-tier",
+      "value": 1,
+      "reason": "明确包含城市档位维度",
+      "answer_evidence": "答案：差旅住宿：二维标准体系——…城市档位(一类/二类/三类)确定",
+      "trace_evidence": "get_policy_doc返回第三条：城市档位包括一类城市、二类城市和三类城市",
+      "source": "llm_judge"
     },
     {
-      "id": "comparison-evidence",
-      "score": 20,
-      "reason": "两份制度证据完整，答案引用了04_travel_expense.md和05_training_expense.md的具体条款。",
-      "answer_evidence": "citations 包含 doc_id: 04_travel_expense.md (第四条、第七条) 和 05_training_expense.md (第五条、第六条)。",
-      "trace_evidence": "轨迹中成功调用 get_policy_doc 获取 04_travel_expense.md 和 05_training_expense.md 全文。"
+      "id": "training-values-policy",
+      "value": 1,
+      "reason": "正确识别培训住宿适用《XX证券培训费管理办法》",
+      "answer_evidence": "答案首段：培训住宿：适用《XX证券培训费管理办法》(05_training_expense.md, XX证人规〔2025〕戊号)",
+      "trace_evidence": "get_policy_doc获取05_training_expense.md，确认制度名称",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-tier-a",
+      "value": 1,
+      "reason": "一类城市培训住宿标准500元/人/晚，数值单位正确",
+      "answer_evidence": "答案：培训住宿标准(元/人/晚)：一类城市：500元/人/晚",
+      "trace_evidence": "get_policy_doc返回第五条表格：一类城市 500元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-tier-b",
+      "value": 1,
+      "reason": "二类城市培训住宿标准420元/人/晚，数值单位正确",
+      "answer_evidence": "答案：二类城市：420元/人/晚",
+      "trace_evidence": "get_policy_doc返回第五条表格：二类城市 420元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "training-values-tier-c",
+      "value": 1,
+      "reason": "三类城市培训住宿标准350元/人/晚，数值单位正确",
+      "answer_evidence": "答案：三类城市：350元/人/晚",
+      "trace_evidence": "get_policy_doc返回第五条表格：三类城市 350元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-scenario",
+      "value": 1,
+      "reason": "给出了一类城市和经理级职级，场景明确",
+      "answer_evidence": "答案：以一类城市(上海)为例：经理级差旅住宿标准：650元/人/晚",
+      "trace_evidence": "get_policy_excerpt/search_policy确认一类城市，get_employee确认经理级M1",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-travel-value",
+      "value": 1,
+      "reason": "差旅住宿标准与制度表一致，经理级一类城市650元",
+      "answer_evidence": "答案：经理级差旅住宿标准：650元/人/晚",
+      "trace_evidence": "get_policy_doc返回第四条表格：经理级一类城市650元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-training-value",
+      "value": 1,
+      "reason": "培训住宿标准与制度表一致，一类城市500元",
+      "answer_evidence": "答案：培训住宿标准：500元/人/晚",
+      "trace_evidence": "get_policy_doc返回第五条表格：一类城市500元",
+      "source": "llm_judge"
+    },
+    {
+      "id": "numeric-comparison-same-tier",
+      "value": 1,
+      "reason": "比较两侧均使用一类城市，属同一档位",
+      "answer_evidence": "答案均标注一类城市(上海)，数值650与500均为一类",
+      "trace_evidence": "get_policy_excerpt/search_policy及get_expense_detail确认city_tier为A",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-mixing-scenario",
+      "value": 1,
+      "reason": "明确区分培训与差旅场景，指出属于不同费用事项",
+      "answer_evidence": "答案：差旅住宿适用《XX证券差旅费管理办法》，培训住宿适用《XX证券培训费管理办法》；差旅制度第七条：培训期间住宿不适用本办法住宿表，应按培训费管理办法执行",
+      "trace_evidence": "get_policy_doc获取第七条和第六条，明确区分",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-mixing-dimensions",
+      "value": 1,
+      "reason": "指出培训只按城市而差旅还按职级，维度不同",
+      "answer_evidence": "答案：标准维度不同：差旅按职级+城市二维定标，培训仅按城市一维定标",
+      "trace_evidence": "get_policy_doc返回第三条和第五条，确认维度差异",
+      "source": "llm_judge"
+    },
+    {
+      "id": "no-mixing-conclusion",
+      "value": 1,
+      "reason": "明确作出不得混用结论",
+      "answer_evidence": "答案：培训制度第六条明确规定：“培训住宿标准仅适用于培训期间住宿，不得与差旅住宿标准混用”",
+      "trace_evidence": "get_policy_doc返回第六条原文",
+      "source": "llm_judge"
+    },
+    {
+      "id": "comparison-evidence-travel",
+      "value": 1,
+      "reason": "引用差旅费管理办法第三、四、七条，条款完整",
+      "answer_evidence": "citations中包含doc_id:04_travel_expense.md, clause_no:第三条、第四条、第七条",
+      "trace_evidence": "get_policy_doc返回完整政策内容，包含所需条款",
+      "source": "llm_judge"
+    },
+    {
+      "id": "comparison-evidence-training",
+      "value": 1,
+      "reason": "引用培训费管理办法第五、六条，条款完整",
+      "answer_evidence": "citations中包含doc_id:05_training_expense.md, clause_no:第五条、第六条",
+      "trace_evidence": "get_policy_doc返回完整政策内容，包含第五条、第六条",
+      "source": "llm_judge"
     }
   ],
-  "critical_failures": [
-    {
-      "id": "fabricated-record-id",
-      "triggered": false,
-      "reason": "未使用不存在记录或无关记录支撑核心结论。"
-    },
-    {
-      "id": "deprecated-policy-as-current",
-      "triggered": false,
-      "reason": "未使用已废止制度形成当前适用结论。"
-    }
-  ],
-  "overall_comment": "回答完整比较了差旅住宿与培训住宿标准的结构和数值差异，并依据制度条款说明了两者的适用场景互斥和不得混用的规定，证据充分。",
+  "overall_comment": "全部检查项均通过，候选提交正确识别了制度、维度、数值，并给出了明确的数值比较和不能混用的结论，引用了必要的条款。",
   "confidence": 1.0
 }
